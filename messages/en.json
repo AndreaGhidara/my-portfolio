@@ -1,0 +1,44 @@
+{
+  "hero": {
+    "badge": {
+      "status": ["Developer", "Creator"]
+    },
+    "title": {
+      "line1": "From idea to solution,",
+      "line2": "always through",
+      "highlight": "the right code."
+    },
+    "description": "I approach every project with a mix of pragmatism and curiosity. I apply the solutions I know and dive into learning the ones I don't. The goal is simple: to write the best code for the specific problem, ensuring I'm never a blocker to growth, but an accelerator.",
+    "buttons": {
+      "cv": "Download CV",
+      "projects": "Explore Solutions"
+    }
+  },
+  "projects": {
+    "intro": {
+      "eyebrow": "Works",
+      "headingLine1": "My Projects",
+      "paragraph": "I'm a passionate Software Developer with expertise in React, Next.js, & modern web technologies. I specialize in building user-friendly applications that solve real-world problems."
+    },
+    "visitButton": "Visit Project",
+    "imageAlt": "Screenshot of {name}",
+    "list": {
+      "visualboost": {
+        "name": "VisualBoost",
+        "description": "Frontend development for Visual Boost, a platform that delivers high-quality editorial images for the fashion, food, and beauty industries."
+      },
+      "customertrack": {
+        "name": "CustomerTrack",
+        "description": "Developed a white-label solution for tracking customer behavior in physical retail environments for CustomerTrack."
+      },
+      "aidify": {
+        "name": "Aidify",
+        "description": "Ongoing development of Aidify, an AI-powered chatbot designed to handle customer care across multiple e-commerce platforms."
+      },
+      "bdroppy": {
+        "name": "Bdroppy",
+        "description": "Complete migration of BDroppy, a B2B dropshipping platform, from React 14 to Next.js with TypeScript for better performance and maintainability."
+      }
+    }
+  }
+}

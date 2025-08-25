@@ -1,0 +1,48 @@
+{
+  "hero": {
+    "badge": {
+      "status": ["Sviluppatore", "Creatore"]
+    },
+    "title": {
+      "line1": "Dall'idea alla soluzione,",
+      "line2": "passando sempre per",
+      "highlight": "il codice giusto."
+    },
+    "description": "Affronto ogni progetto con un mix di pragmatismo e curiosità. Applico le soluzioni che conosco e mi tuffo a imparare quelle che non conosco. L'obiettivo è uno solo: scrivere il codice migliore per il problema specifico, senza mai essere un ostacolo alla crescita.",
+    "buttons": {
+      "cv": "Download CV",
+      "projects": "Scopri le soluzioni"
+    }
+  },
+  "projects": {
+    "intro": {
+      "eyebrow": "Works",
+      "headingLine1": "My Projects",
+      "paragraph": "I'm a passionate Software Developer with expertise in React, Next.js, & modern web technologies. I specialize in building user-friendly applications that solve real-world problems."
+    },
+    "visitButton": "Visit Project",
+    "imageAlt": "Screenshot of {name}",
+    "list": {
+      "visualboost": {
+        "name": "VisualBoost",
+        "title": "Agenzia di Performance Marketing",
+        "description": "Sviluppo frontend per Visual Boost, una piattaforma che fornisce immagini editoriali di alta qualità per i settori moda, food e beauty."
+      },
+      "customertrack": {
+        "name": "CustomerTrack",
+        "title": "Tracciamento Comportamenti Clienti nel Retail",
+        "description": "Sviluppo di una soluzione white-label per il tracciamento del comportamento dei clienti in ambienti di vendita al dettaglio fisici per CustomerTrack."
+      },
+      "aidify": {
+        "name": "Aidify",
+        "title": "Chatbot AI per l'E-commerce",
+        "description": "Sviluppo continuo di Aidify, un chatbot basato su AI progettato per gestire l'assistenza clienti su più piattaforme di e-commerce."
+      },
+      "bdroppy": {
+        "name": "Bdroppy",
+        "title": "Piattaforma di Dropshipping B2B",
+        "description": "Migrazione completa di BDroppy, una piattaforma di dropshipping B2B, da React 14 a Next.js con TypeScript per migliorare performance e manutenibilità."
+      }
+    }
+  }
+}
