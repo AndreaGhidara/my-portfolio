@@ -52,7 +52,6 @@ export default function Footer() {
             <div className="flex flex-col items-center md:items-start gap-2 text-white text-lg font-normal text-center md:text-left">
               <span>Email: {content.contact.email}</span>
               <span>Phone: {content.contact.phone}</span>
-              {/* L'uso di `whitespace-pre-line` permette di rispettare gli a-capo (\n) nell'indirizzo */}
               <span className="whitespace-pre-line">{content.contact.address}</span>
             </div>
           </div>
