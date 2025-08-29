@@ -34,10 +34,10 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale}>
-      <body className={`${kanit.variable} ${geistMono.variable} antialiased`}>
+    <html lang={locale} className="motion-safe:scroll-smooth motion-reduce:scroll-auto">
+      <body className={`${kanit.variable} ${geistMono.variable} antialiased h-full`}>
         <NextIntlClientProvider>
-          <header>
+          <header className="sticky top-0 z-50">
             <Navbar />
           </header>
           {children}

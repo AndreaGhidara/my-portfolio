@@ -33,7 +33,7 @@ export default function SwitchTheme() {
         checked={dark}
         onChange={darkModeHandler}
         type="checkbox"
-        className="switchTheme"
+        className="switchTheme flex justify-center items-center space-x-2 w-full"
       />
     </>
   );

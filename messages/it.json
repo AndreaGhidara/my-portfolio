@@ -4,45 +4,88 @@
       "status": ["Sviluppatore", "Creatore"]
     },
     "title": {
-      "line1": "Dall'idea alla soluzione,",
-      "line2": "passando sempre per",
-      "highlight": "il codice giusto."
+      "line1": "Dall'idea,",
+      "line2": "alla",
+      "highlight": "soluzione"
     },
-    "description": "Affronto ogni progetto con un mix di pragmatismo e curiosità. Applico le soluzioni che conosco e mi tuffo a imparare quelle che non conosco. L'obiettivo è uno solo: scrivere il codice migliore per il problema specifico, senza mai essere un ostacolo alla crescita.",
+    "description": "Ogni progetto è un'opportunità per creare qualcosa di nuovo e mettersi alla prova. Il mio obiettivo: codice di qualità, performance SEO, accessibilità.",
     "buttons": {
-      "cv": "Download CV",
-      "projects": "Scopri le soluzioni"
+      "cv": "Scarica il CV",
+      "projects": "Scopri i Progetti"
     }
   },
   "projects": {
     "intro": {
-      "eyebrow": "Works",
-      "headingLine1": "My Projects",
-      "paragraph": "I'm a passionate Software Developer with expertise in React, Next.js, & modern web technologies. I specialize in building user-friendly applications that solve real-world problems."
+      "eyebrow": "Portfolio",
+      "headingLine1": "I miei ultimi lavori",
+      "paragraph": "Sono uno sviluppatore web specializzato in React e Next.js. Mi piace risolvere problemi esplorando diverse soluzioni e trovando quella più adatta ad ogni contesto."
     },
-    "visitButton": "Visit Project",
-    "imageAlt": "Screenshot of {name}",
+    "visitButton": "Visita il progetto",
+    "imageAlt": "Screenshot del progetto {name}",
     "list": {
       "visualboost": {
         "name": "VisualBoost",
-        "title": "Agenzia di Performance Marketing",
-        "description": "Sviluppo frontend per Visual Boost, una piattaforma che fornisce immagini editoriali di alta qualità per i settori moda, food e beauty."
+        "title": "Piattaforma di immagini editoriali",
+        "description": "Sviluppo frontend per VisualBoost, una piattaforma che offre immagini editoriali di alta qualità per i settori moda, food e beauty."
       },
       "customertrack": {
         "name": "CustomerTrack",
-        "title": "Tracciamento Comportamenti Clienti nel Retail",
-        "description": "Sviluppo di una soluzione white-label per il tracciamento del comportamento dei clienti in ambienti di vendita al dettaglio fisici per CustomerTrack."
+        "title": "Tracciamento comportamenti in retail",
+        "description": "Realizzazione di una soluzione white-label per monitorare il comportamento dei clienti all’interno di punti vendita fisici."
       },
       "aidify": {
         "name": "Aidify",
-        "title": "Chatbot AI per l'E-commerce",
-        "description": "Sviluppo continuo di Aidify, un chatbot basato su AI progettato per gestire l'assistenza clienti su più piattaforme di e-commerce."
+        "title": "Chatbot AI per customer care",
+        "description": "Sviluppo continuo di Aidify, un chatbot basato su intelligenza artificiale progettato per gestire l’assistenza clienti su diverse piattaforme e-commerce."
       },
       "bdroppy": {
         "name": "Bdroppy",
-        "title": "Piattaforma di Dropshipping B2B",
-        "description": "Migrazione completa di BDroppy, una piattaforma di dropshipping B2B, da React 14 a Next.js con TypeScript per migliorare performance e manutenibilità."
+        "title": "Piattaforma dropshipping B2B",
+        "description": "Migrazione completa di BDroppy, piattaforma di dropshipping B2B, da React 14 a Next.js con TypeScript, migliorando performance e manutenibilità."
       }
+    }
+  },
+  "contact": {
+    "title": "Parliamone!",
+    "subtitle": "Hai un progetto o un’idea di collaborazione? Scrivimi liberamente.",
+    "labels": {
+      "name": "Nome",
+      "email": "La tua email",
+      "message": "Il tuo messaggio"
+    },
+    "placeholders": {
+      "email": "la.tua.email@esempio.com",
+      "message": "Ciao Andrea, ti contatto perché..."
+    },
+    "button": {
+      "default": "Invia messaggio",
+      "sending": "Invio in corso..."
+    },
+    "status": {
+      "success": "Messaggio inviato! Grazie per avermi contattato, ti risponderò al più presto.",
+      "error": "Ops! Qualcosa è andato storto. Se il problema persiste, contattami tramite altri canali."
+    },
+    "errors": {
+      "nameRequired": "Il nome è obbligatorio.",
+      "nameMin": "Il nome deve avere almeno 2 caratteri.",
+      "emailRequired": "L'email è obbligatoria.",
+      "emailInvalid": "L'indirizzo email non è valido.",
+      "messageRequired": "Il messaggio è obbligatorio.",
+      "messageMin": "Il messaggio è troppo corto (min. 10 caratteri)."
+    }
+  },
+  "footer": {
+    "brandName": "Andrea Ghidara",
+    "brandAria": "Vai alla homepage di Andrea Ghidara",
+    "ctaTitle": "Trasformiamo insieme la tua idea.",
+    "ctaSubtitle": "Che tu abbia già una visione chiara o stia esplorando nuove possibilità, sono qui per aiutarti a costruire soluzioni.",
+    "emailTitle": "Email",
+    "phoneTitle": "Telefono",
+    "addressTitle": "Torino",
+    "copyright": "Andrea Ghidara. Tutti i diritti riservati.",
+    "socials": {
+      "linkedinAria": "Visita il mio profilo LinkedIn",
+      "githubAria": "Visita la mia pagina Facebook"
     }
   }
 }

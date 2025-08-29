@@ -1,5 +1,3 @@
-// src/components/Projects.tsx
-
 "use client";
 
 import Image from "next/image";
@@ -7,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Globe } from "@/components/magicui/globe";
+import React from "react";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 50 },
@@ -61,14 +60,24 @@ export default function Projects() {
   ];
 
   const fullProjectsData = projectsData.map(project => ({
-    ...project, // Copia tutti i dati di base (id, tech, link, etc.)
-    name: t(`list.${project.id}.name`), // Aggiunge il nome tradotto
-    description: t(`list.${project.id}.description`), // Aggiunge la descrizione tradotta
+    ...project,
+    name: t(`list.${project.id}.name`),
+    description: t(`list.${project.id}.description`),
   }));
 
 
   return (
-    <div className="bg-slate-300 dark:bg-[#1a1d20]">
+    <section id={"projects"} className="relative dark:bg-[#1a1d20]">
+      <div
+        className="absolute inset-0 z-0 opacity-[0.04] dark:opacity-[0.03]"
+        style={{
+          backgroundImage:
+            "linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+          color: "currentColor",
+        }}
+        aria-hidden="true"
+      />
       <div className="relative container mx-auto flex justify-center items-center lg:grid lg:grid-cols-2 ">
         <div className="hidden lg:flex w-full h-full justify-center items-center translate-y-10">
           <Globe className={"w-50 h-50"} />
@@ -83,7 +92,7 @@ export default function Projects() {
 
           <div className="text-center md:text-left max-w-xl">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-slate-900 dark:text-white">
-              {t('intro.headingLine1')}{/* <br /> {content.headingLine2}*/}
+              {t('intro.headingLine1')}
             </h2>
 
             <p className="text-slate-600 dark:text-slate-400 mb-8 text-base leading-relaxed">
@@ -193,6 +202,6 @@ export default function Projects() {
           </ul>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

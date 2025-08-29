@@ -32,7 +32,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="bg-slate-200 dark:bg-zinc-900">
+    <section className="bg-white dark:bg-zinc-900">
       <BackgroundWrapper>
         <div className="text-zinc-800 dark:text-gray-200 overflow-x-hidden">
           <section className="container mx-auto px-6 py-14 md:py-32">

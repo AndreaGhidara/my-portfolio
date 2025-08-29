@@ -4,41 +4,88 @@
       "status": ["Developer", "Creator"]
     },
     "title": {
-      "line1": "From idea to solution,",
-      "line2": "always through",
-      "highlight": "the right code."
+      "line1": "From idea,",
+      "line2": "to",
+      "highlight": "solution"
     },
-    "description": "I approach every project with a mix of pragmatism and curiosity. I apply the solutions I know and dive into learning the ones I don't. The goal is simple: to write the best code for the specific problem, ensuring I'm never a blocker to growth, but an accelerator.",
+    "description": "Every project is an opportunity to create something new and challenge myself. My goal: quality code, SEO performance, accessibility.",
     "buttons": {
       "cv": "Download CV",
-      "projects": "Explore Solutions"
+      "projects": "Explore Projects"
     }
   },
   "projects": {
     "intro": {
-      "eyebrow": "Works",
-      "headingLine1": "My Projects",
-      "paragraph": "I'm a passionate Software Developer with expertise in React, Next.js, & modern web technologies. I specialize in building user-friendly applications that solve real-world problems."
+      "eyebrow": "Portfolio",
+      "headingLine1": "My Latest Work",
+      "paragraph": "I am a web developer specialized in React and Next.js. I enjoy solving problems by exploring different approaches and finding the most suitable solution for each context."
     },
     "visitButton": "Visit Project",
-    "imageAlt": "Screenshot of {name}",
+    "imageAlt": "Screenshot of the project {name}",
     "list": {
       "visualboost": {
         "name": "VisualBoost",
-        "description": "Frontend development for Visual Boost, a platform that delivers high-quality editorial images for the fashion, food, and beauty industries."
+        "title": "Editorial Image Platform",
+        "description": "Frontend development for VisualBoost, a platform providing high-quality editorial images for the fashion, food, and beauty industries."
       },
       "customertrack": {
         "name": "CustomerTrack",
-        "description": "Developed a white-label solution for tracking customer behavior in physical retail environments for CustomerTrack."
+        "title": "Retail Behavior Tracking Solution",
+        "description": "Development of a white-label solution for tracking customer behavior in physical retail environments."
       },
       "aidify": {
         "name": "Aidify",
-        "description": "Ongoing development of Aidify, an AI-powered chatbot designed to handle customer care across multiple e-commerce platforms."
+        "title": "AI Chatbot for Customer Care",
+        "description": "Ongoing development of Aidify, an AI-powered chatbot designed to handle customer support across multiple e-commerce platforms."
       },
       "bdroppy": {
         "name": "Bdroppy",
-        "description": "Complete migration of BDroppy, a B2B dropshipping platform, from React 14 to Next.js with TypeScript for better performance and maintainability."
+        "title": "B2B Dropshipping Platform",
+        "description": "Full migration of BDroppy, a B2B dropshipping platform, from React 14 to Next.js with TypeScript, improving performance and maintainability."
       }
+    }
+  },
+  "contact": {
+    "title": "Let’s talk!",
+    "subtitle": "Do you have a project or a collaboration idea? Feel free to reach out.",
+    "labels": {
+      "name": "Name",
+      "email": "Your Email",
+      "message": "Your Message"
+    },
+    "placeholders": {
+      "email": "your.email@example.com",
+      "message": "Hi Andrea, I’m reaching out because..."
+    },
+    "button": {
+      "default": "Send Message",
+      "sending": "Sending..."
+    },
+    "status": {
+      "success": "Message sent! Thank you for getting in touch, I’ll reply as soon as possible.",
+      "error": "Oops! Something went wrong. If the problem persists, feel free to contact me through other channels."
+    },
+    "errors": {
+      "nameRequired": "Name is required.",
+      "nameMin": "Name must be at least 2 characters.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Please enter a valid email address.",
+      "messageRequired": "Message is required.",
+      "messageMin": "Your message is too short (min. 10 characters)."
+    }
+  },
+  "footer": {
+    "brandName": "Andrea Ghidara",
+    "brandAria": "Go to Andrea Ghidara homepage",
+    "ctaTitle": "Let’s build your next idea together.",
+    "ctaSubtitle": "Whether you already have a clear vision or are exploring new possibilities, I’m here to help you create solutions.",
+    "emailTitle": "Email",
+    "phoneTitle": "Phone",
+    "addressTitle": "Turin",
+    "copyright": "Andrea Ghidara. All rights reserved.",
+    "socials": {
+      "linkedinAria": "Visit my LinkedIn profile",
+      "githubAria": "Visit my Facebook page"
     }
   }
 }
