@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AndrewDev-Portfolio",
-  description: "Look my portfolio",
+  title: "Andrea Ghidara Portfolio",
+  description: "Andrea Ghidara - Portfolio",
 };
 
 export default async function RootLayout({
@@ -28,14 +28,19 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
-  const {locale} = await params;
+  const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
 
   return (
-    <html lang={locale} className="motion-safe:scroll-smooth motion-reduce:scroll-auto">
-      <body className={`${kanit.variable} ${geistMono.variable} antialiased h-full`}>
+    <html
+      lang={locale}
+      className="motion-safe:scroll-smooth motion-reduce:scroll-auto"
+    >
+      <body
+        className={`${kanit.variable} ${geistMono.variable} antialiased h-full`}
+      >
         <NextIntlClientProvider>
           <header className="sticky top-0 z-50">
             <Navbar />
