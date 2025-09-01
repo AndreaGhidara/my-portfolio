@@ -72,10 +72,16 @@ export default function Hero() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
-                  <button className="cursor-pointer px-6 py-3 bg-zinc-900 text-white rounded-lg font-bold hover:bg-zinc-700 dark:bg-gray-50 dark:text-black dark:hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2">
+                  <a
+                    href="/cv/Andrea-Ghidara-CV.pdf"
+                    download
+                    className="cursor-pointer px-6 py-3 bg-zinc-900 text-white rounded-lg font-bold hover:bg-zinc-700 dark:bg-gray-50 dark:text-black dark:hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2"
+                    aria-label="Download CV"
+                  >
+                    {" "}
                     <Download size={18} />
                     {heroContent.buttons.cv}
-                  </button>
+                  </a>
                   <Link
                     href={"#projects"}
                     className="cursor-pointer px-6 py-3 border border-zinc-400 text-zinc-800 hover:bg-zinc-100/50 dark:text-white dark:border-zinc-700 dark:bg-zinc-800/50 dark:hover:border-zinc-500 rounded-lg font-medium transition-all duration-300 gap-2 flex items-center justify-center"
