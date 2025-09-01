@@ -96,14 +96,14 @@ export default function ContactMe() {
   return (
     <section id={"contact"} className="flex min-h-screen w-full items-center justify-center p-4 md:p-8">
       <motion.div
-        className="grid w-full max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-2"
+        className="grid w-full max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-1"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
         <motion.div
-          className="flex flex-col justify-center text-center lg:text-left"
+          className="flex flex-col justify-center text-center lg:text-center"
           variants={itemVariants}
         >
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
@@ -114,9 +114,8 @@ export default function ContactMe() {
           </p>
         </motion.div>
 
-        {/* COLONNA DESTRA: Form Card animato */}
-        <motion.div variants={itemVariants}>
-          <Card className="relative w-full overflow-hidden">
+        <motion.div className="flex justify-center" variants={itemVariants}>
+          <Card className="relative w-full overflow-hidden max-w-2xl">
             <form onSubmit={handleSubmit(processForm)}>
               <CardHeader>
                 <CardTitle hidden></CardTitle>
