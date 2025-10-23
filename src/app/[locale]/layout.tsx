@@ -27,7 +27,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  // canonical su /it (default), alternates per le altre lingue se esistono
   const langPrefix = locale === DEFAULT_LOCALE ? "/it" : `/${locale}`;
   const canonical = `${SITE_URL}${langPrefix}`;
   const languages = Object.fromEntries(

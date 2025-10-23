@@ -1,8 +1,8 @@
-import Hero from "@/components/organisms/Hero";
-import Projects from "@/components/organisms/Projects";
 import ContactMe from "@/components/organisms/ContactMe";
-import Footer from "@/components/organisms/Footer";
 import ReactLenis from "lenis/react";
+import Index from "@/components/organisms/Hero";
+import Projects from "@/components/organisms/Projects";
+import Footer from "@/components/organisms/Footer";
 
 export default function Home() {
   return (
@@ -15,7 +15,7 @@ export default function Home() {
         }}
       >
         <div>
-          <Hero />
+          <Index />
           <Projects />
           <ContactMe />
           <Footer />
