@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Mail, Phone, MapPin } from "lucide-react";
 
 const contactData = {
-  email: "andrea.ghidara.99@gmail.com",
+  email: "ghidara.andrea.99@gmail.com",
   phone: "351 335 0725",
   address: "Torino",
   linkedin: "https://it.linkedin.com/in/andrea-ghidara",

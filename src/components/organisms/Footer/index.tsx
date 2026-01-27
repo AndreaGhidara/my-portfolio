@@ -1,9 +1,8 @@
-
 import { getTranslations } from "next-intl/server";
 import FooterClient from "./FooterClient";
 
 const contactData = {
-  email: "andrea.ghidara.99@gmail.com",
+  email: "ghidara.andrea.99@gmail.com",
   phone: "351 335 0725",
   address: "Torino",
   linkedin: "https://it.linkedin.com/in/andrea-ghidara",

@@ -33,9 +33,9 @@ export async function generateMetadata({
     routing.locales.map((l) => [l, l === DEFAULT_LOCALE ? "/it" : `/${l}`]),
   );
 
-  const title = "Andrea Ghidara | Portfolio";
+  const title = "Andrea Ghidara";
   const description =
-    "Portfolio di Andrea Ghidara: progetti, competenze e contatti. Sviluppo web e UI/UX.";
+    "Andrea Ghidara: progetti, competenze e contatti. Sviluppo web e UI/UX.";
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -43,7 +43,7 @@ export async function generateMetadata({
     description,
     alternates: {
       canonical,
-      languages, // genera hreflang
+      languages,
     },
     openGraph: {
       type: "website",
@@ -53,7 +53,7 @@ export async function generateMetadata({
       description,
       images: [
         {
-          url: "/og/og-image.jpg", // metti un 1200x630 in /public/og/og-image.jpg
+          url: "/og/og-image.jpg",
           width: 1200,
           height: 630,
           alt: "Andrea Ghidara - Portfolio",
@@ -79,9 +79,7 @@ export async function generateMetadata({
       },
     },
     icons: {
-      icon: [
-        { url: "/favicon.ico" },
-      ],
+      icon: [{ url: "/favicon.ico" }],
       apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
       other: [{ rel: "mask-icon", url: "/icons/safari-pinned-tab.svg" }],
     },
