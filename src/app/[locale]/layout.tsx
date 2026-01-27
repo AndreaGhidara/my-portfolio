@@ -41,6 +41,9 @@ export async function generateMetadata({
     metadataBase: new URL(SITE_URL),
     title: { default: title, template: "%s | Andrea Ghidara" },
     description,
+    verification: {
+      google: "aLDY6MBOIPRgcr_V5661w19BPjzQ1r4TNxsARSMlpbc",
+    },
     alternates: {
       canonical,
       languages,

@@ -1,20 +1,23 @@
-import type { MetadataRoute } from "next";
+import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://a-ghidara-dev.vercel.app";
+  const baseUrl = "https://a-ghidara-dev.vercel.app";
+  const locales = ["it", "en"];
+
+  const routes = locales.map((locale) => ({
+    url: `${baseUrl}/${locale}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 1,
+  }));
 
   return [
     {
-      url: `${base}/it`,
+      url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 1
+      changeFrequency: "monthly" as const,
+      priority: 1,
     },
-    {
-      url: `${base}/en`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 1
-    },
+    ...routes,
   ];
 }
