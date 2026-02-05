@@ -36,7 +36,7 @@ export default function HeroClient({ content }: HeroClientProps) {
 
       <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
         <a
-          href="/cv/Andrea-Ghidara-CV.pdf"
+          href="/cv/Andrea-Ghidara-CV-2026.pdf"
           download
           className="cursor-pointer px-6 py-3 bg-zinc-900 text-white rounded-lg font-bold hover:bg-zinc-700 dark:bg-gray-50 dark:text-black dark:hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2"
           aria-label="Download CV"
