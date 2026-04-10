@@ -41,7 +41,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
   return (
     <li
       className={`relative w-full flex flex-col lg:items-center ${
-        index % 2 !== 0 ? 'lg:flex-row-reverse' : 'lg:flex-row'
+        index % 2 !== 0 ? "lg:flex-row-reverse" : "lg:flex-row"
       }`}
     >
       <motion.div
@@ -57,10 +57,15 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
             <div className="bg-yellow-500 w-3 h-3 rounded-full"></div>
             <div className="bg-green-500 w-3 h-3 rounded-full"></div>
           </div>
-          <Link href={project.link} target="_blank" rel="noopener noreferrer" className="block overflow-hidden group">
+          <Link
+            href={project.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block overflow-hidden group"
+          >
             <Image
               src={project.image}
-              alt={t('imageAlt', { name: project.name })}
+              alt={t("imageAlt", { name: project.name })}
               width={1216}
               height={640}
               className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
@@ -77,14 +82,16 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
 
       <motion.div
         className={`w-full lg:w-5/12 mt-6 lg:mt-0 ${
-          index % 2 !== 0 ? 'lg:text-right' : 'lg:text-left'
+          index % 2 !== 0 ? "lg:text-right" : "lg:text-left"
         }`}
         variants={cardVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
       >
-        <p className={`mb-3 text-sm font-semibold uppercase tracking-wider ${project.techColor}`}>
+        <p
+          className={`mb-3 text-sm font-semibold uppercase tracking-wider ${project.techColor}`}
+        >
           {project.tech.join(" · ")}
         </p>
         <h3 className="mb-3 text-2xl lg:text-3xl text-slate-900 dark:text-slate-100 font-bold">
@@ -95,14 +102,24 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         </div>
         <Link
           className={`group inline-flex items-center h-11 rounded-full text-sm font-semibold whitespace-nowrap px-6 focus:outline-none focus:ring-2 mt-8 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 focus:ring-slate-500 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 dark:hover:text-white dark:focus:ring-slate-500 transition-all ${
-            index % 2 !== 0 ? 'lg:mr-auto' : 'lg:ml-auto'
+            index % 2 !== 0 ? "lg:mr-auto" : "lg:ml-auto"
           }`}
           href={project.link}
           target="_blank"
           rel="noopener noreferrer"
         >
-          Visit Project
-          <svg className="overflow-visible ml-3 text-slate-400 group-hover:text-slate-500 dark:text-slate-500 dark:group-hover:text-slate-400 group-hover:translate-x-1 transition-transform" width="3" height="6" viewBox="0 0 3 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {t("visitButton")}
+          <svg
+            className="overflow-visible ml-3 text-slate-400 group-hover:text-slate-500 dark:text-slate-500 dark:group-hover:text-slate-400 group-hover:translate-x-1 transition-transform"
+            width="3"
+            height="6"
+            viewBox="0 0 3 6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M0 0L3 3L0 6"></path>
           </svg>
         </Link>

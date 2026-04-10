@@ -20,7 +20,7 @@
       "headingLine1": "I miei ultimi lavori",
       "paragraph": "Sono uno sviluppatore web specializzato in React e Next.js. Mi piace risolvere problemi esplorando diverse soluzioni e trovando quella più adatta ad ogni contesto."
     },
-    "visitButton": "Visita il progetto",
+    "visitButton": "Visita il sito",
     "imageAlt": "Screenshot del progetto {name}",
     "list": {
       "visualboost": {
@@ -81,7 +81,7 @@
     "ctaSubtitle": "Che tu abbia già una visione chiara o stia esplorando nuove possibilità, sono qui per aiutarti a costruire soluzioni.",
     "emailTitle": "Email",
     "phoneTitle": "Telefono",
-    "addressTitle": "Torino",
+    "addressTitle": "Base di lavoro",
     "copyright": "Andrea Ghidara. Tutti i diritti riservati.",
     "socials": {
       "linkedinAria": "Visita il mio profilo LinkedIn",
