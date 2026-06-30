@@ -37,14 +37,6 @@ export default function AboutMe() {
 
       {/* Sezione Testo con layout corretto */}
       <div className="w-full lg:w-1/2 flex items-start justify-center md:justify-start gap-8">
-        {/* Elemento Decorativo Verticale (visibile solo su schermi md e superiori) */}
-        <div className="hidden md:flex flex-col items-center gap-4 pt-1">
-          <p className="text-sm tracking-[0.2em] uppercase [writing-mode:vertical-rl] text-slate-500 dark:text-slate-400">
-            {content.eyebrow}
-          </p>
-          <div className="w-[2px] h-24 bg-slate-300 dark:bg-slate-700 mt-2"></div>
-        </div>
-
         {/* Blocco di Contenuto Principale */}
         <div className="text-center md:text-left max-w-xl">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-slate-900 dark:text-white">
