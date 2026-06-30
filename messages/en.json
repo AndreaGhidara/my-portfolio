@@ -1,24 +1,44 @@
 {
   "hero": {
     "badge": {
-      "status": ["Developer", "Creator"]
+      "status": ["Freelancer", "Partner"]
     },
     "title": {
       "line1": "From idea,",
       "line2": "to",
       "highlight": "solution"
     },
-    "description": "Every project is an opportunity to create something new and challenge myself. My goal: quality code, SEO performance, accessibility.",
+    "description": "I turn your idea into a digital presence that attracts clients, performs on every device, and ranks on search engines.",
     "buttons": {
-      "cv": "Download CV",
+      "cv": "Let's talk about your project",
       "projects": "Explore Projects"
+    }
+  },
+  "services": {
+    "eyebrow": "What I do",
+    "heading": "My Services",
+    "subheading": "Tailored solutions for your business, from design to launch.",
+    "cta": "Let's talk about your project",
+    "list": {
+      "webdev": {
+        "title": "Web Development",
+        "description": "I design and build your online presence from the ground up — from visual identity to launch. Fast, accessible, and optimized to rank on search engines."
+      },
+      "uiux": {
+        "title": "Process Automation",
+        "description": "I turn manual, repetitive workflows into automated systems — reducing errors, operational time, and costs so your team can focus on what truly matters."
+      },
+      "consulting": {
+        "title": "Consulting & Migration",
+        "description": "I audit your existing project, identify bottlenecks, and modernize legacy code into architectures that are faster, more stable, and easier to maintain long-term."
+      }
     }
   },
   "projects": {
     "intro": {
-      "eyebrow": "Portfolio",
+      "eyebrow": "Recent Work",
       "headingLine1": "My Latest Work",
-      "paragraph": "I am a web developer specialized in React and Next.js. I enjoy solving problems by exploring different approaches and finding the most suitable solution for each context."
+      "paragraph": "I've helped companies in fashion, e-commerce, and SaaS build scalable web products. Every project started from a real problem and ended with a measurable solution."
     },
     "visitButton": "Visit Project",
     "imageAlt": "Screenshot of the project {name}",
@@ -26,27 +46,22 @@
       "visualboost": {
         "name": "VisualBoost",
         "title": "Editorial Image Platform",
-        "description": "Frontend development for VisualBoost, a platform providing high-quality editorial images for the fashion, food, and beauty industries."
-      },
-      "customertrack": {
-        "name": "CustomerTrack",
-        "title": "Retail Behavior Tracking Solution",
-        "description": "Development of a white-label solution for tracking customer behavior in physical retail environments."
+        "description": "Automated the lead capture and job request process, replacing manual workflows with an integrated digital system. Less time on operational tasks, more visibility over business opportunities."
       },
       "aidify": {
         "name": "Aidify",
         "title": "AI Chatbot for Customer Care",
-        "description": "Ongoing development of Aidify, an AI-powered chatbot designed to handle customer support across multiple e-commerce platforms."
+        "description": "Integration of an AI chatbot within e-commerce shops to automatically handle common customer questions, reduce response times, and lighten the workload of the support team."
       },
       "bdroppy": {
         "name": "Bdroppy",
         "title": "B2B Dropshipping Platform",
-        "description": "Full migration of BDroppy, a B2B dropshipping platform, from React 14 to Next.js with TypeScript, improving performance and maintainability."
+        "description": "Full migration from a legacy React codebase to Next.js with TypeScript, significantly improving load times, code maintainability, and overall platform scalability."
       }
     }
   },
   "contact": {
-    "title": "Let’s talk!",
+    "title": "Let's talk!",
     "subtitle": "Do you have a project or a collaboration idea? Feel free to reach out.",
     "labels": {
       "name": "Name",
@@ -55,14 +70,14 @@
     },
     "placeholders": {
       "email": "your.email@example.com",
-      "message": "Hi Andrea, I’m reaching out because..."
+      "message": "Hi Andrea, I'm reaching out because..."
     },
     "button": {
       "default": "Send Message",
       "sending": "Sending..."
     },
     "status": {
-      "success": "Message sent! Thank you for getting in touch, I’ll reply as soon as possible.",
+      "success": "Message sent! Thank you for getting in touch, I'll reply as soon as possible.",
       "error": "Oops! Something went wrong. If the problem persists, feel free to contact me through other channels."
     },
     "errors": {
@@ -77,8 +92,8 @@
   "footer": {
     "brandName": "Andrea Ghidara",
     "brandAria": "Go to Andrea Ghidara homepage",
-    "ctaTitle": "Let’s build your next idea together.",
-    "ctaSubtitle": "Whether you already have a clear vision or are exploring new possibilities, I’m here to help you create solutions.",
+    "ctaTitle": "Let's build your next idea together.",
+    "ctaSubtitle": "Whether you already have a clear vision or are exploring new possibilities, I'm here to help you create solutions.",
     "emailTitle": "Email",
     "phoneTitle": "Phone",
     "addressTitle": "Working base",

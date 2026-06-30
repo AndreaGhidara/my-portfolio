@@ -1,24 +1,44 @@
 {
   "hero": {
     "badge": {
-      "status": ["Sviluppatore", "Creatore"]
+      "status": ["Freelancer", "Partner"]
     },
     "title": {
       "line1": "Dall'idea,",
       "line2": "alla",
       "highlight": "soluzione"
     },
-    "description": "Ogni progetto è un'opportunità per creare qualcosa di nuovo e mettersi alla prova. Il mio obiettivo: codice di qualità, performance SEO, accessibilità.",
+    "description": "Trasformo la tua idea in una presenza digitale che attrae clienti, funziona su ogni dispositivo e ti posiziona sui motori di ricerca.",
     "buttons": {
-      "cv": "Scarica il CV",
+      "cv": "Parliamo del tuo progetto",
       "projects": "Scopri i Progetti"
+    }
+  },
+  "services": {
+    "eyebrow": "Cosa faccio",
+    "heading": "I miei servizi",
+    "subheading": "Soluzioni su misura per il tuo business, dalla progettazione al rilascio.",
+    "cta": "Parliamo del tuo progetto",
+    "list": {
+      "webdev": {
+        "title": "Sviluppo Web",
+        "description": "Progetto e sviluppo la tua presenza online curandola in ogni dettaglio: dall'identità visiva alla messa in produzione. Il risultato è un sito veloce, accessibile e ottimizzato per apparire nelle ricerche."
+      },
+      "uiux": {
+        "title": "Automazione dei Processi",
+        "description": "Trasformo flussi manuali e ripetitivi in sistemi automatizzati, riducendo errori, tempi operativi e costi — così il tuo team può concentrarsi su ciò che conta davvero."
+      },
+      "consulting": {
+        "title": "Consulenza & Migrazione",
+        "description": "Analizzo il tuo progetto esistente, identifico i colli di bottiglia e aggiorno il codice legacy verso architetture moderne — più veloci, più stabili e più facili da mantenere nel tempo."
+      }
     }
   },
   "projects": {
     "intro": {
-      "eyebrow": "Portfolio",
+      "eyebrow": "Lavori recenti",
       "headingLine1": "I miei ultimi lavori",
-      "paragraph": "Sono uno sviluppatore web specializzato in React e Next.js. Mi piace risolvere problemi esplorando diverse soluzioni e trovando quella più adatta ad ogni contesto."
+      "paragraph": "Ho aiutato aziende nel settore moda, e-commerce e SaaS a costruire prodotti web scalabili. Ogni progetto è partito da un problema reale e si è concluso con una soluzione misurabile."
     },
     "visitButton": "Visita il sito",
     "imageAlt": "Screenshot del progetto {name}",
@@ -26,28 +46,23 @@
       "visualboost": {
         "name": "VisualBoost",
         "title": "Piattaforma di immagini editoriali",
-        "description": "Sviluppo frontend per VisualBoost, una piattaforma che offre immagini editoriali di alta qualità per i settori moda, food e beauty."
-      },
-      "customertrack": {
-        "name": "CustomerTrack",
-        "title": "Tracciamento comportamenti in retail",
-        "description": "Realizzazione di una soluzione white-label per monitorare il comportamento dei clienti all’interno di punti vendita fisici."
+        "description": "Automatizzazione del processo di raccolta e gestione dei lead, sostituendo flussi manuali con un sistema digitale integrato. Meno tempo su attività operative, più controllo sulle opportunità di business."
       },
       "aidify": {
         "name": "Aidify",
         "title": "Chatbot AI per customer care",
-        "description": "Sviluppo continuo di Aidify, un chatbot basato su intelligenza artificiale progettato per gestire l’assistenza clienti su diverse piattaforme e-commerce."
+        "description": "Integrazione di un chatbot AI negli shop e-commerce per rispondere automaticamente alle domande frequenti, ridurre i tempi di attesa e alleggerire il carico del team di supporto."
       },
       "bdroppy": {
         "name": "Bdroppy",
         "title": "Piattaforma dropshipping B2B",
-        "description": "Migrazione completa di BDroppy, piattaforma di dropshipping B2B, da React 14 a Next.js con TypeScript, migliorando performance e manutenibilità."
+        "description": "Migrazione dell'intera codebase da un'architettura React legacy a Next.js con TypeScript, migliorando sensibilmente i tempi di caricamento, la manutenibilità del codice e la scalabilità della piattaforma."
       }
     }
   },
   "contact": {
     "title": "Parliamone!",
-    "subtitle": "Hai un progetto o un’idea di collaborazione? Scrivimi liberamente.",
+    "subtitle": "Hai un progetto o un'idea di collaborazione? Scrivimi liberamente.",
     "labels": {
       "name": "Nome",
       "email": "La tua email",

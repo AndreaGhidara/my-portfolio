@@ -1,0 +1,16 @@
+{
+  "name": "Andrea Ghidara",
+  "short_name": "A.Ghidara",
+  "description": "Portfolio di Andrea Ghidara — Sviluppatore Web Freelance",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

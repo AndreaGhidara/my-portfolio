@@ -68,6 +68,8 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
               alt={t("imageAlt", { name: project.name })}
               width={1216}
               height={640}
+              sizes="(max-width: 1024px) 100vw, 42vw"
+              priority={index === 0}
               className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
             />
           </Link>

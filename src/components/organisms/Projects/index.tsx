@@ -16,14 +16,6 @@ export default async function Projects() {
       image: "/images/screenshot/visualboost_screenshot.png",
     },
     {
-      id: "customertrack",
-      tech: ["NextJS", "Typescript", "SEO", "Analytics"],
-      techColor: "text-cyan-500 dark:text-cyan-400",
-      year: 2025,
-      link: "https://customertrack.io",
-      image: "/images/screenshot/customertrack_screenshot.png",
-    },
-    {
       id: "aidify",
       tech: ["NextJS", "Typescript", "GraphQL", "Supabase", "AI Chatbot", "SEO", "Analytics"],
       techColor: "text-cyan-500 dark:text-cyan-400",

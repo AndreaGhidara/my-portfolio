@@ -55,7 +55,7 @@ export default function FooterClient({ translations: t, contactData, currentYear
 
   return (
     <motion.footer
-      className="relative w-full bg-white text-slate-700 dark:bg-[#121212] dark:text-gray-300 overflow-hidden"
+      className="relative w-full bg-slate-50 text-slate-700 dark:bg-[#121212] dark:text-gray-300 overflow-hidden"
       variants={footerContainerVariants}
       initial="hidden"
       whileInView="visible"
@@ -72,7 +72,7 @@ export default function FooterClient({ translations: t, contactData, currentYear
         aria-hidden="true"
       />
 
-      <div className="relative z-10 container mx-auto px-6 sm:px-8 py-16">
+      <div className="relative z-10 container mx-auto px-6 sm:px-8 py-16 lg:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Brand + CTA */}
           <motion.div
