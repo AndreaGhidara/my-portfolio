@@ -29,7 +29,7 @@ export default async function ContactMe() {
   );
 
   return (
-    <section id="contact" className="flex min-h-screen w-full items-center justify-center p-4 md:p-8">
+    <section id="contact" className="flex min-h-screen w-full items-center justify-center px-6 py-16 lg:py-24 bg-slate-50 dark:bg-[#1a1d20]">
       <ContactAnimator
         staticContent={staticContent}
         formComponent={<ContactForm translations={contactFormTranslations} />}

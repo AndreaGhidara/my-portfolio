@@ -17,14 +17,6 @@ export const projectsData = [
     image: "/Screenshot 2025-07-21 at 16.46.37.png",
   },
   {
-    id: "customertrack",
-    tech: ["NextJS", "Typescript", "SEO", "Analytics"],
-    techColor: "text-cyan-500 dark:text-cyan-400",
-    year: 2025,
-    link: "https://customertrack.io",
-    image: "/Screenshot 2025-07-21 at 16.46.37.png",
-  },
-  {
     id: "aidify",
     tech: ["NextJS", "Typescript", "GraphQL", "Supabase", "AI Chatbot", "SEO", "Analytics"],
     techColor: "text-cyan-500 dark:text-cyan-400",

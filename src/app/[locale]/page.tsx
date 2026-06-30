@@ -3,6 +3,7 @@ import ReactLenis from "lenis/react";
 import Index from "@/components/organisms/Hero";
 import Projects from "@/components/organisms/Projects";
 import Footer from "@/components/organisms/Footer";
+import Services from "@/components/organisms/Services";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
       >
         <div>
           <Index />
+          <Services />
           <Projects />
           <ContactMe />
           <Footer />

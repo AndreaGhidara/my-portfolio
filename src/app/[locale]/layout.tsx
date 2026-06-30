@@ -54,21 +54,12 @@ export async function generateMetadata({
       siteName: "Andrea Ghidara",
       title,
       description,
-      images: [
-        {
-          url: "/og/og-image.jpg",
-          width: 1200,
-          height: 630,
-          alt: "Andrea Ghidara - Portfolio",
-        },
-      ],
       locale,
     },
     twitter: {
-      card: "summary_large_image",
+      card: "summary",
       title,
       description,
-      images: ["/og/og-image.jpg"],
     },
     robots: {
       index: true,
@@ -83,8 +74,6 @@ export async function generateMetadata({
     },
     icons: {
       icon: [{ url: "/favicon.ico" }],
-      apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
-      other: [{ rel: "mask-icon", url: "/icons/safari-pinned-tab.svg" }],
     },
     manifest: "/site.webmanifest",
   };
@@ -129,6 +118,7 @@ export default async function RootLayout({
     >
       <body
         className={`${kanit.variable} ${geistMono.variable} antialiased h-full`}
+        suppressHydrationWarning
       >
         <Script
           id="ld-person"

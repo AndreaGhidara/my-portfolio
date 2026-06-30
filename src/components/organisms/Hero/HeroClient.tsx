@@ -1,7 +1,7 @@
 "use client";
 
 import { WordRotate } from "@/components/magicui/word-rotate";
-import { FileJson, Download } from "lucide-react";
+import { FileJson, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import {
   AnimatedSpan,
@@ -35,15 +35,13 @@ export default function HeroClient({ content }: HeroClientProps) {
       </div>
 
       <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
-        <a
-          href="/cv/Andrea_Ghidara_cv_2026.pdf"
-          download
+        <Link
+          href="#contact"
           className="cursor-pointer px-6 py-3 bg-zinc-900 text-white rounded-lg font-bold hover:bg-zinc-700 dark:bg-gray-50 dark:text-black dark:hover:bg-gray-200 transition-all duration-300 flex items-center justify-center gap-2"
-          aria-label="Download CV"
         >
-          <Download size={18} />
+          <ArrowRight size={18} />
           {content.buttons.cv}
-        </a>
+        </Link>
         <Link
           href={"#projects"}
           className="cursor-pointer px-6 py-3 border border-zinc-400 text-zinc-800 hover:bg-zinc-100/50 dark:text-white dark:border-zinc-700 dark:bg-zinc-800/50 dark:hover:border-zinc-500 rounded-lg font-medium transition-all duration-300 gap-2 flex items-center justify-center"
@@ -58,46 +56,28 @@ export default function HeroClient({ content }: HeroClientProps) {
 
 export function TerminalAnimation() {
   return (
-    <Terminal className="w-[300px] sm:w-[500px] md:w-full">
-      <TypingAnimation>npm install @dev-andre</TypingAnimation>
-      <AnimatedSpan delay={1500} className="text-yellow-400">
-        <span>ℹ Installing Core dependencies...</span>
-      </AnimatedSpan>
-      <AnimatedSpan delay={1900} className="text-green-400">
-        <span>✔ Installed React</span>
-      </AnimatedSpan>
+    <Terminal className="w-full">
+      <TypingAnimation>create-project your-website</TypingAnimation>
       <AnimatedSpan delay={2200} className="text-green-400">
-        <span>✔ Installed Next.js</span>
+        <span>✔ Setting up project structure</span>
       </AnimatedSpan>
-      <AnimatedSpan delay={2500} className="text-green-400">
-        <span>✔ Installed TypeScript</span>
-      </AnimatedSpan>
-      <AnimatedSpan delay={2900} className="text-yellow-400">
-        <span>ℹ Installing Styling packages...</span>
-      </AnimatedSpan>
-      <AnimatedSpan delay={3300} className="text-green-400">
-        <span>✔ Installed Tailwind CSS</span>
+      <AnimatedSpan delay={2900} className="text-green-400">
+        <span>✔ Configuring SEO, GEO &amp; performance</span>
       </AnimatedSpan>
       <AnimatedSpan delay={3600} className="text-green-400">
-        <span>✔ Installed Shadcn/UI</span>
+        <span>✔ Building responsive design</span>
       </AnimatedSpan>
-      <AnimatedSpan delay={4000} className="text-yellow-400">
-        <span>ℹ Installing Data handling packages...</span>
+      <AnimatedSpan delay={4300} className="text-green-400">
+        <span>✔ Optimizing load speed</span>
       </AnimatedSpan>
-      <AnimatedSpan delay={4400} className="text-green-400">
-        <span>✔ Installed GraphQL</span>
+      <AnimatedSpan delay={5000} className="text-green-400">
+        <span>✔ Deploying to production</span>
       </AnimatedSpan>
-      <AnimatedSpan delay={4700} className="text-green-400">
-        <span>✔ Installed REST APIs</span>
+      <AnimatedSpan delay={5700} className="text-green-400">
+        <span>✔ Lighthouse: 98 / 100</span>
       </AnimatedSpan>
-      <AnimatedSpan delay={5100} className="text-yellow-400">
-        <span>ℹ Installing Mobile packages...</span>
-      </AnimatedSpan>
-      <AnimatedSpan delay={5500} className="text-green-400">
-        <span>✔ Installed React Native</span>
-      </AnimatedSpan>
-      <TypingAnimation delay={6100} className="text-muted-foreground">
-        Success! @dev-andre is configured and ready to work.
+      <TypingAnimation delay={6500} className="text-muted-foreground">
+        Ready to launch. 🚀
       </TypingAnimation>
     </Terminal>
   );

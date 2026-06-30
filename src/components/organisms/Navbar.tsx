@@ -9,6 +9,7 @@ import LanguageSwitcher from "@/components/molecules/LanguageSwitcher";
 
 const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/#services", label: "Services" },
   { href: "/#projects", label: "Projects" },
   { href: "/#contact", label: "Contact" },
 ];
@@ -53,7 +54,7 @@ export default function Navbar() {
   }, [isMenuOpen]);
 
   return (
-    <section className="sticky top-0 z-50 bg-white/80 dark:bg-[#111111]/10  border-b border-slate-200 dark:border-slate-800">
+    <section className="sticky top-0 z-50 bg-slate-50/80 dark:bg-[#111111]/10  border-b border-slate-200 dark:border-slate-800">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex-1 text-start">
