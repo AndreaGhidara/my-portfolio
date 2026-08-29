@@ -1,91 +1,203 @@
 {
-  "hero": {
-    "badge": {
-      "status": ["Developer", "Creator"]
-    },
-    "title": {
-      "line1": "From idea,",
-      "line2": "to",
-      "highlight": "solution"
-    },
-    "description": "Every project is an opportunity to create something new and challenge myself. My goal: quality code, SEO performance, accessibility.",
-    "buttons": {
-      "cv": "Download CV",
-      "projects": "Explore Projects"
-    }
+  "nav": {
+    "services": "Services",
+    "works": "Work",
+    "contact": "Contact",
+    "themeToggle": "Switch between light and dark theme",
+    "languageLabel": "Language",
+    "skipToContent": "Skip to content"
   },
-  "projects": {
-    "intro": {
-      "eyebrow": "Portfolio",
-      "headingLine1": "My Latest Work",
-      "paragraph": "I am a web developer specialized in React and Next.js. I enjoy solving problems by exploring different approaches and finding the most suitable solution for each context."
-    },
-    "visitButton": "Visit Project",
-    "imageAlt": "Screenshot of the project {name}",
-    "list": {
-      "visualboost": {
-        "name": "VisualBoost",
-        "title": "Editorial Image Platform",
-        "description": "Frontend development for VisualBoost, a platform providing high-quality editorial images for the fashion, food, and beauty industries."
+  "hero": {
+    "eyebrow": "Web developer · Full stack · Italy",
+    "wordmarkAlt": "Andrea",
+    "claim": "I build custom websites, online stores and platforms.",
+    "subclaim": "For companies with a clear idea and nobody to build it.",
+    "ctaPrimary": "Let's talk",
+    "ctaSecondary": "See the work",
+    "scrollHint": "Scroll"
+  },
+  "pact": {
+    "eyebrow": "How it works",
+    "title": "What happens if you write to me",
+    "intro": "I'm Andrea. I've been building software for the web for six years, both inside companies and on my own projects. On small projects I work alone, on large ones in a team — and either way the part I care about is the same: understanding the problem before writing code.",
+    "steps": {
+      "reply": {
+        "title": "I reply within 24 hours",
+        "body": "Always. Even if it's only to say your project isn't right for me, and who could help you instead."
       },
-      "customertrack": {
-        "name": "CustomerTrack",
-        "title": "Retail Behavior Tracking Solution",
-        "description": "Development of a white-label solution for tracking customer behavior in physical retail environments."
+      "call": {
+        "title": "Free 30-minute call",
+        "body": "You tell me what you need, I tell you what I actually think. No sales pitch."
       },
-      "aidify": {
-        "name": "Aidify",
-        "title": "AI Chatbot for Customer Care",
-        "description": "Ongoing development of Aidify, an AI-powered chatbot designed to handle customer support across multiple e-commerce platforms."
+      "proposal": {
+        "title": "A written proposal",
+        "body": "What I'll do, how long it takes, on what terms. In writing, not just spoken."
       },
-      "bdroppy": {
-        "name": "Bdroppy",
-        "title": "B2B Dropshipping Platform",
-        "description": "Full migration of BDroppy, a B2B dropshipping platform, from React 14 to Next.js with TypeScript, improving performance and maintainability."
+      "decide": {
+        "title": "You decide, unhurried",
+        "body": "If it doesn't convince you, we've lost half an hour. No commitment, no chasing."
       }
     }
   },
-  "contact": {
-    "title": "Let’s talk!",
-    "subtitle": "Do you have a project or a collaboration idea? Feel free to reach out.",
+  "services": {
+    "eyebrow": "Services",
+    "title": "What I build",
+    "intro": "Four ways to work together. If your case sits between two of them, that's normal — we'll sort it out on the call.",
+    "list": {
+      "sites": {
+        "title": "Custom sites and landing pages",
+        "description": "Your site is the first thing people see of you. I build it fast, findable on Google and genuinely yours — not a bought theme filled with text."
+      },
+      "ecommerce": {
+        "title": "Online stores",
+        "description": "Selling online without fighting your back office every day. Catalogue, payments, shipping and integration with the tools you already use."
+      },
+      "webapp": {
+        "title": "Web apps and platforms",
+        "description": "Custom back offices, portals and dashboards. For when the spreadsheet isn't enough any more and off-the-shelf software doesn't do what you need."
+      },
+      "ai": {
+        "title": "AI and automation",
+        "description": "Assistants that actually answer, and automation that takes repetitive work off people. Not magic: tools wired to your real data."
+      }
+    }
+  },
+  "works": {
+    "eyebrow": "Work",
+    "title": "Four problems, and how I solved them",
+    "intro": "No logos and slogans here. You'll find the problem that existed, the decision I made, and why I rejected the easy alternative.",
     "labels": {
-      "name": "Name",
-      "email": "Your Email",
-      "message": "Your Message"
+      "symptom": "The symptom",
+      "decision": "The decision",
+      "outcome": "The outcome",
+      "visit": "Visit the site",
+      "open": "Open the case",
+      "close": "Close"
+    },
+    "list": {
+      "bdroppy": {
+        "name": "BDroppy",
+        "symptom": "The platform was stuck on React 14. Every new feature took weeks and the team was afraid to touch the code.",
+        "decision": "Rewriting from scratch was the comfortable choice, but the platform had to stay online and keep selling. I chose an incremental migration, route by route, with old and new running side by side.",
+        "outcome": "A B2B dropshipping platform now on Next.js and TypeScript, migrated without ever taking the service down."
+      },
+      "aidify": {
+        "name": "Aidify",
+        "symptom": "A customer support team buried under the same ten questions, repeated across five different e-commerce platforms.",
+        "decision": "Not a chatbot that guesses, but one wired to the real catalogue and real orders. And above all: when it doesn't know, it hands over to a person instead of inventing an answer.",
+        "outcome": "An AI-based assistant integrated across several stores, absorbing the repetitive requests and leaving the real ones to people."
+      },
+      "customertrack": {
+        "name": "CustomerTrack",
+        "symptom": "Physical shops that knew nothing about their own customers: how many came in, where they stopped, what they actually looked at.",
+        "decision": "Instead of a single product, a white-label solution: each chain uses it as if it were their own. It costs more to build and pays for itself from the second customer onwards.",
+        "outcome": "An in-store behaviour analytics platform, resellable to different brands without rewriting anything."
+      },
+      "visualboost": {
+        "name": "VisualBoost",
+        "symptom": "An editorial image library nobody could browse without sitting there waiting.",
+        "decision": "The bottleneck was the images, not the code. Before anything else: modern formats, right dimensions and progressive loading.",
+        "outcome": "An image platform for fashion, food and beauty that stays fast even on large catalogues."
+      }
+    }
+  },
+  "process": {
+    "eyebrow": "How I work",
+    "title": "Four steps, always the same",
+    "steps": {
+      "understand": {
+        "title": "We understand",
+        "body": "Before talking technology, I work out what has to happen in your business for the project to have been worth anything."
+      },
+      "design": {
+        "title": "I design",
+        "body": "Structure, screens and technical choices. We make the important decisions together — you don't discover them once the work is done."
+      },
+      "build": {
+        "title": "I build",
+        "body": "I work in deliverable pieces: you see something working early and often, not only at the end."
+      },
+      "stay": {
+        "title": "I stay",
+        "body": "I don't disappear after launch. Fixes, changes and a person who answers: it's why clients come back."
+      }
+    }
+  },
+  "journey": {
+    "eyebrow": "Background",
+    "title": "Where I learned",
+    "present": "present",
+    "list": {
+      "idt": {
+        "role": "React Developer",
+        "body": "Complex features on an application used daily, and a shared component library that made the interface consistent across the product."
+      },
+      "eroi": {
+        "role": "Full Stack Developer",
+        "body": "A B2B e-commerce platform end to end: frontend, APIs, database and the dashboard they run it from every day."
+      },
+      "freelance": {
+        "role": "Freelance developer",
+        "body": "Complete projects for small and medium businesses, from gathering requirements to release. This is where I learned to talk to people who aren't technical."
+      }
+    }
+  },
+  "metrics": {
+    "bdroppyComponents": "components migrated",
+    "bdroppyDowntime": "hours of downtime",
+    "aidifyConversations": "conversations handled per month",
+    "customertrackBrands": "chains on the same system",
+    "visualboostCatalog": "images in the catalogue",
+    "years": "years building for the web",
+    "responseTime": "response time"
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Your turn",
+    "client": {
+      "title": "I have a project",
+      "body": "Tell me what you need. I reply within 24 hours, even when the answer is no."
+    },
+    "recruiter": {
+      "title": "I'm considering you for a role",
+      "body": "Here's the current CV and the profiles where you can look at the code I write.",
+      "cv": "Download the CV",
+      "linkedin": "LinkedIn",
+      "github": "GitHub"
+    },
+    "labels": {
+      "name": "Your name",
+      "email": "Your email",
+      "message": "What you need"
     },
     "placeholders": {
-      "email": "your.email@example.com",
-      "message": "Hi Andrea, I’m reaching out because..."
+      "name": "Jane Smith",
+      "email": "jane@hercompany.com",
+      "message": "Hi Andrea, I run a business that…"
     },
     "button": {
-      "default": "Send Message",
-      "sending": "Sending..."
+      "default": "Send message",
+      "sending": "Sending…"
     },
     "status": {
-      "success": "Message sent! Thank you for getting in touch, I’ll reply as soon as possible.",
-      "error": "Oops! Something went wrong. If the problem persists, feel free to contact me through other channels."
+      "success": "Message received. I'll get back to you within 24 hours.",
+      "error": "Something went wrong. If it happens again, email me directly."
     },
     "errors": {
-      "nameRequired": "Name is required.",
-      "nameMin": "Name must be at least 2 characters.",
-      "emailRequired": "Email is required.",
-      "emailInvalid": "Please enter a valid email address.",
-      "messageRequired": "Message is required.",
-      "messageMin": "Your message is too short (min. 10 characters)."
+      "nameRequired": "I need a name to reply to.",
+      "nameMin": "The name needs at least 2 characters.",
+      "emailRequired": "Without an email I can't reply.",
+      "emailInvalid": "That email address doesn't look valid.",
+      "messageRequired": "Write me a couple of lines about what you need.",
+      "messageMin": "A few more words and I'll understand better: at least 10 characters."
     }
   },
   "footer": {
-    "brandName": "Andrea Ghidara",
-    "brandAria": "Go to Andrea Ghidara homepage",
-    "ctaTitle": "Let’s build your next idea together.",
-    "ctaSubtitle": "Whether you already have a clear vision or are exploring new possibilities, I’m here to help you create solutions.",
-    "emailTitle": "Email",
-    "phoneTitle": "Phone",
-    "addressTitle": "Working base",
-    "copyright": "Andrea Ghidara. All rights reserved.",
-    "socials": {
-      "linkedinAria": "Visit my LinkedIn profile",
-      "githubAria": "Visit my Facebook page"
-    }
+    "tagline": "I build software for the web. From Bergamo, for whoever turns up.",
+    "emailLabel": "Email",
+    "rights": "All rights reserved.",
+    "linkedinAria": "Go to Andrea Ghidara's LinkedIn profile",
+    "githubAria": "Go to Andrea Ghidara's GitHub profile",
+    "homeAria": "Back to top of page"
   }
 }
