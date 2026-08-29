@@ -1,6 +1,7 @@
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { QuoteFrame } from "@/components/brand/QuoteFrame";
-import { WorkCase, type WorkCaseData, type WorkCaseLabels } from "./WorkCase";
+import { WorksShelf } from "./WorksShelf";
+import type { WorkCaseData, WorkCaseLabels } from "./types";
 
 export type WorksViewProps = {
   eyebrow: string;
@@ -25,12 +26,13 @@ export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewPro
         </div>
 
         <p className="mt-5 max-w-2xl text-[var(--fg-muted)]">{intro}</p>
+      </div>
 
-        <div className="mt-10 border-b border-[var(--line)]">
-          {items.map((item, index) => (
-            <WorkCase key={item.id} data={item} labels={labels} index={index} />
-          ))}
-        </div>
+      {/* Lo schedario esce dalla colonna del testo: quattro cartelle accostate
+          dentro 896px lascerebbero al sintomo una colonna da poche parole per
+          riga, e il sintomo e' la cosa che deve leggersi. */}
+      <div className="mx-auto mt-10 max-w-6xl">
+        <WorksShelf items={items} labels={labels} />
       </div>
     </section>
   );

@@ -164,6 +164,92 @@ h1, h2, h3, .display {
   }
 }
 
+/* Lo schedario dei lavori.
+
+   Da telefono: pila verticale, le cartelle si sovrappongono di pochissimo —
+   quel tanto che basta a leggersi come pila senza coprire il sintomo, che e'
+   la cosa che fa riconoscere il cliente nel problema.
+
+   Da desktop: in fila, sovrapposte di un pezzo, con le linguette sfalsate in
+   altezza. Lo z-index cresce con l'ordine, quindi ogni cartella copre il bordo
+   destro della precedente: e' l'occlusione a fare lo schedario, non un'ombra.
+   Il fondo pieno delle cartelle serve proprio a questo. */
+[data-work-shelf] {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-work-shelf] > * {
+  position: relative;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-work-shelf] > * + * { margin-top: -0.4rem; }
+
+[data-work-shelf] > *:hover,
+[data-work-shelf] > *:focus-visible {
+  transform: translateY(-6px);
+  z-index: 20;
+}
+
+@media (min-width: 1024px) {
+  [data-work-shelf] { flex-direction: row; align-items: stretch; }
+
+  [data-work-shelf] > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  [data-work-shelf] > * + * {
+    margin-top: 0;
+    margin-left: -3rem;
+  }
+
+  [data-work-shelf] > *:nth-child(even) { margin-top: 0.9rem; }
+
+  /* La cartella successiva copre gli ultimi 3rem di questa: senza spazio
+     riservato, il sintomo finisce sotto e si legge a meta'. */
+  [data-work-shelf] > *:not(:last-child) [data-folder-body] { padding-right: 4.25rem; }
+
+  [data-work-shelf] > *:hover,
+  [data-work-shelf] > *:focus-visible { transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-work-shelf] > * { transition: none; }
+}
+
+/* Il dossier. <dialog> nativo: focus, Escape, strato superiore e ritorno del
+   focus li gestisce il browser. Qui c'e' solo la forma. */
+[data-work-dialog] {
+  display: flex;
+  flex-direction: column;
+  /* Il reset di Tailwind azzera i margini di ogni elemento e con essi il
+     `margin: auto` con cui il browser centra un dialog: senza, il dossier
+     resta incollato in alto a sinistra. */
+  margin: auto;
+  width: min(64rem, calc(100vw - 2 * var(--gutter)));
+  max-height: min(88vh, 56rem);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background-color: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+}
+
+[data-work-dialog]::backdrop {
+  background-color: color-mix(in srgb, var(--ink) 55%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+/* showModal() rende il resto della pagina inerte ma non ne blocca lo scroll:
+   senza questo, la rotellina scorre il sito dietro al dossier.
+   Serve su html E su body: bloccando solo html, il ruolo di elemento che
+   scorre passa a body e la pagina continua a muoversi lo stesso. */
+html[data-dialog-open],
+html[data-dialog-open] body { overflow: hidden; }
+
 [data-ink-circle] { position: relative; display: grid; }
 [data-ink-circle-fill] {
   position: absolute;
