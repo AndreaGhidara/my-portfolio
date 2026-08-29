@@ -32,14 +32,13 @@ export function HeroView({
           <Wordmark
             text="ANDREA"
             label={wordmarkAlt}
-            priority
             className="flex w-full justify-between gap-[1px] [&>img]:h-auto [&>img]:w-[15.5%]"
           />
         </h1>
 
         <div data-hero-avatar className="relative z-10 -mt-[6%] flex justify-center">
           <InkCircle className="relative grid size-32 place-items-center lg:size-44">
-            <Avatar priority className="relative z-10 w-[88%]" />
+            <Avatar className="relative z-10 w-[88%]" />
           </InkCircle>
         </div>
 

@@ -28,7 +28,7 @@
   --bg: var(--ink);
   --fg: var(--paper);
   --fg-muted: #A79E8C; /* from palette.mutedDark */
-  --line: #3A342A; /* from palette.lineDark */
+  --line: var(--muted); /* il vecchio lineDark era a 1.52:1 su --ink, sotto la soglia 3:1 WCAG per elementi non testuali */
 }
 
 body {

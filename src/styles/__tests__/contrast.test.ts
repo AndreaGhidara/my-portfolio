@@ -53,7 +53,7 @@ describe("tema scuro", () => {
     expect(contrastRatio(palette.orange, palette.ink)).toBeGreaterThanOrEqual(3);
   });
 
-  it("il border scuro su inchiostro è visibile", () => {
-    expect(contrastRatio(palette.lineDark, palette.ink)).toBeGreaterThanOrEqual(1.5);
+  it("il border scuro (--line = --muted in tema scuro) supera 3:1 su inchiostro: soglia WCAG per elementi non testuali", () => {
+    expect(contrastRatio(palette.muted, palette.ink)).toBeGreaterThanOrEqual(3);
   });
 });
