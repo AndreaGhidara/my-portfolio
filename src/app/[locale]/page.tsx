@@ -8,6 +8,7 @@ import { Pact } from "@/components/sections/Pact";
 import { Services } from "@/components/sections/Services";
 import { Works } from "@/components/sections/Works";
 import { Process } from "@/components/sections/Process";
+import { Journey } from "@/components/sections/Journey";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
       <Services />
       <Works />
       <Process />
+      <Journey />
     </>
   );
 }
