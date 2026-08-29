@@ -87,6 +87,26 @@ h1, h2, h3, .display {
   [data-site-header] { transition: none; }
 }
 
+/* La lampadina del bottone tema. Il vetro e' spento (grigio) su tema chiaro
+   e acceso su tema scuro: e' buio, si accende la luce — la stessa metafora
+   del vecchio interruttore. Lo stato viene da html[data-theme] e non da
+   React, che lo saprebbe solo dopo il mount: caricando in tema scuro si
+   vedrebbe la lampadina spenta per un fotogramma.
+   Il giallo dell'originale non c'e' perche' la palette e' chiusa a sei
+   colori; acceso usa --accent, che nel sito e' gia' il colore della luce. */
+[data-bulb-glass] { fill: var(--line); transition: fill 240ms ease; }
+[data-bulb-cap] { fill: var(--fg-muted); }
+
+[data-bulb-halo] { opacity: 0; transition: opacity 240ms ease; }
+
+[data-theme="dark"] [data-bulb-glass] { fill: var(--accent); }
+[data-theme="dark"] [data-bulb-halo] { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-bulb-glass],
+  [data-bulb-halo] { transition: none; }
+}
+
 [data-ink-circle] { position: relative; display: grid; }
 [data-ink-circle-fill] {
   position: absolute;
