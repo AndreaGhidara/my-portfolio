@@ -56,4 +56,12 @@ describe("tema scuro", () => {
   it("il border scuro (--line = --muted in tema scuro) supera 3:1 su inchiostro: soglia WCAG per elementi non testuali", () => {
     expect(contrastRatio(palette.muted, palette.ink)).toBeGreaterThanOrEqual(3);
   });
+
+  it("la lampadina accesa supera 3:1 su inchiostro: soglia WCAG per elementi non testuali", () => {
+    expect(contrastRatio(palette.bulb, palette.ink)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("la lampadina accesa e' invisibile su carta: per questo si accende solo in tema scuro", () => {
+    expect(contrastRatio(palette.bulb, palette.paper)).toBeLessThan(1.5);
+  });
 });
