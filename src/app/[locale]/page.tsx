@@ -5,6 +5,7 @@
  */
 import { Hero } from "@/components/sections/Hero";
 import { Pact } from "@/components/sections/Pact";
+import { Services } from "@/components/sections/Services";
 import { Process } from "@/components/sections/Process";
 
 export default function Home() {
@@ -12,6 +13,7 @@ export default function Home() {
     <>
       <Hero />
       <Pact />
+      <Services />
       <Process />
     </>
   );
