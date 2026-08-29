@@ -151,18 +151,23 @@ export default async function RootLayout({
         <NextIntlClientProvider>
           <SmoothScroll />
 
-          {/* La ragnatela parte dall'angolo vero della pagina, non da quello
-              dell'hero: dentro <section id="hero"> (overflow-hidden) veniva
-              tagliata e si leggeva come un arco casuale sul bordo sinistro.
-              Sta sopra l'header (z superiore) perche' il fondo semitrasparente
-              della barra la sbiadirebbe fino a farla sparire; e' decorativa,
-              pointer-events-none, e scorre via con la pagina. */}
-          <WebCorner className="pointer-events-none absolute left-0 top-0 z-[60] block w-36 lg:w-72" />
-
           <header id="top" className="sticky top-0 z-50 bg-[var(--bg)]/85 backdrop-blur">
             <Navbar />
           </header>
-          <main id="main">{children}</main>
+
+          {/* La ragnatela vive qui e non dentro <section id="hero">: quella ha
+              overflow-hidden, e con gli offset negativi la tagliava sul bordo
+              sinistro riducendola a un arco casuale.
+              Ancorata all'angolo di <main> parte davvero da in alto a sinistra
+              senza finire dietro la barra: sotto l'header il fondo
+              semitrasparente la taglierebbe di netto, sopra passerebbe sulla A
+              invece che sotto. Sta a -z-10, quindi le lettere le stanno davanti
+              e il fondo di <body> resta comunque dietro (si propaga al canvas).
+              Decorativa: aria-hidden e pointer-events-none. */}
+          <main id="main" className="relative">
+            <WebCorner className="pointer-events-none absolute left-0 top-0 -z-10 block w-36 lg:w-72" />
+            {children}
+          </main>
         </NextIntlClientProvider>
         {/* Fuori da <main>: e' chrome di sito come la Navbar, e un <footer>
             dentro <main> perde il ruolo implicito contentinfo (HTML-AAM). */}
