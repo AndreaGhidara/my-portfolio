@@ -48,3 +48,12 @@ h1, h2, h3, .display {
   text-transform: uppercase;
   color: var(--fg-muted);
 }
+
+[data-ink-circle] { position: relative; display: grid; }
+[data-ink-circle-fill] {
+  position: absolute;
+  inset: 0;
+  /* --paint e' animata da paint(): il cerchio si dipinge da sinistra. */
+  --paint: 100%;
+  clip-path: inset(0 calc(100% - var(--paint)) 0 0);
+}
