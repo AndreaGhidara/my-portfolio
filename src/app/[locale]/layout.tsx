@@ -1,23 +1,34 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Kanit } from "next/font/google";
+import { Archivo, Archivo_Black } from "next/font/google";
+import localFont from "next/font/local";
 import "@/app/globals.css";
-import Navbar from "@/components/organisms/Navbar";
+import { Navbar } from "@/components/shell/Navbar";
+import { ThemeScript } from "@/components/shell/ThemeScript";
+import { SmoothScroll } from "@/components/shell/SmoothScroll";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import Script from "next/script";
+import { site } from "@/content/site";
 
 const SITE_URL = "https://a-ghidara-dev.vercel.app";
 const DEFAULT_LOCALE = "it";
 
-const kanit = Kanit({
+const archivo = Archivo({
   subsets: ["latin"],
-  weight: ["200", "300", "400", "600"],
-  variable: "--font-kanit",
+  variable: "--font-body",
+  display: "swap",
 });
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const archivoBlack = Archivo_Black({
   subsets: ["latin"],
+  weight: "400",
+  variable: "--font-display",
+  display: "swap",
+});
+const mono = localFont({
+  src: "../../fonts/CascadiaCode.woff2",
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export async function generateMetadata({
@@ -108,10 +119,7 @@ export default async function RootLayout({
     name: "Andrea Ghidara",
     url: SITE_URL + "/it",
     jobTitle: "Sviluppatore Web",
-    sameAs: [
-      "https://www.linkedin.com/in/andrea-ghidara",
-      "https://github.com/AndreaGhidara",
-    ],
+    sameAs: site.socials.map((social) => social.url),
   };
 
   const webSiteJsonLd = {
@@ -123,13 +131,11 @@ export default async function RootLayout({
   };
 
   return (
-    <html
-      lang={locale}
-      className="motion-safe:scroll-smooth motion-reduce:scroll-auto"
-    >
-      <body
-        className={`${kanit.variable} ${geistMono.variable} antialiased h-full`}
-      >
+    <html lang={locale} suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
+      <body className={`${archivo.variable} ${archivoBlack.variable} ${mono.variable} min-h-dvh`}>
         <Script
           id="ld-person"
           type="application/ld+json"
@@ -143,10 +149,11 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }}
         />
         <NextIntlClientProvider>
-          <header className="sticky top-0 z-50">
+          <SmoothScroll />
+          <header id="top" className="sticky top-0 z-50 bg-[var(--bg)]/85 backdrop-blur">
             <Navbar />
           </header>
-          {children}
+          <main id="main">{children}</main>
         </NextIntlClientProvider>
       </body>
     </html>

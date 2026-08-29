@@ -1,26 +1,8 @@
-import ContactMe from "@/components/organisms/ContactMe";
-import ReactLenis from "lenis/react";
-import Index from "@/components/organisms/Hero";
-import Projects from "@/components/organisms/Projects";
-import Footer from "@/components/organisms/Footer";
-
+/**
+ * Le sezioni vengono aggiunte una alla volta dai task successivi,
+ * nell'ordine deciso nella spec. Il montaggio finale e i metadati
+ * sono nel Task 16.
+ */
 export default function Home() {
-  return (
-    <>
-      <ReactLenis
-        root
-        options={{
-          duration: 1.2,
-          smoothWheel: true,
-        }}
-      >
-        <div>
-          <Index />
-          <Projects />
-          <ContactMe />
-          <Footer />
-        </div>
-      </ReactLenis>
-    </>
-  );
+  return null;
 }
