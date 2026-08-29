@@ -1,6 +1,5 @@
 import { Avatar } from "@/components/brand/Avatar";
 import { InkCircle } from "@/components/brand/InkCircle";
-import { WebCorner } from "@/components/brand/WebCorner";
 import { Wordmark } from "@/components/brand/Wordmark";
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { HeroMotion } from "./HeroMotion";
@@ -20,7 +19,6 @@ export function HeroView({
 }: HeroViewProps) {
   return (
     <section id="hero" className="relative overflow-hidden px-[var(--gutter)] pb-16 pt-6">
-      <WebCorner className="pointer-events-none absolute -left-6 -top-6 block w-32 lg:w-52" />
       <ThreadSegment section="hero" className="pointer-events-none absolute inset-0 -z-10" />
 
       <HeroMotion>

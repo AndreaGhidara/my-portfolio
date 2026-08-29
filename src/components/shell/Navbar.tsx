@@ -4,6 +4,11 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { site } from "@/content/site";
 
 /**
+ * A tutta larghezza, non incolonnata in un contenitore centrato: cosi' il
+ * nome in alto a sinistra cade sulla stessa verticale della "A" di ANDREA
+ * nell'hero, e il tema in alto a destra sull'ultima "A". Il portfolio non
+ * ha una colonna di testo da rispettare: ha due bordi.
+ *
  * Sobria per scelta: il nome grande sta nell'hero, qui basta l'ancora.
  * Il link "salta al contenuto" è il primo elemento focalizzabile della
  * pagina: senza, chi naviga da tastiera deve attraversare la navbar a
@@ -19,7 +24,7 @@ export async function Navbar() {
   ];
 
   return (
-    <nav className="mx-auto flex max-w-6xl items-center justify-between px-[var(--gutter)] py-3">
+    <nav className="relative z-10 flex items-center justify-between px-[var(--gutter)] py-3">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:rounded focus:bg-[var(--fg)] focus:px-3 focus:py-2 focus:text-[var(--bg)]"
