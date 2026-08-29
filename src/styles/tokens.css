@@ -135,6 +135,35 @@ h1, h2, h3, .display {
    verso il chiaro il fronte e' gia' oltre lo schermo quando conterebbe. Restava
    solo il costo: una sfocatura a tutto schermo per quasi un secondo. */
 
+/* Le due frecce sotto l'hero. Scendono e si riaccendono a turno, sfalsate:
+   la seconda insegue la prima, cosi' il movimento ha una direzione e non e'
+   un rimbalzo sul posto. transform-box: fill-box perche' senza, la traslazione
+   su un <path> si calcola sul sistema di riferimento dell'SVG intero. */
+[data-scroll-chevron] {
+  transform-box: fill-box;
+  animation: scroll-cue 1900ms ease-in-out infinite;
+}
+
+[data-scroll-chevron]:nth-of-type(2) { animation-delay: 160ms; }
+
+@keyframes scroll-cue {
+  0%, 100% { opacity: 0.4; transform: translateY(-1.5px); }
+  45% { opacity: 1; transform: translateY(1.5px); }
+}
+
+/* Un invito a scorrere che pulsa all'infinito e' esattamente il tipo di
+   movimento che chi ha chiesto meno animazioni vuole spento. Le frecce
+   restano, ferme e leggibili. */
+@media (prefers-reduced-motion: reduce) {
+  [data-scroll-chevron] {
+    animation: none;
+    /* Ferme sono l'unico stato che si vede: a piena opacita' fanno 4,97:1 su
+       carta, mentre il minimo della pulsazione sarebbe illeggibile da fermo. */
+    opacity: 1;
+    transform: none;
+  }
+}
+
 [data-ink-circle] { position: relative; display: grid; }
 [data-ink-circle-fill] {
   position: absolute;
