@@ -3,6 +3,7 @@ import { Archivo, Archivo_Black, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "@/app/globals.css";
 import { Navbar } from "@/components/shell/Navbar";
+import { WebCorner } from "@/components/brand/WebCorner";
 import { Footer } from "@/components/sections/Footer";
 import { ThemeScript } from "@/components/shell/ThemeScript";
 import { SmoothScroll } from "@/components/shell/SmoothScroll";
@@ -134,7 +135,7 @@ export default async function RootLayout({
       <head>
         <ThemeScript />
       </head>
-      <body className={`${archivo.variable} ${archivoBlack.variable} ${monoFull.variable} ${monoLight.variable} min-h-dvh`}>
+      <body className={`${archivo.variable} ${archivoBlack.variable} ${monoFull.variable} ${monoLight.variable} relative min-h-dvh`}>
         <Script
           id="ld-person"
           type="application/ld+json"
@@ -149,6 +150,15 @@ export default async function RootLayout({
         />
         <NextIntlClientProvider>
           <SmoothScroll />
+
+          {/* La ragnatela parte dall'angolo vero della pagina, non da quello
+              dell'hero: dentro <section id="hero"> (overflow-hidden) veniva
+              tagliata e si leggeva come un arco casuale sul bordo sinistro.
+              Sta sopra l'header (z superiore) perche' il fondo semitrasparente
+              della barra la sbiadirebbe fino a farla sparire; e' decorativa,
+              pointer-events-none, e scorre via con la pagina. */}
+          <WebCorner className="pointer-events-none absolute left-0 top-0 z-[60] block w-36 lg:w-72" />
+
           <header id="top" className="sticky top-0 z-50 bg-[var(--bg)]/85 backdrop-blur">
             <Navbar />
           </header>
