@@ -9,6 +9,7 @@ import { Services } from "@/components/sections/Services";
 import { Works } from "@/components/sections/Works";
 import { Process } from "@/components/sections/Process";
 import { Journey } from "@/components/sections/Journey";
+import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/sections/Footer";
 
 export default function Home() {
@@ -20,6 +21,7 @@ export default function Home() {
       <Works />
       <Process />
       <Journey />
+      <Contact />
       <Footer />
     </>
   );
