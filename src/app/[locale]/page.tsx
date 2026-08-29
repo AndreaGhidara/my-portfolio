@@ -5,12 +5,14 @@
  */
 import { Hero } from "@/components/sections/Hero";
 import { Pact } from "@/components/sections/Pact";
+import { Process } from "@/components/sections/Process";
 
 export default function Home() {
   return (
     <>
       <Hero />
       <Pact />
+      <Process />
     </>
   );
 }
