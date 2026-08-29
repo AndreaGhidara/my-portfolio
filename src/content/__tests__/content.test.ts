@@ -15,6 +15,17 @@ function flatKeys(obj: unknown, prefix = ""): string[] {
   );
 }
 
+/** Segue un percorso puntato dentro un oggetto annidato, senza `any`. */
+function valueAt(obj: unknown, path: string): unknown {
+  return path.split(".").reduce<unknown>(
+    (acc, part) =>
+      typeof acc === "object" && acc !== null
+        ? (acc as Record<string, unknown>)[part]
+        : undefined,
+    obj,
+  );
+}
+
 const itKeys = flatKeys(it_).sort();
 const enKeys = flatKeys(en_).sort();
 
@@ -25,7 +36,7 @@ describe("parità fra le due lingue", () => {
 
   it("nessuna stringa è vuota", () => {
     const empty = flatKeys(it_).filter((k) => {
-      const value = k.split(".").reduce<any>((acc, part) => acc?.[part], it_);
+      const value = valueAt(it_, k);
       return typeof value === "string" && value.trim() === "";
     });
     expect(empty).toEqual([]);
@@ -98,6 +109,13 @@ describe("percorso", () => {
   it("è ordinato dal più recente", () => {
     const years = journey.map((entry) => entry.year);
     expect([...years].sort((a, b) => b - a)).toEqual(years);
+  });
+
+  it("ogni tappa ha ruolo e descrizione in entrambe le lingue", () => {
+    for (const entry of journey) {
+      expect(itKeys).toContain(`journey.list.${entry.id}.role`);
+      expect(itKeys).toContain(`journey.list.${entry.id}.body`);
+    }
   });
 });
 
