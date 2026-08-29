@@ -1,0 +1,9 @@
+{
+  "name": "Andrea Ghidara",
+  "short_name": "A. Ghidara",
+  "start_url": "/it",
+  "display": "standalone",
+  "background_color": "#F5F1E8",
+  "theme_color": "#E4572E",
+  "icons": [{ "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }]
+}

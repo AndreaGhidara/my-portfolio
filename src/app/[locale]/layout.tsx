@@ -3,6 +3,7 @@ import { Archivo, Archivo_Black } from "next/font/google";
 import localFont from "next/font/local";
 import "@/app/globals.css";
 import { Navbar } from "@/components/shell/Navbar";
+import { Footer } from "@/components/sections/Footer";
 import { ThemeScript } from "@/components/shell/ThemeScript";
 import { SmoothScroll } from "@/components/shell/SmoothScroll";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
@@ -65,21 +66,12 @@ export async function generateMetadata({
       siteName: "Andrea Ghidara",
       title,
       description,
-      images: [
-        {
-          url: "/og/og-image.jpg",
-          width: 1200,
-          height: 630,
-          alt: "Andrea Ghidara - Portfolio",
-        },
-      ],
       locale,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/og/og-image.jpg"],
     },
     robots: {
       index: true,
@@ -94,8 +86,6 @@ export async function generateMetadata({
     },
     icons: {
       icon: [{ url: "/favicon.ico" }],
-      apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
-      other: [{ rel: "mask-icon", url: "/icons/safari-pinned-tab.svg" }],
     },
     manifest: "/site.webmanifest",
   };
@@ -116,16 +106,17 @@ export default async function RootLayout({
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: "Andrea Ghidara",
-    url: SITE_URL + "/it",
+    name: site.name,
+    url: `${SITE_URL}/${locale}`,
     jobTitle: "Sviluppatore Web",
+    email: site.email,
     sameAs: site.socials.map((social) => social.url),
   };
 
   const webSiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Andrea Ghidara",
+    name: site.name,
     url: SITE_URL,
     inLanguage: locale,
   };
@@ -155,6 +146,9 @@ export default async function RootLayout({
           </header>
           <main id="main">{children}</main>
         </NextIntlClientProvider>
+        {/* Fuori da <main>: e' chrome di sito come la Navbar, e un <footer>
+            dentro <main> perde il ruolo implicito contentinfo (HTML-AAM). */}
+        <Footer />
       </body>
     </html>
   );
