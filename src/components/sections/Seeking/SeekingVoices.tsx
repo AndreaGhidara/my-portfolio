@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap } from "@/animations/gsap";
+import { gsap, ScrollTrigger } from "@/animations/gsap";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import type { SeekingItem } from "./SeekingView";
 
@@ -27,6 +27,24 @@ export function SeekingVoices({ items }: { items: SeekingItem[] }) {
     const full = level === "full";
     const timeline = gsap.timeline({
       scrollTrigger: { trigger: root, start: "top 78%", once: true },
+    });
+
+    // La riga attiva e' quella che attraversa la fascia centrale dello schermo:
+    // scorrendo, l'attenzione si sposta da una voce all'altra da sola. Il
+    // riflettore non tocca MAI l'opacita' del testo — carta su arancio e' gia'
+    // 3,3:1, ammesso solo perche' e' testo grande, e abbassarla lo porterebbe
+    // sotto la soglia. Si muove tutto sulla riga, che e' decorativa.
+    rows.forEach((row) => {
+      ScrollTrigger.create({
+        trigger: row,
+        // Non una fascia ma una LINEA, al 55% dello schermo: il trigger e'
+        // attivo solo mentre quella linea attraversa la riga. Con una fascia
+        // larga si accendevano tre voci insieme, e un riflettore che illumina
+        // tre cose non e' un riflettore.
+        start: "top 55%",
+        end: "bottom 55%",
+        onToggle: (self) => row.toggleAttribute("data-voice-active", self.isActive),
+      });
     });
 
     rows.forEach((row, index) => {
@@ -61,7 +79,7 @@ export function SeekingVoices({ items }: { items: SeekingItem[] }) {
           <span
             data-voice-rule
             aria-hidden="true"
-            className="block h-px w-full origin-left bg-[var(--on-accent)] opacity-30"
+            className="block h-px w-full origin-left bg-[var(--paper)]"
           />
           <div className="mt-4 flex items-baseline gap-4 lg:gap-6">
             <span className="eyebrow shrink-0 !text-[var(--on-accent)]">

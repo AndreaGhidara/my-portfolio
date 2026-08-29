@@ -12,11 +12,19 @@ import { THREAD_ANCHORS, type SectionId } from "./anchors";
  */
 export function ThreadSegment({
   section,
-  scrub = false,
+  scrub = true,
   className,
 }: {
   section: SectionId;
-  /** Aggancia il disegno allo scroll. Ignorato fuori dal livello "full". */
+  /**
+   * Agganciato allo scroll per default: il filo e' un'idea sola che
+   * attraversa la pagina, e disegnandosi a scatti quando ogni sezione entra
+   * si leggeva come sette animazioni diverse. Legato allo scroll diventa una
+   * cosa che scorrendo si tesse sotto di te — ed e' anche l'unico indicatore
+   * di avanzamento del sito, senza sembrarlo.
+   * `weave` lo ignora fuori dal livello "full": su touch lo scrub e' la
+   * prima causa di scatti.
+   */
   scrub?: boolean;
   className?: string;
 }) {

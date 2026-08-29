@@ -258,6 +258,38 @@ h1, h2, h3, .display {
 html[data-dialog-open],
 html[data-dialog-open] body { overflow: hidden; }
 
+/* Le quattro voci. La riga che attraversa la fascia centrale dello schermo si
+   accende e si fa avanti di qualche pixel: scorrendo, l'attenzione passa da una
+   frase all'altra senza che l'utente debba fare niente.
+
+   Il riflettore sta tutto sulla riga e sullo spostamento, mai sull'opacita' del
+   testo: carta su arancio e' 3,3:1, ammesso solo perche' e' testo grande, e
+   smorzare le frasi non attive le porterebbe sotto la soglia dei non attivi.
+
+   Nessuna freccia e nessun cambio di cursore: queste frasi non sono ancora
+   cliccabili, e un'affordance che promette un click inesistente e' peggio di
+   nessuna affordance. */
+[data-voice-row] {
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-voice-rule] {
+  opacity: 0.28;
+  transition: opacity 420ms ease;
+}
+
+[data-voice-row][data-voice-active] { transform: translateX(6px); }
+[data-voice-row][data-voice-active] [data-voice-rule] { opacity: 1; }
+
+@media (hover: hover) {
+  [data-voice-row]:hover [data-voice-rule] { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-voice-row] { transition: none; transform: none; }
+  [data-voice-rule] { transition: none; opacity: 0.6; }
+}
+
 [data-ink-circle] { position: relative; display: grid; }
 [data-ink-circle-fill] {
   position: absolute;
