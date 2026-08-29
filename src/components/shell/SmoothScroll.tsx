@@ -31,7 +31,23 @@ export function SmoothScroll() {
 
     ScrollTrigger.refresh();
 
+    // Quando si apre un dossier, Lenis va fermato davvero: `overflow: hidden`
+    // impedisce all'utente di scorrere, non al codice, e Lenis scorre proprio
+    // via codice in risposta alla rotellina. Senza questo, la pagina continua
+    // a scorrere dietro al modale nonostante il blocco.
+    // L'osservatore sta qui e non nel dialog: chi apre un modale non deve
+    // sapere che esiste uno scroll fluido, gli basta dichiarare il suo stato.
+    const root = document.documentElement;
+    const syncDialogState = () => {
+      if (root.hasAttribute("data-dialog-open")) lenis.stop();
+      else lenis.start();
+    };
+    const observer = new MutationObserver(syncDialogState);
+    observer.observe(root, { attributeFilter: ["data-dialog-open"] });
+    syncDialogState();
+
     return () => {
+      observer.disconnect();
       gsap.ticker.remove(tick);
       gsap.ticker.lagSmoothing(500, 33);
       lenis.destroy();

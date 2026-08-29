@@ -25,3 +25,26 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: vi.fn(),
   }),
 });
+
+/**
+ * jsdom non implementa <dialog>: showModal() e close() non esistono proprio.
+ * Questo minimo li aggiunge — attributo `open` e evento `close` — quel tanto
+ * che serve a verificare COSA mostriamo nel dossier e come lo annunciamo.
+ *
+ * Quello che questo finto <dialog> NON dimostra: trappola del focus, chiusura
+ * con Escape, inertizzazione della pagina sotto, ritorno del focus sulla
+ * cartella. Sono comportamenti del browser e vanno verificati in un browser
+ * vero, non qui: un test che li desse per buoni certificherebbe il nulla.
+ */
+if (typeof HTMLDialogElement !== "undefined" && !HTMLDialogElement.prototype.showModal) {
+  HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
+    this.open = true;
+  };
+  HTMLDialogElement.prototype.show = function show(this: HTMLDialogElement) {
+    this.open = true;
+  };
+  HTMLDialogElement.prototype.close = function close(this: HTMLDialogElement) {
+    this.open = false;
+    this.dispatchEvent(new Event("close"));
+  };
+}

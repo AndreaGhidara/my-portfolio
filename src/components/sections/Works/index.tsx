@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { works } from "@/content/works";
 import { metricById } from "@/content/metrics";
 import { WorksView } from "./WorksView";
-import type { WorkCaseData } from "./WorkCase";
+import type { WorkCaseData } from "./types";
 
 export async function Works() {
   const t = await getTranslations("works");

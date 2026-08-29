@@ -48,27 +48,44 @@ const props = {
 };
 
 describe("WorksView", () => {
-  it("l'indice mostra il sintomo, non il nome del prodotto: è ciò che fa riconoscere il cliente", () => {
+  it("ogni cartella chiusa mostra il sintomo: è ciò che fa riconoscere il cliente, e da telefono non c'è hover che lo riveli", () => {
     render(<WorksView {...props} />);
-    expect(screen.getByText(items[0].symptom)).toBeVisible();
+    for (const item of items) {
+      expect(screen.getByText(item.symptom)).toBeVisible();
+    }
   });
 
-  it("ogni caso è chiuso all'inizio, per non annegare chi scorre", () => {
+  it("la linguetta porta nome e anno, così il sintomo resta il titolo", () => {
     render(<WorksView {...props} />);
-    const toggles = screen.getAllByRole("button", { expanded: false });
-    expect(toggles).toHaveLength(2);
+    expect(screen.getByText("BDroppy · 2024")).toBeVisible();
   });
 
-  it("aprendo un caso compaiono decisione ed esito", async () => {
+  it("all'inizio nessun dossier è aperto", () => {
     render(<WorksView {...props} />);
-    const toggle = screen.getAllByRole("button")[0];
-
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(screen.queryByText(items[0].decision)).not.toBeInTheDocument();
-    await userEvent.click(toggle);
+  });
 
-    expect(toggle).toHaveAttribute("aria-expanded", "true");
+  it("cliccando una cartella si apre il dossier con decisione ed esito", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(screen.getAllByRole("button")[0]);
+
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toBeVisible();
     expect(screen.getByText(items[0].decision)).toBeVisible();
     expect(screen.getByText(items[0].outcome)).toBeVisible();
+  });
+
+  it("il dossier ha un nome accessibile: chi naviga a voce deve sapere di quale caso si tratta", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(screen.getAllByRole("button")[0]);
+    expect(screen.getByRole("dialog", { name: /BDroppy/ })).toBeInTheDocument();
+  });
+
+  it("mentre il dossier è aperto la pagina sotto non scorre", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(screen.getAllByRole("button")[0]);
+    expect(document.documentElement).toHaveAttribute("data-dialog-open");
   });
 
   it("il link al sito si apre in una scheda nuova, in sicurezza", async () => {
@@ -84,5 +101,12 @@ describe("WorksView", () => {
     await userEvent.click(screen.getAllByRole("button")[0]);
     expect(screen.getByText("120")).toBeVisible();
     expect(screen.getByText("componenti migrati")).toBeVisible();
+  });
+
+  it("il dossier mostra il caso della cartella cliccata, non sempre il primo", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(screen.getAllByRole("button")[1]);
+    expect(screen.getByText(items[1].decision)).toBeVisible();
+    expect(screen.queryByText(items[0].decision)).not.toBeInTheDocument();
   });
 });
