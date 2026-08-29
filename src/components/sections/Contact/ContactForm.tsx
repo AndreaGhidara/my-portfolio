@@ -69,10 +69,13 @@ export function ContactForm({ copy }: { copy: ContactFormCopy }) {
           autoComplete="name"
           placeholder={copy.placeholders.name}
           aria-invalid={Boolean(errors.name)}
+          aria-describedby={errors.name ? "name-error" : undefined}
           className={field}
           {...register("name")}
         />
-        {errors.name && <p className="mt-1 text-sm font-semibold text-[var(--fg)]">{errors.name.message}</p>}
+        {errors.name && (
+          <p id="name-error" className="mt-1 text-sm font-semibold text-[var(--fg)]">{errors.name.message}</p>
+        )}
       </div>
 
       <div className="mt-5">
@@ -85,10 +88,13 @@ export function ContactForm({ copy }: { copy: ContactFormCopy }) {
           autoComplete="email"
           placeholder={copy.placeholders.email}
           aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? "email-error" : undefined}
           className={field}
           {...register("email")}
         />
-        {errors.email && <p className="mt-1 text-sm font-semibold text-[var(--fg)]">{errors.email.message}</p>}
+        {errors.email && (
+          <p id="email-error" className="mt-1 text-sm font-semibold text-[var(--fg)]">{errors.email.message}</p>
+        )}
       </div>
 
       <div className="mt-5">
@@ -100,11 +106,12 @@ export function ContactForm({ copy }: { copy: ContactFormCopy }) {
           rows={5}
           placeholder={copy.placeholders.message}
           aria-invalid={Boolean(errors.message)}
+          aria-describedby={errors.message ? "message-error" : undefined}
           className={field}
           {...register("message")}
         />
         {errors.message && (
-          <p className="mt-1 text-sm font-semibold text-[var(--fg)]">{errors.message.message}</p>
+          <p id="message-error" className="mt-1 text-sm font-semibold text-[var(--fg)]">{errors.message.message}</p>
         )}
       </div>
 
