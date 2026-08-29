@@ -105,14 +105,12 @@ export function WorkCase({
             {data.metrics.length > 0 && (
               <dl className="flex flex-wrap gap-6">
                 {data.metrics.map((metric) => (
-                  <div key={metric.id}>
-                    <dd>
-                      <span className="block text-3xl font-black leading-none text-[var(--fg)]">
-                        {metric.value}
-                      </span>
-                      <span className="mt-1 block text-xs text-[var(--fg-muted)]">
-                        {metric.label}
-                      </span>
+                  // flex-col-reverse: nel DOM l'ordine resta dt -> dd, come richiede
+                  // la specifica; a schermo il numero appare sopra la sua etichetta.
+                  <div key={metric.id} className="flex flex-col-reverse gap-1">
+                    <dt className="text-xs text-[var(--fg-muted)]">{metric.label}</dt>
+                    <dd className="text-3xl font-black leading-none text-[var(--fg)]">
+                      {metric.value}
                     </dd>
                   </div>
                 ))}
