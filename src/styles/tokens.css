@@ -1,0 +1,32 @@
+:root {
+  --paper: #F5F1E8;
+  --ink: #14120F;
+  --orange: #E4572E;
+  --graph: #D9D3C4;
+  --muted: #6E6759;
+
+  --bg: var(--paper);
+  --fg: var(--ink);
+  --fg-muted: var(--muted);
+  --line: var(--graph);
+  --accent: var(--orange);
+  --on-accent: var(--ink);
+
+  --radius: 10px;
+  --section-y: 4.5rem;
+  --gutter: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --section-y: 8rem;
+    --gutter: 2.5rem;
+  }
+}
+
+[data-theme="dark"] {
+  --bg: var(--ink);
+  --fg: var(--paper);
+  --fg-muted: #A79E8C;
+  --line: #3A342A;
+}
