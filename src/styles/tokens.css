@@ -122,7 +122,13 @@ h1, h2, h3, .display {
 }
 
 ::view-transition-old(root) { z-index: 0; }
+
 ::view-transition-new(root) { z-index: 1; }
+
+/* Provato e scartato: un drop-shadow caldo sul fronte d'onda, per far leggere
+   il cerchio come luce. Verso il tema scuro il giallo cade su carta e sparisce,
+   verso il chiaro il fronte e' gia' oltre lo schermo quando conterebbe. Restava
+   solo il costo: una sfocatura a tutto schermo per quasi un secondo. */
 
 [data-ink-circle] { position: relative; display: grid; }
 [data-ink-circle-fill] {
