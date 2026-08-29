@@ -1,5 +1,4 @@
 import { Reveal } from "@/animations/components/Reveal";
-import { QuoteFrame } from "@/components/brand/QuoteFrame";
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
 
 export type ServiceItem = { id: string; title: string; description: string };
@@ -11,41 +10,49 @@ export type ServicesViewProps = {
   items: ServiceItem[];
 };
 
+/**
+ * La risposta alle quattro frasi della sezione precedente, nello stesso
+ * ordine: la prima riga qui e' come si risolve la prima frase di la'.
+ *
+ * Su carta e non sull'arancio: il blocco rumoroso e' il riconoscimento, questo
+ * e' il blocco che si legge. Due sezioni gridate di fila si annullano, e questo
+ * ha il testo piu' lungo della pagina — sull'arancio andrebbe tutto in
+ * inchiostro per il contrasto, e sarebbe un muro.
+ */
 export function ServicesView({ eyebrow, title, intro, items }: ServicesViewProps) {
   return (
-    <section
-      id="services"
-      className="relative bg-[var(--accent)] px-[var(--gutter)] py-[var(--section-y)]"
-    >
-      <ThreadSegment section="services" className="pointer-events-none absolute inset-0 opacity-40" />
+    <section id="services" className="relative px-[var(--gutter)] py-[var(--section-y)]">
+      <ThreadSegment section="services" className="pointer-events-none absolute inset-0 -z-10" />
 
-      {/* Le virgolette aprono e chiudono davvero il blocco. */}
-      <QuoteFrame variant="open" className="absolute left-4 top-4 block w-20 lg:w-32 [&_img]:h-auto [&_img]:w-full [&_img]:brightness-0 [&_img]:invert" />
-
-      <div className="relative mx-auto max-w-4xl pt-16">
-        <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
-        {/* Carta su arancio: 3,3:1, ammesso solo perche' e' testo grande. */}
-        <h2 className="mt-3 text-4xl text-[var(--paper)] lg:text-6xl">{title}</h2>
-        {/* Testo corrente sull'arancio: deve essere inchiostro (5,1:1),
-            mai carta (3,3:1). E' il vincolo di contrasto della spec. */}
-        <p data-service-description className="mt-4 max-w-2xl text-[var(--on-accent)]">
+      <div className="mx-auto max-w-5xl">
+        <p className="eyebrow">{eyebrow}</p>
+        <h2 className="mt-3 text-3xl lg:text-5xl">{title}</h2>
+        <p data-service-description className="mt-5 max-w-2xl text-[var(--fg-muted)]">
           {intro}
         </p>
 
-        <Reveal className="mt-10 grid gap-4 sm:grid-cols-2" stagger={0.09}>
+        {/* Una colonna sola anche da desktop: sono quattro risposte da leggere
+            in fila, non quattro schede da confrontare a colpo d'occhio. La
+            griglia a due colonne invitava a saltarle. */}
+        <Reveal as="ol" className="mt-10 border-t border-[var(--line)]" stagger={0.09}>
           {items.map((item, index) => (
-            <article key={item.id} className="rounded-[var(--radius)] bg-[var(--paper)] p-6">
-              <span className="eyebrow !text-[var(--ink)]">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <h3 className="mt-2 text-xl font-bold text-[var(--ink)]">{item.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{item.description}</p>
-            </article>
+            <li
+              key={item.id}
+              className="grid gap-2 border-b border-[var(--line)] py-7 lg:grid-cols-[13rem_1fr] lg:gap-8 lg:py-9"
+            >
+              <div className="lg:pt-1">
+                <span className="eyebrow">{String(index + 1).padStart(2, "0")}</span>
+                <h3 className="mt-1 text-lg font-bold leading-tight text-[var(--fg)] lg:text-xl">
+                  {item.title}
+                </h3>
+              </div>
+              <p className="max-w-2xl leading-relaxed text-[var(--fg-muted)]">
+                {item.description}
+              </p>
+            </li>
           ))}
         </Reveal>
       </div>
-
-      <QuoteFrame variant="close" className="absolute -bottom-6 left-4 block w-12 lg:w-16 [&_img]:h-auto [&_img]:w-full [&_img]:brightness-0 [&_img]:invert" />
     </section>
   );
 }

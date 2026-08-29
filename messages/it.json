@@ -16,49 +16,46 @@
     "ctaSecondary": "Guarda i lavori",
     "scrollHint": "Scorri"
   },
-  "pact": {
-    "eyebrow": "Come funziona",
-    "title": "Cosa succede se mi scrivi",
-    "intro": "Sono Andrea. Sviluppo software per il web da sei anni, tra aziende e progetti miei. Sui progetti piccoli lavoro da solo, su quelli grandi in team — e in entrambi i casi la parte che mi interessa è la stessa: capire il problema prima di scrivere codice.",
-    "steps": {
-      "reply": {
-        "title": "Rispondo entro 24 ore",
-        "body": "Sempre. Anche solo per dirti che il tuo progetto non fa per me e chi potrebbe aiutarti."
-      },
-      "call": {
-        "title": "Call gratuita di 30 minuti",
-        "body": "Mi racconti cosa ti serve, ti dico cosa ne penso davvero. Senza venderti niente."
-      },
-      "proposal": {
-        "title": "Proposta scritta",
-        "body": "Cosa faccio, in quanto tempo, a che condizioni. Nero su bianco, non a voce."
-      },
-      "decide": {
-        "title": "Decidi con calma",
-        "body": "Se non ti convince, ci siamo persi mezz'ora. Nessun impegno, nessuna insistenza."
-      }
-    }
-  },
-  "services": {
-    "eyebrow": "Servizi",
-    "title": "Cosa costruisco",
-    "intro": "Quattro modi di lavorare insieme. Se il tuo caso sta in mezzo a due, è normale: se ne parla in call.",
+  "seeking": {
+    "eyebrow": "Partiamo da qui",
+    "title": "Cosa stai cercando?",
+    "intro": "Se sei arrivato fin qui, una di queste frasi te la sei già detta.",
     "list": {
       "sites": {
-        "title": "Siti e landing su misura",
-        "description": "Il sito è la prima cosa che vedono di te. Lo costruisco veloce, trovabile su Google e davvero tuo — non un tema comprato e riempito di testo."
+        "voice": "Il mio sito non dice quello che faccio davvero."
+      },
+      "ecommerce": {
+        "voice": "Voglio vendere online senza combattere ogni giorno col gestionale."
+      },
+      "webapp": {
+        "voice": "Ho un'idea in testa e nessuno che la costruisca."
+      },
+      "ai": {
+        "voice": "Voglio smettere di fare a mano quello che potrebbe farsi da solo."
+      }
+    },
+    "outro": "Ti ci sei riconosciuto? Allora la parte difficile l'hai già fatta: sai cosa ti serve."
+  },
+  "services": {
+    "eyebrow": "Il metodo",
+    "title": "Come lo costruisco",
+    "intro": "Quattro modi di lavorare, uno per ogni frase qui sopra. Se il tuo caso sta in mezzo a due, è normale: se ne parla in call.",
+    "list": {
+      "sites": {
+        "title": "Siti e landing",
+        "description": "Niente temi comprati e riempiti di testo. Si parte da cosa deve capire chi atterra nei primi tre secondi, e da lì scendono struttura, parole e immagini. Poi velocità e indicizzazione: sono la differenza fra avere un sito ed essere trovati."
       },
       "ecommerce": {
         "title": "E-commerce",
-        "description": "Vendere online senza combattere ogni giorno col gestionale. Catalogo, pagamenti, spedizioni e integrazione con gli strumenti che usi già."
+        "description": "Il catalogo lo collego a quello che hai già — gestionale, magazzino, corriere — invece di chiederti di aggiornare due sistemi a mano. Pagamenti e spedizioni restano configurabili: domani puoi cambiare fornitore senza rifare il negozio."
       },
       "webapp": {
         "title": "Web app e piattaforme",
-        "description": "Gestionali, portali e dashboard su misura. Per quando il foglio di calcolo non basta più e il software pronto non fa quello che ti serve."
+        "description": "Si parte dalla versione più piccola che sta in piedi e la si mette presto davanti a qualcuno vero. Ruoli, permessi e abbonamenti si costruiscono da subito: aggiungerli a cose fatte vuol dire riscrivere."
       },
       "ai": {
         "title": "AI e automazioni",
-        "description": "Assistenti che rispondono davvero e automazioni che tolgono alle persone il lavoro ripetitivo. Non magia: strumenti collegati ai tuoi dati veri."
+        "description": "Collegate ai tuoi dati veri, non a un modello che indovina. E una regola che non negozio: quando l'assistente non sa, passa a una persona invece di inventare una risposta."
       }
     }
   },

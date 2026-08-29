@@ -3,9 +3,9 @@ import { render, screen } from "@testing-library/react";
 import { ServicesView } from "../ServicesView";
 
 const props = {
-  eyebrow: "Servizi",
-  title: "Cosa costruisco",
-  intro: "Quattro modi di lavorare insieme.",
+  eyebrow: "Il metodo",
+  title: "Come lo costruisco",
+  intro: "Quattro modi di lavorare, uno per ogni frase qui sopra.",
   items: [
     { id: "sites", title: "Siti e landing su misura", description: "Il sito è la prima cosa." },
     { id: "ecommerce", title: "E-commerce", description: "Vendere online." },
@@ -27,10 +27,17 @@ describe("ServicesView", () => {
     expect(screen.getByText("04")).toBeVisible();
   });
 
-  it("le descrizioni usano il colore inchiostro sull'arancio, non la carta", () => {
+  it("le quattro risposte stanno in una lista ordinata: rispondono in ordine alle quattro voci", () => {
     const { container } = render(<ServicesView {...props} />);
-    const description = container.querySelector("[data-service-description]");
-    expect(description?.className).toContain("--on-accent");
+    expect(container.querySelector("ol")).not.toBeNull();
+    expect(container.querySelectorAll("ol > li")).toHaveLength(4);
+  });
+
+  it("mostra il metodo di ogni voce, non solo il nome del servizio", () => {
+    render(<ServicesView {...props} />);
+    for (const item of props.items) {
+      expect(screen.getByText(item.description)).toBeVisible();
+    }
   });
 
   it("è ancorabile dalla navbar", () => {
