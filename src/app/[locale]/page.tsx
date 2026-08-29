@@ -4,11 +4,13 @@
  * sono nel Task 16.
  */
 import { Hero } from "@/components/sections/Hero";
+import { Pact } from "@/components/sections/Pact";
 
 export default function Home() {
   return (
     <>
       <Hero />
+      <Pact />
     </>
   );
 }
