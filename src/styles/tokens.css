@@ -33,6 +33,23 @@
 
 body {
   font-family: var(--font-body), system-ui, sans-serif;
+  /* --font-mono-light e --font-mono-full sono le custom property iniettate da
+     next/font sulla classe di <body> (layout.tsx): --font-mono va quindi
+     risolto qui, non su :root, perche' su <html> quelle variabili non sono
+     ancora visibili e var(--font-mono) risulterebbe invalido. */
+  --font-mono: var(--font-mono-light);
+}
+
+/* Cascadia (--font-mono-full) e' riservato al desktop: sotto i 1024px --font-mono
+   resta sul monospace Google leggero per non far scaricare i 201 KB di Cascadia
+   ai dispositivi mobile. Entrambi i font DEVONO restare "preload: false" in
+   layout.tsx: se anche uno solo dei due torna a fare preload, next/font forza
+   il download indipendentemente da quale variabile viene effettivamente usata
+   nel CSS, e questa ottimizzazione smette silenziosamente di funzionare. */
+@media (min-width: 1024px) {
+  body {
+    --font-mono: var(--font-mono-full);
+  }
 }
 
 h1, h2, h3, .display {
