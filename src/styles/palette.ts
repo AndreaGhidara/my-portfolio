@@ -9,6 +9,8 @@ export const palette = {
   orange: "#E4572E",
   graph: "#D9D3C4",
   muted: "#6E6759",
+  mutedDark: "#A79E8C",
+  lineDark: "#3A342A",
 } as const;
 
 export type PaletteToken = keyof typeof palette;

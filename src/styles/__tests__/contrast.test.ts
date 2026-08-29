@@ -46,10 +46,14 @@ describe("vincoli di accessibilità della spec", () => {
 
 describe("tema scuro", () => {
   it("il testo secondario scuro supera AA su inchiostro", () => {
-    expect(contrastRatio("#A79E8C", palette.ink)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(palette.mutedDark, palette.ink)).toBeGreaterThanOrEqual(4.5);
   });
 
   it("l'arancio su inchiostro è ammesso solo per testo grande", () => {
     expect(contrastRatio(palette.orange, palette.ink)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("il border scuro su inchiostro è visibile", () => {
+    expect(contrastRatio(palette.lineDark, palette.ink)).toBeGreaterThanOrEqual(1.5);
   });
 });
