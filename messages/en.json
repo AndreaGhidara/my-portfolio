@@ -16,49 +16,46 @@
     "ctaSecondary": "See the work",
     "scrollHint": "Scroll"
   },
-  "pact": {
-    "eyebrow": "How it works",
-    "title": "What happens if you write to me",
-    "intro": "I'm Andrea. I've been building software for the web for six years, both inside companies and on my own projects. On small projects I work alone, on large ones in a team — and either way the part I care about is the same: understanding the problem before writing code.",
-    "steps": {
-      "reply": {
-        "title": "I reply within 24 hours",
-        "body": "Always. Even if it's only to say your project isn't right for me, and who could help you instead."
-      },
-      "call": {
-        "title": "Free 30-minute call",
-        "body": "You tell me what you need, I tell you what I actually think. No sales pitch."
-      },
-      "proposal": {
-        "title": "A written proposal",
-        "body": "What I'll do, how long it takes, on what terms. In writing, not just spoken."
-      },
-      "decide": {
-        "title": "You decide, unhurried",
-        "body": "If it doesn't convince you, we've lost half an hour. No commitment, no chasing."
-      }
-    }
-  },
-  "services": {
-    "eyebrow": "Services",
-    "title": "What I build",
-    "intro": "Four ways to work together. If your case sits between two of them, that's normal — we'll sort it out on the call.",
+  "seeking": {
+    "eyebrow": "Where it starts",
+    "title": "What are you looking for?",
+    "intro": "If you've read this far, you've already said one of these out loud.",
     "list": {
       "sites": {
-        "title": "Custom sites and landing pages",
-        "description": "Your site is the first thing people see of you. I build it fast, findable on Google and genuinely yours — not a bought theme filled with text."
+        "voice": "My site doesn't say what I actually do."
       },
       "ecommerce": {
-        "title": "Online stores",
-        "description": "Selling online without fighting your back office every day. Catalogue, payments, shipping and integration with the tools you already use."
+        "voice": "I want to sell online without fighting my back office every day."
+      },
+      "webapp": {
+        "voice": "I have an idea in my head and nobody to build it."
+      },
+      "ai": {
+        "voice": "I want to stop doing by hand what could do itself."
+      }
+    },
+    "outro": "Recognised yourself? Then you've done the hard part already: you know what you need."
+  },
+  "services": {
+    "eyebrow": "The method",
+    "title": "How I build it",
+    "intro": "Four ways of working, one for each sentence above. If your case sits between two, that's normal: we talk it through on a call.",
+    "list": {
+      "sites": {
+        "title": "Sites and landing pages",
+        "description": "No bought themes filled with text. It starts from what a visitor has to understand in the first three seconds; structure, words and images follow from that. Then speed and indexing: the difference between having a site and being found."
+      },
+      "ecommerce": {
+        "title": "E-commerce",
+        "description": "I connect the catalogue to what you already run — back office, warehouse, courier — instead of asking you to update two systems by hand. Payments and shipping stay configurable: tomorrow you can switch provider without rebuilding the shop."
       },
       "webapp": {
         "title": "Web apps and platforms",
-        "description": "Custom back offices, portals and dashboards. For when the spreadsheet isn't enough any more and off-the-shelf software doesn't do what you need."
+        "description": "We start from the smallest version that stands up and put it in front of a real person early. Roles, permissions and subscriptions get built from the start: adding them later means rewriting."
       },
       "ai": {
         "title": "AI and automation",
-        "description": "Assistants that actually answer, and automation that takes repetitive work off people. Not magic: tools wired to your real data."
+        "description": "Connected to your real data, not to a model that guesses. And one rule I don't negotiate: when the assistant doesn't know, it hands over to a person instead of inventing an answer."
       }
     }
   },

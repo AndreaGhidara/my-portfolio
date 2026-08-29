@@ -1,9 +1,9 @@
 export type SectionId =
-  | "hero" | "pact" | "services" | "works" | "process" | "journey" | "contact";
+  | "hero" | "seeking" | "services" | "works" | "process" | "journey" | "contact";
 
 /** L'ordine in cui il filo attraversa la pagina. */
 export const SECTION_ORDER: SectionId[] = [
-  "hero", "pact", "services", "works", "process", "journey", "contact",
+  "hero", "seeking", "services", "works", "process", "journey", "contact",
 ];
 
 /**
@@ -16,7 +16,7 @@ export const SECTION_ORDER: SectionId[] = [
  */
 export const THREAD_ANCHORS: Record<SectionId, { in: number; out: number }> = {
   hero: { in: 6, out: 82 },
-  pact: { in: 82, out: 14 },
+  seeking: { in: 82, out: 14 },
   services: { in: 14, out: 88 },
   works: { in: 88, out: 20 },
   process: { in: 20, out: 50 },
