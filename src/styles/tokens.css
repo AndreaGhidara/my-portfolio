@@ -109,26 +109,35 @@ h1, h2, h3, .display {
   [data-bulb-halo] { transition: none; }
 }
 
-/* Cambio tema: il fotogramma nuovo cresce in un cerchio sopra quello vecchio,
-   che resta fermo sotto. La dissolvenza incrociata predefinita del browser va
-   spenta, altrimenti si sovrappone al cerchio e il tema vecchio sbiadisce
-   mentre il nuovo si apre: due effetti che si annullano a vicenda.
-   Il cerchio vero e proprio e' animato da ThemeToggle, che e' l'unico a sapere
-   dove si trova il bottone. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+/* Cambio tema: un disco del colore di fondo del tema NUOVO cresce dal bottone
+   della lampadina fino a coprire lo schermo; sotto, a schermo coperto, si
+   cambia tema; poi il disco svanisce e la pagina nuova compare.
+
+   E' un elemento vero in posizione fissa e non un ritaglio sui fotogrammi
+   delle view transition: quelle disegnano dentro un'area di riferimento
+   propria, che non si comporta uguale ovunque, e il cerchio finiva a partire
+   dal centro invece che dalla lampadina. Un elemento fisso lo posizionano
+   tutti allo stesso modo, e l'effetto funziona anche dove le view transition
+   non ci sono.
+
+   Si anima solo transform, che non ridisegna il layout. */
+[data-theme-wipe] {
+  position: fixed;
+  left: var(--wipe-x);
+  top: var(--wipe-y);
+  width: calc(var(--wipe-r) * 2);
+  height: calc(var(--wipe-r) * 2);
+  margin-left: calc(var(--wipe-r) * -1);
+  margin-top: calc(var(--wipe-r) * -1);
+  border-radius: 50%;
+  transform: scale(0);
+  will-change: transform;
+  pointer-events: none;
+  z-index: 9999;
 }
 
-::view-transition-old(root) { z-index: 0; }
-
-::view-transition-new(root) { z-index: 1; }
-
-/* Provato e scartato: un drop-shadow caldo sul fronte d'onda, per far leggere
-   il cerchio come luce. Verso il tema scuro il giallo cade su carta e sparisce,
-   verso il chiaro il fronte e' gia' oltre lo schermo quando conterebbe. Restava
-   solo il costo: una sfocatura a tutto schermo per quasi un secondo. */
+[data-theme-wipe][data-to="dark"] { background-color: var(--ink); }
+[data-theme-wipe][data-to="light"] { background-color: var(--paper); }
 
 [data-ink-circle] { position: relative; display: grid; }
 [data-ink-circle-fill] {
