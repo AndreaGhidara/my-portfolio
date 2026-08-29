@@ -2,7 +2,7 @@
 
 import { useRef, type ReactNode } from "react";
 import { gsap } from "@/animations/gsap";
-import { paint, stamp } from "@/animations/presets";
+import { paint, reveal, stamp } from "@/animations/presets";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 
 /**
@@ -23,12 +23,10 @@ export function HeroMotion({ children }: { children: ReactNode }) {
     const intro = gsap.timeline();
     intro.add(stamp(letters, { level, stagger: 0.09 }) ?? gsap.timeline());
     intro.add(paint(circle, { level }) ?? gsap.timeline(), "-=0.35");
-    intro.from(root.querySelectorAll("[data-hero-copy] > *"), {
-      opacity: 0,
-      y: 18,
-      stagger: 0.08,
-      duration: 0.5,
-    }, "-=0.4");
+    intro.add(
+      reveal(root.querySelectorAll("[data-hero-copy] > *"), { level, stagger: 0.08 }) ?? gsap.timeline(),
+      "-=0.4",
+    );
 
     if (level !== "full") return;
 
