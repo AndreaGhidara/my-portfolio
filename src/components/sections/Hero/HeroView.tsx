@@ -59,28 +59,31 @@ export function HeroView({
             </a>
           </div>
         </div>
-      </HeroMotion>
 
-      {/* Le due frecce dicono "scorri" senza una parola da tradurre, ma il
-          testo resta per chi naviga a voce: un'icona sola non e' un'istruzione. */}
-      <p className="mt-10 flex justify-center text-[var(--fg-muted)]">
-        <span className="sr-only">{scrollHint}</span>
-        <svg
-          data-scroll-cue
-          aria-hidden="true"
-          viewBox="0 0 24 26"
-          width="22"
-          height="24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path data-scroll-chevron d="M5 6l7 7 7-7" />
-          <path data-scroll-chevron d="M5 13l7 7 7-7" />
-        </svg>
-      </p>
+        {/* Le due frecce dicono "scorri" senza una parola da tradurre, ma il
+            testo resta per chi naviga a voce: un'icona sola non e' un'istruzione.
+            Stanno dentro HeroMotion e non dopo: fuori comparivano subito, e si
+            invitava a scorrere una pagina che non aveva ancora finito di
+            apparire. Sono l'ultimo passo dell'ingresso. */}
+        <p data-hero-outro className="mt-10 flex justify-center text-[var(--fg-muted)]">
+          <span className="sr-only">{scrollHint}</span>
+          <svg
+            data-scroll-cue
+            aria-hidden="true"
+            viewBox="0 0 24 26"
+            width="22"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path data-scroll-chevron d="M5 6l7 7 7-7" />
+            <path data-scroll-chevron d="M5 13l7 7 7-7" />
+          </svg>
+        </p>
+      </HeroMotion>
     </section>
   );
 }

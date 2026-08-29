@@ -27,6 +27,9 @@ export function HeroMotion({ children }: { children: ReactNode }) {
       reveal(root.querySelectorAll("[data-hero-copy] > *"), { level, stagger: 0.08 }) ?? gsap.timeline(),
       "-=0.4",
     );
+    // Le frecce per ultime, e senza sovrapposizione: invitano a scorrere, e
+    // ha senso invitare solo quando c'e' gia' qualcosa da guardare.
+    intro.add(reveal(root.querySelectorAll("[data-hero-outro]"), { level }) ?? gsap.timeline());
 
     if (level !== "full") return;
 
