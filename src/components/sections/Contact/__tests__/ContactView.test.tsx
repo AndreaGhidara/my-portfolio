@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { ContactView } from "../ContactView";
 
 const props = {
@@ -62,5 +63,21 @@ describe("ContactView", () => {
   it("l'esito dell'invio è annunciato alla tecnologia assistiva", () => {
     const { container } = render(<ContactView {...props} />);
     expect(container.querySelector('[role="status"]')).not.toBeNull();
+  });
+
+  it("ogni campo invalido e' associato al proprio messaggio d'errore", async () => {
+    const user = userEvent.setup();
+    render(<ContactView {...props} />);
+
+    const submit = screen.getByRole("button", { name: props.form.button.default });
+    await user.click(submit);
+
+    const nameInput = await screen.findByLabelText(props.form.labels.name);
+    const emailInput = screen.getByLabelText(props.form.labels.email);
+    const messageInput = screen.getByLabelText(props.form.labels.message);
+
+    expect(nameInput).toHaveAccessibleDescription(props.form.errors.nameRequired);
+    expect(emailInput).toHaveAccessibleDescription(props.form.errors.emailRequired);
+    expect(messageInput).toHaveAccessibleDescription(props.form.errors.messageRequired);
   });
 });
