@@ -66,6 +66,27 @@ h1, h2, h3, .display {
   color: var(--fg-muted);
 }
 
+/* L'header ha fondo pieno per default: e' lo stato sicuro, quello che vale
+   anche senza JavaScript, quando la nav ha del contenuto che le scorre sotto.
+   In cima alla pagina non ha niente sotto tranne la ragnatela, e il fondo
+   semitrasparente la taglierebbe di netto all'altezza della barra: li' resta
+   trasparente. data-at-top e' scritto da TopStateScript prima del paint e
+   tenuto aggiornato da HeaderScrollState. */
+[data-site-header] {
+  background-color: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(8px);
+  transition: background-color 240ms ease, backdrop-filter 240ms ease;
+}
+
+[data-at-top] [data-site-header] {
+  background-color: transparent;
+  backdrop-filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-site-header] { transition: none; }
+}
+
 [data-ink-circle] { position: relative; display: grid; }
 [data-ink-circle-fill] {
   position: absolute;
