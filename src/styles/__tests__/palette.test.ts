@@ -2,9 +2,9 @@ import { describe, it, expect } from "vitest";
 import { palette } from "../palette";
 
 describe("palette", () => {
-  it("espone esattamente i sei token della spec", () => {
+  it("espone esattamente i sette token della spec", () => {
     expect(Object.keys(palette).sort()).toEqual(
-      ["graph", "ink", "muted", "mutedDark", "orange", "paper"],
+      ["bulb", "graph", "ink", "muted", "mutedDark", "orange", "paper"],
     );
   });
 
@@ -15,5 +15,6 @@ describe("palette", () => {
     expect(palette.graph).toBe("#D9D3C4");
     expect(palette.muted).toBe("#6E6759");
     expect(palette.mutedDark).toBe("#A79E8C");
+    expect(palette.bulb).toBe("#FDEA7B");
   });
 });

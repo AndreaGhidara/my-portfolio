@@ -4,6 +4,7 @@
   --orange: #E4572E;
   --graph: #D9D3C4;
   --muted: #6E6759;
+  --bulb: #FDEA7B;
 
   --bg: var(--paper);
   --fg: var(--ink);
@@ -92,20 +93,36 @@ h1, h2, h3, .display {
    del vecchio interruttore. Lo stato viene da html[data-theme] e non da
    React, che lo saprebbe solo dopo il mount: caricando in tema scuro si
    vedrebbe la lampadina spenta per un fotogramma.
-   Il giallo dell'originale non c'e' perche' la palette e' chiusa a sei
-   colori; acceso usa --accent, che nel sito e' gia' il colore della luce. */
+   Il giallo acceso e' --bulb, il settimo colore della palette: esiste solo
+   per questa lampadina e non va usato altrove. Su carta avrebbe 1,08:1, cioe'
+   sarebbe invisibile — ma si accende solo in tema scuro, dove fa 15,3:1. */
 [data-bulb-glass] { fill: var(--line); transition: fill 240ms ease; }
 [data-bulb-cap] { fill: var(--fg-muted); }
 
 [data-bulb-halo] { opacity: 0; transition: opacity 240ms ease; }
 
-[data-theme="dark"] [data-bulb-glass] { fill: var(--accent); }
+[data-theme="dark"] [data-bulb-glass] { fill: var(--bulb); }
 [data-theme="dark"] [data-bulb-halo] { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
   [data-bulb-glass],
   [data-bulb-halo] { transition: none; }
 }
+
+/* Cambio tema: il fotogramma nuovo cresce in un cerchio sopra quello vecchio,
+   che resta fermo sotto. La dissolvenza incrociata predefinita del browser va
+   spenta, altrimenti si sovrappone al cerchio e il tema vecchio sbiadisce
+   mentre il nuovo si apre: due effetti che si annullano a vicenda.
+   Il cerchio vero e proprio e' animato da ThemeToggle, che e' l'unico a sapere
+   dove si trova il bottone. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) { z-index: 0; }
+::view-transition-new(root) { z-index: 1; }
 
 [data-ink-circle] { position: relative; display: grid; }
 [data-ink-circle-fill] {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * La lampadina del vecchio sito, staccata dall'interruttore a levetta e
@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
  */
 export function ThemeToggle({ label }: { label: string }) {
   const [isDark, setIsDark] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setIsDark(document.documentElement.getAttribute("data-theme") === "dark");
@@ -24,18 +25,57 @@ export function ThemeToggle({ label }: { label: string }) {
 
   const toggle = () => {
     const next = !isDark;
-    setIsDark(next);
-    if (next) {
-      document.documentElement.setAttribute("data-theme", "dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.removeAttribute("data-theme");
-      localStorage.setItem("theme", "light");
+
+    // Deve restare sincrono: startViewTransition fotografa il prima, esegue
+    // questa funzione e fotografa il dopo. Un aggiornamento differito qui
+    // finirebbe fuori dalla transizione e il cerchio si aprirebbe sul nulla.
+    const applyTheme = () => {
+      setIsDark(next);
+      if (next) {
+        document.documentElement.setAttribute("data-theme", "dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("theme", "light");
+      }
+    };
+
+    if (!canAnimateThemeChange()) {
+      applyTheme();
+      return;
     }
+
+    const transition = document.startViewTransition!(applyTheme);
+
+    transition.ready
+      .then(() => {
+        const origin = circleOrigin(buttonRef.current);
+        document.documentElement.animate(
+          {
+            clipPath: [
+              `circle(0px at ${origin.x}px ${origin.y}px)`,
+              `circle(${origin.radius}px at ${origin.x}px ${origin.y}px)`,
+            ],
+          },
+          {
+            duration: 620,
+            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+            // Si anima solo il fotogramma NUOVO: cresce sopra quello vecchio
+            // che resta fermo sotto. Animando entrambi si vedrebbe il vecchio
+            // tema scivolare via e il cerchio perderebbe il senso.
+            pseudoElement: "::view-transition-new(root)",
+          },
+        );
+      })
+      .catch(() => {
+        /* Transizione interrotta (doppio click, cambio pagina): il tema e'
+           gia' stato applicato, non c'e' niente da recuperare. */
+      });
   };
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       onClick={toggle}
       aria-label={label}
@@ -49,8 +89,8 @@ export function ThemeToggle({ label }: { label: string }) {
             veniva tagliata in un quadrato visibile sul fondo scuro. */}
         <defs>
           <radialGradient id="bulb-halo">
-            <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--bulb)" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="var(--bulb)" stopOpacity="0" />
           </radialGradient>
         </defs>
         <circle data-bulb-halo cx="12" cy="9" r="9" fill="url(#bulb-halo)" />
@@ -76,4 +116,37 @@ export function ThemeToggle({ label }: { label: string }) {
       </svg>
     </button>
   );
+}
+
+/**
+ * Il cerchio si apre solo dove il browser sa fare le transizioni di vista e
+ * dove l'utente non ha chiesto meno movimento. Altrove il tema cambia di
+ * colpo, che e' il comportamento di sempre: l'effetto e' un di piu', mai la
+ * condizione perche' il bottone funzioni.
+ */
+function canAnimateThemeChange() {
+  return (
+    typeof document.startViewTransition === "function" &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+/**
+ * Centro del bottone e raggio necessario a coprire lo schermo: e' la
+ * distanza dall'angolo piu' lontano, non mezza diagonale, altrimenti in un
+ * angolo resterebbe una fetta del tema vecchio.
+ */
+function circleOrigin(button: HTMLElement | null) {
+  const rect = button?.getBoundingClientRect();
+  const x = rect ? rect.left + rect.width / 2 : window.innerWidth;
+  const y = rect ? rect.top + rect.height / 2 : 0;
+
+  return {
+    x,
+    y,
+    radius: Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y),
+    ),
+  };
 }
