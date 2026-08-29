@@ -18,67 +18,63 @@ import { useEffect, useRef, useState } from "react";
 export function ThemeToggle({ label }: { label: string }) {
   const [isDark, setIsDark] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const wiping = useRef(false);
 
   useEffect(() => {
     setIsDark(document.documentElement.getAttribute("data-theme") === "dark");
   }, []);
 
   const toggle = () => {
-    // Un click alla volta: due dischi sovrapposti si annullerebbero a vicenda
-    // e il tema finirebbe fuori sincrono con il bottone.
-    if (wiping.current) return;
-
     const next = !isDark;
 
-    // La scelta si registra subito, il colore si dipinge dopo. Separarle
-    // serve a due cose: aria-pressed cambia all'istante invece che fra sette
-    // decimi di secondo, e se ricarichi mentre il disco cresce la preferenza
-    // e' gia' salvata, quindi la pagina torna su con il tema che hai scelto.
-    const commitChoice = () => {
+    // Deve restare sincrono: startViewTransition fotografa il prima, esegue
+    // questa funzione e fotografa il dopo. Un aggiornamento differito qui
+    // finirebbe fuori dalla transizione e il cerchio si aprirebbe sul nulla.
+    const applyTheme = () => {
       setIsDark(next);
-      localStorage.setItem("theme", next ? "dark" : "light");
+      if (next) {
+        document.documentElement.setAttribute("data-theme", "dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("theme", "light");
+      }
     };
 
-    const paintTheme = () => {
-      if (next) document.documentElement.setAttribute("data-theme", "dark");
-      else document.documentElement.removeAttribute("data-theme");
-    };
-
-    commitChoice();
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      paintTheme();
+    if (!canAnimateThemeChange()) {
+      applyTheme();
       return;
     }
 
-    wiping.current = true;
-    const disc = makeDisc(buttonRef.current, next);
-    document.body.appendChild(disc);
+    const transition = document.startViewTransition!(applyTheme);
 
-    disc
-      .animate({ transform: ["scale(0)", "scale(1)"] }, {
-        // Lento in partenza: il bottone sta a un pelo dal bordo alto, quindi
-        // del disco se ne vede solo un quarto. Con una partenza rapida non
-        // resta il tempo di vedere da dove nasce.
-        duration: 720,
-        easing: "cubic-bezier(0.85, 0, 0.15, 1)",
-        fill: "forwards",
+    transition.ready
+      .then(() => {
+        const c = revealCircle(buttonRef.current);
+        document.documentElement.animate(
+          {
+            clipPath: [
+              `circle(0% at ${c.x}% ${c.y}%)`,
+              `circle(${c.radius}% at ${c.x}% ${c.y}%)`,
+            ],
+          },
+          {
+            // Lento in partenza apposta. Il bottone sta a trenta pixel dal
+            // bordo alto, quindi del cerchio se ne vede solo un quarto: con
+            // una partenza rapida a nessuno resta il tempo di vedere il
+            // punto d'origine, e il buio sembra scendere dal bordo invece
+            // che uscire dalla lampadina.
+            duration: 950,
+            easing: "cubic-bezier(0.85, 0, 0.15, 1)",
+            // Si anima solo il fotogramma NUOVO: cresce sopra quello vecchio
+            // che resta fermo sotto. Cosi' dentro il cerchio si legge la
+            // pagina nel tema nuovo, invece di una macchia di colore pieno.
+            pseudoElement: "::view-transition-new(root)",
+          },
+        );
       })
-      .finished.then(() => {
-        // Il disco ha gia' il colore di fondo del tema nuovo: si dipinge
-        // mentre copre tutto, quindi il passaggio non si vede.
-        paintTheme();
-        return disc.animate({ opacity: [1, 0] }, {
-          duration: 280,
-          easing: "ease-out",
-          fill: "forwards",
-        }).finished;
-      })
-      .catch(paintTheme)
-      .finally(() => {
-        disc.remove();
-        wiping.current = false;
+      .catch(() => {
+        /* Transizione interrotta (doppio click, cambio pagina): il tema e'
+           gia' stato applicato, non c'e' niente da recuperare. */
       });
   };
 
@@ -128,30 +124,44 @@ export function ThemeToggle({ label }: { label: string }) {
 }
 
 /**
- * Il disco che copre lo schermo durante il cambio tema.
- *
- * E' un elemento vero in posizione fissa, non un ritaglio sui fotogrammi
- * delle view transition: quelle disegnano dentro uno spazio di coordinate
- * proprio, che non si comporta uguale ovunque, e il cerchio finiva altrove.
- * Un elemento fisso lo posizionano tutti allo stesso modo.
- *
- * Il raggio e' la distanza dall'angolo piu' lontano, non mezza diagonale:
- * altrimenti in un angolo resterebbe scoperta una fetta del tema vecchio.
+ * Il cerchio si apre solo dove il browser sa fare le transizioni di vista e
+ * dove l'utente non ha chiesto meno movimento. Altrove il tema cambia di
+ * colpo, che e' il comportamento di sempre: l'effetto e' un di piu', mai la
+ * condizione perche' il bottone funzioni.
  */
-function makeDisc(button: HTMLElement | null, toDark: boolean) {
-  const rect = button?.getBoundingClientRect();
-  const x = rect ? rect.left + rect.width / 2 : window.innerWidth;
-  const y = rect ? rect.top + rect.height / 2 : 0;
-  const radius = Math.hypot(
-    Math.max(x, window.innerWidth - x),
-    Math.max(y, window.innerHeight - y),
+function canAnimateThemeChange() {
+  return (
+    typeof document.startViewTransition === "function" &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
+}
 
-  const disc = document.createElement("div");
-  disc.setAttribute("data-theme-wipe", "");
-  disc.setAttribute("data-to", toDark ? "dark" : "light");
-  disc.style.setProperty("--wipe-x", `${x}px`);
-  disc.style.setProperty("--wipe-y", `${y}px`);
-  disc.style.setProperty("--wipe-r", `${radius}px`);
-  return disc;
+/**
+ * Cerchio d'apertura, in PERCENTUALE e mai in pixel.
+ *
+ * Il ritaglio si applica al fotogramma della transizione, non alla finestra,
+ * e su uno schermo a densita' doppia quel fotogramma e' largo il doppio: un
+ * pixel 1382 su una fotografia da 2880 cade al 48%, cioe' al centro dello
+ * schermo invece che sulla lampadina. In percentuale la scala non conta piu'.
+ *
+ * Il raggio e' la distanza dall'angolo piu' lontano e non mezza diagonale,
+ * altrimenti in un angolo resterebbe scoperta una fetta del tema vecchio.
+ * La percentuale del raggio in circle() si risolve su sqrt(w²+h²)/sqrt(2)
+ * del riquadro di riferimento: e' quella la conversione qui sotto.
+ */
+function revealCircle(button: HTMLElement | null) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const rect = button?.getBoundingClientRect();
+  const x = rect ? rect.left + rect.width / 2 : vw;
+  const y = rect ? rect.top + rect.height / 2 : 0;
+
+  const radiusPx = Math.hypot(Math.max(x, vw - x), Math.max(y, vh - y));
+  const referenceLength = Math.hypot(vw, vh) / Math.SQRT2;
+
+  return {
+    x: (x / vw) * 100,
+    y: (y / vh) * 100,
+    radius: (radiusPx / referenceLength) * 100,
+  };
 }
