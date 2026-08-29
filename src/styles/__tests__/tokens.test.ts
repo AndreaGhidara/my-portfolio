@@ -18,6 +18,18 @@ describe("tokens.css", () => {
     expect(css).toMatch(/\[data-theme="dark"\][\s\S]*--bg:\s*var\(--ink\)/);
   });
 
+  it("un dossier chiuso resta display:none", () => {
+    // Difetto vero, gia' arrivato in pagina: dichiarando `display` sul
+    // selettore nudo si sovrascrive il display:none che il browser da' a un
+    // <dialog> chiuso. Il dossier chiuso restava disegnato e, senza figli,
+    // diventava una scatola alta 2px: una linea sotto le cartelle, `fixed`
+    // dopo la prima apertura, quindi incollata allo schermo mentre si scorre.
+    expect(css).toMatch(/\[data-work-dialog\]:not\(\[open\]\)\s*\{[^}]*display:\s*none/);
+
+    const bareRule = /\[data-work-dialog\]\s*\{[^}]*display\s*:/;
+    expect(css).not.toMatch(bareRule);
+  });
+
   it("contiene solo colori hex dalla palette", () => {
     const hexRegex = /#[0-9A-Fa-f]{6}/g;
     const hexesInCss = css.match(hexRegex) || [];

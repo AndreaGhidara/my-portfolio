@@ -44,16 +44,28 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
       const target = dialog.getBoundingClientRect();
       const dx = origin.left + origin.width / 2 - (target.left + target.width / 2);
       const dy = origin.top + origin.height / 2 - (target.top + target.height / 2);
+      // Scala uniforme e non due fattori diversi: scalando larghezza e altezza
+      // in modo indipendente il testo si deforma in modo visibile. Si prende il
+      // rapporto piu' piccolo cosi' la partenza e' davvero piccola anche da
+      // telefono, dove la cartella e' larga quasi quanto lo schermo.
+      const scale = Math.max(
+        0.15,
+        Math.min(origin.width / target.width, origin.height / target.height),
+      );
 
       dialog.animate(
         [
-          // Scala uniforme e non due fattori diversi: scalando larghezza e
-          // altezza in modo indipendente il testo si deforma in modo visibile
-          // durante l'apertura.
-          { transform: `translate(${dx}px, ${dy}px) scale(0.55)`, opacity: 0 },
-          { transform: "none", opacity: 1 },
+          // L'inclinazione e' l'apertura: il dossier parte dalla cartella,
+          // ribaltato come un coperchio, e si spiana venendo verso di te.
+          {
+            transform: `perspective(1600px) translate(${dx}px, ${dy}px) scale(${scale}) rotateX(-16deg)`,
+            opacity: 0,
+            offset: 0,
+          },
+          { opacity: 1, offset: 0.28 },
+          { transform: "perspective(1600px) translate(0px, 0px) scale(1) rotateX(0deg)", opacity: 1, offset: 1 },
         ],
-        { duration: 420, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+        { duration: 520, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
       );
     }
 
@@ -76,7 +88,8 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
     >
       {data && (
         <div className="flex min-h-0 flex-1 flex-col">
-          <div className="flex items-start justify-between gap-4 border-b border-[var(--line)] px-5 py-4 lg:px-8">
+          <div className="border-b border-[var(--line)] px-[var(--gutter)] py-4">
+            <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-4">
             <p id={titleId} className="eyebrow">
               {data.name} · {data.year}
             </p>
@@ -88,9 +101,11 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
               <span aria-hidden="true" className="text-lg leading-none">×</span>
               <span className="sr-only">{labels.close}</span>
             </button>
+            </div>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 lg:px-8 lg:py-8">
+          <div className="min-h-0 flex-1 overflow-y-auto px-[var(--gutter)] py-6 lg:py-10">
+            <div className="mx-auto w-full max-w-5xl">
             <Image
               src={data.screenshot}
               alt={`${data.name}: schermata del progetto`}
@@ -153,6 +168,7 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
                   </li>
                 ))}
               </ul>
+            </div>
             </div>
           </div>
         </div>
