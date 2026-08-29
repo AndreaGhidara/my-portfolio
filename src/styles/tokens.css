@@ -220,33 +220,41 @@ h1, h2, h3, .display {
 }
 
 /* Il dossier. <dialog> nativo: focus, Escape, strato superiore e ritorno del
-   focus li gestisce il browser. Qui c'e' solo la forma. */
-[data-work-dialog] {
+   focus li gestisce il browser. Qui c'e' solo la forma.
+
+   Tutto sta sotto [open], e non e' un dettaglio: dichiarando display su
+   [data-work-dialog] senza qualificarlo si sovrascrive il `display: none` che
+   il browser da' a un dialog chiuso. Il dossier chiuso restava disegnato e,
+   senza figli, diventava una scatola alta 2px — una linea sotto le cartelle,
+   assoluta prima della prima apertura e `fixed` dopo, quindi incollata allo
+   schermo mentre si scorre la pagina. */
+[data-work-dialog]:not([open]) { display: none; }
+
+[data-work-dialog][open] {
   display: flex;
   flex-direction: column;
-  /* Il reset di Tailwind azzera i margini di ogni elemento e con essi il
-     `margin: auto` con cui il browser centra un dialog: senza, il dossier
-     resta incollato in alto a sinistra. */
-  margin: auto;
-  width: min(64rem, calc(100vw - 2 * var(--gutter)));
-  max-height: min(88vh, 56rem);
+  /* A tutto schermo: il dossier non e' un riquadro appoggiato sopra il sito,
+     e' il posto dove stai adesso. La misura del testo la tiene il contenuto
+     dentro, non la finestra. */
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
   padding: 0;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border: 0;
+  border-radius: 0;
   background-color: var(--bg);
   color: var(--fg);
   overflow: hidden;
 }
 
+/* Si vede solo durante l'apertura, mentre il dossier e' ancora piccolo:
+   e' quello che stacca la cartella che si apre dal resto della pagina. */
 [data-work-dialog]::backdrop {
   background-color: color-mix(in srgb, var(--ink) 55%, transparent);
-  backdrop-filter: blur(2px);
 }
 
-/* showModal() rende il resto della pagina inerte ma non ne blocca lo scroll:
-   senza questo, la rotellina scorre il sito dietro al dossier.
-   Serve su html E su body: bloccando solo html, il ruolo di elemento che
-   scorre passa a body e la pagina continua a muoversi lo stesso. */
 html[data-dialog-open],
 html[data-dialog-open] body { overflow: hidden; }
 
