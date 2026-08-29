@@ -58,8 +58,13 @@ export function ThemeToggle({ label }: { label: string }) {
             ],
           },
           {
-            duration: 620,
-            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+            // Lento in partenza apposta. Il bottone sta a trenta pixel dal
+            // bordo alto, quindi del cerchio se ne vede solo un quarto: con
+            // una partenza rapida a nessuno resta il tempo di vedere il
+            // punto d'origine, e il buio sembra scendere dal bordo invece
+            // che uscire dalla lampadina.
+            duration: 950,
+            easing: "cubic-bezier(0.85, 0, 0.15, 1)",
             // Si anima solo il fotogramma NUOVO: cresce sopra quello vecchio
             // che resta fermo sotto. Animando entrambi si vedrebbe il vecchio
             // tema scivolare via e il cerchio perderebbe il senso.
