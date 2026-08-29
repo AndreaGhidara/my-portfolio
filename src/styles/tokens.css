@@ -27,6 +27,6 @@
 [data-theme="dark"] {
   --bg: var(--ink);
   --fg: var(--paper);
-  --fg-muted: #A79E8C;
-  --line: #3A342A;
+  --fg-muted: #A79E8C; /* from palette.mutedDark */
+  --line: #3A342A; /* from palette.lineDark */
 }
