@@ -23,7 +23,7 @@ export function ServicesView({ eyebrow, title, intro, items }: ServicesViewProps
       <QuoteFrame variant="open" className="absolute left-4 top-4 block w-20 lg:w-32 [&_img]:h-auto [&_img]:w-full [&_img]:brightness-0 [&_img]:invert" />
 
       <div className="relative mx-auto max-w-4xl pt-16">
-        <p className="eyebrow !text-[var(--on-accent)] opacity-70">{eyebrow}</p>
+        <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
         {/* Carta su arancio: 3,3:1, ammesso solo perche' e' testo grande. */}
         <h2 className="mt-3 text-4xl text-[var(--paper)] lg:text-6xl">{title}</h2>
         {/* Testo corrente sull'arancio: deve essere inchiostro (5,1:1),
@@ -35,7 +35,7 @@ export function ServicesView({ eyebrow, title, intro, items }: ServicesViewProps
         <Reveal className="mt-10 grid gap-4 sm:grid-cols-2" stagger={0.09}>
           {items.map((item, index) => (
             <article key={item.id} className="rounded-[var(--radius)] bg-[var(--paper)] p-6">
-              <span className="eyebrow !text-[var(--accent)]">
+              <span className="eyebrow !text-[var(--ink)]">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <h3 className="mt-2 text-xl font-bold text-[var(--ink)]">{item.title}</h3>
