@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Archivo_Black } from "next/font/google";
+import { Archivo, Archivo_Black, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "@/app/globals.css";
 import { Navbar } from "@/components/shell/Navbar";
@@ -26,10 +26,18 @@ const archivoBlack = Archivo_Black({
   variable: "--font-display",
   display: "swap",
 });
-const mono = localFont({
+const monoFull = localFont({
   src: "../../fonts/CascadiaCode.woff2",
-  variable: "--font-mono",
+  variable: "--font-mono-full",
   display: "swap",
+  preload: false,
+});
+const monoLight = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-mono-light",
+  display: "swap",
+  preload: false,
 });
 
 export async function generateMetadata({
@@ -126,7 +134,7 @@ export default async function RootLayout({
       <head>
         <ThemeScript />
       </head>
-      <body className={`${archivo.variable} ${archivoBlack.variable} ${mono.variable} min-h-dvh`}>
+      <body className={`${archivo.variable} ${archivoBlack.variable} ${monoFull.variable} ${monoLight.variable} min-h-dvh`}>
         <Script
           id="ld-person"
           type="application/ld+json"
