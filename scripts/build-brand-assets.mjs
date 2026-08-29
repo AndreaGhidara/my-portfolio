@@ -5,12 +5,19 @@ import path from "node:path";
 const SRC = "assets-source";
 const OUT = "public/brand";
 
-/** Larghezza di uscita per asset. Il doppio della massima resa a schermo. */
+/**
+ * Larghezza di uscita per asset. Regola: circa 3x la dimensione CSS
+ * massima a cui l'elemento viene reso (copre display retina/3x senza
+ * sprecare byte su pixel che nessuno schermo mostrera' mai).
+ * - ink-circle: reso al massimo a `size-32 lg:size-44` -> 176px CSS.
+ * - avatar: reso `w-[88%]` dentro lo stesso cerchio -> ~155px CSS.
+ * Per entrambi 480px basta e avanza anche a 3x.
+ */
 const WIDTHS = {
   "letter-a": 600, "letter-n": 600, "letter-d": 600,
   "letter-r": 600, "letter-e": 600,
   "quote-open": 900, "quote-close": 500,
-  "ink-circle": 800, "avatar": 700,
+  "ink-circle": 480, "avatar": 480,
 };
 
 const targets = [
@@ -53,7 +60,7 @@ for (const [name, out] of targets) {
       .greyscale()
       .webp({ quality: 50, alphaQuality: 95, effort: 6 });
   } else {
-    pipeline = pipeline.webp({ quality: 78, effort: 6 });
+    pipeline = pipeline.webp({ quality: 82, effort: 6 });
   }
 
   const info = await pipeline.toFile(outPath);
