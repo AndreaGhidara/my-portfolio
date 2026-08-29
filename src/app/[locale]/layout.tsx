@@ -3,6 +3,8 @@ import { Archivo, Archivo_Black, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "@/app/globals.css";
 import { Navbar } from "@/components/shell/Navbar";
+import { TopStateScript } from "@/components/shell/TopStateScript";
+import { HeaderScrollState } from "@/components/shell/HeaderScrollState";
 import { WebCorner } from "@/components/brand/WebCorner";
 import { Footer } from "@/components/sections/Footer";
 import { ThemeScript } from "@/components/shell/ThemeScript";
@@ -134,6 +136,7 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning>
       <head>
         <ThemeScript />
+        <TopStateScript />
       </head>
       <body className={`${archivo.variable} ${archivoBlack.variable} ${monoFull.variable} ${monoLight.variable} relative min-h-dvh`}>
         <Script
@@ -151,23 +154,21 @@ export default async function RootLayout({
         <NextIntlClientProvider>
           <SmoothScroll />
 
-          <header id="top" className="sticky top-0 z-50 bg-[var(--bg)]/85 backdrop-blur">
+          <HeaderScrollState />
+
+          {/* Ancorata all'angolo vero della pagina, non a quello dell'hero:
+              dentro <section id="hero"> (overflow-hidden) veniva tagliata e si
+              riduceva a un arco casuale sul bordo sinistro.
+              A -z-10 le lettere di ANDREA le passano davanti, mentre il fondo
+              di <body> resta comunque dietro perche' si propaga al canvas.
+              Sopra c'e' solo l'header, che in cima alla pagina e' trasparente
+              apposta per non tagliarla. Decorativa: pointer-events-none. */}
+          <WebCorner className="pointer-events-none absolute left-0 top-0 -z-10 block w-36 lg:w-72" />
+
+          <header id="top" data-site-header className="sticky top-0 z-50">
             <Navbar />
           </header>
-
-          {/* La ragnatela vive qui e non dentro <section id="hero">: quella ha
-              overflow-hidden, e con gli offset negativi la tagliava sul bordo
-              sinistro riducendola a un arco casuale.
-              Ancorata all'angolo di <main> parte davvero da in alto a sinistra
-              senza finire dietro la barra: sotto l'header il fondo
-              semitrasparente la taglierebbe di netto, sopra passerebbe sulla A
-              invece che sotto. Sta a -z-10, quindi le lettere le stanno davanti
-              e il fondo di <body> resta comunque dietro (si propaga al canvas).
-              Decorativa: aria-hidden e pointer-events-none. */}
-          <main id="main" className="relative">
-            <WebCorner className="pointer-events-none absolute left-0 top-0 -z-10 block w-36 lg:w-72" />
-            {children}
-          </main>
+          <main id="main">{children}</main>
         </NextIntlClientProvider>
         {/* Fuori da <main>: e' chrome di sito come la Navbar, e un <footer>
             dentro <main> perde il ruolo implicito contentinfo (HTML-AAM). */}
