@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ElementType, type ReactNode } from "react";
+import { useRef, type ComponentPropsWithoutRef, type ElementType, type ReactNode } from "react";
 import { reveal } from "../presets";
 import { useSectionAnimation } from "../useSectionAnimation";
 
@@ -13,7 +13,7 @@ type RevealProps = {
   delay?: number;
   /** Ritardo fra i figli diretti, se ce n'è più di uno. */
   stagger?: number;
-};
+} & Omit<ComponentPropsWithoutRef<"div">, "children" | "className">;
 
 /**
  * Ingresso generico per i blocchi senza animazione su misura.
@@ -26,6 +26,7 @@ export function Reveal({
   className,
   delay = 0,
   stagger = 0.07,
+  ...rest
 }: RevealProps) {
   const scope = useRef<HTMLElement | null>(null);
 
@@ -36,8 +37,12 @@ export function Reveal({
     reveal(targets, { level, trigger: root, delay, stagger });
   }, scope);
 
+  // Tutto quello che Reveal non conosce arriva all'elemento reso. Un involucro
+  // di presentazione che mangia gli attributi costringe chi lo usa ad avvolgerlo
+  // in un <div> solo per poterli scrivere, e l'elemento che conta — qui una
+  // <ol> — smette di essere quello che finisce nel DOM.
   return (
-    <Tag ref={scope} className={className}>
+    <Tag ref={scope} className={className} {...rest}>
       {children}
     </Tag>
   );
