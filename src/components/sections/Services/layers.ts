@@ -246,6 +246,14 @@ export const OBJECTS_PER_LAYER: Record<DeskLayout, number> = { wide: 6, tall: 4 
  * ANGLE_OFFSET, che e' quello che rende il pavimento raggiungibile: a passo
  * regolare il soffitto misurato e' 0,64 punti, e non si supera con nessuna
  * scelta di raggi.
+ *
+ * L'anello esterno e' stato ritarato quando il post-it bianco e' passato quarto
+ * nel suo strato: l'oggetto che gli e' subentrato in sesta posizione porta
+ * un'etichetta che li' prima non c'era, e il minimo del mondo orizzontale era
+ * sceso a 1,23 — sopra il pavimento, ma senza piu' margine sopra. Mezzo punto di
+ * raggio in meno in larghezza e tre decimi in piu' in altezza lo riportano a
+ * 1,40, e il punto piu' stretto torna a essere un oggetto contro il BORDO del
+ * mondo invece che due oggetti fra loro, che e' il vincolo meno fragile dei due.
  * Cambiarne uno solo a occhio rompe il tavolo: la prova sta in layers.test.ts.
  */
 const RADII: Record<DeskLayout, { rx: number; ry: number }[]> = {
@@ -253,7 +261,7 @@ const RADII: Record<DeskLayout, { rx: number; ry: number }[]> = {
     { rx: 15.1, ry: 22.8 },
     { rx: 27.3, ry: 25.5 },
     { rx: 39.1, ry: 28.2 },
-    { rx: 41.2, ry: 33.3 },
+    { rx: 40.7, ry: 33.6 },
   ],
   tall: [
     { rx: 15.7, ry: 11.6 },
@@ -279,8 +287,8 @@ const START_ANGLE: Record<DeskLayout, number[]> = {
  * E' anche l'unica cosa che fa spazio. A passo regolare il minimo raggiungibile
  * a 1440 e' 0,64% dell'altezza del mondo — quattro pixel, e li' finisce: non e'
  * una taratura sfortunata, e' il soffitto di quel modello, misurato. Con lo
- * scostamento si arriva a 1,58%, dieci pixel, con gli anelli che tornano anche
- * a crescere in tutte e due le direzioni invece di accavallarsi.
+ * scostamento si arriva a 1,40%, quasi nove pixel, con gli anelli che tornano
+ * anche a crescere in tutte e due le direzioni invece di accavallarsi.
  *
  * Dipende dall'INDICE e non dallo strato: sei numeri per il mondo orizzontale e
  * quattro per quello verticale, non ventiquattro e sedici. I quattro strati non
