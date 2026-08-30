@@ -551,6 +551,73 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
 });
 
 /**
+ * La domanda sul post-it bianco non e' un'etichetta: sta DENTRO la sagoma, e
+ * per la geometria quell'oggetto e' muto — objectBox lo misura senza striscia.
+ * Vuol dire che nessuna delle quattro prove di LABEL la guarda, e che se un
+ * giorno una traduzione la allunga, il testo esce dal post-it e non se ne
+ * accorge nessuno: [data-desk-ask] non ha overflow, e l'ingombro dichiarato non
+ * cambia di un punto. E' esattamente il buco che il contratto delle etichette
+ * esiste per chiudere, quindi qui si chiude anche per lei.
+ *
+ * Il conto e' tutto letto: la scatola dal viewBox della sagoma e dall'inset del
+ * foglio di stile, il corpo dal suo clamp, la larghezza del mondo dalla regola
+ * che la dichiara. L'unico numero a mano e' l'avanzamento del carattere mono,
+ * lo stesso 0,6em della prova delle etichette e per le stesse ragioni.
+ */
+describe("la domanda sul post-it ci sta dentro il post-it", () => {
+  const DOMANDA = blocco("[data-desk-ask] {");
+
+  it("in tutte e due le lingue, e in tutte le finestre in cui si disegna", () => {
+    const [rientro] = misura(DOMANDA, /inset:\s*([\d.]+)%/, "domanda");
+    const [interlinea] = misura(DOMANDA, /line-height:\s*([\d.]+)/, "domanda");
+    const [minimo, cqw, massimo] = misura(
+      DOMANDA,
+      /font-size:\s*clamp\(\s*([\d.]+)rem\s*,\s*([\d.]+)cqw\s*,\s*([\d.]+)rem\s*\)/,
+      "domanda",
+    );
+    const [vw, rem] = misura(MONDO, /width:\s*min\(([\d.]+)vw,\s*([\d.]+)rem\)/, "mondo");
+    const AVANZAMENTO = 0.6;
+
+    const testi = [it_, en_].map(
+      (messaggi) => (messaggi as unknown as { services: { blank: string } }).services.blank,
+    );
+    expect(testi.every((t) => t.length > 0)).toBe(true);
+
+    // Il post-it si disegna solo nel mondo orizzontale, che vive dai 1024px in
+    // su: sotto, il disegno e' il gemello e li' la domanda non si scrive. Le due
+    // finestre sono gli estremi — la piu' stretta che lo disegna e una in cui il
+    // mondo ha gia' toccato il suo massimo.
+    for (const finestra of [FINESTRA.wide, 2560]) {
+      const mondo = Math.min((finestra * vw) / 100, rem * REM);
+      const corpo = Math.min(Math.max((cqw * mondo) / 100, minimo * REM), massimo * REM);
+      // Il post-it e' quadrato (126x126), quindi l'inset vale uguale sui due
+      // lati: il 12% della larghezza e il 12% dell'altezza sono lo stesso numero.
+      const lato = (drawWidth("wide", "postit") / 100) * mondo;
+      const dentro = lato * (1 - (2 * rientro) / 100);
+      const perRiga = Math.floor(dentro / (corpo * AVANZAMENTO));
+
+      for (const testo of testi) {
+        let righe = 1;
+        let riga = 0;
+        for (const parola of testo.split(/\s+/)) {
+          expect(parola.length, `"${parola}" non ci sta su una riga a ${finestra}px`).toBeLessThanOrEqual(perRiga);
+          if (riga === 0) riga = parola.length;
+          else if (riga + 1 + parola.length <= perRiga) riga += 1 + parola.length;
+          else {
+            righe += 1;
+            riga = parola.length;
+          }
+        }
+        expect(
+          righe * interlinea * corpo,
+          `"${testo}" esce dal post-it a ${finestra}px (${righe} righe in ${dentro.toFixed(1)}px)`,
+        ).toBeLessThanOrEqual(dentro);
+      }
+    }
+  });
+});
+
+/**
  * L'altra copia dichiarata. Le finestre del titolo e della tesi vivono in
  * layers.ts, ma chi le applica e' il foglio di stile, e il CSS una costante di
  * TypeScript non la sa importare: i numeri stanno in due posti. Rileggerli da
