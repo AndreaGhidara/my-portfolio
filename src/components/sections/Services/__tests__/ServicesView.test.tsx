@@ -4,6 +4,10 @@ import { ServicesView } from "../ServicesView";
 import type { ServicesViewProps } from "../ServicesView";
 import { LABEL, drawWidth } from "../layers";
 
+/** Il quarto, come nel tavolo vero: il mondo verticale disegna i primi quattro
+ *  oggetti di ogni strato, e il post-it bianco deve stare fra quelli. */
+const MUTO = 3;
+
 const layer = (id: string, n: number, mute = false) => ({
   id,
   title: `Strato ${id}`,
@@ -11,7 +15,7 @@ const layer = (id: string, n: number, mute = false) => ({
   objects: Array.from({ length: n }, (_, i) => ({
     id: `${id}-${i}`,
     shape: "sheet" as const,
-    label: mute && i === n - 1 ? null : `${id} oggetto ${i}`,
+    label: mute && i === MUTO ? null : `${id} oggetto ${i}`,
   })),
 });
 
@@ -112,19 +116,24 @@ describe("il tavolo è la lista", () => {
     expect(within(vero).getAllByRole("link")).toHaveLength(1);
   });
 
-  it("nel gemello il post-it resta un disegno: un comando solo per una porta sola", () => {
-    // Il gemello e' un disegno aria-hidden, e in piu' questo post-it li' non si
-    // disegna nemmeno: e' il sesto oggetto del suo strato, e il mondo verticale
-    // ne mostra quattro (data-off). Un secondo <a> sarebbe una copia che nessuno
-    // puo' premere, nessuno puo' raggiungere col Tab e nessuno sente.
+  it("nel gemello il post-it si disegna e si preme, ma non entra nel giro dei Tab", () => {
+    // Sotto i 1024px il disegno e' il gemello, e questo post-it li' c'e': e' il
+    // quarto oggetto del suo strato, non il sesto, quindi non porta data-off.
+    // Un post-it che porta da qualche parte e non si preme sarebbe il disegno di
+    // un comando, percio' l'<a> c'e'. Ma il gemello e' aria-hidden per intero:
+    // una seconda fermata del Tab annuncerebbe il nulla, e il nome del comando
+    // sta nell'altro mondo — quello che uno screen reader legge davvero.
     const { container } = render(<ServicesView {...props} />);
     const gemello = container.querySelector("[data-desk-world][aria-hidden]") as HTMLElement;
-    expect(gemello.querySelectorAll("a")).toHaveLength(0);
-    const muto = [...gemello.querySelectorAll("[data-desk-object]")].filter(
+    const muti = [...gemello.querySelectorAll("[data-desk-object]")].filter(
       (el) => !el.querySelector("[data-desk-label]"),
     );
-    expect(muto).toHaveLength(1);
-    expect(muto[0]).toHaveAttribute("data-off");
+    expect(muti).toHaveLength(1);
+    expect(muti[0]).not.toHaveAttribute("data-off");
+    const comando = muti[0].querySelector("[data-desk-blank]") as HTMLElement;
+    expect(comando).toHaveAttribute("href", "#contact");
+    expect(comando).toHaveAttribute("tabindex", "-1");
+    expect(comando).toHaveTextContent("");
   });
 
   it("le sagome sono decorative: il significato sta nell'etichetta, non nel disegno", () => {

@@ -42,7 +42,7 @@ export function DeskObject({
   hidden: boolean;
   /** Il gemello che il CSS nasconde: si disegna, ma non si legge. */
   ghost: boolean;
-  /** Solo il post-it bianco ce l'ha, e solo nel mondo che si legge. */
+  /** Solo il post-it bianco ce l'ha. */
   href?: string;
   /** Il nome accessibile del comando. Sul tavolo non si vede finche' non lo si
    *  sfiora, ma si legge sempre: e' il nome che annuncia uno screen reader. */
@@ -70,13 +70,22 @@ export function DeskObject({
       }
     >
       {href ? (
-        <a href={href} data-desk-blank>
+        // Il comando sta in tutti e due i mondi, perche' il post-it si disegna
+        // in tutti e due: sotto i 1024px quello che si vede e' il gemello, e un
+        // post-it che porta da qualche parte ma non si preme sarebbe un disegno
+        // di un comando. Nel gemello pero' e' una superficie da toccare e basta:
+        // il gemello e' aria-hidden per intero, e un secondo <a> nel giro dei
+        // Tab sarebbe una fermata che non annuncia niente. Niente domanda
+        // scritta, per la stessa ragione — li' non si legge (e a quella misura
+        // non si leggerebbe comunque): il nome del comando lo porta l'altro
+        // mondo, che sotto i 1024px e' quello che uno screen reader legge.
+        <a href={href} data-desk-blank tabIndex={ghost ? -1 : undefined}>
           {sagoma}
           {/* La domanda e' il nome del comando: con opacity 0 non si vede, ma
               resta nell'albero di accessibilita' ed e' quella che uno screen
               reader annuncia. Niente data-desk-label — questa non e' una voce
               dell'elenco, e il conteggio delle etichette resta ventitre'. */}
-          <span data-desk-ask>{action}</span>
+          {ghost ? null : <span data-desk-ask>{action}</span>}
         </a>
       ) : (
         <>

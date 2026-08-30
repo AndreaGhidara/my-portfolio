@@ -47,17 +47,46 @@ export const SHAPE_BOX: Record<DeskDrawing, { w: number; h: number }> = {
  */
 export const DRAW_SCALE: Record<DeskLayout, number> = { wide: 1, tall: 0.5 };
 
-/** Larghezza del disegno, in percentuale della larghezza del mondo. E' l'unica
- *  misura che il CSS riceve: l'altezza la porta l'aspect-ratio della sagoma. */
+/**
+ * Le cifre con cui una percentuale arriva al CSS. Non e' una rifinitura: quel
+ * numero viene serializzato due volte, una dal server dentro l'HTML e una dal
+ * client dentro la prop, e le due serializzazioni non danno la stessa stringa —
+ * 76.60017417717651 diventa "76.6002" da una parte e resta intero dall'altra.
+ * React lo vede come un attributo che non combacia e lo dice in console a ogni
+ * caricamento. Arrotondando alla sorgente le due stringhe sono la stessa.
+ *
+ * Quattro decimali sono molto sotto quello che il disegno sa esprimere: a 1440
+ * un decimillesimo di percentuale e' un millesimo di pixel, e il punto piu'
+ * stretto di questo tavolo si misura in punti interi.
+ */
+const CIFRE = 4;
+const quota = (n: number) => +n.toFixed(CIFRE);
+
+/**
+ * Larghezza del disegno, in percentuale della larghezza del mondo. E' l'unica
+ * misura che il CSS riceve: l'altezza la porta l'aspect-ratio della sagoma.
+ *
+ * Arrotondata come tutte le percentuali che finiscono in uno style inline: vedi
+ * la nota di CIFRE.
+ */
 export function drawWidth(layout: DeskLayout, shape: DeskDrawing): number {
-  return (DRAW_SCALE[layout] * SHAPE_BOX[shape].w * 100) / WORLD[layout].width;
+  return quota((DRAW_SCALE[layout] * SHAPE_BOX[shape].w * 100) / WORLD[layout].width);
 }
 
-/** Altezza del disegno, in percentuale dell'ALTEZZA del mondo. Il mondo non e'
- *  quadrato: una percentuale orizzontale e una verticale non misurano lo stesso
- *  lato, ed e' esattamente la trappola in cui si cade scrivendone una sola. */
+/**
+ * Altezza del disegno, in percentuale dell'ALTEZZA del mondo. Il mondo non e'
+ * quadrato: una percentuale orizzontale e una verticale non misurano lo stesso
+ * lato, ed e' esattamente la trappola in cui si cade scrivendone una sola.
+ *
+ * Si ricava dalla larghezza ARROTONDATA, non dal viewBox: nel browser l'altezza
+ * non e' un numero che qualcuno scrive, e' la larghezza vera moltiplicata per
+ * l'aspect-ratio della sagoma. Ripartendo dal viewBox il modello misurerebbe un
+ * rettangolo alto qualche millesimo piu' di quello disegnato — poco, ma un
+ * modello che non parte da quello che il browser ha in mano non e' il modello.
+ */
 export function drawHeight(layout: DeskLayout, shape: DeskDrawing): number {
-  return (DRAW_SCALE[layout] * SHAPE_BOX[shape].h * 100) / WORLD[layout].height;
+  const { w, h } = SHAPE_BOX[shape];
+  return (drawWidth(layout, shape) * h * WORLD[layout].width) / (w * WORLD[layout].height);
 }
 
 /**
@@ -309,7 +338,9 @@ export function placeObject(layout: DeskLayout, layer: number, index: number): P
   // Deterministico: nessun Math.random. Il tavolo deve uscire identico a ogni
   // render, o server e client disegnano due tavoli diversi e React protesta.
   const rotate = (((layer * 7 + index * 13) % 11) - 5) * 1.4;
-  return { x: 50 + dx, y: 50 + dy, rotate };
+  // Arrotondati qui e non nel componente: la prova della geometria deve misurare
+  // gli stessi numeri che il browser disegna, non quelli da cui vengono.
+  return { x: quota(50 + dx), y: quota(50 + dy), rotate: quota(rotate) };
 }
 
 /**

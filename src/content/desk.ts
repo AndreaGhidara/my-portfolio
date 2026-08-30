@@ -60,9 +60,15 @@ export const deskLayers: DeskLayer[] = [
       { id: "ai", shape: "postit" },
       { id: "automation", shape: "postit" },
       { id: "analytics", shape: "postit" },
+      // Quarto e non ultimo, e l'ordine qui e' l'ordine del disegno: il mondo
+      // verticale disegna i primi quattro oggetti di ogni strato, e questo e'
+      // l'unico oggetto del tavolo che porta da qualche parte. Un comando che
+      // sul telefono non si vede e' un comando che sul telefono non c'e'.
+      // Il posto se lo prende da "Farsi trovare", che scala in quinta e sul
+      // telefono resta nell'elenco senza stare nel disegno.
+      { id: "blank", shape: "postit", mute: true },
       { id: "seo", shape: "postit" },
       { id: "care", shape: "postit" },
-      { id: "blank", shape: "postit", mute: true },
     ],
   },
 ];
