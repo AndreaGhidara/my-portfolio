@@ -32,8 +32,14 @@ const LAYOUTS: DeskLayout[] = ["wide", "tall"];
  * del mondo. Non e' zero apposta: "non si sovrappongono" e' una prova cieca —
  * passa con mezzo pixel di stacco come con mezzo centimetro — e mezzo pixel non
  * sopravvive a un carattere di ripiego o a un altro motore di rendering.
+ *
+ * 1,2 punti sono circa 7,6 px a 1440. Il tavolo ne tiene 1,585 (10,04 px), cioe'
+ * un terzo di margine sopra il pavimento: abbastanza perche' un ritocco piccolo
+ * non faccia cadere la suite al primo carattere, poco abbastanza perche' una
+ * ritaratura vera — un'etichetta piu' lunga, un settimo oggetto per strato —
+ * la faccia cadere subito, che e' lo scopo.
  */
-const CLEARANCE_FLOOR = 0.5;
+const CLEARANCE_FLOOR = 1.2;
 
 type Rect = { x0: number; x1: number; y0: number; y1: number };
 
@@ -272,6 +278,42 @@ describe("dove finiscono gli oggetti", () => {
     }
   });
 
+  it("dentro uno strato non stanno a distanze uguali, ma non si ammucchiano", () => {
+    // Sei oggetti ogni sessanta gradi si leggono come il quadrante di un
+    // orologio. Lo scostamento angolare e' quello che li rimette su un tavolo —
+    // ed e' anche l'unica cosa che fa spazio: a passo regolare il minimo
+    // raggiungibile a 1440 e' 0,64 punti, sotto il pavimento qui sopra.
+    // Le due prove sono una coppia: senza la seconda "irregolare" si otterrebbe
+    // benissimo ammucchiando tutto da una parte.
+    for (const layout of LAYOUTS) {
+      const conto = OBJECTS_PER_LAYER[layout];
+      const passo = 360 / conto;
+      const angolo = (layer: number, i: number) => {
+        const p = placeObject(layout, layer, i);
+        return (Math.atan2(p.y - 50, p.x - 50) * 180) / Math.PI;
+      };
+      for (let layer = 0; layer < deskLayers.length; layer++) {
+        const salti: number[] = [];
+        for (let i = 0; i < conto; i++) {
+          let d = angolo(layer, (i + 1) % conto) - angolo(layer, i);
+          while (d <= 0) d += 360;
+          expect(Number.isFinite(d), `${layout} strato ${layer} oggetto ${i}`).toBe(true);
+          salti.push(d);
+        }
+        expect(
+          salti.reduce((a, b) => a + b, 0),
+          `${layout} strato ${layer}: gli oggetti girano una volta sola`,
+        ).toBeCloseTo(360, 6);
+        const irregolare = Math.max(...salti.map((d) => Math.abs(d - passo)));
+        expect(irregolare, `${layout} strato ${layer} e' un quadrante`).toBeGreaterThan(passo * 0.1);
+        // e nessun grappolo: mai meno di meta' passo fra due consecutivi
+        expect(Math.min(...salti), `${layout} strato ${layer} si ammucchia`).toBeGreaterThan(
+          passo * 0.5,
+        );
+      }
+    }
+  });
+
   it("li inclina un po', ma sempre allo stesso modo: il disegno non balla fra un render e l'altro", () => {
     const primo = placeObject("wide", 2, 3);
     const secondo = placeObject("wide", 2, 3);
@@ -432,8 +474,18 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
     const [respiro] = misura(ETICHETTA, /padding:\s*[\d.]+em\s+([\d.]+)em/, "etichetta");
     // box-sizing: border-box (preflight): il max-width comprende il respiro.
     const disponibile = LABEL.width - 2 * respiro;
-    // Avanzamento di una monospaziata, in em per carattere: misurato nel browser
-    // sul carattere del tavolo (dodici caratteri = 7,2em).
+    // Avanzamento in em per carattere. E' l'ultimo numero preso a mano di questo
+    // file, e resta preso a mano: i due caratteri del tavolo arrivano da
+    // next/font (JetBrains Mono sotto i 1024px, Cascadia Code sopra) e leggerne
+    // la tabella hmtx dentro un .woff2 in un test costa piu' di quanto valga.
+    // I valori veri: JetBrains Mono avanza esattamente 0,600em, Cascadia Code
+    // 0,586em (1200 unita' su 2048); i ripieghi generici stanno sotto o poco
+    // sopra — Menlo e DejaVu Sans Mono 0,602, Courier New 0,600, Consolas 0,550.
+    // Si tiene il piu' largo dei due caratteri veri. Il margine e' dichiarato,
+    // non sperato: la prova qui sotto verifica che la parola piu' lunga ci stia,
+    // e ci sta finche' l'avanzamento non supera 0,608em (7,3em diviso dodici
+    // caratteri). Un carattere di ripiego piu' largo di cosi' non e' comune, ma
+    // se dovesse capitare la parola sborda invece di andare a capo.
     const AVANZAMENTO = 0.6;
     const righe = (testo: string) => {
       let n = 1;

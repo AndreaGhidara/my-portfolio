@@ -212,32 +212,56 @@ export const OBJECTS_PER_LAYER: Record<DeskLayout, number> = { wide: 6, tall: 4 
  *
  * La taratura non punta a "non si sovrappongono" ma a un pavimento di aria
  * dichiarato: fra due cose qualsiasi del tavolo — due oggetti, un oggetto e il
- * centro, un oggetto e il bordo — resta piu' di mezzo punto di altezza del
- * mondo (a 1440 sono quasi quattro pixel). Il mondo orizzontale sta contro quel
- * pavimento: sei oggetti per strato non ne concedono molto di piu' finche' gli
- * oggetti di uno strato restano equidistanti fra loro.
+ * centro, un oggetto e il bordo — resta piu' di 1,2 punti di altezza del mondo
+ * (a 1440 sono piu' di sette pixel). Insieme ai raggi e agli angoli si tara
+ * ANGLE_OFFSET, che e' quello che rende il pavimento raggiungibile: a passo
+ * regolare il soffitto misurato e' 0,64 punti, e non si supera con nessuna
+ * scelta di raggi.
  * Cambiarne uno solo a occhio rompe il tavolo: la prova sta in layers.test.ts.
  */
 const RADII: Record<DeskLayout, { rx: number; ry: number }[]> = {
   wide: [
-    { rx: 15.4, ry: 20.3 },
-    { rx: 29.8, ry: 35.5 },
-    { rx: 40.7, ry: 36.5 },
-    { rx: 41.2, ry: 39.5 },
+    { rx: 15.1, ry: 22.8 },
+    { rx: 27.3, ry: 25.5 },
+    { rx: 39.1, ry: 28.2 },
+    { rx: 41.2, ry: 33.3 },
   ],
   tall: [
-    { rx: 17.5, ry: 15.2 },
-    { rx: 21.5, ry: 27.5 },
-    { rx: 28.9, ry: 38.6 },
-    { rx: 33.5, ry: 42.2 },
+    { rx: 15.7, ry: 11.6 },
+    { rx: 26.5, ry: 23.8 },
+    { rx: 29.9, ry: 31.5 },
+    { rx: 44.6, ry: 36.8 },
   ],
 };
 
 /** Da dove parte a distribuire gli oggetti ogni strato. Sfalsati apposta:
  *  allineati, i quattro strati formavano dei raggi e sembrava un sole. */
 const START_ANGLE: Record<DeskLayout, number[]> = {
-  wide: [-142, -5, -162, 158],
-  tall: [48, -105, -170, -43],
+  wide: [159, -81, 120, -36],
+  tall: [123, 164, -59, -149],
+};
+
+/**
+ * Quanto ogni oggetto si scosta, in gradi, dal posto regolare che gli toccava
+ * sull'anello. Su una scrivania vera le cose non stanno a distanze uguali: sei
+ * oggetti ogni sessanta gradi si leggono come il quadrante di un orologio, non
+ * come un piano su cui qualcuno lavora.
+ *
+ * E' anche l'unica cosa che fa spazio. A passo regolare il minimo raggiungibile
+ * a 1440 e' 0,64% dell'altezza del mondo — quattro pixel, e li' finisce: non e'
+ * una taratura sfortunata, e' il soffitto di quel modello, misurato. Con lo
+ * scostamento si arriva a 1,58%, dieci pixel, con gli anelli che tornano anche
+ * a crescere in tutte e due le direzioni invece di accavallarsi.
+ *
+ * Dipende dall'INDICE e non dallo strato: sei numeri per il mondo orizzontale e
+ * quattro per quello verticale, non ventiquattro e sedici. I quattro strati non
+ * si allineano lo stesso, perche' ognuno parte da un angolo suo. Chi li ritara
+ * rilegga la nota su RADII: si muovono tutti insieme, e la prova che li tiene e'
+ * "fra due cose qualsiasi resta aria vera".
+ */
+const ANGLE_OFFSET: Record<DeskLayout, number[]> = {
+  wide: [11, 3, -16, 11, 3, -16],
+  tall: [20, 8, 20, 8],
 };
 
 /** Distanza fra il perimetro dello strato e il centro dell'oggetto, in % di mezzo mondo. */
@@ -278,7 +302,9 @@ export function objectBox(
 export function placeObject(layout: DeskLayout, layer: number, index: number): Placement {
   const count = OBJECTS_PER_LAYER[layout];
   const { rx, ry } = RADII[layout][layer];
-  const angle = ((START_ANGLE[layout][layer] + index * (360 / count)) * Math.PI) / 180;
+  const angle =
+    ((START_ANGLE[layout][layer] + index * (360 / count) + ANGLE_OFFSET[layout][index]) * Math.PI) /
+    180;
   const [dx, dy] = onRect(angle, rx + PAD, ry + PAD);
   // Deterministico: nessun Math.random. Il tavolo deve uscire identico a ogni
   // render, o server e client disegnano due tavoli diversi e React protesta.
