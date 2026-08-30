@@ -34,8 +34,8 @@ const LAYOUTS: DeskLayout[] = ["wide", "tall"];
  * passa con mezzo pixel di stacco come con mezzo centimetro — e mezzo pixel non
  * sopravvive a un carattere di ripiego o a un altro motore di rendering.
  *
- * 1,2 punti sono circa 7,6 px a 1440. Il tavolo ne tiene 1,585 (10,04 px), cioe'
- * un terzo di margine sopra il pavimento: abbastanza perche' un ritocco piccolo
+ * 1,2 punti sono circa 7,6 px a 1440. Il tavolo ne tiene 1,395 (8,84 px), cioe'
+ * un sesto di margine sopra il pavimento: abbastanza perche' un ritocco piccolo
  * non faccia cadere la suite al primo carattere, poco abbastanza perche' una
  * ritaratura vera — un'etichetta piu' lunga, un settimo oggetto per strato —
  * la faccia cadere subito, che e' lo scopo.
