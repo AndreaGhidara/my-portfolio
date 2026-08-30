@@ -9,7 +9,7 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "assets": "node scripts/build-brand-assets.mjs && node scripts/build-web-corner.mjs"
+    "assets": "node scripts/build-brand-assets.mjs && node scripts/build-web-corner.mjs && node scripts/build-desk.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
