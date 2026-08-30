@@ -181,7 +181,46 @@ describe("la camera", () => {
     expect(vivi.size).toBe(0);
   });
 
-  it("e nemmeno smontando: l'ascoltatore se ne va col palco", () => {
+  it("il fuoco da tastiera sul post-it porta la pagina al fotogramma di riposo, e smette all'uscita da «full»", () => {
+    // La prova di sopra misura quanti ascoltatori vivono; questa misura cosa
+    // sente un utente. Servono tutte e due: la prima passerebbe anche con una
+    // correzione sbagliata — l'ascoltatore lasciato dentro la build della camera
+    // e un removeEventListener appiccicato a spegni() — e non guarda ne' la
+    // guardia del :focus-visible ne' dove si va a finire.
+    const salta = vi.fn();
+    vi.stubGlobal("scrollTo", salta);
+    const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
+    const { container } = render(<DeskStage {...props} />);
+    const postit = container.querySelector(
+      '[data-desk-world][data-layout="wide"] [data-desk-blank]',
+    ) as HTMLElement;
+
+    postit.focus();
+    // Che la guardia sia passata davvero, e non che l'evento non sia mai
+    // arrivato: senza questa riga il verde qui sotto non direbbe niente.
+    expect(postit.matches(":focus-visible")).toBe(true);
+    expect(salta).toHaveBeenCalledTimes(1);
+
+    cambiaIdea((q) => q.includes("prefers-reduced-motion"));
+
+    // Fuori da "full" il track e' tornato alto quanto il suo contenuto: lo stesso
+    // salto diventa una pagina che si muove senza che nessuno l'abbia chiesto.
+    const arrivati: Event[] = [];
+    palco(container).addEventListener("focusin", (e) => arrivati.push(e));
+    postit.blur();
+    postit.focus();
+    // Il fuoco c'e' ancora e il focusin arriva ancora al palco: quello che manca
+    // e' solo chi lo ascoltava.
+    expect(arrivati).toHaveLength(1);
+    expect(postit.matches(":focus-visible")).toBe(true);
+    expect(salta).toHaveBeenCalledTimes(1);
+  });
+
+  // Le due che seguono non provano la correzione — erano gia' vere prima, perche'
+  // lo smontaggio passa dal revert di gsap.context e a livello ridotto la build
+  // non gira nemmeno. Sono guardie: tengono i due lati che la correzione avrebbe
+  // potuto rompere spostando l'ascoltatore in un effetto suo.
+  it("guardia: smontando il palco l'ascoltatore se ne va con lui", () => {
     const vivi = ascoltatoriDelFuoco();
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { unmount } = render(<DeskStage {...props} />);
@@ -190,7 +229,7 @@ describe("la camera", () => {
     expect(vivi.size).toBe(0);
   });
 
-  it("a movimento ridotto non viene attaccato per niente", () => {
+  it("guardia: a movimento ridotto non viene attaccato per niente", () => {
     const vivi = ascoltatoriDelFuoco();
     mockMedia((q) => q.includes("prefers-reduced-motion"));
     render(<DeskStage {...props} />);
