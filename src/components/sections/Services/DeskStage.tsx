@@ -155,7 +155,12 @@ export function DeskStage({
       const preso = event.target as HTMLElement | null;
       if (!preso?.closest("[data-desk-blank]") || !preso.matches(":focus-visible")) return;
       const fine = trackEl.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
-      window.scrollTo({ top: fine, behavior: "auto" });
+      // "instant" e non "auto": auto vuol dire "quello che dice scroll-behavior",
+      // e il giorno che qualcuno scrive smooth su html questo salto diventerebbe
+      // un'animazione — proprio quella che chi ha ridotto il movimento non deve
+      // vedere. (Qui non ci arriva: sotto "full" questo ascoltatore non esiste
+      // nemmeno. Ma la riga deve reggere da sola.)
+      window.scrollTo({ top: fine, behavior: "instant" });
     };
     stageEl.addEventListener("focusin", alFotogrammaDiRiposo);
 

@@ -187,6 +187,19 @@ describe("quanto e' grande un oggetto", () => {
     }
   });
 
+  it("il post-it bianco si disegna anche sul telefono: e' l'unico oggetto che porta da qualche parte", () => {
+    // Il mondo verticale disegna i primi OBJECTS_PER_LAYER.tall oggetti di ogni
+    // strato e gli altri li lascia nell'elenco senza disegnarli. Se il post-it
+    // finisse fuori da quei primi, sul telefono resterebbe un comando che si
+    // annuncia e non si vede: il fuoco su una cosa larga zero pixel, e niente
+    // da premere col dito. E' il motivo per cui in content/desk.ts sta quarto.
+    const blank = deskLayers[3].objects.findIndex((o) => o.mute);
+    expect(blank).toBeGreaterThanOrEqual(0);
+    expect(blank, "il post-it bianco e' fuori dal disegno del telefono").toBeLessThan(
+      OBJECTS_PER_LAYER.tall,
+    );
+  });
+
   it("il post-it bianco non ha etichetta e non ne occupa il posto", () => {
     const blank = deskLayers[3].objects.findIndex((o) => o.mute);
     expect(blank).toBeGreaterThanOrEqual(0);

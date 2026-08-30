@@ -624,14 +624,6 @@ html[data-dialog-open] body { overflow: hidden; }
   transition: opacity 0.25s;
 }
 
-/* Il fuoco si deve vedere su carta e su inchiostro, e l'arancio e' il colore
-   con cui questa pagina dice "questo si preme". */
-[data-desk-blank]:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  border-radius: 2px;
-}
-
 /* Un comando che prende il fuoco si vede anche se la camera non e' ancora
    arrivata al suo strato: --p decide quando un oggetto ENTRA, il Tab no, e un
    anello di fuoco su una cosa trasparente non e' un anello di fuoco.

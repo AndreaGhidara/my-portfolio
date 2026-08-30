@@ -140,21 +140,12 @@ export function DeskTable({
                   // stata raccontata, quindi porta dove la si racconta. Il
                   // segnale e' l'etichetta che manca, che e' lo stesso `mute`
                   // di content/desk.ts arrivato fin qui.
-                  //
-                  // Nel gemello no. Non e' prudenza: li' questo post-it e' il
-                  // sesto oggetto del suo strato, e il mondo verticale ne
-                  // disegna quattro — data-off, display:none. Un <a> in quella
-                  // copia non si potrebbe ne' premere ne' raggiungere, e
-                  // sarebbe comunque un secondo comando per la stessa porta
-                  // dentro un aria-hidden. Il comando sta nel mondo che si
-                  // legge, che sotto i 1024px e' quello a un pixel: li' il
-                  // post-it non e' disegnato, ma nell'elenco c'e' e si annuncia.
-                  // Il prezzo e' una fermata del Tab che non si vede, sotto i
-                  // 1024. Non c'e' una regola CSS che tolga un elemento dal
-                  // giro dei Tab senza toglierlo anche allo screen reader, e
-                  // fra le due si tiene quella che parla.
-                  href={!ghost && object.label === null ? "#contact" : undefined}
-                  action={!ghost && object.label === null ? blank : undefined}
+                  // Anche nel gemello, che sotto i 1024px e' il disegno vero:
+                  // il post-it e' il quarto oggetto del suo strato apposta, e
+                  // sul telefono si vede. Come si comporta li' lo decide
+                  // DeskObject — si preme, non si tabula.
+                  href={object.label === null ? "#contact" : undefined}
+                  action={object.label === null ? blank : undefined}
                 />
               ))}
             </ul>
