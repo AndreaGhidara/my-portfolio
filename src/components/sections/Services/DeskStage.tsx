@@ -56,6 +56,7 @@ export function DeskStage({
   title,
   lead,
   centre,
+  blank,
   punch,
   layers,
 }: {
@@ -63,6 +64,7 @@ export function DeskStage({
   title: string;
   lead: string;
   centre: string;
+  blank: string;
   punch: string;
   layers: DeskLayerData[];
 }) {
@@ -131,6 +133,32 @@ export function DeskStage({
     measure();
     write(0);
 
+    /**
+     * Il Tab non e' una rotellina. L'unico comando del tavolo sta su un oggetto
+     * dell'anello piu' esterno, e al fotogramma zero quell'anello e' ingrandito
+     * quattro volte e ritagliato via dall'overflow del palco. Il browser porta
+     * "in vista" l'elemento che prende il fuoco leggendone il rettangolo, e il
+     * rettangolo del clip non sa niente: misurato a 1440, il fuoco finiva su un
+     * post-it a (-80, 251) che sotto quel punto non c'era — anello arancione
+     * compreso, cioe' nessun anello che si veda.
+     *
+     * Qui la pagina va al fotogramma di riposo, che di una scena guidata dallo
+     * scorrimento e' l'unico punto fisso: dove l'oggetto sta e' funzione di dove
+     * sta la pagina, e l'unico posto dove le due cose non si rincorrono e' la
+     * fine del track — li' il tavolo e' completo e ogni oggetto e' dov'e'
+     * disegnato. Con lo scrub, il tavolo si compone mentre il fuoco lo raggiunge.
+     *
+     * Solo da tastiera: :focus-visible e' falso per un click, e un click sul
+     * post-it deve andare ai contatti, non far saltare la pagina prima.
+     */
+    const alFotogrammaDiRiposo = (event: FocusEvent) => {
+      const preso = event.target as HTMLElement | null;
+      if (!preso?.closest("[data-desk-blank]") || !preso.matches(":focus-visible")) return;
+      const fine = trackEl.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+      window.scrollTo({ top: fine, behavior: "auto" });
+    };
+    stageEl.addEventListener("focusin", alFotogrammaDiRiposo);
+
     camera.current = ScrollTrigger.create({
       trigger: trackEl,
       start: "top top",
@@ -146,7 +174,10 @@ export function DeskStage({
     // Anche lo smontaggio passa di qui: gsap.context di useGSAP chiama questa
     // al revert. Le due property nessun altro le toglierebbe, e restassero
     // appiccicate a --p = 0 il tavolo resterebbe vuoto per sempre.
-    return spegni;
+    return () => {
+      stageEl.removeEventListener("focusin", alFotogrammaDiRiposo);
+      spegni();
+    };
   }, scope);
 
   return (
@@ -159,8 +190,8 @@ export function DeskStage({
             <p>{lead}</p>
           </header>
 
-          <DeskTable layers={layers} centre={centre} layout="wide" />
-          <DeskTable layers={layers} centre={centre} layout="tall" ghost />
+          <DeskTable layers={layers} centre={centre} blank={blank} layout="wide" />
+          <DeskTable layers={layers} centre={centre} blank={blank} layout="tall" ghost />
 
           <p data-desk-punch>{punch}</p>
         </div>

@@ -17,6 +17,10 @@ import { LABEL, SHAPE_BOX, drawWidth, type Beat, type DeskLayout, type Placement
  * `currentColor` degli SVG si risolve sul documento dell'immagine, che non sa
  * niente del tema, e i disegni resterebbero neri anche su fondo inchiostro.
  * Come maschera il colore lo mette chi la contiene, e segue carta e inchiostro.
+ *
+ * Ventitre' oggetti su ventiquattro sono un disegno con una parola sotto. Il
+ * ventiquattresimo — il post-it bianco — e' un comando, e allora la sagoma sta
+ * dentro un <a>: l'unica cosa del tavolo che si preme.
  */
 export function DeskObject({
   shape,
@@ -26,6 +30,8 @@ export function DeskObject({
   beat,
   hidden,
   ghost,
+  href,
+  action,
 }: {
   shape: DeskShape;
   label: string | null;
@@ -36,8 +42,14 @@ export function DeskObject({
   hidden: boolean;
   /** Il gemello che il CSS nasconde: si disegna, ma non si legge. */
   ghost: boolean;
+  /** Solo il post-it bianco ce l'ha, e solo nel mondo che si legge. */
+  href?: string;
+  /** Il nome accessibile del comando. Sul tavolo non si vede finche' non lo si
+   *  sfiora, ma si legge sempre: e' il nome che annuncia uno screen reader. */
+  action?: string;
 }) {
   const box = SHAPE_BOX[shape];
+  const sagoma = <span data-desk-shape style={{ aspectRatio: `${box.w} / ${box.h}` }} />;
 
   return (
     <li
@@ -57,16 +69,29 @@ export function DeskObject({
         } as CSSProperties
       }
     >
-      <span data-desk-shape style={{ aspectRatio: `${box.w} / ${box.h}` }} />
-      {/* La larghezza massima della striscia arriva da LABEL e non dal CSS: e'
-          con quel numero che objectFootprint tiene le distanze, e se il foglio
-          di stile ne usasse un altro la prova misurerebbe un tavolo diverso da
-          quello disegnato. */}
-      {label ? (
-        <span data-desk-label style={{ maxWidth: `${LABEL.width}em` }}>
-          {label}
-        </span>
-      ) : null}
+      {href ? (
+        <a href={href} data-desk-blank>
+          {sagoma}
+          {/* La domanda e' il nome del comando: con opacity 0 non si vede, ma
+              resta nell'albero di accessibilita' ed e' quella che uno screen
+              reader annuncia. Niente data-desk-label — questa non e' una voce
+              dell'elenco, e il conteggio delle etichette resta ventitre'. */}
+          <span data-desk-ask>{action}</span>
+        </a>
+      ) : (
+        <>
+          {sagoma}
+          {/* La larghezza massima della striscia arriva da LABEL e non dal CSS:
+              e' con quel numero che objectFootprint tiene le distanze, e se il
+              foglio di stile ne usasse un altro la prova misurerebbe un tavolo
+              diverso da quello disegnato. */}
+          {label ? (
+            <span data-desk-label style={{ maxWidth: `${LABEL.width}em` }}>
+              {label}
+            </span>
+          ) : null}
+        </>
+      )}
     </li>
   );
 }

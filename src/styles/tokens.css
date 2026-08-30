@@ -570,6 +570,77 @@ html[data-dialog-open] body { overflow: hidden; }
   color: color-mix(in oklab, var(--bulb) 72%, var(--muted));
 }
 
+/* Il post-it bianco: l'unico oggetto del tavolo che si preme. Il colore resta
+   quello di sopra — e' un post-it come gli altri, e la differenza non e' che si
+   vede diverso, e' che si tocca.
+
+   La domanda sta DENTRO la sagoma e non sotto come le etichette. Non e' una
+   scelta grafica: l'ingombro di questo oggetto, per layers.ts, e' il solo
+   disegno (objectBox lo misura senza striscia, perche' e' muto), e una parola
+   appesa sotto si mangerebbe l'aria che la geometria dichiara senza che
+   nessuna prova se ne accorga. Dentro, il rettangolo resta quello e il
+   pavimento di 1,2 punti non si muove.
+
+   Non si vede quasi mai, ma si legge sempre: con opacity 0 il testo resta
+   nell'albero di accessibilita', ed e' quel testo il nome del comando. */
+[data-desk-blank] {
+  display: block;
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+}
+
+[data-desk-ask] {
+  position: absolute;
+  /* Dentro il foglio, non sul bordo: il post-it e' disegnato a mano e i lati
+     non sono dritti. */
+  inset: 12%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: var(--font-mono), monospace;
+  /* Il corpo segue il mondo come quello delle etichette: dentro il post-it ci
+     stanno undici caratteri per riga, e la domanda ne conta diciassette. */
+  font-size: clamp(0.42rem, 1cqw, 0.68rem);
+  line-height: 1.25;
+  color: var(--fg);
+  opacity: 0;
+}
+
+/* Al passaggio e al fuoco. E sempre, a tavolo fermo: li' nessuno passa di li'
+   per caso — chi arriva col dito un hover non ce l'ha — e un post-it che non
+   dice niente resterebbe un quadrato giallo che non si sa cos'e'. */
+[data-desk-blank]:hover [data-desk-ask],
+[data-desk-blank]:focus-visible [data-desk-ask],
+[data-desk]:not([data-motion="full"]) [data-desk-ask] {
+  opacity: 1;
+}
+
+/* La dissolvenza sta solo a movimento pieno, e non serve un'altra media query
+   per tenerla: [data-motion="full"] lo scrive resolveMotionLevel, che davanti a
+   prefers-reduced-motion: reduce dice "none". Chi ha chiesto di non muovere
+   niente legge la domanda gia' scritta, ferma. */
+[data-desk][data-motion="full"] [data-desk-ask] {
+  transition: opacity 0.25s;
+}
+
+/* Il fuoco si deve vedere su carta e su inchiostro, e l'arancio e' il colore
+   con cui questa pagina dice "questo si preme". */
+[data-desk-blank]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Un comando che prende il fuoco si vede anche se la camera non e' ancora
+   arrivata al suo strato: --p decide quando un oggetto ENTRA, il Tab no, e un
+   anello di fuoco su una cosa trasparente non e' un anello di fuoco.
+   E' l'unico !important del tavolo, e ci vuole: l'opacita' arriva inline
+   perche' e' un dato dell'oggetto, e una regola non batte uno style. */
+[data-desk-object]:focus-within {
+  opacity: 1 !important;
+}
+
 [data-desk-object] [data-desk-label] {
   position: absolute;
   left: 50%;

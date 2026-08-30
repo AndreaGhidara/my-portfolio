@@ -574,6 +574,41 @@ describe("il titolo e la tesi hanno gli stessi numeri nei due file", () => {
   });
 });
 
+/**
+ * I cavi. La forma del DOM — due SVG e non uno — la tiene gia' DeskCables.test,
+ * ma da sola non prova niente: e' la GEOMETRIA delle due scatole a dare un senso
+ * a quella divisione, e sta tutta nel foglio di stile. Rimettere i capi a
+ * `width: 100%` li riporta nella scatola del piano, che e' larga min(94vw, 62rem)
+ * e centrata: il 14% e l'88% da cui il filo entra e esce smettono di essere
+ * percentuali della PAGINA, e alla giunzione torna il gradino da 170px misurato
+ * a 1440. Nessuna prova di DeskCables se ne accorgerebbe — i path non cambiano
+ * di un carattere. Questa se ne accorge.
+ */
+describe("le due scatole dei cavi", () => {
+  const CAPI = blocco("[data-desk-cables-ends] {");
+  const DERIVAZIONE = blocco("[data-desk-cables-branch] {");
+
+  it("i capi si misurano sulla finestra: e' li' che il filo entra e esce", () => {
+    expect(CAPI).toMatch(/width:\s*100vw/);
+    // Larga quanto la finestra ma concentrica al piano: senza queste due il 50/50
+    // del viewBox non sarebbe piu' il laptop, e i cavi non uscirebbero da li'.
+    expect(CAPI).toMatch(/left:\s*50%/);
+    expect(CAPI).toMatch(/transform:\s*translateX\(-50%\)/);
+  });
+
+  it("la derivazione resta nella scatola del piano: e' nel piano che sta il rack", () => {
+    // Nella scatola larga quanto la finestra il suo capo scivolerebbe fuori dal
+    // tavolo man mano che lo schermo si allarga: al -4,2% del piano a 1920.
+    expect(DERIVAZIONE).toMatch(/width:\s*100%/);
+    expect(DERIVAZIONE).not.toMatch(/vw/);
+  });
+
+  it("le due scatole hanno la stessa altezza: i tre tratti partono dallo stesso punto", () => {
+    expect(CAPI).toMatch(/height:\s*100%/);
+    expect(DERIVAZIONE).toMatch(/height:\s*100%/);
+  });
+});
+
 describe("le didascalie si danno il cambio", () => {
   it("ognuna entra con il suo strato", () => {
     expect(CAPTION_BEATS.map((c) => c.from)).toEqual(LAYER_BEATS.map((b) => b.from));
