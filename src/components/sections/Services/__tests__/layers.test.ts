@@ -5,6 +5,7 @@ import { deskLayers } from "@/content/desk";
 import it_ from "../../../../../messages/it.json";
 import en_ from "../../../../../messages/en.json";
 import {
+  CAPTION_BEATS,
   LABEL,
   LAYER_BEATS,
   OBJECTS_PER_LAYER,
@@ -518,5 +519,58 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
       }
       expect(righe(etichetta), `"${etichetta}" va a tre righe`).toBeLessThanOrEqual(2);
     }
+  });
+});
+
+/**
+ * L'altra copia dichiarata. Le finestre del titolo e della tesi vivono in
+ * layers.ts, ma chi le applica e' il foglio di stile, e il CSS una costante di
+ * TypeScript non la sa importare: i numeri stanno in due posti. Rileggerli da
+ * qui e' l'unico modo perche' cambiarne uno solo non passi liscio — e passare
+ * liscio vorrebbe dire un titolo che se ne va mentre entra il primo foglio,
+ * cioe' i due testi da leggere insieme.
+ */
+describe("il titolo e la tesi hanno gli stessi numeri nei due file", () => {
+  const TITOLO = blocco('[data-desk][data-motion="full"] [data-desk-title] {');
+  const TESI = blocco('[data-desk][data-motion="full"] [data-desk-punch] {');
+  const DIDASCALIA = blocco('[data-desk][data-motion="full"] [data-desk-caption] {');
+
+  it("il titolo esce esattamente nella finestra di TITLE_BEAT", () => {
+    const [da, quanto] = misura(TITOLO, /1 - \(var\(--p, 1\) - ([\d.]+)\) \/ ([\d.]+)/, "titolo");
+    expect(da).toBeCloseTo(TITLE_BEAT.from, 6);
+    expect(quanto).toBeCloseTo(TITLE_BEAT.span, 6);
+  });
+
+  it("la tesi entra esattamente nella finestra di PUNCH_BEAT", () => {
+    const [da, quanto] = misura(
+      TESI,
+      /clamp\(0,\s*\(var\(--p, 1\) - ([\d.]+)\)\s*\/\s*([\d.]+)/,
+      "tesi",
+    );
+    expect(da).toBeCloseTo(PUNCH_BEAT.from, 6);
+    expect(quanto).toBeCloseTo(PUNCH_BEAT.span, 6);
+  });
+
+  it("la didascalia legge i due estremi da CAPTION_BEATS e non da un numero suo", () => {
+    // Se il CSS smettesse di leggere --until, le quattro didascalie si
+    // accatasterebbero nello stesso posto senza che niente lo dica.
+    expect(DIDASCALIA).toContain("var(--from)");
+    expect(DIDASCALIA).toContain("var(--until)");
+  });
+});
+
+describe("le didascalie si danno il cambio", () => {
+  it("ognuna entra con il suo strato", () => {
+    expect(CAPTION_BEATS.map((c) => c.from)).toEqual(LAYER_BEATS.map((b) => b.from));
+  });
+
+  it("ognuna esce quando comincia la successiva: mai due nello stesso posto", () => {
+    for (let i = 0; i < CAPTION_BEATS.length - 1; i++) {
+      expect(CAPTION_BEATS[i].until).toBeCloseTo(CAPTION_BEATS[i + 1].from, 6);
+    }
+  });
+
+  it("l'ultima resta finche' non arriva la tesi, che e' la frase che la sostituisce", () => {
+    expect(CAPTION_BEATS[CAPTION_BEATS.length - 1].until).toBeCloseTo(PUNCH_BEAT.from, 6);
   });
 });
