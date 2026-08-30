@@ -692,6 +692,84 @@ describe("le due scatole dei cavi", () => {
   });
 });
 
+/**
+ * Il blocco della camera, e tutto il resto del foglio di stile. Le graffe si
+ * contano invece di fermarsi alla prima: dentro una @media la prima graffa che
+ * chiude e' quella della prima regola, non quella del blocco.
+ */
+const CAMERA = (() => {
+  const chiave = "@media (prefers-reduced-motion: no-preference)";
+  const inizio = TOKENS.indexOf(chiave);
+  if (inizio < 0) throw new Error(`tokens.css non ha piu' ${chiave}`);
+  const apre = TOKENS.indexOf("{", inizio);
+  let profondita = 0;
+  let i = apre;
+  for (; i < TOKENS.length; i++) {
+    if (TOKENS[i] === "{") profondita += 1;
+    else if (TOKENS[i] === "}" && (profondita -= 1) === 0) break;
+  }
+  return { dentro: TOKENS.slice(apre + 1, i), fuori: TOKENS.slice(0, inizio) + TOKENS.slice(i + 1) };
+})();
+
+/**
+ * I due patti su cui poggia tutto il resto, e gli unici che nessuna prova
+ * guardava. Sono invarianti del FOGLIO DI STILE, non del modello: una modifica
+ * che porti i 380vh fuori dalla media query, o che scriva una regola di camera
+ * senza la chiave [data-motion="full"], o che tolga un `, 1` a una lettura di
+ * --p, lascia verdi tutte le altre prove di questo file — e rompe la sezione
+ * per chi ha chiesto di non muovere niente, o per chi il JavaScript non ce l'ha.
+ * Fin qui l'unica prova era un curl fatto a mano una volta, che nel repository
+ * non c'e'.
+ */
+describe("il patto del fallback e' scritto in ogni riga che legge la camera", () => {
+  it("nessuna lettura di --p o --s e' senza il suo default", () => {
+    // Senza JavaScript nessuno le scrive: --p vale 1 e --s vale 1, il tavolo si
+    // vede intero e il fotogramma a riposo e' anche quello finale. Basta un
+    // `, 1` dimenticato perche' l'opacita' diventi invalida e mezzo tavolo
+    // sparisca per chi non ha il JavaScript — e nient'altro se ne accorgerebbe.
+    const letture = [...TOKENS.matchAll(/var\(\s*--[ps]\b[^)]*\)/g)].map((m) => m[0]);
+    // Se un giorno le letture sparissero tutte, il ciclo qui sotto sarebbe vero
+    // per vuoto: il conto dice che ce ne sono ancora.
+    expect(letture.length).toBeGreaterThanOrEqual(5);
+    for (const lettura of letture) {
+      expect(lettura, "una lettura della camera senza il suo default").toMatch(
+        /^var\(\s*--[ps],\s*1\)$/,
+      );
+    }
+  });
+});
+
+describe("il movimento ha una porta sola, e due chiavi per quella porta", () => {
+  it("ogni selettore della camera porta la chiave [data-motion=\"full\"]", () => {
+    // La media query da sola non basta: dice solo che l'utente non ha chiesto
+    // meno movimento, e non sa niente della finestra stretta ne' del puntatore
+    // grosso. Quelli li sa solo resolveMotionLevel, che li scrive in
+    // data-motion. Una regola scritta qui dentro senza la chiave si
+    // applicherebbe anche a un tablet, dove il palco non aggancia niente: piano
+    // sticky, track alto 380vh e nessuno che scriva --p.
+    const selettori = [...CAMERA.dentro.matchAll(/(^|\})\s*([^{}]+)\{/g)].flatMap((m) =>
+      m[2].split(",").map((s) => s.trim().replace(/\s+/g, " ")),
+    );
+    expect(selettori.length).toBeGreaterThanOrEqual(9);
+    for (const selettore of selettori) {
+      expect(selettore, `${selettore} entra senza chiave`).toContain(
+        '[data-desk][data-motion="full"]',
+      );
+    }
+  });
+
+  it("l'altezza del track e lo sticky del palco esistono solo li' dentro", () => {
+    // Sono le due righe che trasformano la sezione in una camera: 380vh di
+    // corsa e un palco che sta fermo mentre passano. Fuori da quella porta
+    // vorrebbero dire tre schermi di vuoto da scorrere a mano, con il tavolo
+    // gia' finito e fermo — che e' il modo peggiore di rompere il fallback.
+    expect(CAMERA.dentro).toContain("380vh");
+    expect(CAMERA.dentro).toContain("position: sticky");
+    expect(CAMERA.fuori).not.toContain("380vh");
+    expect(CAMERA.fuori).not.toContain("position: sticky");
+  });
+});
+
 describe("le didascalie si danno il cambio", () => {
   it("ognuna entra con il suo strato", () => {
     expect(CAPTION_BEATS.map((c) => c.from)).toEqual(LAYER_BEATS.map((b) => b.from));
