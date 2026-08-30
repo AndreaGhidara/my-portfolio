@@ -53,7 +53,7 @@ body {
   }
 }
 
-h1, h2, h3, .display {
+h1, h2, h3, h4, .display {
   font-family: var(--font-display), var(--font-body), sans-serif;
   letter-spacing: -0.02em;
   line-height: 1.03;
@@ -297,4 +297,206 @@ html[data-dialog-open] body { overflow: hidden; }
   /* --paint e' animata da paint(): il cerchio si dipinge da sinistra. */
   --paint: 100%;
   clip-path: inset(0 calc(100% - var(--paint)) 0 0);
+}
+
+/* ── Il tavolo ──────────────────────────────────────────────────────────────
+   La geometria arriva tutta da layers.ts, in percentuale: qui non si sa quanto
+   e' grande lo schermo, e non serve saperlo. --p e --s le scrivera' il palco,
+   una volta per fotogramma; finche' nessuno le scrive, --p vale 1 e il tavolo
+   e' quello di adesso — completo. E' il patto del fallback. */
+
+[data-desk-track] { position: relative; }
+
+[data-desk-stage] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  padding-block: var(--section-y);
+  padding-inline: var(--gutter);
+  /* clip e non hidden: hidden crea un contenitore di scorrimento, e quando
+     arrivera' la camera romperebbe il position: sticky del palco. Serve solo
+     a non far uscire dalla pagina l'etichetta di un oggetto di bordo. */
+  overflow-x: clip;
+}
+
+[data-desk-title] { max-width: 34rem; text-align: center; }
+[data-desk-title] h2 { margin-top: 0.75rem; font-size: clamp(1.9rem, 5vw, 3rem); }
+[data-desk-title] p:last-child { margin-top: 1rem; color: var(--fg-muted); }
+
+[data-desk-punch] {
+  max-width: 40rem;
+  text-align: center;
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+/* Il mondo e' due cose impilate: il piano del tavolo, che ha le proporzioni
+   dichiarate da layers.ts, e sotto le didascalie dei quattro strati. Le <ul>
+   degli oggetti ricalcano il piano invece di stare dentro il blocco intero:
+   cosi' le percentuali di layers.ts continuano a misurare il piano, e una riga
+   di testo in piu' in una didascalia non sposta il tavolo di un pixel. */
+[data-desk-world] {
+  position: relative;
+  width: min(94vw, 62rem);
+  /* Le etichette si misurano sulla larghezza del mondo e non su quella della
+     finestra: lo stesso mondo, stretto o largo, deve avere lo stesso disegno. */
+  container-type: inline-size;
+}
+
+[data-desk-surface],
+[data-desk-layer] > ul {
+  aspect-ratio: var(--world-w) / var(--world-h);
+}
+
+[data-desk-surface] { position: relative; }
+
+[data-desk-layer] > ul {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+[data-desk-cables] { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* Il gemello nascosto e' aria-hidden e puo' sparire del tutto. L'altro no: e'
+   quello che porta le etichette che legge uno screen reader, e sotto i 1024px,
+   dove non si disegna, deve restare comunque nell'albero di accessibilita' —
+   con display:none il tavolo sul telefono non lo leggerebbe piu' nessuno. */
+[data-desk-world][data-layout="tall"] { display: none; }
+
+@media (max-width: 1023px) {
+  [data-desk-world][data-layout="wide"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  [data-desk-world][data-layout="tall"] {
+    display: block;
+    width: min(92vw, 26rem);
+  }
+}
+
+/* Il centro. La sua larghezza arriva inline da CENTRE.width, perche' e' con
+   quel numero che i test verificano che nessun oggetto lo copra. */
+[data-desk-centre] {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--fg);
+}
+
+[data-desk-centre-label] {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  margin-top: 0.4em;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(0.5rem, 2.3cqw, 0.7rem);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+[data-desk-layers], [data-desk-layer] > ul { list-style: none; margin: 0; padding: 0; }
+
+[data-desk-layers] {
+  display: grid;
+  gap: 1.75rem;
+  margin-top: 3.5rem;
+}
+
+@media (min-width: 1024px) {
+  [data-desk-layers] { grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+}
+
+[data-desk-caption] h3 { font-size: 1.125rem; }
+[data-desk-caption] p {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
+[data-desk-object] {
+  position: absolute;
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  color: var(--fg-muted);
+  /* left, top, width e la finestra --from/--span sono dati e arrivano inline.
+     L'opacita' pure: dipende da --from e --span, che sono dati dell'oggetto.
+     Qui non si dichiara nessuna transizione — non c'e' niente che si muove, e
+     quindi niente che reduced-motion debba spegnere. */
+}
+
+/* Fuori dai primi quattro: sparisce dal disegno sul telefono, non dalla lista.
+   Sono gli oggetti del solo mondo verticale, che e' gia' aria-hidden. */
+[data-desk-object][data-off] { display: none; }
+
+/* La sagoma e' una maschera e non una <img>: dentro una <img> il currentColor
+   degli SVG si risolve sul documento dell'immagine, che del tema non sa niente,
+   e i disegni resterebbero neri anche su fondo inchiostro. Come maschera il
+   colore lo mette chi la contiene. */
+[data-desk-shape] {
+  display: block;
+  width: 100%;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: 100% 100%;
+}
+
+[data-desk-object][data-shape="sheet"] [data-desk-shape] { mask-image: url("/brand/desk/sheet.svg"); }
+[data-desk-object][data-shape="card"] [data-desk-shape] { mask-image: url("/brand/desk/card.svg"); }
+[data-desk-object][data-shape="postit"] [data-desk-shape] { mask-image: url("/brand/desk/postit.svg"); }
+[data-desk-object][data-shape="plate"] [data-desk-shape] { mask-image: url("/brand/desk/plate.svg"); }
+[data-desk-object][data-shape="rack"] [data-desk-shape] { mask-image: url("/brand/desk/rack.svg"); }
+[data-desk-object][data-shape="phone"] [data-desk-shape] { mask-image: url("/brand/desk/phone.svg"); }
+[data-desk-centre] [data-desk-shape] { mask-image: url("/brand/desk/laptop.svg"); }
+
+/* L'infrastruttura e' disegnata piu' chiara: e' lo strato che non si vede mai
+   finche' non manca. Piu' chiara, non invisibile — con --line, che e' il colore
+   delle righe di un bordo, un foglio su carta sarebbe sparito. */
+[data-desk-object][data-shape="rack"],
+[data-desk-object][data-shape="plate"] {
+  color: color-mix(in oklab, var(--fg-muted) 70%, var(--bg));
+}
+
+/* Il post-it e' l'unico calore che non sia arancio. --bulb era in palette e non
+   faceva niente: qui ha un mestiere. Spento con --muted per reggere sia su
+   carta sia su inchiostro, dove il giallo pieno griderebbe. */
+[data-desk-object][data-shape="postit"] {
+  color: color-mix(in oklab, var(--bulb) 72%, var(--muted));
+}
+
+[data-desk-object] [data-desk-label] {
+  position: absolute;
+  left: 50%;
+  top: 104%;
+  transform: translateX(-50%);
+  /* Va a capo invece di restare su una riga: "L'area riservata" su una riga
+     sola e' largo il doppio dell'oggetto che nomina, e finisce addosso
+     all'etichetta accanto. Sul tavolo lo spazio verticale costa meno di
+     quello orizzontale. */
+  width: max-content;
+  max-width: 6em;
+  text-align: center;
+  line-height: 1.25;
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(0.5rem, 2.6cqw, 0.72rem);
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  /* Il tavolo e' fitto e qualche etichetta finisce per forza sopra il disegno
+     di un altro oggetto: sotto ci va il colore del fondo, cosi' resta leggibile.
+     Non e' un riquadro — il fondo e' lo stesso della pagina, e quello che si
+     vede e' solo il disegno che si interrompe sotto la parola, come farebbe
+     un cartellino appoggiato sopra. */
+  background-color: var(--bg);
+  padding: 0.1em 0.3em;
 }

@@ -4,19 +4,40 @@ import {
   LAYER_BEATS,
   OBJECTS_PER_LAYER,
   PUNCH_BEAT,
+  SHAPE_BOX,
   TITLE_BEAT,
   WORLD,
   cameraScale,
+  centreBox,
+  drawWidth,
   objectBeat,
+  objectExtent,
   placeObject,
+  type DeskDrawing,
   type DeskLayout,
 } from "../layers";
+import { SHAPES } from "../../../../../scripts/build-desk.mjs";
 
 const LAYOUTS: DeskLayout[] = ["wide", "tall"];
 
-/** Mezza larghezza e mezza altezza del piu' grande oggetto, in percentuale
- *  del mondo. Il post-it e' il piu' largo; il telefono il piu' alto. */
-const MARGIN = { x: 5.5, y: 8 };
+/**
+ * Il rettangolo che un oggetto occupa davvero: centro piu' le sue mezze
+ * estensioni. Le sagome hanno proporzioni molto diverse (il telefono e' 74x148,
+ * il piatto 118x54): un margine unico per tutti sarebbe un numero indovinato, e
+ * un test che guarda il centro mentre il disegno esce dal bordo non protegge
+ * niente.
+ */
+function boxOf(layout: DeskLayout, layer: number, index: number) {
+  const { shape } = deskLayers[layer].objects[index];
+  const { x, y, rotate } = placeObject(layout, layer, index);
+  const half = objectExtent(layout, shape, rotate);
+  return { x0: x - half.x, x1: x + half.x, y0: y - half.y, y1: y + half.y };
+}
+
+/** Due rettangoli che si toccano, anche solo per un angolo. */
+function overlap(a: ReturnType<typeof boxOf>, b: ReturnType<typeof boxOf>) {
+  return a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+}
 
 describe("il mondo del tavolo", () => {
   it("ha due formati: orizzontale per il desktop, verticale per il telefono", () => {
@@ -36,28 +57,57 @@ describe("il mondo del tavolo", () => {
   });
 });
 
+describe("quanto sono grandi gli oggetti", () => {
+  it("misurano quello che dice il generatore delle sagome: i due file non possono divergere", () => {
+    for (const [name, spec] of Object.entries(SHAPES)) {
+      expect(SHAPE_BOX[name as keyof typeof SHAPE_BOX], name).toEqual({ w: spec.w, h: spec.h });
+    }
+  });
+
+  it("sul tavolo hanno le proporzioni del loro disegno: il telefono resta stretto e alto", () => {
+    // La trappola: il mondo non e' quadrato, e una percentuale orizzontale e una
+    // verticale non misurano lo stesso lato. Sbagliando, il telefono (74x148)
+    // verrebbe alto un terzo del tavolo.
+    for (const layout of LAYOUTS) {
+      for (const [name, box] of Object.entries(SHAPE_BOX)) {
+        const half = objectExtent(layout, name as DeskDrawing, 0);
+        const larghezza = (half.x * 2 * WORLD[layout].width) / 100;
+        const altezza = (half.y * 2 * WORLD[layout].height) / 100;
+        expect(larghezza / altezza, `${layout}/${name}`).toBeCloseTo(box.w / box.h, 5);
+      }
+    }
+  });
+
+  it("nel mondo verticale si disegnano piu' piccoli: a misura naturale un foglio sarebbe un quinto della larghezza", () => {
+    const naturale = (SHAPE_BOX.sheet.w * 100) / WORLD.tall.width;
+    expect(naturale).toBeGreaterThan(20);
+    expect(drawWidth("tall", "sheet")).toBeLessThan(naturale * 0.6);
+  });
+});
+
 describe("dove finiscono gli oggetti", () => {
-  it("restano dentro il mondo, in tutti e due i formati", () => {
+  it("restano dentro il mondo col disegno intero, non solo col centro", () => {
     for (const layout of LAYOUTS) {
       for (let layer = 0; layer < deskLayers.length; layer++) {
         for (let i = 0; i < OBJECTS_PER_LAYER[layout]; i++) {
-          const { x, y } = placeObject(layout, layer, i);
-          expect(x, `${layout} strato ${layer} oggetto ${i}`).toBeGreaterThan(MARGIN.x);
-          expect(x).toBeLessThan(100 - MARGIN.x);
-          expect(y).toBeGreaterThan(MARGIN.y);
-          expect(y).toBeLessThan(100 - MARGIN.y);
+          const box = boxOf(layout, layer, i);
+          const dove = `${layout} strato ${layer} oggetto ${i}`;
+          expect(box.x0, dove).toBeGreaterThan(0);
+          expect(box.x1, dove).toBeLessThan(100);
+          expect(box.y0, dove).toBeGreaterThan(0);
+          expect(box.y1, dove).toBeLessThan(100);
         }
       }
     }
   });
 
-  it("non coprono il laptop: nessun oggetto entra nel quadrato centrale", () => {
+  it("non coprono il laptop: nemmeno un angolo entra nel centro", () => {
     for (const layout of LAYOUTS) {
+      const centro = centreBox(layout);
       for (let layer = 0; layer < deskLayers.length; layer++) {
         for (let i = 0; i < OBJECTS_PER_LAYER[layout]; i++) {
-          const { x, y } = placeObject(layout, layer, i);
-          const dentro = Math.abs(x - 50) < 14 && Math.abs(y - 50) < 14;
-          expect(dentro, `${layout} strato ${layer} oggetto ${i} copre il laptop`).toBe(false);
+          const dove = `${layout} strato ${layer} oggetto ${i} copre il laptop`;
+          expect(overlap(boxOf(layout, layer, i), centro), dove).toBe(false);
         }
       }
     }

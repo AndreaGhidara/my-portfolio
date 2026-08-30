@@ -1,40 +1,60 @@
 import { Reveal } from "@/animations/components/Reveal";
-import { ThreadSegment } from "@/components/thread/ThreadSegment";
+import { DeskStage } from "./DeskStage";
+import type { DeskLayerData } from "./DeskTable";
 
 export type ServiceItem = { id: string; title: string; description: string };
 
 export type ServicesViewProps = {
   eyebrow: string;
-  title: string;
+  stageTitle: string;
+  stageLead: string;
+  centre: string;
+  punch: string;
+  practice: string;
   intro: string;
+  layers: DeskLayerData[];
   items: ServiceItem[];
 };
 
 /**
- * La risposta alle quattro frasi della sezione precedente, nello stesso
- * ordine: la prima riga qui e' come si risolve la prima frase di la'.
+ * La risposta alle quattro frasi della sezione precedente. Non e' un elenco di
+ * risposte: e' un tavolo, e la risposta e' "qualunque delle quattro sia la tua,
+ * il lavoro e' questo tavolo qui".
  *
- * Su carta e non sull'arancio: il blocco rumoroso e' il riconoscimento, questo
- * e' il blocco che si legge. Due sezioni gridate di fila si annullano, e questo
- * ha il testo piu' lungo della pagina — sull'arancio andrebbe tutto in
- * inchiostro per il contrasto, e sarebbe un muro.
+ * "E in pratica?" viene dopo, ed e' deliberatamente separabile: il tavolo e' lo
+ * spettacolo, quel blocco e' la sostanza, e conserva la risposta 1:1 alle quattro
+ * voci. Se un giorno pesa, si toglie senza toccare il tavolo.
  */
-export function ServicesView({ eyebrow, title, intro, items }: ServicesViewProps) {
+export function ServicesView({
+  eyebrow,
+  stageTitle,
+  stageLead,
+  centre,
+  punch,
+  practice,
+  intro,
+  layers,
+  items,
+}: ServicesViewProps) {
   return (
-    <section id="services" className="relative px-[var(--gutter)] py-[var(--section-y)]">
-      <ThreadSegment section="services" className="pointer-events-none absolute inset-0 -z-10" />
+    <section id="services" className="relative">
+      {/* Niente <ThreadSegment> qui: in questa sezione il filo SONO i cavi, dentro
+          il tavolo. Due tratti sovrapposti sarebbero due fili, ed e' esattamente
+          la cosa che il concept vieta. */}
+      <DeskStage
+        eyebrow={eyebrow}
+        title={stageTitle}
+        lead={stageLead}
+        centre={centre}
+        punch={punch}
+        layers={layers}
+      />
 
-      <div className="mx-auto max-w-5xl">
-        <p className="eyebrow">{eyebrow}</p>
-        <h2 className="mt-3 text-3xl lg:text-5xl">{title}</h2>
-        <p data-service-description className="mt-5 max-w-2xl text-[var(--fg-muted)]">
-          {intro}
-        </p>
+      <div className="mx-auto max-w-5xl px-[var(--gutter)] pb-[var(--section-y)]">
+        <h3 className="text-2xl lg:text-4xl">{practice}</h3>
+        <p className="mt-4 max-w-2xl text-[var(--fg-muted)]">{intro}</p>
 
-        {/* Una colonna sola anche da desktop: sono quattro risposte da leggere
-            in fila, non quattro schede da confrontare a colpo d'occhio. La
-            griglia a due colonne invitava a saltarle. */}
-        <Reveal as="ol" className="mt-10 border-t border-[var(--line)]" stagger={0.09}>
+        <Reveal as="ol" data-practice className="mt-10 border-t border-[var(--line)]" stagger={0.09}>
           {items.map((item, index) => (
             <li
               key={item.id}
@@ -42,13 +62,14 @@ export function ServicesView({ eyebrow, title, intro, items }: ServicesViewProps
             >
               <div className="lg:pt-1">
                 <span className="eyebrow">{String(index + 1).padStart(2, "0")}</span>
-                <h3 className="mt-1 text-lg font-bold leading-tight text-[var(--fg)] lg:text-xl">
+                {/* Livello 4: queste quattro voci stanno dentro "E in pratica?",
+                    che e' il loro <h3>. Al livello 3 sarebbero fratelle del
+                    titolo che le contiene. */}
+                <h4 className="mt-1 text-lg font-bold leading-tight text-[var(--fg)] lg:text-xl">
                   {item.title}
-                </h3>
+                </h4>
               </div>
-              <p className="max-w-2xl leading-relaxed text-[var(--fg-muted)]">
-                {item.description}
-              </p>
+              <p className="max-w-2xl leading-relaxed text-[var(--fg-muted)]">{item.description}</p>
             </li>
           ))}
         </Reveal>
