@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, it, expect } from "vitest";
 import { SHAPES, buildShape } from "../build-desk.mjs";
 
@@ -11,6 +13,22 @@ describe("le sagome del tavolo", () => {
   it("escono identiche a ogni build: il tremolio e' seminato, non casuale", () => {
     for (const name of Object.keys(SHAPES)) {
       expect(buildShape(name), name).toBe(buildShape(name));
+    }
+  });
+
+  it("sono quelle che stanno in public/brand/desk: i file committati non invecchiano", () => {
+    // La prova qui sopra confronta il generatore con se stesso: dice che non
+    // c'e' caso in giro, non che i sette file spediti siano aggiornati. Il CSS
+    // le monta come maschere da /brand/desk/*.svg, quindi quello che si vede e'
+    // il file, non il generatore: ritoccare una sagoma e scordarsi
+    // `npm run assets` spedisce il disegno vecchio, e senza questa prova se ne
+    // accorgerebbe solo un viewBox cambiato — un path no, e i path sono tutto
+    // il disegno.
+    for (const name of Object.keys(SHAPES)) {
+      const file = resolve(process.cwd(), `public/brand/desk/${name}.svg`);
+      expect(readFileSync(file, "utf8"), `${name}.svg e' da rigenerare: npm run assets`).toBe(
+        buildShape(name),
+      );
     }
   });
 
