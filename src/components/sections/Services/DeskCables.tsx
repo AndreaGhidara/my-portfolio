@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { weave } from "@/animations/presets";
+import { useMotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import { THREAD_ANCHORS } from "@/components/thread/anchors";
 
@@ -76,8 +77,38 @@ const BRANCH = `M50 50 C50 66, 30 72, 22 82`;
  */
 export function DeskCables() {
   const scope = useRef<HTMLDivElement | null>(null);
+  const cavo = useRef<gsap.core.Timeline | null>(null);
+  const level = useMotionLevel();
 
-  useSectionAnimation((level) => {
+  /**
+   * Staccare il cavo dallo scorrimento. `weave` restituisce una timeline con il
+   * suo ScrollTrigger appeso al track della camera, e non basta che smetta di
+   * essere usata: finche' e' viva riscrive lo strokeDashoffset a ogni giro di
+   * rotellina. Si uccidono tutti e due — il trigger non se ne va con la
+   * timeline.
+   */
+  const spegni = useCallback(() => {
+    cavo.current?.scrollTrigger?.kill();
+    cavo.current?.kill();
+    cavo.current = null;
+  }, []);
+
+  // Dichiarato PRIMA della build, ed e' l'ordine a far funzionare la cosa: al
+  // cambio di livello React chiama i cleanup in ordine di dichiarazione e poi
+  // gli effetti, quindi il cavo vecchio muore prima che ne nasca uno nuovo.
+  //
+  // Serve perche' useGSAP con delle dipendenze rimanda il revert allo
+  // smontaggio, non al cambio di livello: senza, chi esce da "full" — la
+  // riduzione del movimento accesa a meta' strada, la finestra che scende sotto
+  // i 1024, un puntatore grosso che arriva — si terrebbe addosso lo scrub di
+  // prima, che continua a tessere addosso a chi ha appena chiesto di non
+  // muovere niente. E' la stessa mancanza che DeskStage copre con spegni().
+  //
+  // A ogni cambio, non solo all'uscita da "full": sopra "none" `weave` ne crea
+  // comunque uno nuovo, e due cavi sullo stesso track sono due.
+  useLayoutEffect(() => spegni, [level, spegni]);
+
+  useSectionAnimation((livello) => {
     const nodes = Array.from(scope.current?.querySelectorAll("path") ?? []);
     // Il trigger e la finestra sono quelli della camera, non quelli di default
     // del filo. Il piano vive dentro un palco sticky e la camera lo scala:
@@ -90,7 +121,17 @@ export function DeskCables() {
     // alla camera: il filo arriva al suo posto nell'istante esatto in cui la
     // camera smette di arretrare.
     const trigger = scope.current?.closest("[data-desk-track]") ?? scope.current;
-    weave(nodes, { level, trigger, scrub: true, start: "top top", end: "bottom bottom" });
+    cavo.current = weave(nodes, {
+      level: livello,
+      trigger,
+      scrub: true,
+      start: "top top",
+      end: "bottom bottom",
+    });
+
+    // Anche lo smontaggio passa di qui: gsap.context di useGSAP chiama questa
+    // al revert.
+    return spegni;
   }, scope);
 
   return (
