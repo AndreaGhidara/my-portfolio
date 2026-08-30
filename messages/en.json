@@ -38,7 +38,6 @@
   },
   "services": {
     "eyebrow": "The method",
-    "title": "How I build it",
     "intro": "Four ways of working, one for each sentence above. If your case sits between two, that's normal: we talk it through on a call.",
     "list": {
       "sites": {

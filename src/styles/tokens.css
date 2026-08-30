@@ -391,6 +391,52 @@ html[data-dialog-open] body { overflow: hidden; }
   color: var(--fg);
 }
 
+/* Il sito finito dentro lo schermo. Misure in percentuale della scatola del
+   laptop: lo schermo disegnato va da 2,5% a 97,5% in orizzontale e da 3,75% a
+   87% in verticale, e questo ci sta dentro con un margine. Non c'e' nessun
+   testo — a questa misura sarebbe illeggibile comunque — ma c'e' l'arancio del
+   bottone, che e' l'unica cosa che distingue un sito finito da un wireframe. */
+[data-desk-screen] {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 9%;
+  height: 73%;
+  display: flex;
+  flex-direction: column;
+  gap: 6%;
+}
+
+[data-desk-screen] > * {
+  display: block;
+  border-radius: 0.5px;
+  background-color: color-mix(in oklab, currentColor 38%, transparent);
+}
+
+/* La barra in cima: e' quella che dice "e' un sito", non un foglio. */
+[data-desk-screen-bar] {
+  height: 12%;
+  background-color: color-mix(in oklab, currentColor 20%, transparent);
+}
+[data-desk-screen-head] {
+  height: 15%;
+  width: 62%;
+  margin-top: 2%;
+  background-color: color-mix(in oklab, currentColor 62%, transparent);
+}
+[data-desk-screen-line] { height: 6%; }
+[data-desk-screen-line]:nth-of-type(3) { width: 88%; }
+[data-desk-screen-line]:nth-of-type(4) { width: 80%; }
+[data-desk-screen-line]:nth-of-type(5) { width: 64%; }
+/* L'arancio. Sul tavolo ci sono due soli colori: il giallo del post-it e
+   questo, ed e' qui che deve stare — al centro, sulla cosa che si compra. */
+[data-desk-screen-cta] {
+  height: 13%;
+  width: 34%;
+  margin-top: auto;
+  background-color: var(--accent);
+}
+
 [data-desk-centre-label] {
   position: absolute;
   left: 50%;
@@ -483,14 +529,20 @@ html[data-dialog-open] body { overflow: hidden; }
   /* Va a capo invece di restare su una riga: "L'area riservata" su una riga
      sola e' largo il doppio dell'oggetto che nomina, e finisce addosso
      all'etichetta accanto. Sul tavolo lo spazio verticale costa meno di
-     quello orizzontale. */
+     quello orizzontale.
+
+     Le tre misure che seguono sono la striscia che layers.ts tiene libera
+     attorno a ogni oggetto: due righe da 1.2 piu' 0.2 di respiro fanno i 2.6em
+     di LABEL.height, e max-width (che arriva inline, da LABEL.width) e' larga
+     quanto la parola piu' lunga del vocabolario del tavolo — "prenotazioni",
+     dodici caratteri — piu' il respiro laterale, cosi' niente sborda dal posto
+     che gli e' stato tenuto. Senza spaziatura fra le lettere: 0.04em su dodici
+     caratteri sono mezzo em, ed e' mezzo em che va tolto a un altro oggetto. */
   width: max-content;
-  max-width: 6em;
   text-align: center;
-  line-height: 1.25;
+  line-height: 1.2;
   font-family: var(--font-mono), monospace;
   font-size: clamp(0.5rem, 2.6cqw, 0.72rem);
-  letter-spacing: 0.04em;
   color: var(--fg);
   /* Il tavolo e' fitto e qualche etichetta finisce per forza sopra il disegno
      di un altro oggetto: sotto ci va il colore del fondo, cosi' resta leggibile.
@@ -498,5 +550,5 @@ html[data-dialog-open] body { overflow: hidden; }
      vede e' solo il disegno che si interrompe sotto la parola, come farebbe
      un cartellino appoggiato sopra. */
   background-color: var(--bg);
-  padding: 0.1em 0.3em;
+  padding: 0.1em 0.2em;
 }

@@ -72,6 +72,28 @@ export function DeskTable({
             data-desk-shape
             style={{ aspectRatio: `${SHAPE_BOX.laptop.w} / ${SHAPE_BOX.laptop.h}` }}
           />
+
+          {/* Il sito finito, dentro lo schermo. La sezione si apre su "un sito
+              finito riempie lo schermo" e si chiude dicendo che quello schermo
+              e' UNA delle cose sul tavolo: se al centro c'e' una cornice vuota,
+              la frase indica un rettangolo nero e non dice piu' niente.
+
+              Non puo' stare dentro laptop.svg: le sagome sono maschere a un
+              colore solo, e una maschera l'arancio non lo sa portare. Qui e'
+              DOM vero, appoggiato sopra il disegno e misurato sulla scatola del
+              laptop (lo schermo, nel viewBox 360x240, va da 9,9 a 351,209).
+
+              E' decorazione e basta: nessun testo, niente da annunciare. Il nome
+              del centro e' gia' la didascalia "il progetto" qui sotto. */}
+          <span data-desk-screen aria-hidden="true">
+            <span data-desk-screen-bar />
+            <span data-desk-screen-head />
+            <span data-desk-screen-line />
+            <span data-desk-screen-line />
+            <span data-desk-screen-line />
+            <span data-desk-screen-cta />
+          </span>
+
           <span data-desk-centre-label>{centre}</span>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { ServicesView } from "../ServicesView";
 import type { ServicesViewProps } from "../ServicesView";
+import { LABEL, drawWidth } from "../layers";
 
 const layer = (id: string, n: number, mute = false) => ({
   id,
@@ -102,6 +103,17 @@ describe("il tavolo è la lista", () => {
     }
   });
 
+  it("il disegno e' quello che la geometria dice: la larghezza arriva da layers.ts", () => {
+    // Senza questa, si potrebbe togliere la larghezza inline e ogni prova di
+    // layers.test.ts continuerebbe a passare, dimostrando cose su un mondo che
+    // nessuno disegna piu'.
+    const { container } = render(<ServicesView {...props} />);
+    const primo = container.querySelector(SOLI_VERI) as HTMLElement;
+    expect(primo.style.width).toBe(`${drawWidth("wide", "sheet")}%`);
+    const etichetta = primo.querySelector("[data-desk-label]") as HTMLElement;
+    expect(etichetta.style.maxWidth).toBe(`${LABEL.width}em`);
+  });
+
   it("il gemello nascosto non si fa leggere due volte", () => {
     const { container } = render(<ServicesView {...props} />);
     const gemelli = container.querySelectorAll("[data-desk-world][aria-hidden]");
@@ -111,6 +123,34 @@ describe("il tavolo è la lista", () => {
     for (const oggetto of gemelli[0].querySelectorAll("[data-desk-object]")) {
       expect(oggetto).toHaveAttribute("data-ghost");
     }
+  });
+});
+
+describe("lo schermo al centro", () => {
+  it("porta un sito finito, non una cornice vuota: e' la cosa che la tesi indica", () => {
+    const { container } = render(<ServicesView {...props} />);
+    const centro = container.querySelector(
+      "[data-desk-world]:not([aria-hidden]) [data-desk-centre]",
+    ) as HTMLElement;
+    const schermo = centro.querySelector("[data-desk-screen]") as HTMLElement;
+    expect(schermo).not.toBeNull();
+    // La barra in cima, il titolo, le righe di testo e il bottone: e' quello che
+    // fa leggere un rettangolo come un sito e non come un foglio.
+    expect(schermo.querySelector("[data-desk-screen-bar]")).not.toBeNull();
+    expect(schermo.querySelector("[data-desk-screen-head]")).not.toBeNull();
+    expect(schermo.querySelectorAll("[data-desk-screen-line]").length).toBeGreaterThanOrEqual(2);
+    expect(schermo.querySelector("[data-desk-screen-cta]")).not.toBeNull();
+  });
+
+  it("lo schermo e' muto: il nome del centro e' gia' la sua didascalia", () => {
+    const { container } = render(<ServicesView {...props} />);
+    const centro = container.querySelector(
+      "[data-desk-world]:not([aria-hidden]) [data-desk-centre]",
+    ) as HTMLElement;
+    expect(centro).toHaveTextContent(props.centre);
+    const schermo = centro.querySelector("[data-desk-screen]") as HTMLElement;
+    expect(schermo).toHaveAttribute("aria-hidden", "true");
+    expect(schermo.textContent).toBe("");
   });
 });
 

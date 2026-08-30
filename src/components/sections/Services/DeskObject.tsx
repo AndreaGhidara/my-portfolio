@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { DeskShape } from "@/content/desk";
-import { SHAPE_BOX, drawWidth, type Beat, type DeskLayout, type Placement } from "./layers";
+import { LABEL, SHAPE_BOX, drawWidth, type Beat, type DeskLayout, type Placement } from "./layers";
 
 /**
  * Un oggetto sul tavolo. E' un <li>, non un <div> che finge: lo strato e' una
@@ -58,7 +58,15 @@ export function DeskObject({
       }
     >
       <span data-desk-shape style={{ aspectRatio: `${box.w} / ${box.h}` }} />
-      {label ? <span data-desk-label>{label}</span> : null}
+      {/* La larghezza massima della striscia arriva da LABEL e non dal CSS: e'
+          con quel numero che objectFootprint tiene le distanze, e se il foglio
+          di stile ne usasse un altro la prova misurerebbe un tavolo diverso da
+          quello disegnato. */}
+      {label ? (
+        <span data-desk-label style={{ maxWidth: `${LABEL.width}em` }}>
+          {label}
+        </span>
+      ) : null}
     </li>
   );
 }

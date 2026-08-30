@@ -38,7 +38,6 @@
   },
   "services": {
     "eyebrow": "Il metodo",
-    "title": "Come lo costruisco",
     "intro": "Quattro modi di lavorare, uno per ogni frase qui sopra. Se il tuo caso sta in mezzo a due, è normale: se ne parla in call.",
     "list": {
       "sites": {
