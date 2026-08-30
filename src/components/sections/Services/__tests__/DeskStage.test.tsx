@@ -57,12 +57,16 @@ const palco = (container: HTMLElement) =>
  * Gli ascoltatori di `focusin` vivi sul palco, in un insieme che si svuota da
  * solo quando vengono staccati.
  *
- * E' una prova che guarda dentro, e non e' pigrizia: quello che l'ascoltatore FA
- * qui non si puo' provocare, perche' jsdom non implementa :focus-visible e
- * risponde false anche a un elemento che ha appena preso il fuoco. Quello che
- * conta comunque e' un'altra cosa — quanto vive — ed e' esattamente li' che il
- * difetto stava: attaccato dentro la build della camera, si staccava solo al
- * revert di gsap.context, che al cambio di livello non arriva mai.
+ * E' una prova che guarda dentro, e non e' pigrizia: misura QUANTO VIVE
+ * l'ascoltatore, ed e' esattamente li' che il difetto stava — attaccato dentro
+ * la build della camera, si staccava solo al revert di gsap.context, che al
+ * cambio di livello non arriva mai.
+ *
+ * La vita non la misura la prova qui sotto, che pure c'e' e guarda dall'esterno:
+ * quella esercita un percorso solo — il fuoco sul post-it dopo l'uscita da
+ * «full» — e dello smontaggio, e del livello in cui l'ascoltatore non deve
+ * nascere proprio, non dice niente. Sono le due guardie in fondo, e poggiano
+ * tutte e due su questo conto.
  */
 function ascoltatoriDelFuoco() {
   const vivi = new Set<unknown>();
