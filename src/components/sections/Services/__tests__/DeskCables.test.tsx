@@ -97,7 +97,11 @@ function suUnTrack() {
     </div>,
   );
   const track = container.querySelector("[data-desk-track]") as HTMLElement;
-  return { track, agganciati: () => ScrollTrigger.getAll().filter((t) => t.trigger === track) };
+  return {
+    container,
+    track,
+    agganciati: () => ScrollTrigger.getAll().filter((t) => t.trigger === track),
+  };
 }
 
 /**
@@ -127,6 +131,36 @@ describe("i cavi lasciano andare lo scorrimento quando il livello cambia", () =>
     // A "none" `weave` non parte nemmeno: se il vecchio non se ne va da solo,
     // non se ne va piu' nessuno fino allo smontaggio.
     expect(agganciati()).toHaveLength(0);
+  });
+
+  it("e non lascia il cavo a meta': il tratteggio scritto inline se ne va con lo scrub", () => {
+    // `weave` scrive dasharray e dashoffset inline al momento della build, PRIMA
+    // che si scorra di un pixel, tutti e due pari alla lunghezza del tratto:
+    // cavo invisibile. A "none" `weave` non riparte, quindi se lo scrub muore e
+    // quelle due restano, i tre tratti spariscono per sempre — e il fotogramma a
+    // riposo, il cui patto e' «il filo e' continuo», diventa un filo tagliato.
+    // Uccidere e basta e' peggio di non uccidere: il vecchio scrub, almeno, il
+    // cavo lo disegnava.
+    //
+    // Quello che questa prova NON dimostra: che il cavo si veda. In jsdom un
+    // path e' lungo zero (vedi vitest.setup.ts) e gsap scrive due zeri, quindi
+    // qui si guarda che le DICHIARAZIONI se ne vadano, non che disegnino. Come
+    // si tesse un filo si guarda in un browser.
+    const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
+    const { container } = suUnTrack();
+    const tratti = [...container.querySelectorAll("path")];
+    expect(tratti).toHaveLength(3);
+    for (const tratto of tratti) {
+      expect(tratto.style.getPropertyValue("stroke-dasharray")).not.toBe("");
+      expect(tratto.style.getPropertyValue("stroke-dashoffset")).not.toBe("");
+    }
+
+    cambiaIdea((q) => q.includes("prefers-reduced-motion"));
+
+    for (const tratto of tratti) {
+      expect(tratto.style.getPropertyValue("stroke-dasharray"), "tratteggio appiccicato").toBe("");
+      expect(tratto.style.getPropertyValue("stroke-dashoffset"), "tratteggio appiccicato").toBe("");
+    }
   });
 
   it("chi stringe la finestra sotto i 1024 non si ritrova due cavi sullo stesso track", () => {
