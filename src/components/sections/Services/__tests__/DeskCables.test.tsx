@@ -31,6 +31,29 @@ describe("i cavi", () => {
     expect(ds.some((d) => d.includes("50 50"))).toBe(true);
   });
 
+  it("i capi stanno nella scatola della finestra, la derivazione in quella del piano", () => {
+    // Non e' un vezzo che siano due SVG: il 14% e l'88% sono percentuali della
+    // pagina — e' li' che escono e entrano le sezioni vicine — mentre il rack in
+    // cui finisce la derivazione e' una percentuale del piano. Rimettere i tre
+    // tratti in una scatola sola riapre il gradino da 170px alla giunzione,
+    // oppure fa scivolare la derivazione fuori dal tavolo.
+    const { container } = render(<DeskCables />);
+    const di = (sel: string) =>
+      [...container.querySelectorAll(`${sel} path`)].map((p) => p.getAttribute("d") ?? "");
+
+    const capi = di("[data-desk-cables-ends]");
+    const derivazione = di("[data-desk-cables-branch]");
+
+    expect(capi).toHaveLength(2);
+    expect(capi.some((d) => d.startsWith(`M${THREAD_ANCHORS.services.in} `))).toBe(true);
+    expect(capi.some((d) => d.trimEnd().endsWith(` ${THREAD_ANCHORS.services.out} 100`))).toBe(true);
+
+    expect(derivazione).toHaveLength(1);
+    // Tutti e tre partono dallo stesso punto: le due scatole sono concentriche
+    // e il loro (50 / 50) e' il laptop.
+    expect(derivazione[0].startsWith("M50 50")).toBe(true);
+  });
+
   it("usano il colore della linea, non l'arancio: sono un filo, non un accento", () => {
     const { container } = render(<DeskCables />);
     for (const path of container.querySelectorAll("path")) {
