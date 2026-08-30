@@ -28,6 +28,7 @@ const props: ServicesViewProps = {
   stageLead: "Un sito finito.",
   centre: "il progetto",
   punch: "Quello che chiami «un sito» è lo schermo al centro.",
+  blank: "E la tua, qual è?",
   practice: "E in pratica?",
   intro: "Quattro modi di lavorare.",
   layers: [layer("site", 6), layer("logic", 6), layer("infra", 6), layer("growth", 6, true)],
@@ -85,12 +86,45 @@ describe("il tavolo è la lista", () => {
     expect(lette).toEqual(attese);
   });
 
-  it("il post-it bianco è sul tavolo e non ha nome: è muto apposta", () => {
+  it("il post-it bianco non porta un'etichetta: il suo nome è quello di un comando", () => {
     const { container } = render(<ServicesView {...props} />);
     const oggetti = container.querySelectorAll(SOLI_VERI);
     expect(oggetti).toHaveLength(24);
-    const muti = [...oggetti].filter((el) => !el.querySelector("[data-desk-label]"));
-    expect(muti).toHaveLength(1);
+    // Ventitre' etichette e un post-it. Quella che manca non e' una traduzione
+    // dimenticata: e' l'unico oggetto che non si legge, si preme — e il nome
+    // che uno screen reader annuncia e' il nome del comando, non una voce
+    // dell'elenco. Per questo il conteggio delle etichette resta ventitre'.
+    const senzaEtichetta = [...oggetti].filter((el) => !el.querySelector("[data-desk-label]"));
+    expect(senzaEtichetta).toHaveLength(1);
+    expect(within(senzaEtichetta[0] as HTMLElement).getByRole("link")).toHaveAccessibleName(
+      props.blank,
+    );
+  });
+
+  it("il post-it bianco è l'unica cosa che si può toccare, e porta al contatto", () => {
+    render(<ServicesView {...props} />);
+    expect(screen.getByRole("link", { name: props.blank })).toHaveAttribute("href", "#contact");
+  });
+
+  it("non ci sono altri comandi sul tavolo: il resto è un disegno da guardare", () => {
+    const { container } = render(<ServicesView {...props} />);
+    const vero = container.querySelector("[data-desk-world]:not([aria-hidden])") as HTMLElement;
+    expect(within(vero).getAllByRole("link")).toHaveLength(1);
+  });
+
+  it("nel gemello il post-it resta un disegno: un comando solo per una porta sola", () => {
+    // Il gemello e' un disegno aria-hidden, e in piu' questo post-it li' non si
+    // disegna nemmeno: e' il sesto oggetto del suo strato, e il mondo verticale
+    // ne mostra quattro (data-off). Un secondo <a> sarebbe una copia che nessuno
+    // puo' premere, nessuno puo' raggiungere col Tab e nessuno sente.
+    const { container } = render(<ServicesView {...props} />);
+    const gemello = container.querySelector("[data-desk-world][aria-hidden]") as HTMLElement;
+    expect(gemello.querySelectorAll("a")).toHaveLength(0);
+    const muto = [...gemello.querySelectorAll("[data-desk-object]")].filter(
+      (el) => !el.querySelector("[data-desk-label]"),
+    );
+    expect(muto).toHaveLength(1);
+    expect(muto[0]).toHaveAttribute("data-off");
   });
 
   it("le sagome sono decorative: il significato sta nell'etichetta, non nel disegno", () => {

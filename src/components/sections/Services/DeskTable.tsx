@@ -41,11 +41,14 @@ export type DeskLayerData = {
 export function DeskTable({
   layers,
   centre,
+  blank,
   layout,
   ghost = false,
 }: {
   layers: DeskLayerData[];
   centre: string;
+  /** Il nome del comando sul post-it bianco: l'unico oggetto che si preme. */
+  blank: string;
   layout: DeskLayout;
   /** Il gemello che il CSS nasconde: sta nel DOM, ma non va letto due volte. */
   ghost?: boolean;
@@ -132,6 +135,26 @@ export function DeskTable({
                   beat={objectBeat(index, i % shown, shown)}
                   ghost={ghost}
                   hidden={i >= shown}
+                  // L'oggetto senza etichetta e' il post-it bianco, e non ce
+                  // n'e' un altro: e' il posto per la cosa che non e' ancora
+                  // stata raccontata, quindi porta dove la si racconta. Il
+                  // segnale e' l'etichetta che manca, che e' lo stesso `mute`
+                  // di content/desk.ts arrivato fin qui.
+                  //
+                  // Nel gemello no. Non e' prudenza: li' questo post-it e' il
+                  // sesto oggetto del suo strato, e il mondo verticale ne
+                  // disegna quattro — data-off, display:none. Un <a> in quella
+                  // copia non si potrebbe ne' premere ne' raggiungere, e
+                  // sarebbe comunque un secondo comando per la stessa porta
+                  // dentro un aria-hidden. Il comando sta nel mondo che si
+                  // legge, che sotto i 1024px e' quello a un pixel: li' il
+                  // post-it non e' disegnato, ma nell'elenco c'e' e si annuncia.
+                  // Il prezzo e' una fermata del Tab che non si vede, sotto i
+                  // 1024. Non c'e' una regola CSS che tolga un elemento dal
+                  // giro dei Tab senza toglierlo anche allo screen reader, e
+                  // fra le due si tiene quella che parla.
+                  href={!ghost && object.label === null ? "#contact" : undefined}
+                  action={!ghost && object.label === null ? blank : undefined}
                 />
               ))}
             </ul>

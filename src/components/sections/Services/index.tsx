@@ -26,6 +26,7 @@ export async function Services() {
       stageTitle={t("stageTitle")}
       stageLead={t("stageLead")}
       centre={t("centre")}
+      blank={t("blank")}
       punch={t("punch")}
       practice={t("practice")}
       intro={t("intro")}

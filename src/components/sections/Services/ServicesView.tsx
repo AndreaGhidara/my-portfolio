@@ -9,6 +9,9 @@ export type ServicesViewProps = {
   stageTitle: string;
   stageLead: string;
   centre: string;
+  /** Il nome del comando sul post-it bianco. Non e' un'etichetta del tavolo:
+   *  e' la ventiquattresima cosa, quella che si preme. */
+  blank: string;
   punch: string;
   practice: string;
   intro: string;
@@ -30,6 +33,7 @@ export function ServicesView({
   stageTitle,
   stageLead,
   centre,
+  blank,
   punch,
   practice,
   intro,
@@ -46,6 +50,7 @@ export function ServicesView({
         title={stageTitle}
         lead={stageLead}
         centre={centre}
+        blank={blank}
         punch={punch}
         layers={layers}
       />
