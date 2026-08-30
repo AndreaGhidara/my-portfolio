@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { ScrollTrigger } from "@/animations/gsap";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
@@ -93,7 +93,14 @@ export function DeskStage({
   // cambio di livello — e a livello "none" useSectionAnimation non chiama
   // nemmeno la build. Chi esce da "full" non avrebbe quindi nessuno a spegnergli
   // la camera: questo effetto e' quel qualcuno.
-  useEffect(() => {
+  //
+  // useLayoutEffect e non useEffect: il commit che porta via il CSS della camera
+  // e questa pulizia devono stare nello stesso giro. Passivo, si spegne DOPO che
+  // il browser ha gia' dipinto un fotogramma senza le regole di "full" ma con
+  // --p ancora appiccicata all'ultimo valore, e quel fotogramma e' un tavolo
+  // mezzo trasparente. In SSR non gira, e non e' un problema: un cambio di
+  // livello sul server non esiste.
+  useLayoutEffect(() => {
     if (level !== "full") spegni();
   }, [level, spegni]);
 

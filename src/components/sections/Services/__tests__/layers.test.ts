@@ -402,10 +402,25 @@ const TOKENS = readFileSync(resolve(process.cwd(), "src/styles/tokens.css"), "ut
   // il foglio di stile racconta di se'.
   .replace(/\/\*[\s\S]*?\*\//g, "");
 
+/**
+ * Il selettore si cerca ANCORATO A CAPO RIGA, non con un indexOf qualunque.
+ * "[data-desk-world] {" e' contenuto per intero dentro
+ * "[data-desk][data-motion='full'] [data-desk-world] {", che sta piu' in giu'
+ * nel file: con indexOf la regola giusta si trova solo perche' l'originale
+ * viene prima, e la prima regola discendente scritta piu' in alto ripunterebbe
+ * in silenzio la rete di sicurezza della geometria su un margin-bottom.
+ * Il ^[ \t]* tiene le regole dentro @media, che sono rientrate, ma non lascia
+ * passare niente prima del selettore sulla stessa riga.
+ */
 function blocco(selettore: string, ultimo = false): string {
-  const i = ultimo ? TOKENS.lastIndexOf(selettore) : TOKENS.indexOf(selettore);
-  if (i < 0) throw new Error(`tokens.css non ha piu' la regola ${selettore}`);
-  const apre = TOKENS.indexOf("{", i);
+  const ancorato = new RegExp(
+    `^[ \\t]*${selettore.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`,
+    "gm",
+  );
+  const trovati = [...TOKENS.matchAll(ancorato)];
+  const trovato = ultimo ? trovati.at(-1) : trovati[0];
+  if (!trovato) throw new Error(`tokens.css non ha piu' la regola ${selettore}`);
+  const apre = TOKENS.indexOf("{", trovato.index);
   return TOKENS.slice(apre + 1, TOKENS.indexOf("}", apre));
 }
 
