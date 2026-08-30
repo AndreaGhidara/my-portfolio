@@ -531,9 +531,14 @@ html[data-dialog-open] body { overflow: hidden; }
      all'etichetta accanto. Sul tavolo lo spazio verticale costa meno di
      quello orizzontale.
 
-     Le tre misure che seguono sono la striscia che layers.ts tiene libera
-     attorno a ogni oggetto: due righe da 1.2 piu' 0.2 di respiro fanno i 2.6em
-     di LABEL.height, e max-width (che arriva inline, da LABEL.width) e' larga
+     Le misure che seguono sono la striscia che layers.ts tiene libera attorno a
+     ogni oggetto, e non sono libere: un test le legge DA QUI e verifica che
+     LABEL le rispecchi. Due righe da 1.2 piu' 0.2 di respiro fanno i 2.6em di
+     LABEL.height, il top: 104% e' LABEL.gap, il corpo del carattere e' LABEL.em.
+     Cambiarne una senza cambiare layers.ts fa cadere una prova — apposta: la
+     geometria misurerebbe un rettangolo piu' piccolo di quello disegnato, e
+     nessuna prova di sovrapposizione se ne accorgerebbe.
+     max-width (che arriva inline, da LABEL.width) e' larga
      quanto la parola piu' lunga del vocabolario del tavolo — "prenotazioni",
      dodici caratteri — piu' il respiro laterale, cosi' niente sborda dal posto
      che gli e' stato tenuto. Senza spaziatura fra le lettere: 0.04em su dodici
