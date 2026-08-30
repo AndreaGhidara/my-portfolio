@@ -6,6 +6,7 @@ import { works } from "../works";
 import { journey } from "../journey";
 import { metrics, metricById } from "../metrics";
 import { site } from "../site";
+import { deskLayers } from "../desk";
 
 /** Elenco piatto di tutte le chiavi annidate, per confrontare due dizionari. */
 function flatKeys(obj: unknown, prefix = ""): string[] {
@@ -128,5 +129,48 @@ describe("dati del sito", () => {
     const ids = site.socials.map((s) => s.id);
     expect(ids).toContain("linkedin");
     expect(ids).toContain("github");
+  });
+});
+
+describe("il tavolo", () => {
+  it("ha quattro strati, dal piu' vicino al laptop al piu' lontano", () => {
+    expect(deskLayers.map((l) => l.id)).toEqual(["site", "logic", "infra", "growth"]);
+  });
+
+  it("ogni strato porta sei oggetti", () => {
+    for (const layer of deskLayers) {
+      expect(layer.objects, layer.id).toHaveLength(6);
+    }
+  });
+
+  it("ogni strato ha titolo e riga in entrambe le lingue", () => {
+    for (const layer of deskLayers) {
+      expect(itKeys).toContain(`services.layers.${layer.id}.title`);
+      expect(itKeys).toContain(`services.layers.${layer.id}.lead`);
+    }
+  });
+
+  it("ogni oggetto che parla ha la sua etichetta in entrambe le lingue", () => {
+    for (const layer of deskLayers) {
+      for (const object of layer.objects.filter((o) => !o.mute)) {
+        expect(itKeys).toContain(`services.layers.${layer.id}.objects.${object.id}`);
+      }
+    }
+  });
+
+  it("c'e' un oggetto muto e uno solo: il post-it bianco", () => {
+    const muti = deskLayers.flatMap((l) => l.objects.filter((o) => o.mute));
+    expect(muti).toHaveLength(1);
+    expect(muti[0].id).toBe("blank");
+  });
+
+  it("l'oggetto muto non ha un'etichetta appesa da nessuna parte", () => {
+    expect(itKeys).not.toContain("services.layers.growth.objects.blank");
+  });
+
+  it("la sezione conserva i quattro testi lunghi: il tavolo non li sostituisce", () => {
+    for (const id of ["sites", "ecommerce", "webapp", "ai"]) {
+      expect(itKeys).toContain(`services.list.${id}.description`);
+    }
   });
 });
