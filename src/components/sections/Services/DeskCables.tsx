@@ -81,28 +81,52 @@ export function DeskCables() {
   const level = useMotionLevel();
 
   /**
-   * Staccare il cavo dallo scorrimento. `weave` restituisce una timeline con il
-   * suo ScrollTrigger appeso al track della camera, e non basta che smetta di
-   * essere usata: finche' e' viva riscrive lo strokeDashoffset a ogni giro di
-   * rotellina. Si uccidono tutti e due — il trigger non se ne va con la
-   * timeline.
+   * Staccare il cavo dallo scorrimento, e non lasciarlo a meta'.
+   *
+   * Due cose, perche' la prima da sola fa danno. Il ScrollTrigger va ucciso —
+   * finche' e' vivo riscrive lo strokeDashoffset a ogni giro di rotellina — e va
+   * ucciso PRIMA della timeline, perche' con la timeline non se ne andrebbe.
+   *
+   * Ma il tratteggio `weave` lo scrive inline al momento della build, prima che
+   * si scorra di un pixel: dasharray e dashoffset tutti e due pari alla
+   * lunghezza del tratto, cioe' cavo invisibile, ed e' lo scrub che poi lo
+   * disegna. Uccidere e basta lo lascia li'. Chi arriva a "full" e poi accende
+   * la riduzione del movimento va a "none", dove `weave` non riparte piu': i tre
+   * tratti resterebbero invisibili per sempre, e il fotogramma a riposo — quello
+   * il cui patto e' che il filo sia continuo — sarebbe un filo tagliato in due.
+   * Sarebbe peggio di lasciare attaccato il vecchio scrub, che almeno il cavo lo
+   * disegnava.
+   *
+   * Toglierle e' esattamente quello che DeskStage.spegni() fa con --p e --s, e
+   * per la stessa ragione: quello che il disegno legge sempre non puo' restare
+   * appiccicato all'ultimo valore scritto da una camera che non c'e' piu'.
    */
   const spegni = useCallback(() => {
     cavo.current?.scrollTrigger?.kill();
     cavo.current?.kill();
     cavo.current = null;
+    for (const tratto of scope.current?.querySelectorAll("path") ?? []) {
+      tratto.style.removeProperty("stroke-dasharray");
+      tratto.style.removeProperty("stroke-dashoffset");
+    }
   }, []);
 
-  // Dichiarato PRIMA della build, ed e' l'ordine a far funzionare la cosa: al
-  // cambio di livello React chiama i cleanup in ordine di dichiarazione e poi
-  // gli effetti, quindi il cavo vecchio muore prima che ne nasca uno nuovo.
-  //
-  // Serve perche' useGSAP con delle dipendenze rimanda il revert allo
+  // Serve un effetto perche' useGSAP con delle dipendenze rimanda il revert allo
   // smontaggio, non al cambio di livello: senza, chi esce da "full" — la
   // riduzione del movimento accesa a meta' strada, la finestra che scende sotto
   // i 1024, un puntatore grosso che arriva — si terrebbe addosso lo scrub di
   // prima, che continua a tessere addosso a chi ha appena chiesto di non
   // muovere niente. E' la stessa mancanza che DeskStage copre con spegni().
+  //
+  // useLayoutEffect e non useEffect, e per la ragione di DeskStage: passivo, si
+  // spegnerebbe DOPO che il browser ha gia' dipinto un fotogramma senza le
+  // regole di "full" ma con il tratteggio ancora appiccicato all'ultimo valore,
+  // e quel fotogramma e' un cavo tagliato.
+  //
+  // Dove sia dichiarato invece non conta, e non e' un vincolo da conservare:
+  // React chiama TUTTI i cleanup di layout prima di TUTTI gli effetti di layout,
+  // in tutto l'albero, quindi il cavo vecchio e' gia' morto quando `weave`
+  // costruisce il nuovo comunque lo si scriva.
   //
   // A ogni cambio, non solo all'uscita da "full": sopra "none" `weave` ne crea
   // comunque uno nuovo, e due cavi sullo stesso track sono due.
