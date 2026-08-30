@@ -11,7 +11,9 @@ import {
   centreBox,
   drawWidth,
   objectBeat,
+  objectBox,
   objectExtent,
+  objectFootprint,
   placeObject,
   type DeskDrawing,
   type DeskLayout,
@@ -20,23 +22,30 @@ import { SHAPES } from "../../../../../scripts/build-desk.mjs";
 
 const LAYOUTS: DeskLayout[] = ["wide", "tall"];
 
-/**
- * Il rettangolo che un oggetto occupa davvero: centro piu' le sue mezze
- * estensioni. Le sagome hanno proporzioni molto diverse (il telefono e' 74x148,
- * il piatto 118x54): un margine unico per tutti sarebbe un numero indovinato, e
- * un test che guarda il centro mentre il disegno esce dal bordo non protegge
- * niente.
- */
-function boxOf(layout: DeskLayout, layer: number, index: number) {
-  const { shape } = deskLayers[layer].objects[index];
-  const { x, y, rotate } = placeObject(layout, layer, index);
-  const half = objectExtent(layout, shape, rotate);
-  return { x0: x - half.x, x1: x + half.x, y0: y - half.y, y1: y + half.y };
-}
+type Rect = { x0: number; x1: number; y0: number; y1: number };
 
 /** Due rettangoli che si toccano, anche solo per un angolo. */
-function overlap(a: ReturnType<typeof boxOf>, b: ReturnType<typeof boxOf>) {
+function overlap(a: Rect, b: Rect) {
   return a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+}
+
+/**
+ * Tutti gli oggetti disegnati in un formato, ognuno col suo rettangolo vero:
+ * sagoma piu' striscia dell'etichetta, inclinazione compresa. E' l'unica lista
+ * su cui abbia senso provare qualcosa — un tavolo non si controlla uno strato
+ * per volta, perche' le collisioni che si vedono sono quelle FRA strati.
+ */
+function everyObject(layout: DeskLayout) {
+  const out: { box: Rect; dove: string }[] = [];
+  for (let layer = 0; layer < deskLayers.length; layer++) {
+    for (let i = 0; i < OBJECTS_PER_LAYER[layout]; i++) {
+      out.push({
+        box: objectBox(layout, layer, i),
+        dove: `${layout} ${deskLayers[layer].id}/${deskLayers[layer].objects[i].id}`,
+      });
+    }
+  }
+  return out;
 }
 
 describe("il mondo del tavolo", () => {
@@ -85,18 +94,36 @@ describe("quanto sono grandi gli oggetti", () => {
   });
 });
 
-describe("dove finiscono gli oggetti", () => {
-  it("restano dentro il mondo col disegno intero, non solo col centro", () => {
+describe("quanto e' grande un oggetto", () => {
+  it("un oggetto e' la sagoma PIU' la sua etichetta: la striscia sta nell'ingombro", () => {
+    // Senza questa, la prova successiva misurerebbe meta' oggetto: le
+    // sovrapposizioni che si vedono a occhio sono quasi tutte fra una parola e
+    // il disegno di qualcun altro.
     for (const layout of LAYOUTS) {
-      for (let layer = 0; layer < deskLayers.length; layer++) {
-        for (let i = 0; i < OBJECTS_PER_LAYER[layout]; i++) {
-          const box = boxOf(layout, layer, i);
-          const dove = `${layout} strato ${layer} oggetto ${i}`;
-          expect(box.x0, dove).toBeGreaterThan(0);
-          expect(box.x1, dove).toBeLessThan(100);
-          expect(box.y0, dove).toBeGreaterThan(0);
-          expect(box.y1, dove).toBeLessThan(100);
-        }
+      const muto = objectFootprint(layout, "sheet", 0, false);
+      const parlante = objectFootprint(layout, "sheet", 0, true);
+      expect(parlante.y1, layout).toBeGreaterThan(muto.y1);
+      expect(parlante.y0, layout).toBe(muto.y0);
+    }
+  });
+
+  it("il post-it bianco non ha etichetta e non ne occupa il posto", () => {
+    const blank = deskLayers[3].objects.findIndex((o) => o.mute);
+    expect(blank).toBeGreaterThanOrEqual(0);
+    const parlante = objectFootprint("wide", "postit", 0, true);
+    const muto = objectFootprint("wide", "postit", 0, false);
+    expect(muto.y1).toBeLessThan(parlante.y1);
+  });
+});
+
+describe("dove finiscono gli oggetti", () => {
+  it("restano dentro il mondo con tutto quello che sono, etichetta compresa", () => {
+    for (const layout of LAYOUTS) {
+      for (const { box, dove } of everyObject(layout)) {
+        expect(box.x0, dove).toBeGreaterThan(0);
+        expect(box.x1, dove).toBeLessThan(100);
+        expect(box.y0, dove).toBeGreaterThan(0);
+        expect(box.y1, dove).toBeLessThan(100);
       }
     }
   });
@@ -104,11 +131,8 @@ describe("dove finiscono gli oggetti", () => {
   it("non coprono il laptop: nemmeno un angolo entra nel centro", () => {
     for (const layout of LAYOUTS) {
       const centro = centreBox(layout);
-      for (let layer = 0; layer < deskLayers.length; layer++) {
-        for (let i = 0; i < OBJECTS_PER_LAYER[layout]; i++) {
-          const dove = `${layout} strato ${layer} oggetto ${i} copre il laptop`;
-          expect(overlap(boxOf(layout, layer, i), centro), dove).toBe(false);
-        }
+      for (const { box, dove } of everyObject(layout)) {
+        expect(overlap(box, centro), `${dove} copre il laptop`).toBe(false);
       }
     }
   });
@@ -125,17 +149,17 @@ describe("dove finiscono gli oggetti", () => {
     }
   });
 
-  it("nessun oggetto si sovrappone a un altro dello stesso strato", () => {
+  it("niente si sovrappone a niente, su tutto il tavolo: rettangoli veri, non centri", () => {
+    // La prova che c'era prima misurava la distanza fra i CENTRI di due oggetti
+    // dello stesso strato: due fogli a 8 e 8 di distanza passavano con 11,3
+    // mentre i loro disegni si accavallavano su tutti e due i lati. E le
+    // collisioni vere stavano fra strati diversi, dove non guardava nessuno.
     for (const layout of LAYOUTS) {
-      for (let layer = 0; layer < deskLayers.length; layer++) {
-        const punti = Array.from({ length: OBJECTS_PER_LAYER[layout] }, (_, i) =>
-          placeObject(layout, layer, i),
-        );
-        for (let a = 0; a < punti.length; a++) {
-          for (let b = a + 1; b < punti.length; b++) {
-            const d = Math.hypot(punti[a].x - punti[b].x, punti[a].y - punti[b].y);
-            expect(d, `${layout} strato ${layer}: ${a} e ${b} si toccano`).toBeGreaterThan(11);
-          }
+      const oggetti = everyObject(layout);
+      for (let a = 0; a < oggetti.length; a++) {
+        for (let b = a + 1; b < oggetti.length; b++) {
+          const dove = `${oggetti[a].dove} × ${oggetti[b].dove}`;
+          expect(overlap(oggetti[a].box, oggetti[b].box), dove).toBe(false);
         }
       }
     }
