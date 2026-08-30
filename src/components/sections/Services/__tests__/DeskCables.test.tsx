@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { render } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { act, cleanup, render } from "@testing-library/react";
+import { ScrollTrigger } from "@/animations/gsap";
 import { DeskCables } from "../DeskCables";
 import { THREAD_ANCHORS } from "@/components/thread/anchors";
 
@@ -59,5 +60,85 @@ describe("i cavi", () => {
     for (const path of container.querySelectorAll("path")) {
       expect(path.getAttribute("stroke")).toBe("var(--line)");
     }
+  });
+});
+
+/**
+ * jsdom risponde a matchMedia con il mock di vitest.setup.ts, che dice sempre
+ * "movimento ridotto": qui serve poterlo cambiare query per query, e a pagina
+ * aperta. E' la stessa manopola di DeskStage.test.tsx, e prova la stessa cosa —
+ * cosa succede a chi cambia idea mentre la sezione e' gia' sullo schermo.
+ */
+function mockMedia(matches: (q: string) => boolean) {
+  const ascoltatori = new Set<() => void>();
+  let risponde = matches;
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    get matches() {
+      return risponde(query);
+    },
+    media: query,
+    addEventListener: (_: string, h: () => void) => ascoltatori.add(h),
+    removeEventListener: (_: string, h: () => void) => ascoltatori.delete(h),
+  }));
+  return (poi: (q: string) => boolean) => {
+    risponde = poi;
+    act(() => ascoltatori.forEach((h) => h()));
+  };
+}
+
+/**
+ * I cavi vivono dentro il piano, che vive dentro il track della camera: e' a
+ * quello che si agganciano, ed e' li' che vanno contati.
+ */
+function suUnTrack() {
+  const { container } = render(
+    <div data-desk-track>
+      <DeskCables />
+    </div>,
+  );
+  const track = container.querySelector("[data-desk-track]") as HTMLElement;
+  return { track, agganciati: () => ScrollTrigger.getAll().filter((t) => t.trigger === track) };
+}
+
+/**
+ * Quanti agganci allo scorrimento restano vivi, e non cosa disegnano: in jsdom
+ * un path e' lungo zero (vedi vitest.setup.ts) e il tratteggio non prova
+ * niente. Quello che conta e' comunque un'altra cosa — quanto vive l'aggancio —
+ * ed e' esattamente li' che stava il difetto: `weave` restituisce una timeline
+ * che nessuno teneva, e useGSAP con delle dipendenze rimanda il revert allo
+ * smontaggio, non al cambio di livello. Il vecchio scrub restava appeso al
+ * track e continuava a riscrivere lo strokeDashoffset a ogni giro di rotellina,
+ * addosso a chi aveva appena chiesto di non muovere niente.
+ */
+describe("i cavi lasciano andare lo scorrimento quando il livello cambia", () => {
+  beforeEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  it("chi accende la riduzione del movimento a meta' strada non si porta dietro lo scrub", () => {
+    const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
+    const { agganciati } = suUnTrack();
+    expect(agganciati()).toHaveLength(1);
+
+    cambiaIdea((q) => q.includes("prefers-reduced-motion"));
+
+    // A "none" `weave` non parte nemmeno: se il vecchio non se ne va da solo,
+    // non se ne va piu' nessuno fino allo smontaggio.
+    expect(agganciati()).toHaveLength(0);
+  });
+
+  it("chi stringe la finestra sotto i 1024 non si ritrova due cavi sullo stesso track", () => {
+    // Uscita da "full" senza arrivare a "none": la build rigira a "reduced" e
+    // ne crea uno nuovo. Contarli e' l'unico modo di accorgersi del vecchio.
+    const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
+    const { agganciati } = suUnTrack();
+    expect(agganciati()).toHaveLength(1);
+
+    // Puntatore fine ma schermo stretto: e' "reduced", non "none".
+    cambiaIdea((q) => q.includes("pointer"));
+
+    expect(agganciati()).toHaveLength(1);
   });
 });
