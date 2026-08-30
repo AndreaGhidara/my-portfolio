@@ -1,6 +1,11 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, it, expect } from "vitest";
 import { deskLayers } from "@/content/desk";
+import it_ from "../../../../../messages/it.json";
+import en_ from "../../../../../messages/en.json";
 import {
+  LABEL,
   LAYER_BEATS,
   OBJECTS_PER_LAYER,
   PUNCH_BEAT,
@@ -22,11 +27,39 @@ import { SHAPES } from "../../../../../scripts/build-desk.mjs";
 
 const LAYOUTS: DeskLayout[] = ["wide", "tall"];
 
+/**
+ * Il pavimento dell'aria fra due cose sul tavolo, in percentuale dell'ALTEZZA
+ * del mondo. Non e' zero apposta: "non si sovrappongono" e' una prova cieca —
+ * passa con mezzo pixel di stacco come con mezzo centimetro — e mezzo pixel non
+ * sopravvive a un carattere di ripiego o a un altro motore di rendering.
+ */
+const CLEARANCE_FLOOR = 0.5;
+
 type Rect = { x0: number; x1: number; y0: number; y1: number };
 
 /** Due rettangoli che si toccano, anche solo per un angolo. */
 function overlap(a: Rect, b: Rect) {
   return a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+}
+
+/**
+ * Quanta aria c'e' fra due rettangoli, in percentuale dell'ALTEZZA del mondo.
+ * Le due coordinate non hanno la stessa unita' — x e' una quota della larghezza,
+ * y dell'altezza — quindi lo stacco orizzontale va riportato sull'altezza prima
+ * di confrontarlo con quello verticale, o si sommano mele e pere. Negativo
+ * vuol dire sovrapposti.
+ */
+function clearance(a: Rect, b: Rect, layout: DeskLayout) {
+  const ratio = WORLD[layout].width / WORLD[layout].height;
+  const dx = Math.max(b.x0 - a.x1, a.x0 - b.x1) * ratio;
+  const dy = Math.max(b.y0 - a.y1, a.y0 - b.y1);
+  return Math.max(dx, dy);
+}
+
+/** Quanto dista dal bordo del mondo, nella stessa unita'. */
+function clearanceFromWorld(a: Rect, layout: DeskLayout) {
+  const ratio = WORLD[layout].width / WORLD[layout].height;
+  return Math.min(a.x0 * ratio, (100 - a.x1) * ratio, a.y0, 100 - a.y1);
 }
 
 /**
@@ -107,6 +140,46 @@ describe("quanto e' grande un oggetto", () => {
     }
   });
 
+  it("inclinato occupa il rettangolo che il browser disegna, non uno isotropo", () => {
+    // La trappola: x e' una quota della larghezza del mondo, y dell'altezza, e
+    // il CSS ruota in PIXEL. Ruotare quella coppia mista con [cos -sin; sin cos]
+    // misura un rettangolo che non esiste — nel mondo orizzontale tiene troppo
+    // largo e troppo poco alto, e l'errore cresce con l'inclinazione.
+    // Qui il conto si rifa' dall'altra parte: si va in pixel, si ruota li', e si
+    // torna. Due strade diverse per lo stesso rettangolo.
+    for (const layout of LAYOUTS) {
+      const { width, height } = WORLD[layout];
+      for (const rotate of [-7, -4.2, 3.5, 7]) {
+        const fermo = objectFootprint(layout, "phone", 0, true);
+        const radianti = (rotate * Math.PI) / 180;
+        const cos = Math.cos(radianti);
+        const sin = Math.sin(radianti);
+        const angoli = [
+          [fermo.x0, fermo.y0],
+          [fermo.x1, fermo.y0],
+          [fermo.x0, fermo.y1],
+          [fermo.x1, fermo.y1],
+        ]
+          // in pixel
+          .map(([x, y]) => [(x * width) / 100, (y * height) / 100])
+          // si ruota dove ruota il CSS
+          .map(([x, y]) => [x * cos - y * sin, x * sin + y * cos])
+          // e si torna in percentuale
+          .map(([x, y]) => [(x * 100) / width, (y * 100) / height]);
+        const atteso = {
+          x0: Math.min(...angoli.map((a) => a[0])),
+          x1: Math.max(...angoli.map((a) => a[0])),
+          y0: Math.min(...angoli.map((a) => a[1])),
+          y1: Math.max(...angoli.map((a) => a[1])),
+        };
+        const misurato = objectFootprint(layout, "phone", rotate, true);
+        for (const lato of ["x0", "x1", "y0", "y1"] as const) {
+          expect(misurato[lato], `${layout} ${rotate}° ${lato}`).toBeCloseTo(atteso[lato], 9);
+        }
+      }
+    }
+  });
+
   it("il post-it bianco non ha etichetta e non ne occupa il posto", () => {
     const blank = deskLayers[3].objects.findIndex((o) => o.mute);
     expect(blank).toBeGreaterThanOrEqual(0);
@@ -162,6 +235,40 @@ describe("dove finiscono gli oggetti", () => {
           expect(overlap(oggetti[a].box, oggetti[b].box), dove).toBe(false);
         }
       }
+    }
+  });
+
+  it("fra due cose qualsiasi resta aria vera, non un pelo", () => {
+    // "Non si sovrappongono" passa identico con mezzo pixel di stacco e con
+    // mezzo centimetro: e' cieco proprio dove il disegno e' fragile. Un tavolo
+    // che deve reggere un carattere di ripiego, l'arrotondamento ai subpixel e
+    // un motore di rendering diverso ha bisogno di aria misurata, e dichiarata.
+    // Il pavimento e' in percentuale dell'altezza del mondo, che e' l'unita' in
+    // cui e' scritta tutta la geometria: a 1440 vale circa 6,3 pixel per punto.
+    for (const layout of LAYOUTS) {
+      const oggetti = everyObject(layout);
+      const centro = centreBox(layout);
+      let peggiore = Infinity;
+      let dove = "";
+      const segna = (aria: number, chi: string) => {
+        if (aria < peggiore) {
+          peggiore = aria;
+          dove = chi;
+        }
+      };
+      for (let a = 0; a < oggetti.length; a++) {
+        for (let b = a + 1; b < oggetti.length; b++) {
+          segna(
+            clearance(oggetti[a].box, oggetti[b].box, layout),
+            `${oggetti[a].dove} × ${oggetti[b].dove}`,
+          );
+        }
+        segna(clearance(oggetti[a].box, centro, layout), `${oggetti[a].dove} × il centro`);
+        segna(clearanceFromWorld(oggetti[a].box, layout), `${oggetti[a].dove} × il bordo`);
+      }
+      expect(peggiore, `${layout}: il punto piu' stretto e' ${dove}`).toBeGreaterThan(
+        CLEARANCE_FLOOR,
+      );
     }
   });
 
@@ -235,5 +342,129 @@ describe("la camera", () => {
     const meta = cameraScale(0.5, 4, 1);
     expect(meta).toBeLessThan((4 + 1) / 2);
     expect(meta).toBeGreaterThan(1);
+  });
+});
+
+/**
+ * L'etichetta e' un contratto fra due file che non si parlano: layers.ts tiene
+ * il posto, tokens.css lo disegna. Cambiare interlinea, respiro o stacco nel
+ * foglio di stile senza dirlo a LABEL fa misurare alla geometria un rettangolo
+ * piu' piccolo di quello vero — e nessuna prova di sovrapposizione se ne
+ * accorge, perche' una prova di collisione e' cieca per costruzione a un
+ * ingombro che si restringe. Leggere il CSS come testo e' brutto: e' anche
+ * l'unica cosa in questo repository che possa cogliere quella modifica.
+ */
+const TOKENS = readFileSync(resolve(process.cwd(), "src/styles/tokens.css"), "utf8")
+  // Via i commenti: qui si legge quello che il browser applica, non quello che
+  // il foglio di stile racconta di se'.
+  .replace(/\/\*[\s\S]*?\*\//g, "");
+
+function blocco(selettore: string, ultimo = false): string {
+  const i = ultimo ? TOKENS.lastIndexOf(selettore) : TOKENS.indexOf(selettore);
+  if (i < 0) throw new Error(`tokens.css non ha piu' la regola ${selettore}`);
+  const apre = TOKENS.indexOf("{", i);
+  return TOKENS.slice(apre + 1, TOKENS.indexOf("}", apre));
+}
+
+function misura(testo: string, dichiarazione: RegExp, dove: string): number[] {
+  const trovato = testo.match(dichiarazione);
+  if (!trovato) throw new Error(`${dove}: non c'e' piu' ${dichiarazione}`);
+  return trovato.slice(1).map(Number);
+}
+
+const ETICHETTA = blocco("[data-desk-object] [data-desk-label] {");
+const MONDO = blocco("[data-desk-world] {");
+const MONDO_STRETTO = blocco('[data-desk-world][data-layout="tall"] {', true);
+
+/** Il rem del sito, e le due finestre piu' strette in cui ogni mondo si disegna. */
+const REM = 16;
+const FINESTRA = { wide: 1024, tall: 320 };
+
+describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
+  it("LABEL.height sono le due righe e il respiro scritti nel CSS", () => {
+    const [interlinea] = misura(ETICHETTA, /line-height:\s*([\d.]+)/, "etichetta");
+    const [respiro] = misura(ETICHETTA, /padding:\s*([\d.]+)em/, "etichetta");
+    // Due righe: e' l'assunto di tutto il modello, ed e' la prova qui sotto a
+    // tenerlo in piedi.
+    expect(LABEL.height).toBeCloseTo(2 * interlinea + 2 * respiro, 6);
+  });
+
+  it("LABEL.gap e' lo stacco di top, non un numero che somiglia", () => {
+    const [top] = misura(ETICHETTA, /top:\s*([\d.]+)%/, "etichetta");
+    expect(LABEL.gap).toBeCloseTo(top / 100 - 1, 6);
+  });
+
+  it("LABEL.width arriva inline: il foglio di stile non ne tiene una seconda copia", () => {
+    expect(ETICHETTA).not.toMatch(/max-width/);
+  });
+
+  it("LABEL.em e' il corpo dichiarato diviso il mondo piu' stretto che lo porta", () => {
+    // 1em in percentuale della LARGHEZZA del mondo. Il caso peggiore — quello da
+    // riservare — e' il mondo piu' stretto: il carattere li' e' al minimo, ma il
+    // mondo si stringe di piu' di lui.
+    const [minimo, cqw, massimo] = misura(
+      ETICHETTA,
+      /font-size:\s*clamp\(\s*([\d.]+)rem\s*,\s*([\d.]+)cqw\s*,\s*([\d.]+)rem\s*\)/,
+      "etichetta",
+    );
+    const larghezze: Record<DeskLayout, number[]> = {
+      wide: misura(MONDO, /width:\s*min\(([\d.]+)vw,\s*([\d.]+)rem\)/, "mondo"),
+      tall: misura(MONDO_STRETTO, /width:\s*min\(([\d.]+)vw,\s*([\d.]+)rem\)/, "mondo stretto"),
+    };
+    for (const layout of LAYOUTS) {
+      const [vw, rem] = larghezze[layout];
+      const mondo = Math.min((FINESTRA[layout] * vw) / 100, rem * REM);
+      const corpo = Math.min(Math.max((cqw * mondo) / 100, minimo * REM), massimo * REM);
+      const atteso = (corpo / mondo) * 100;
+      // Riservare in eccesso va bene, in difetto no: la disuguaglianza ha un verso.
+      expect(LABEL.em[layout], `${layout} riserva meno di quanto disegna`).toBeGreaterThanOrEqual(
+        atteso,
+      );
+      expect(LABEL.em[layout], `${layout} riserva troppo`).toBeLessThan(atteso + 0.05);
+    }
+  });
+
+  it("nessuna etichetta va a tre righe: LABEL.height ne conta due", () => {
+    // Il rischio vero non e' la parola lunga — il max-width la manda a capo — ma
+    // la frase che di righe ne fa tre senza avere una sola parola lunga
+    // ("Il tuo gestionale online"). Qui ogni etichetta vera, in tutte e due le
+    // lingue, viene impaginata contro la larghezza che le e' riservata.
+    const [respiro] = misura(ETICHETTA, /padding:\s*[\d.]+em\s+([\d.]+)em/, "etichetta");
+    // box-sizing: border-box (preflight): il max-width comprende il respiro.
+    const disponibile = LABEL.width - 2 * respiro;
+    // Avanzamento di una monospaziata, in em per carattere: misurato nel browser
+    // sul carattere del tavolo (dodici caratteri = 7,2em).
+    const AVANZAMENTO = 0.6;
+    const righe = (testo: string) => {
+      let n = 1;
+      let riga = 0;
+      for (const parola of testo.split(/\s+/)) {
+        const larga = parola.length * AVANZAMENTO;
+        if (riga === 0) riga = larga;
+        else if (riga + (1 + parola.length) * AVANZAMENTO <= disponibile + 1e-9) {
+          riga += (1 + parola.length) * AVANZAMENTO;
+        } else {
+          n += 1;
+          riga = larga;
+        }
+      }
+      return n;
+    };
+    const tutte = [it_, en_].flatMap((messaggi) =>
+      Object.values(
+        (messaggi as unknown as { services: { layers: Record<string, { objects?: Record<string, string> }> } })
+          .services.layers,
+      ).flatMap((strato) => Object.values(strato.objects ?? {})),
+    );
+    expect(tutte.length).toBeGreaterThan(40);
+    for (const etichetta of tutte) {
+      for (const parola of etichetta.split(/\s+/)) {
+        // Una parola sola non va a capo: se non ci sta, sborda dal posto tenuto.
+        expect(parola.length * AVANZAMENTO, `"${parola}" non ci sta`).toBeLessThanOrEqual(
+          disponibile,
+        );
+      }
+      expect(righe(etichetta), `"${etichetta}" va a tre righe`).toBeLessThanOrEqual(2);
+    }
   });
 });

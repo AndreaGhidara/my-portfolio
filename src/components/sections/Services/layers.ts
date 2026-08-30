@@ -62,9 +62,10 @@ export function drawHeight(layout: DeskLayout, shape: DeskDrawing): number {
 
 /**
  * Mezza larghezza e mezza altezza del solo DISEGNO, inclinazione compresa, in
- * percentuale del mondo. Le due misure vengono da drawWidth/drawHeight e non da
- * una seconda copia della formula: e' su quel numero che poggia tutta la prova
- * dei bordi, e due copie che possono divergere non provano niente.
+ * percentuale del mondo. Non riscrive niente: chiede a objectFootprint lo stesso
+ * rettangolo, senza etichetta. Senza etichetta l'ingombro e' simmetrico attorno
+ * al centro, quindi il lato destro e il lato basso sono gia' le due mezze
+ * estensioni. Una copia sola della rotazione, che e' la parte che si sbaglia.
  *
  * Attenzione: questo e' il disegno, non l'oggetto. L'oggetto e' il disegno PIU'
  * la sua etichetta, e si misura con objectFootprint().
@@ -74,12 +75,8 @@ export function objectExtent(
   shape: DeskDrawing,
   rotate: number,
 ): { x: number; y: number } {
-  const halfX = drawWidth(layout, shape) / 2;
-  const halfY = drawHeight(layout, shape) / 2;
-  const radians = (Math.abs(rotate) * Math.PI) / 180;
-  const cos = Math.cos(radians);
-  const sin = Math.sin(radians);
-  return { x: halfX * cos + halfY * sin, y: halfX * sin + halfY * cos };
+  const f = objectFootprint(layout, shape, rotate, false);
+  return { x: f.x1, y: f.y1 };
 }
 
 /**
@@ -99,6 +96,14 @@ export function objectExtent(
  * carattere e' fissato in rem su un mondo largo al piu' 62rem, in quello
  * verticale segue il contenitore (cqw). Sono i valori piu' larghi dei due
  * intervalli, perche' un ingombro sbagliato deve sbagliare in eccesso.
+ *
+ * Nessuno di questi quattro numeri e' scelto qui: sono tutti la traduzione di
+ * una dichiarazione di tokens.css (interlinea e respiro per `height`, `top`
+ * per `gap`, il corpo del carattere e la larghezza del mondo per `em`). E'
+ * un contratto fra due file che non si parlano, e i test lo leggono davvero —
+ * cambiare il foglio di stile senza cambiare qui fa cadere una prova. Serviva:
+ * una prova di sovrapposizione e' cieca, per costruzione, a un ingombro che si
+ * restringe, quindi rimpicciolire uno di questi numeri lascerebbe tutto verde.
  */
 export const LABEL = {
   width: 7.7,
@@ -140,12 +145,20 @@ export function objectFootprint(
   const radians = (rotate * Math.PI) / 180;
   const cos = Math.cos(radians);
   const sin = Math.sin(radians);
+  // La rotazione del CSS avviene in PIXEL, e qui le due coordinate non hanno la
+  // stessa unita': x e' una quota della larghezza del mondo, y una quota della
+  // sua altezza. Ruotare quella coppia mista con la matrice isotropa
+  // [cos -sin; sin cos] misura un rettangolo che il browser non disegna mai —
+  // nel mondo orizzontale (1440x920) tiene troppo largo e troppo poco alto.
+  // Si passa in pixel, si ruota, si torna: k e' altezza/larghezza del mondo.
+  //   x' = x·cos − y·k·sin      y' = x·sin/k + y·cos
+  const k = WORLD[layout].height / WORLD[layout].width;
   const corners = [
     [x0, y0],
     [x1, y0],
     [x0, y1],
     [x1, y1],
-  ].map(([x, y]) => [x * cos - y * sin, x * sin + y * cos]);
+  ].map(([x, y]) => [x * cos - y * k * sin, (x * sin) / k + y * cos]);
   const xs = corners.map((c) => c[0]);
   const ys = corners.map((c) => c[1]);
   return {
@@ -196,14 +209,21 @@ export const OBJECTS_PER_LAYER: Record<DeskLayout, number> = { wide: 6, tall: 4 
  * l'unico modo di tenerli separati e' che dove uno sta in alto l'altro stia di
  * lato. Per questo gli anelli non sono omotetici — uno e' largo e basso, il
  * successivo stretto e alto — e per questo gli angoli non sono regolari.
+ *
+ * La taratura non punta a "non si sovrappongono" ma a un pavimento di aria
+ * dichiarato: fra due cose qualsiasi del tavolo — due oggetti, un oggetto e il
+ * centro, un oggetto e il bordo — resta piu' di mezzo punto di altezza del
+ * mondo (a 1440 sono quasi quattro pixel). Il mondo orizzontale sta contro quel
+ * pavimento: sei oggetti per strato non ne concedono molto di piu' finche' gli
+ * oggetti di uno strato restano equidistanti fra loro.
  * Cambiarne uno solo a occhio rompe il tavolo: la prova sta in layers.test.ts.
  */
 const RADII: Record<DeskLayout, { rx: number; ry: number }[]> = {
   wide: [
-    { rx: 15.0, ry: 19.9 },
-    { rx: 27.2, ry: 30.3 },
-    { rx: 38.2, ry: 32.3 },
-    { rx: 40.2, ry: 38.6 },
+    { rx: 15.4, ry: 20.3 },
+    { rx: 29.8, ry: 35.5 },
+    { rx: 40.7, ry: 36.5 },
+    { rx: 41.2, ry: 39.5 },
   ],
   tall: [
     { rx: 17.5, ry: 15.2 },
@@ -216,7 +236,7 @@ const RADII: Record<DeskLayout, { rx: number; ry: number }[]> = {
 /** Da dove parte a distribuire gli oggetti ogni strato. Sfalsati apposta:
  *  allineati, i quattro strati formavano dei raggi e sembrava un sole. */
 const START_ANGLE: Record<DeskLayout, number[]> = {
-  wide: [-137, -60, -160, 160],
+  wide: [-142, -5, -162, 158],
   tall: [48, -105, -170, -43],
 };
 
