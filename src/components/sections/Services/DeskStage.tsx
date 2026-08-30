@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { ScrollTrigger } from "@/animations/gsap";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
@@ -133,37 +133,6 @@ export function DeskStage({
     measure();
     write(0);
 
-    /**
-     * Il Tab non e' una rotellina. L'unico comando del tavolo sta su un oggetto
-     * dell'anello piu' esterno, e al fotogramma zero quell'anello e' ingrandito
-     * quattro volte e ritagliato via dall'overflow del palco. Il browser porta
-     * "in vista" l'elemento che prende il fuoco leggendone il rettangolo, e il
-     * rettangolo del clip non sa niente: misurato a 1440, il fuoco finiva su un
-     * post-it a (-80, 251) che sotto quel punto non c'era — anello arancione
-     * compreso, cioe' nessun anello che si veda.
-     *
-     * Qui la pagina va al fotogramma di riposo, che di una scena guidata dallo
-     * scorrimento e' l'unico punto fisso: dove l'oggetto sta e' funzione di dove
-     * sta la pagina, e l'unico posto dove le due cose non si rincorrono e' la
-     * fine del track — li' il tavolo e' completo e ogni oggetto e' dov'e'
-     * disegnato. Con lo scrub, il tavolo si compone mentre il fuoco lo raggiunge.
-     *
-     * Solo da tastiera: :focus-visible e' falso per un click, e un click sul
-     * post-it deve andare ai contatti, non far saltare la pagina prima.
-     */
-    const alFotogrammaDiRiposo = (event: FocusEvent) => {
-      const preso = event.target as HTMLElement | null;
-      if (!preso?.closest("[data-desk-blank]") || !preso.matches(":focus-visible")) return;
-      const fine = trackEl.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
-      // "instant" e non "auto": auto vuol dire "quello che dice scroll-behavior",
-      // e il giorno che qualcuno scrive smooth su html questo salto diventerebbe
-      // un'animazione — proprio quella che chi ha ridotto il movimento non deve
-      // vedere. (Qui non ci arriva: sotto "full" questo ascoltatore non esiste
-      // nemmeno. Ma la riga deve reggere da sola.)
-      window.scrollTo({ top: fine, behavior: "instant" });
-    };
-    stageEl.addEventListener("focusin", alFotogrammaDiRiposo);
-
     camera.current = ScrollTrigger.create({
       trigger: trackEl,
       start: "top top",
@@ -179,11 +148,56 @@ export function DeskStage({
     // Anche lo smontaggio passa di qui: gsap.context di useGSAP chiama questa
     // al revert. Le due property nessun altro le toglierebbe, e restassero
     // appiccicate a --p = 0 il tavolo resterebbe vuoto per sempre.
-    return () => {
-      stageEl.removeEventListener("focusin", alFotogrammaDiRiposo);
-      spegni();
-    };
+    return spegni;
   }, scope);
+
+  /**
+   * Il Tab non e' una rotellina. L'unico comando del tavolo sta su un oggetto
+   * dell'anello piu' esterno, e al fotogramma zero quell'anello e' ingrandito
+   * quattro volte e ritagliato via dall'overflow del palco. Il browser porta
+   * "in vista" l'elemento che prende il fuoco leggendone il rettangolo, e il
+   * rettangolo del clip non sa niente: misurato a 1440, il fuoco finiva su un
+   * post-it a (-80, 251) che sotto quel punto non c'era — anello arancione
+   * compreso, cioe' nessun anello che si veda.
+   *
+   * Qui la pagina va al fotogramma di riposo, che di una scena guidata dallo
+   * scorrimento e' l'unico punto fisso: dove l'oggetto sta e' funzione di dove
+   * sta la pagina, e l'unico posto dove le due cose non si rincorrono e' la fine
+   * del track — li' il tavolo e' completo e ogni oggetto e' dov'e' disegnato.
+   * Con lo scrub, il tavolo si compone mentre il fuoco lo raggiunge.
+   *
+   * Sta in un effetto suo, con [level], e non dentro la build della camera:
+   * quella si disfa solo al revert di gsap.context, che al cambio di livello non
+   * arriva (e' la stessa mancanza che l'effetto qui sopra copre a mano per --p e
+   * --s). Restando attaccato, un ascoltatore appeso qui farebbe saltare la
+   * pagina proprio nei due stati in cui questa sezione deve stare ferma — la
+   * finestra che si stringe sotto i 1024 e il movimento ridotto acceso a meta'
+   * strada — e sotto i 1024 per una fermata del Tab che nemmeno si vede. React
+   * il suo cleanup lo chiama a ogni cambio di level, e questo e' tutto quello
+   * che serve.
+   *
+   * Solo da tastiera: :focus-visible e' falso per un click, e un click sul
+   * post-it deve andare ai contatti, non far saltare la pagina prima.
+   */
+  useEffect(() => {
+    const stageEl = stage.current;
+    const trackEl = track.current;
+    if (level !== "full" || !stageEl || !trackEl) return;
+
+    const alFotogrammaDiRiposo = (event: FocusEvent) => {
+      const preso = event.target as HTMLElement | null;
+      if (!preso?.closest("[data-desk-blank]") || !preso.matches(":focus-visible")) return;
+      const fine = trackEl.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+      // "instant" e non "auto": auto vuol dire "quello che dice scroll-behavior",
+      // e il giorno che qualcuno scrive smooth su html questo salto diventerebbe
+      // un'animazione — proprio quella che chi ha ridotto il movimento non deve
+      // vedere. Qui non ci arriva, ma la riga deve reggere da sola.
+      window.scrollTo({ top: fine, behavior: "instant" });
+    };
+
+    stageEl.addEventListener("focusin", alFotogrammaDiRiposo);
+    return () => stageEl.removeEventListener("focusin", alFotogrammaDiRiposo);
+  }, [level]);
 
   return (
     <div ref={scope} data-desk data-motion={level}>

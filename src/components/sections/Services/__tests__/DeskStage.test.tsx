@@ -33,7 +33,10 @@ const layers = [0, 1, 2, 3].map((i) => ({
   objects: Array.from({ length: 6 }, (_, j) => ({
     id: `l${i}-${j}`,
     shape: "sheet" as const,
-    label: `oggetto ${j}`,
+    // Il quarto dell'ultimo strato e' il post-it bianco: senza etichetta, e
+    // quindi con il comando. Serve qui perche' il palco porta un ascoltatore
+    // che vive solo per lui.
+    label: i === 3 && j === 3 ? null : `oggetto ${j}`,
   })),
 }));
 
@@ -42,6 +45,7 @@ const props = {
   title: "Tutto quello che non si vede",
   lead: "Un sito finito.",
   centre: "il progetto",
+  blank: "E la tua, qual è?",
   punch: "Il resto è il tavolo.",
   layers,
 };
@@ -49,8 +53,45 @@ const props = {
 const palco = (container: HTMLElement) =>
   container.querySelector("[data-desk-stage]") as HTMLElement;
 
+/**
+ * Gli ascoltatori di `focusin` vivi sul palco, in un insieme che si svuota da
+ * solo quando vengono staccati.
+ *
+ * E' una prova che guarda dentro, e non e' pigrizia: quello che l'ascoltatore FA
+ * qui non si puo' provocare, perche' jsdom non implementa :focus-visible e
+ * risponde false anche a un elemento che ha appena preso il fuoco. Quello che
+ * conta comunque e' un'altra cosa — quanto vive — ed e' esattamente li' che il
+ * difetto stava: attaccato dentro la build della camera, si staccava solo al
+ * revert di gsap.context, che al cambio di livello non arriva mai.
+ */
+function ascoltatoriDelFuoco() {
+  const vivi = new Set<unknown>();
+  const suPalco = (el: HTMLElement, tipo: string) =>
+    tipo === "focusin" && el.hasAttribute("data-desk-stage");
+  const attacca = HTMLElement.prototype.addEventListener;
+  const stacca = HTMLElement.prototype.removeEventListener;
+  vi.spyOn(HTMLElement.prototype, "addEventListener").mockImplementation(function (
+    this: HTMLElement,
+    ...args: Parameters<HTMLElement["addEventListener"]>
+  ) {
+    if (suPalco(this, args[0])) vivi.add(args[1]);
+    return attacca.apply(this, args);
+  });
+  vi.spyOn(HTMLElement.prototype, "removeEventListener").mockImplementation(function (
+    this: HTMLElement,
+    ...args: Parameters<HTMLElement["removeEventListener"]>
+  ) {
+    if (suPalco(this, args[0])) vivi.delete(args[1]);
+    return stacca.apply(this, args);
+  });
+  return vivi;
+}
+
 beforeEach(() => vi.unstubAllGlobals());
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe("il palco dichiara il livello", () => {
   it("lo scrive dove il CSS lo cerca: e' li' che si appende l'altezza del track", () => {
@@ -120,6 +161,40 @@ describe("la camera", () => {
     // tavolo fermo e mezzo trasparente, che e' peggio di tutti e due gli stati.
     expect(palco(container).style.getPropertyValue("--p")).toBe("");
     expect(palco(container).style.getPropertyValue("--s")).toBe("");
+  });
+
+  it("chi esce dal movimento pieno non si porta dietro il salto al fuoco", () => {
+    // Il salto al fotogramma di riposo esiste perche' sotto la camera l'oggetto
+    // che prende il fuoco e' ingrandito e ritagliato via. Fuori da "full" la
+    // camera non c'e', il track torna alto quanto il suo contenuto, e quello
+    // stesso salto diventa una pagina che si muove senza che nessuno l'abbia
+    // chiesto — nei due stati in cui questa sezione deve stare ferma, e sotto i
+    // 1024px per una fermata del Tab che nemmeno si vede.
+    const vivi = ascoltatoriDelFuoco();
+    const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
+    const { container } = render(<DeskStage {...props} />);
+    expect(vivi.size).toBe(1);
+
+    cambiaIdea((q) => q.includes("prefers-reduced-motion"));
+
+    expect(container.querySelector("[data-desk]")).toHaveAttribute("data-motion", "none");
+    expect(vivi.size).toBe(0);
+  });
+
+  it("e nemmeno smontando: l'ascoltatore se ne va col palco", () => {
+    const vivi = ascoltatoriDelFuoco();
+    mockMedia((q) => !q.includes("prefers-reduced-motion"));
+    const { unmount } = render(<DeskStage {...props} />);
+    expect(vivi.size).toBe(1);
+    unmount();
+    expect(vivi.size).toBe(0);
+  });
+
+  it("a movimento ridotto non viene attaccato per niente", () => {
+    const vivi = ascoltatoriDelFuoco();
+    mockMedia((q) => q.includes("prefers-reduced-motion"));
+    render(<DeskStage {...props} />);
+    expect(vivi.size).toBe(0);
   });
 
   it("smontando il palco le due property se ne vanno con lui", () => {
