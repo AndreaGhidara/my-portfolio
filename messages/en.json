@@ -57,6 +57,60 @@
         "title": "AI and automation",
         "description": "Connected to your real data, not to a model that guesses. And one rule I don't negotiate: when the assistant doesn't know, it hands over to a person instead of inventing an answer."
       }
+    },
+    "stageTitle": "Everything you don't see",
+    "stageLead": "A finished website. From here on, everything underneath it.",
+    "centre": "the project",
+    "punch": "What you call \"a website\" is the screen in the middle. The rest is the table.",
+    "practice": "And in practice?",
+    "layers": {
+      "site": {
+        "title": "The site",
+        "lead": "What you see. Colour, type, hierarchy, words, images — and how all of it holds up on a six-inch screen.",
+        "objects": {
+          "colors": "Colour",
+          "type": "Type",
+          "sections": "Sections",
+          "copy": "Copy",
+          "images": "Images",
+          "mobile": "The phone"
+        }
+      },
+      "logic": {
+        "title": "The logic",
+        "lead": "What the site does. Everything a visitor can do is a written rule, an edge case anticipated, an error handled before it happens.",
+        "objects": {
+          "forms": "Enquiries",
+          "account": "Accounts",
+          "catalog": "The catalogue",
+          "payments": "Payments",
+          "booking": "Bookings",
+          "erp": "Your back office"
+        }
+      },
+      "infra": {
+        "title": "The infrastructure",
+        "lead": "What keeps it standing at three in the morning. You never see it — until it's missing, and then it's all you see.",
+        "objects": {
+          "hosting": "Where it lives",
+          "database": "The data",
+          "backups": "The copies",
+          "domain": "The domain",
+          "security": "Security",
+          "speed": "Speed"
+        }
+      },
+      "growth": {
+        "title": "The services",
+        "lead": "What makes it grow after launch. A site going live is where the work starts, not where it's delivered.",
+        "objects": {
+          "ai": "The assistant",
+          "automation": "Automations",
+          "analytics": "The numbers",
+          "seo": "Being found",
+          "care": "Upkeep"
+        }
+      }
     }
   },
   "works": {

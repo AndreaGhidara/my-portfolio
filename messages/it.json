@@ -57,6 +57,60 @@
         "title": "AI e automazioni",
         "description": "Collegate ai tuoi dati veri, non a un modello che indovina. E una regola che non negozio: quando l'assistente non sa, passa a una persona invece di inventare una risposta."
       }
+    },
+    "stageTitle": "Tutto quello che non si vede",
+    "stageLead": "Un sito finito. Da qui in poi, tutto quello che c'è sotto.",
+    "centre": "il progetto",
+    "punch": "Quello che chiami «un sito» è lo schermo al centro. Il resto è il tavolo.",
+    "practice": "E in pratica?",
+    "layers": {
+      "site": {
+        "title": "Il sito",
+        "lead": "Quello che si vede. Colori, caratteri, gerarchia, parole, immagini — e come tutto questo regge anche su uno schermo da sei pollici.",
+        "objects": {
+          "colors": "I colori",
+          "type": "I caratteri",
+          "sections": "Le sezioni",
+          "copy": "I testi",
+          "images": "Le immagini",
+          "mobile": "Il telefono"
+        }
+      },
+      "logic": {
+        "title": "Le logiche",
+        "lead": "Quello che il sito fa. Ogni cosa che un visitatore può compiere è una regola scritta, un caso limite previsto, un errore gestito prima che capiti.",
+        "objects": {
+          "forms": "I contatti",
+          "account": "L'area riservata",
+          "catalog": "Il catalogo",
+          "payments": "I pagamenti",
+          "booking": "Le prenotazioni",
+          "erp": "Il tuo gestionale"
+        }
+      },
+      "infra": {
+        "title": "L'infrastruttura",
+        "lead": "Quello che lo tiene in piedi alle tre di notte. Non si vede mai — finché non manca, e allora è l'unica cosa che si vede.",
+        "objects": {
+          "hosting": "Dove sta",
+          "database": "I dati",
+          "backups": "Le copie",
+          "domain": "Il dominio",
+          "security": "La sicurezza",
+          "speed": "La velocità"
+        }
+      },
+      "growth": {
+        "title": "I servizi",
+        "lead": "Quello che lo fa crescere dopo il lancio. Il sito online è l'inizio del lavoro, non la consegna.",
+        "objects": {
+          "ai": "L'assistente",
+          "automation": "Le automazioni",
+          "analytics": "I numeri",
+          "seo": "Farsi trovare",
+          "care": "La manutenzione"
+        }
+      }
     }
   },
   "works": {
