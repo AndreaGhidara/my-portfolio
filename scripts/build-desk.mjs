@@ -10,13 +10,19 @@ const OUT = "public/brand/desk";
  */
 export const SHAPES = {
   sheet:  { w: 150, h: 96,  parts: ["rect", "rules"] },
-  card:   { w: 152, h: 62,  parts: ["rect", "tab"] },
+  // La card e' piu' alta delle altre: le prime 16 unita' sono lo spazio dove
+  // vive la linguetta, cosi' che sporga davvero invece di finire tagliata dal
+  // viewBox (dove viveva prima di questa correzione).
+  card:   { w: 152, h: 78,  parts: ["rect", "tab"] },
   postit: { w: 126, h: 126, parts: ["rect", "curl"] },
   plate:  { w: 118, h: 54,  parts: ["rect", "holes"] },
   rack:   { w: 132, h: 104, parts: ["rect", "units"] },
   phone:  { w: 74,  h: 148, parts: ["rect", "screen"] },
   laptop: { w: 360, h: 240, parts: ["rect", "screen", "hinge"] },
 };
+
+/** Spazio in cima al viewBox della card, riservato alla linguetta. */
+const CARD_TAB_MARGIN = 16;
 
 /**
  * Generatore lineare congruenziale. Serve UN SOLO numero: che il tremolio sia
@@ -75,10 +81,15 @@ function inner(name, spec, random) {
     }
   }
   if (spec.parts.includes("tab")) {
-    paths.push(wobblyRect(12, -8, 44, 12, random, 1.1, 14));
+    // Sporge sopra il bordo del corpo (che qui parte piu' in basso, a
+    // CARD_TAB_MARGIN), ma resta dentro il viewBox: sporgere e uscire dal
+    // disegno non sono la stessa cosa.
+    paths.push(wobblyRect(12, 2, 44, CARD_TAB_MARGIN + 2, random, 1.1, 14));
   }
   if (spec.parts.includes("curl")) {
-    paths.push(wobblyLine(w - 26, h, w, h - 26, random, 2.2));
+    // La piega dell'angolo che si solleva: una diagonale corta, appena
+    // dentro il bordo, non una linea che lo attraversa e lo supera.
+    paths.push(wobblyLine(w - 34, h - 8, w - 8, h - 34, random, 2.2));
   }
   if (spec.parts.includes("holes")) {
     paths.push(wobblyRect(10, 10, 12, 12, random, 0.9, 8));
@@ -101,7 +112,13 @@ function inner(name, spec, random) {
 export function buildShape(name) {
   const spec = SHAPES[name];
   const random = rng(SEEDS[name]);
-  const paths = [wobblyRect(2, 2, spec.w - 4, spec.h - 4, random), ...inner(name, spec, random)];
+  // Solo la card lascia margine in cima, per la linguetta: per tutte le altre
+  // il corpo occupa il viewBox intero, come sempre.
+  const top = name === "card" ? 2 + CARD_TAB_MARGIN : 2;
+  const paths = [
+    wobblyRect(2, top, spec.w - 4, spec.h - 2 - top, random),
+    ...inner(name, spec, random),
+  ];
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${spec.w} ${spec.h}"`,
     ` fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"`,
