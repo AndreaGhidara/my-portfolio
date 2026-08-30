@@ -1,8 +1,8 @@
 import type { CSSProperties } from "react";
 import type { DeskShape } from "@/content/desk";
 import {
+  CAPTION_BEATS,
   CENTRE,
-  LAYER_BEATS,
   OBJECTS_PER_LAYER,
   SHAPE_BOX,
   WORLD,
@@ -101,11 +101,18 @@ export function DeskTable({
       <ol data-desk-layers>
         {layers.map((layer, index) => (
           <li key={layer.id} data-desk-layer={layer.id}>
-            {/* La finestra viene da LAYER_BEATS, non ricalcolata a mano: il
-                conteggio delle fasi vive in un posto solo. */}
+            {/* La finestra viene da CAPTION_BEATS, non ricalcolata a mano: il
+                conteggio delle fasi vive in un posto solo. Ha due estremi e non
+                uno: sotto la camera le quattro didascalie stanno tutte nello
+                stesso posto, e si danno il cambio. */}
             <div
               data-desk-caption
-              style={{ "--from": LAYER_BEATS[index].from } as CSSProperties}
+              style={
+                {
+                  "--from": CAPTION_BEATS[index].from,
+                  "--until": CAPTION_BEATS[index].until,
+                } as CSSProperties
+              }
             >
               <h3>{layer.title}</h3>
               <p>{layer.lead}</p>

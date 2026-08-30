@@ -333,6 +333,24 @@ export const TITLE_BEAT: Beat = { from: 0.02, span: 0.08 };
 export const PUNCH_BEAT: Beat = { from: 0.9, span: 0.07 };
 
 /**
+ * La finestra di una didascalia. A tavolo fermo le quattro stanno in colonna e
+ * si leggono tutte insieme; sotto la camera stanno tutte nello STESSO posto —
+ * la fascia sotto l'angolo sinistro del piano — e allora una alla volta e'
+ * l'unica lettura possibile: entra col suo strato, esce quando comincia il
+ * successivo. L'ultima resta finche' non arriva la tesi, che e' la frase che la
+ * sostituisce.
+ *
+ * E' l'unica finestra a due estremi del tavolo: gli oggetti entrano e restano,
+ * queste si danno il cambio. Per questo `until` e non `span`.
+ */
+export type CaptionBeat = { from: number; until: number };
+
+export const CAPTION_BEATS: CaptionBeat[] = LAYER_BEATS.map((beat, i) => ({
+  from: beat.from,
+  until: LAYER_BEATS[i + 1]?.from ?? PUNCH_BEAT.from,
+}));
+
+/**
  * Dentro uno strato gli oggetti non compaiono tutti insieme: si sfalsano sul
  * primo terzo della finestra, e finiscono comunque insieme allo strato.
  */

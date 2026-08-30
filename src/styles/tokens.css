@@ -557,3 +557,107 @@ html[data-dialog-open] body { overflow: hidden; }
   background-color: var(--bg);
   padding: 0.1em 0.2em;
 }
+
+/* ── La camera ──────────────────────────────────────────────────────────────
+   Da qui in giu' e' tutto movimento, e ha due chiavi per la stessa porta:
+   `prefers-reduced-motion: no-preference` e [data-motion="full"], che scrive
+   DeskStage. Chi non ha chiesto lo spettacolo non prende UNA SOLA di queste
+   regole: il tavolo fermo qui sopra resta quello che era, senza niente da
+   disfare a colpi di !important. E siccome useMotionLevel dice "none" in SSR e
+   al primo render, fermo e completo e' anche quello che si vede prima che il
+   JavaScript arrivi. */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-desk][data-motion="full"] [data-desk-track] { height: 380vh; }
+
+  /* Il palco e' sticky dentro il track: 280vh di scorrimento passano sotto uno
+     schermo fermo. Niente `pin` di ScrollTrigger, cosi' non c'e' un pin-spacer
+     da far litigare con Lenis.
+
+     I tre blocchi smettono di stare in colonna e vanno tutti nella stessa
+     cella: il titolo sta SOPRA il laptop mentre lo riempie, la tesi arriva
+     sopra il tavolo finito. In colonna non ci starebbero — il solo mondo e'
+     alto 824px, e questo palco e' alto quanto lo schermo. */
+  [data-desk][data-motion="full"] [data-desk-stage] {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding-block: 0;
+    display: grid;
+    place-items: center;
+    /* clip e non hidden: hidden creerebbe un contenitore di scorrimento e
+       romperebbe lo sticky qui sopra. Al primo fotogramma il piano e' quattro
+       volte lo schermo, e senza questo sborda sulle sezioni vicine. */
+    overflow: clip;
+  }
+
+  [data-desk][data-motion="full"] [data-desk-stage] > * { grid-area: 1 / 1; }
+
+  /* La camera vera. Il piano e le quattro <ul> degli oggetti sono lo stesso
+     rettangolo, sovrapposto: si ingrandiscono INSIEME o il disegno si strappa,
+     le sagome da una parte e il laptop dall'altra. --s la scrive il palco una
+     volta per fotogramma; senza JavaScript non e' scritta, vale 1, e questa
+     riga non fa niente. Sono cinque elementi trasformati dal CSS: il palco non
+     ne tocca nessuno. */
+  [data-desk][data-motion="full"] [data-desk-surface],
+  [data-desk][data-motion="full"] [data-desk-layer] > ul {
+    transform: scale(var(--s, 1));
+  }
+
+  /* Il titolo se ne va prima che entri il primo foglio; la tesi arriva a tavolo
+     completo. Le due finestre sono TITLE_BEAT e PUNCH_BEAT di layers.ts: il CSS
+     una costante non la sa importare, quindi i numeri stanno anche qui — e un
+     test rilegge QUESTO file per tenere i due posti uguali.
+     z-index perche' nella stessa cella vince chi e' scritto dopo, e il titolo
+     nel DOM viene prima del mondo. */
+  [data-desk][data-motion="full"] [data-desk-title] {
+    z-index: 1;
+    opacity: clamp(0, 1 - (var(--p, 1) - 0.02) / 0.08, 1);
+  }
+
+  /* La tesi non sta al centro: al centro c'e' lo schermo che la frase indica,
+     e coprirlo mentre la si legge sarebbe togliere la battuta. */
+  [data-desk][data-motion="full"] [data-desk-punch] {
+    align-self: end;
+    margin-bottom: 3vh;
+    opacity: clamp(0, (var(--p, 1) - 0.9) / 0.07, 1);
+  }
+
+  /* Le didascalie escono dal flusso: cosi' il mondo e' alto quanto il piano e
+     il tavolo ci sta in uno schermo. In colonna il mondo sarebbe alto 824px.
+     Non si posiziona [data-desk-layers]: se diventasse un elemento posizionato,
+     le <ul> degli oggetti si aggancerebbero a LUI invece che al mondo e i
+     ventiquattro oggetti finirebbero tutti in un angolo. Basta svuotarlo. */
+  [data-desk][data-motion="full"] [data-desk-layers] {
+    display: block;
+    margin-top: 0;
+  }
+
+  /* Il margine che tiene la fascia della didascalia. Il mondo e' centrato per
+     la sua scatola di margine, quindi il piano sale di meta' di questo e sotto
+     resta la striscia dove la parola non finisce mai addosso a un oggetto.
+     Senza, l'unico posto libero sarebbe dentro il tavolo, e il fondo pagina
+     della didascalia mangerebbe l'etichetta di chi ci sta sotto. */
+  [data-desk][data-motion="full"] [data-desk-world] { margin-bottom: 6.5rem; }
+
+  /* Una alla volta, sotto l'angolo sinistro del piano, come il sottotitolo di
+     un documentario: entra con il suo strato ed esce quando comincia il
+     successivo. I due estremi arrivano inline da CAPTION_BEATS. Il fondo pagina
+     dietro la parola e' lo stesso trucco delle etichette: finche' la camera e'
+     arretrata il piano ingrandito passa di qui, e senza non si leggerebbe. */
+  [data-desk][data-motion="full"] [data-desk-caption] {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    margin-top: 0.75rem;
+    z-index: 1;
+    max-width: 32rem;
+    padding: 0.35rem 1rem 0.35rem 0;
+    background-color: var(--bg);
+    opacity: clamp(
+      0,
+      min((var(--p, 1) - var(--from)) / 0.05, (var(--until) - var(--p, 1)) / 0.05),
+      1
+    );
+  }
+}
