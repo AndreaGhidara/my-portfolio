@@ -48,3 +48,18 @@ if (typeof HTMLDialogElement !== "undefined" && !HTMLDialogElement.prototype.sho
     this.dispatchEvent(new Event("close"));
   };
 }
+
+/**
+ * jsdom non ha nemmeno SVGPathElement: un <path> gli esce come SVGElement, e
+ * getTotalLength() non esiste. Chi disegna un tratto — il filo, i cavi del
+ * tavolo — lo misura per darsi lo strokeDasharray, e senza questo lancia appena
+ * il livello di movimento sale sopra "none". Zero, e non un numero finto: la
+ * lunghezza vera dipende dalla geometria, che qui nessuno calcola, e un numero
+ * inventato inviterebbe a scriverci sopra un'asserzione che non prova niente.
+ *
+ * Quello che questo NON dimostra: che il tratto si disegni davvero. Come si
+ * tesse un filo si guarda in un browser, non qui.
+ */
+if (typeof SVGElement !== "undefined" && !("getTotalLength" in SVGElement.prototype)) {
+  (SVGElement.prototype as unknown as { getTotalLength: () => number }).getTotalLength = () => 0;
+}

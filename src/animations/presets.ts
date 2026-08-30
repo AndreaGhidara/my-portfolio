@@ -42,7 +42,26 @@ export function stamp(
  */
 export function weave(
   paths: SVGPathElement[],
-  { level, trigger, scrub = false, stagger = 0.12 }: Common & { scrub?: boolean; stagger?: number },
+  {
+    level,
+    trigger,
+    scrub = false,
+    stagger = 0.12,
+    start,
+    end,
+  }: Common & {
+    scrub?: boolean;
+    stagger?: number;
+    /**
+     * La finestra dello scrub, per chi ne ha una sua. Il filo di sezione si
+     * tesse per tutto il tempo in cui la sezione attraversa lo schermo, ed e'
+     * il default; i cavi del tavolo no, perche' devono arrivare al loro stato
+     * finale esattamente quando ci arriva la camera — che e' il fotogramma a
+     * riposo, e l'unico in cui il filo va a posto. Ignorati fuori dallo scrub.
+     */
+    start?: string;
+    end?: string;
+  },
 ): gsap.core.Timeline | null {
   if (level === "none" || paths.length === 0) return null;
 
@@ -57,8 +76,8 @@ export function weave(
     scrollTrigger: trigger
       ? {
           trigger,
-          start: useScrub ? "top bottom" : "top 85%",
-          end: useScrub ? "bottom top" : undefined,
+          start: useScrub ? (start ?? "top bottom") : "top 85%",
+          end: useScrub ? (end ?? "bottom top") : undefined,
           scrub: useScrub ? 0.6 : false,
           once: !useScrub,
         }

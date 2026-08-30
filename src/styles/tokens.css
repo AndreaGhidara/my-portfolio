@@ -359,7 +359,25 @@ html[data-dialog-open] body { overflow: hidden; }
   width: 100%;
 }
 
-[data-desk-cables] { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* I cavi ricalcano il piano, e da li' prendono le loro percentuali: il 14% e
+   l'88% degli ancoraggi del filo sono il 14% e l'88% del PIANO, che e' anche
+   l'unico modo perche' restino attaccati al laptop mentre la camera arretra.
+   Nessuno z-index: l'ordine di sovrapposizione e' gia' quello del DOM. I cavi
+   sono il primo figlio del piano, quindi il laptop scritto dopo li copre — ed
+   e' per questo che sembrano uscire da dietro la scocca — e le <ul> degli
+   oggetti, che vengono dopo il piano, passano sopra tutti e due. Mettere qui
+   uno z-index non cambierebbe niente; darlo ai fratelli, come verrebbe
+   spontaneo, renderebbe posizionato [data-desk-layers] e i ventiquattro
+   oggetti finirebbero tutti in un angolo (vedi la nota della camera).
+   overflow visible perche' l'SVG di suo taglia: i due capi stanno esattamente
+   sul bordo, e con il taglio la testa tonda del cavo si vedrebbe mozzata. */
+[data-desk-cables] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
 
 /* Il gemello nascosto e' aria-hidden e puo' sparire del tutto. L'altro no: e'
    quello che porta le etichette che legge uno screen reader, e sotto i 1024px,
