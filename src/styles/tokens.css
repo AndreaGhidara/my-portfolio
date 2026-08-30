@@ -359,19 +359,50 @@ html[data-dialog-open] body { overflow: hidden; }
   width: 100%;
 }
 
-/* I cavi ricalcano il piano, e da li' prendono le loro percentuali: il 14% e
-   l'88% degli ancoraggi del filo sono il 14% e l'88% del PIANO, che e' anche
-   l'unico modo perche' restino attaccati al laptop mentre la camera arretra.
-   Nessuno z-index: l'ordine di sovrapposizione e' gia' quello del DOM. I cavi
-   sono il primo figlio del piano, quindi il laptop scritto dopo li copre — ed
-   e' per questo che sembrano uscire da dietro la scocca — e le <ul> degli
+/* I cavi restano FIGLI del piano — e' l'unico modo perche' la camera li scali
+   insieme al laptop da cui escono, e staccarli sarebbe la cosa che il concept
+   vieta. Nessuno z-index: l'ordine di sovrapposizione e' gia' quello del DOM.
+   I cavi sono il primo figlio del piano, quindi il laptop scritto dopo li copre
+   — ed e' per questo che sembrano uscire da dietro la scocca — e le <ul> degli
    oggetti, che vengono dopo il piano, passano sopra tutti e due. Mettere qui
    uno z-index non cambierebbe niente; darlo ai fratelli, come verrebbe
    spontaneo, renderebbe posizionato [data-desk-layers] e i ventiquattro
-   oggetti finirebbero tutti in un angolo (vedi la nota della camera).
-   overflow visible perche' l'SVG di suo taglia: i due capi stanno esattamente
-   sul bordo, e con il taglio la testa tonda del cavo si vedrebbe mozzata. */
+   oggetti finirebbero tutti in un angolo (vedi la nota della camera). */
 [data-desk-cables] {
+  position: absolute;
+  inset: 0;
+}
+
+/* La scatola di giunzione: larga quanto la FINESTRA e concentrica al piano.
+   Il perche' e' misurato: il piano e' largo min(94vw, 62rem) e centrato,
+   quindi il suo 14% non e' il 14% della pagina, che e' invece dove esce il filo
+   della sezione di sopra. A 1440 il gradino era di 161px in entrata e 170px in
+   uscita. Due scatole concentriche condividono il centro, quindi il 50/50 del
+   viewBox e' ancora il laptop, mentre il 14% e l'88% diventano quelli della
+   finestra e la giunzione si richiude — senza staccare i cavi dal piano.
+   overflow visible perche' l'SVG di suo taglia: i due capi stanno esattamente
+   sul bordo, e con il taglio la testa tonda del cavo si vedrebbe mozzata.
+   Quello che sborda di lato lo tiene [data-desk-stage] con il suo overflow
+   clip: la pagina non scorre di traverso, verificato a 1440 e a 390. */
+[data-desk-cables-ends] {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  height: 100%;
+  transform: translateX(-50%);
+  overflow: visible;
+}
+
+/* La derivazione no: quella resta nella scatola del PIANO, perche' il rack in
+   cui finisce sta nel piano e si misura in percentuali del piano. Nella
+   scatola larga quanto la finestra il suo capo scivolerebbe via man mano che
+   lo schermo si allarga — misurato: al 22% resterebbe al 9,4% del piano a
+   1440, e al -4,2% a 1920, cioe' fuori dal tavolo. Le due scatole hanno lo
+   stesso centro e la stessa altezza, quindi il (50 / 50) da cui partono tutti
+   e tre i tratti e' lo stesso punto: il laptop. */
+[data-desk-cables-branch] {
   position: absolute;
   inset: 0;
   width: 100%;

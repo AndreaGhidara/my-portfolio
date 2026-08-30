@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type RefObject } from "react";
+import { useRef } from "react";
 import { weave } from "@/animations/presets";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import { THREAD_ANCHORS } from "@/components/thread/anchors";
@@ -8,19 +8,23 @@ import { THREAD_ANCHORS } from "@/components/thread/anchors";
 const { in: ENTRY, out: EXIT } = THREAD_ANCHORS.services;
 
 /**
- * Tre tratti. Dal bordo di sopra al laptop, dal laptop al bordo di sotto, e una
- * derivazione che scende verso il rack dello strato infrastruttura — che sta
- * davvero li': a (23,4 / 80,6) nel mondo orizzontale, a (17,7 / 76,2) in quello
- * verticale, e la derivazione finisce dentro tutti e due. Il primo tratto e il
- * terzo passano sotto la scocca: il laptop e' disegnato dopo, nello stesso
- * piano, e li copre. E' per questo che i cavi escono dal RETRO e non da un
- * fianco.
+ * I due capi. Entrano dove esce «Cosa stai cercando?» ed escono dove entrano i
+ * Lavori, e le loro x sono percentuali della FINESTRA: stanno nella scatola di
+ * giunzione (vedi sotto).
  */
-const PATHS = [
+const ENDS = [
   `M${ENTRY} 0 C${ENTRY} 30, 34 42, 50 50`,
   `M50 50 C68 58, ${EXIT} 72, ${EXIT} 100`,
-  `M50 50 C50 66, 30 72, 22 82`,
 ];
+
+/**
+ * La derivazione che scende nel rack dello strato infrastruttura — che sta
+ * davvero li': a (23,4 / 80,6) nel mondo orizzontale, a (17,7 / 76,2) in quello
+ * verticale, e la derivazione finisce dentro tutti e due. Le sue x sono
+ * percentuali del PIANO, perche' del piano sono percentuali le coordinate del
+ * rack.
+ */
+const BRANCH = `M50 50 C50 66, 30 72, 22 82`;
 
 /**
  * I cavi. Sono il segmento di filo di questa sezione, e non una sua citazione:
@@ -36,16 +40,28 @@ const PATHS = [
  * I cavi stanno DENTRO il piano, quindi la camera li ingrandisce insieme al
  * laptop da cui escono. E' il prezzo, ed e' il prezzo giusto: agganciarli alla
  * pagina invece che al mondo li staccherebbe dall'oggetto che li tiene, che e'
- * tutto il punto. Al fotogramma d'apertura il mondo e' a 4,2x (misurato a
- * 1440x900) e i due capi stanno fuori dallo schermo; la continuita' col resto
- * della pagina si legge al fotogramma a riposo — l'ultimo della camera, e
- * l'unico che esista a "reduced", a "none" e senza JavaScript. Detto
- * altrimenti: il filo non e' gia' al suo posto, ci arriva mentre la camera
- * arretra.
+ * tutto il punto.
+ *
+ * Due SVG e non uno, ed e' l'unica ragione per cui sono due: il 14% e l'88%
+ * sono percentuali della PAGINA — e' li' che escono e entrano le sezioni
+ * vicine — mentre il rack in cui finisce la derivazione e' una percentuale del
+ * PIANO. Il piano e' largo min(94vw, 62rem) e centrato, quindi i due 14% non
+ * coincidono: misurato a 1440, il filo faceva un gradino di 161px in entrata e
+ * 170px in uscita. Cosi' i capi vivono in una scatola larga quanto la finestra
+ * e la derivazione in una larga quanto il piano; le due scatole sono
+ * concentriche e alte uguali, quindi il (50 / 50) da cui partono tutti e tre i
+ * tratti resta lo stesso punto, che e' il laptop. Le regole stanno in
+ * tokens.css, sotto [data-desk-cables-ends] e [data-desk-cables-branch].
+ *
+ * Al fotogramma d'apertura il mondo e' a 4,2x (misurato a 1440x900) e i due
+ * capi stanno fuori dallo schermo; la continuita' col resto della pagina si
+ * legge al fotogramma a riposo — l'ultimo della camera, e l'unico che esista a
+ * "reduced", a "none" e senza JavaScript. Detto altrimenti: il filo non e' gia'
+ * al suo posto, ci arriva mentre la camera arretra.
  *
  * viewBox 100x100 con preserveAspectRatio disattivato: le coordinate sono
- * percentuali e il tratto si adatta a qualsiasi proporzione del mondo, come per
- * ThreadSegment. Lo spessore resta sottile grazie a non-scaling-stroke,
+ * percentuali della scatola e il tratto si adatta a qualsiasi proporzione, come
+ * per ThreadSegment. Lo spessore resta sottile grazie a non-scaling-stroke,
  * altrimenti la camera che arretra ingrasserebbe il cavo di quattro volte.
  *
  * Il conto di non-scaling-stroke, misurato e non dedotto: con quel vector-effect
@@ -59,7 +75,7 @@ const PATHS = [
  * Task 5.
  */
 export function DeskCables() {
-  const scope = useRef<SVGSVGElement | null>(null);
+  const scope = useRef<HTMLDivElement | null>(null);
 
   useSectionAnimation((level) => {
     const nodes = Array.from(scope.current?.querySelectorAll("path") ?? []);
@@ -75,19 +91,31 @@ export function DeskCables() {
     // camera smette di arretrare.
     const trigger = scope.current?.closest("[data-desk-track]") ?? scope.current;
     weave(nodes, { level, trigger, scrub: true, start: "top top", end: "bottom bottom" });
-  }, scope as RefObject<HTMLElement | null>);
+  }, scope);
+
+  return (
+    <div ref={scope} data-desk-cables aria-hidden="true">
+      <Scatola box="ends" paths={ENDS} />
+      <Scatola box="branch" paths={[BRANCH]} />
+    </div>
+  );
+}
+
+/** Una scatola di cavi. Fra le due cambia solo la larghezza, e la decide il CSS. */
+function Scatola({ box, paths }: { box: "ends" | "branch"; paths: string[] }) {
+  const attr =
+    box === "ends" ? { "data-desk-cables-ends": "" } : { "data-desk-cables-branch": "" };
 
   return (
     <svg
-      ref={scope}
-      data-desk-cables
+      {...attr}
       aria-hidden="true"
       viewBox="0 0 100 100"
       preserveAspectRatio="none"
       width="100%"
       height="100%"
     >
-      {PATHS.map((d) => (
+      {paths.map((d) => (
         <path
           key={d}
           d={d}
