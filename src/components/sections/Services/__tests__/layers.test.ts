@@ -590,8 +590,11 @@ describe("la domanda sul post-it ci sta dentro il post-it", () => {
     for (const finestra of [FINESTRA.wide, 2560]) {
       const mondo = Math.min((finestra * vw) / 100, rem * REM);
       const corpo = Math.min(Math.max((cqw * mondo) / 100, minimo * REM), massimo * REM);
-      // Il post-it e' quadrato (126x126), quindi l'inset vale uguale sui due
-      // lati: il 12% della larghezza e il 12% dell'altezza sono lo stesso numero.
+      // Il post-it e' quadrato, quindi l'inset vale uguale sui due lati e il
+      // budget orizzontale e' anche quello verticale. Se un giorno il viewBox
+      // smettesse di esserlo, questo conto misurerebbe l'asse sbagliato in
+      // silenzio: meglio che cada qui.
+      expect(SHAPE_BOX.postit.w, "il post-it non e' piu' quadrato").toBe(SHAPE_BOX.postit.h);
       const lato = (drawWidth("wide", "postit") / 100) * mondo;
       const dentro = lato * (1 - (2 * rientro) / 100);
       const perRiga = Math.floor(dentro / (corpo * AVANZAMENTO));
