@@ -1,6 +1,44 @@
 import type { CSSProperties } from "react";
 import type { DeskShape } from "@/content/desk";
-import { LABEL, SHAPE_BOX, drawWidth, type Beat, type DeskLayout, type Placement } from "./layers";
+import {
+  LABEL,
+  SHAPE_BOX,
+  drawWidth,
+  type Beat,
+  type DeskDrawing,
+  type DeskLayout,
+  type Placement,
+} from "./layers";
+
+/**
+ * Il disegno di una sagoma: due strati, non uno. Sotto la superficie, sopra il
+ * tracciato — e sono due perche' una maschera CSS dipinge UN colore solo, e con
+ * un colore solo un foglio, una scheda e un telefono restano lo stesso grigio
+ * identico. I quattro strati del tavolo si leggevano come quattro contorni
+ * della stessa famiglia invece che come quattro tipi di cosa.
+ *
+ * L'ordine e' quello del DOM e non un z-index: il pieno e' scritto per primo,
+ * il tracciato gli passa sopra. Le due maschere vengono dallo stesso contorno
+ * esterno (lo genera una funzione sola, e una prova lo verifica), quindi
+ * combaciano invece di lasciare un alone.
+ *
+ * Il colore lo mette il CSS, come prima: e' per questo che il tema continua a
+ * funzionare da se'. Cambia solo che adesso ci sono due superfici da colorare.
+ *
+ * I led del rack sono lo strato in piu' che nessuna maschera puo' portare:
+ * una maschera e' una forma, e loro sono colore. Decorativi — niente da
+ * annunciare, come tutto il resto del disegno.
+ */
+export function DeskShapeArt({ drawing }: { drawing: DeskDrawing }) {
+  const box = SHAPE_BOX[drawing];
+  return (
+    <span data-desk-shape style={{ aspectRatio: `${box.w} / ${box.h}` }}>
+      <span data-desk-fill />
+      <span data-desk-line />
+      {drawing === "rack" ? <span data-desk-leds /> : null}
+    </span>
+  );
+}
 
 /**
  * Un oggetto sul tavolo. E' un <li>, non un <div> che finge: lo strato e' una
@@ -13,10 +51,11 @@ import { LABEL, SHAPE_BOX, drawWidth, type Beat, type DeskLayout, type Placement
  * fallback — se il JavaScript non gira, --p non viene mai scritta, vale 1, e si
  * vede il tavolo completo. Il fotogramma finale e' lo stato di riposo.
  *
- * La sagoma e' una maschera CSS e non una <img>: dentro una <img> il
+ * La sagoma e' fatta di maschere CSS e non di <img>: dentro una <img> il
  * `currentColor` degli SVG si risolve sul documento dell'immagine, che non sa
  * niente del tema, e i disegni resterebbero neri anche su fondo inchiostro.
  * Come maschera il colore lo mette chi la contiene, e segue carta e inchiostro.
+ * Quanti strati siano, e perche', lo dice DeskShapeArt qui sopra.
  *
  * Ventitre' oggetti su ventiquattro sono un disegno con una parola sotto. Il
  * ventiquattresimo — il post-it bianco — e' un comando, e allora la sagoma sta
@@ -48,8 +87,7 @@ export function DeskObject({
    *  sfiora, ma si legge sempre: e' il nome che annuncia uno screen reader. */
   action?: string;
 }) {
-  const box = SHAPE_BOX[shape];
-  const sagoma = <span data-desk-shape style={{ aspectRatio: `${box.w} / ${box.h}` }} />;
+  const sagoma = <DeskShapeArt drawing={shape} />;
 
   return (
     <li

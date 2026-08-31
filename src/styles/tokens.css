@@ -446,6 +446,12 @@ html[data-dialog-open] body { overflow: hidden; }
    testo — a questa misura sarebbe illeggibile comunque — ma c'e' l'arancio del
    bottone, che e' l'unica cosa che distingue un sito finito da un wireframe. */
 [data-desk-screen] {
+  /* La luce dello schermo. Da quando la scocca ha il suo pieno scuro, il sito
+     qui dentro non puo' piu' essere currentColor: sul tema chiaro sarebbe
+     inchiostro su inchiostro. E' --paper fisso, come fissa e' la scocca — uno
+     schermo acceso e' chiaro anche di giorno, ed e' il contrasto con la scocca
+     a farlo leggere acceso invece che disegnato. */
+  color: var(--paper);
   position: absolute;
   left: 6%;
   right: 6%;
@@ -534,40 +540,136 @@ html[data-dialog-open] body { overflow: hidden; }
    Sono gli oggetti del solo mondo verticale, che e' gia' aria-hidden. */
 [data-desk-object][data-off] { display: none; }
 
-/* La sagoma e' una maschera e non una <img>: dentro una <img> il currentColor
-   degli SVG si risolve sul documento dell'immagine, che del tema non sa niente,
-   e i disegni resterebbero neri anche su fondo inchiostro. Come maschera il
-   colore lo mette chi la contiene. */
+/* ── I materiali ────────────────────────────────────────────────────────────
+   Le sagome sono maschere e non <img>: dentro una <img> il currentColor degli
+   SVG si risolve sul documento dell'immagine, che del tema non sa niente, e i
+   disegni resterebbero neri anche su fondo inchiostro. Come maschera il colore
+   lo mette chi la contiene.
+
+   Ma una maschera dipinge UN COLORE SOLO. Con un file solo per sagoma, foglio,
+   scheda e telefono erano lo stesso grigio identico: quattro contorni della
+   stessa famiglia invece di quattro tipi di cosa. Da qui ogni sagoma e' due
+   strati — la superficie sotto, il tratto sopra — e due maschere, tagliate
+   dallo stesso contorno esterno dal generatore, quindi a registro.
+
+   Il colore non e' piu' currentColor, e questo e' il punto delicato: era lui a
+   seguire il tema gratis. Ogni tinta qui sotto nasce percio' da un token del
+   tema — mai un colore scritto a mano — e ognuna dichiara a quale delle due
+   famiglie appartiene:
+
+   - quello che e' CARTA (foglio, scheda, piastra) si misura su --bg/--fg e si
+     inverte con la pagina: un foglio e' chiaro sulla carta e scuro
+     sull'inchiostro, come il testo;
+   - quello che e' UN OGGETTO (rack, telefono, laptop, post-it) tiene il suo
+     colore vero in tutti e due i temi: un rack e' una scatola scura e un
+     post-it e' giallo anche di notte. Restano pero' legati ai token — la
+     scocca schiarisce con --fg-muted, che in scuro e' piu' chiaro, cosi' un
+     blocco nero su fondo inchiostro non diventa un buco. */
+
 [data-desk-shape] {
   display: block;
+  position: relative;
   width: 100%;
-  background-color: currentColor;
+  /* L'ombra sta sul CONTENITORE, non sui due strati: il filtro si applica
+     prima della maschera, e su un elemento mascherato l'ombra verrebbe
+     ritagliata via dalla maschera stessa. Qui cade fuori dalla sagoma, com'e'
+     giusto — e cade solo sulle superfici: l'etichetta e' una sorella, non una
+     figlia, e un'ombra sotto una parola non e' un tavolo, e' un banner.
+     E' la STESSA ombra per tutti, corta e vicina: gli oggetti stanno sullo
+     stesso piano sotto la stessa luce, e un'ombra proporzionale alla sagoma
+     direbbe che il foglio piu' grande e' anche quello piu' sollevato. */
+  filter: drop-shadow(0 0.09em 0.14em color-mix(in oklab, var(--ink) 26%, transparent));
+}
+
+/* I due strati (piu' i led del rack) stanno uno sull'altro. Nessuno z-index:
+   l'ordine e' quello del DOM, e il pieno e' scritto per primo. */
+[data-desk-shape] > * {
+  position: absolute;
+  inset: 0;
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: 100% 100%;
 }
 
-[data-desk-object][data-shape="sheet"] [data-desk-shape] { mask-image: url("/brand/desk/sheet.svg"); }
-[data-desk-object][data-shape="card"] [data-desk-shape] { mask-image: url("/brand/desk/card.svg"); }
-[data-desk-object][data-shape="postit"] [data-desk-shape] { mask-image: url("/brand/desk/postit.svg"); }
-[data-desk-object][data-shape="plate"] [data-desk-shape] { mask-image: url("/brand/desk/plate.svg"); }
-[data-desk-object][data-shape="rack"] [data-desk-shape] { mask-image: url("/brand/desk/rack.svg"); }
-[data-desk-object][data-shape="phone"] [data-desk-shape] { mask-image: url("/brand/desk/phone.svg"); }
-[data-desk-centre] [data-desk-shape] { mask-image: url("/brand/desk/laptop.svg"); }
+/* Il default e' il disegno di prima: una sagoma senza materiale dichiarato
+   resta il suo contorno, e non sparisce. */
+[data-desk-fill] { background-color: var(--desk-pieno, transparent); }
+[data-desk-line] { background-color: var(--desk-tratto, currentColor); }
 
-/* L'infrastruttura e' disegnata piu' chiara: e' lo strato che non si vede mai
-   finche' non manca. Piu' chiara, non invisibile — con --line, che e' il colore
-   delle righe di un bordo, un foglio su carta sarebbe sparito. */
-[data-desk-object][data-shape="rack"],
-[data-desk-object][data-shape="plate"] {
-  color: color-mix(in oklab, var(--fg-muted) 70%, var(--bg));
+[data-desk-object][data-shape="sheet"] [data-desk-fill] { mask-image: url("/brand/desk/sheet-fill.svg"); }
+[data-desk-object][data-shape="sheet"] [data-desk-line] { mask-image: url("/brand/desk/sheet.svg"); }
+[data-desk-object][data-shape="card"] [data-desk-fill] { mask-image: url("/brand/desk/card-fill.svg"); }
+[data-desk-object][data-shape="card"] [data-desk-line] { mask-image: url("/brand/desk/card.svg"); }
+[data-desk-object][data-shape="postit"] [data-desk-fill] { mask-image: url("/brand/desk/postit-fill.svg"); }
+[data-desk-object][data-shape="postit"] [data-desk-line] { mask-image: url("/brand/desk/postit.svg"); }
+[data-desk-object][data-shape="plate"] [data-desk-fill] { mask-image: url("/brand/desk/plate-fill.svg"); }
+[data-desk-object][data-shape="plate"] [data-desk-line] { mask-image: url("/brand/desk/plate.svg"); }
+[data-desk-object][data-shape="rack"] [data-desk-fill] { mask-image: url("/brand/desk/rack-fill.svg"); }
+[data-desk-object][data-shape="rack"] [data-desk-line] { mask-image: url("/brand/desk/rack.svg"); }
+[data-desk-object][data-shape="phone"] [data-desk-fill] { mask-image: url("/brand/desk/phone-fill.svg"); }
+[data-desk-object][data-shape="phone"] [data-desk-line] { mask-image: url("/brand/desk/phone.svg"); }
+[data-desk-centre] [data-desk-fill] { mask-image: url("/brand/desk/laptop-fill.svg"); }
+[data-desk-centre] [data-desk-line] { mask-image: url("/brand/desk/laptop.svg"); }
+
+/* La tavola dei materiali: ogni sagoma dichiara la sua coppia, i due strati la
+   leggono. Sta in un posto solo apposta — e' la tavola della specifica, e
+   sparpagliata fra quattordici regole non si riconoscerebbe piu'. */
+
+/* Carta appena staccata dal fondo, bordo grafite: e' il foglio. */
+[data-desk-object][data-shape="sheet"] {
+  --desk-pieno: color-mix(in oklab, var(--fg) 7%, var(--bg));
+  --desk-tratto: var(--fg-muted);
 }
 
-/* Il post-it e' l'unico calore che non sia arancio. --bulb era in palette e non
-   faceva niente: qui ha un mestiere. Spento con --muted per reggere sia su
-   carta sia su inchiostro, dove il giallo pieno griderebbe. */
+/* Carta, e il bordo di inchiostro: la scheda e' stampata, il foglio no. */
+[data-desk-object][data-shape="card"] {
+  --desk-pieno: color-mix(in oklab, var(--fg) 15%, var(--bg));
+  --desk-tratto: color-mix(in oklab, var(--fg) 80%, var(--bg));
+}
+
+/* Grafite: la piastra e' l'unica cosa di metallo sul tavolo. Il tratto e' la
+   stessa grafite tirata verso il testo — piu' scura su carta, piu' chiara su
+   inchiostro, che e' la stessa cosa: staccare il bordo dal pieno. */
+[data-desk-object][data-shape="plate"] {
+  --desk-pieno: color-mix(in oklab, var(--fg-muted) 50%, var(--bg));
+  --desk-tratto: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
+}
+
+/* La scocca: rack, telefono e laptop sono la stessa cosa — scatole scure. Non
+   e' --fg, e' --ink: un apparecchio non si inverte col tema. Schiarito con
+   --fg-muted, che in scuro e' chiaro: e' quel 22% a tenere il blocco staccato
+   dal fondo inchiostro invece di lasciarlo un buco nero su nero. */
+[data-desk-object][data-shape="rack"],
+[data-desk-object][data-shape="phone"],
+[data-desk-centre] {
+  --desk-pieno: color-mix(in oklab, var(--ink) 78%, var(--fg-muted));
+  --desk-tratto: color-mix(in oklab, var(--ink) 42%, var(--fg-muted));
+}
+
+/* Il post-it e' l'unico calore che non sia arancio, e --bulb pieno: un post-it
+   giallo e' giallo su qualunque tavolo. Il bordo e' lo stesso giallo spento
+   nell'inchiostro — fisso anche lui, perche' fissa e' la carta che borda. */
 [data-desk-object][data-shape="postit"] {
-  color: color-mix(in oklab, var(--bulb) 72%, var(--muted));
+  --desk-pieno: var(--bulb);
+  --desk-tratto: color-mix(in oklab, var(--bulb) 55%, var(--ink));
+}
+
+/* I led del rack. Sono l'unica cosa del tavolo che una maschera non sa portare:
+   una maschera e' una forma, un led e' un colore. Tre accesi e uno spento, come
+   un rack vero — e le ellissi sono in percentuale, non in px, cosi' restano
+   punti di luce e non palle quando la camera arretra.
+   Le quattro unita' del rack, nel viewBox 132x104, hanno il centro a 17,5,
+   39,5, 61,5 e 83,5: sono le quattro quote qui sotto, in percentuale. */
+[data-desk-leds] {
+  background-image:
+    radial-gradient(ellipse 4% 5% at 85% 17%, var(--bulb) 45%, transparent 100%),
+    radial-gradient(ellipse 4% 5% at 85% 38%, var(--bulb) 45%, transparent 100%),
+    radial-gradient(
+      ellipse 4% 5% at 85% 59%,
+      color-mix(in oklab, var(--bulb) 20%, var(--ink)) 45%,
+      transparent 100%
+    ),
+    radial-gradient(ellipse 4% 5% at 85% 80%, var(--bulb) 45%, transparent 100%);
 }
 
 /* Il post-it bianco: l'unico oggetto del tavolo che si preme. Il colore resta
@@ -603,7 +705,10 @@ html[data-dialog-open] body { overflow: hidden; }
      stanno undici caratteri per riga, e la domanda ne conta diciassette. */
   font-size: clamp(0.42rem, 1cqw, 0.68rem);
   line-height: 1.25;
-  color: var(--fg);
+  /* Inchiostro fisso, non --fg: il post-it e' giallo pieno in tutti e due i
+     temi, e sul tema scuro --fg e' carta — la domanda sparirebbe dentro il
+     giallo proprio nell'unico momento in cui la si legge. */
+  color: var(--ink);
   opacity: 0;
 }
 

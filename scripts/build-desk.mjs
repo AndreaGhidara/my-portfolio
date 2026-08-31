@@ -109,14 +109,25 @@ function inner(name, spec, random) {
   return paths;
 }
 
-export function buildShape(name) {
-  const spec = SHAPES[name];
-  const random = rng(SEEDS[name]);
+/**
+ * Il contorno esterno: il corpo dell'oggetto, e nient'altro. E' il PRIMO
+ * sorteggio che ogni sagoma fa, ed e' l'unico punto in cui viene disegnato —
+ * il contorno e il pieno chiamano questa, cosi' l'uno e' per costruzione il
+ * tracciato dell'altro. Ridisegnarlo a parte darebbe due tremolii diversi e
+ * ogni oggetto del tavolo avrebbe un alone.
+ */
+function outerPath(name, spec, random) {
   // Solo la card lascia margine in cima, per la linguetta: per tutte le altre
   // il corpo occupa il viewBox intero, come sempre.
   const top = name === "card" ? 2 + CARD_TAB_MARGIN : 2;
+  return wobblyRect(2, top, spec.w - 4, spec.h - 2 - top, random);
+}
+
+export function buildShape(name) {
+  const spec = SHAPES[name];
+  const random = rng(SEEDS[name]);
   const paths = [
-    wobblyRect(2, top, spec.w - 4, spec.h - 2 - top, random),
+    outerPath(name, spec, random),
     ...inner(name, spec, random),
   ];
   return [
@@ -128,13 +139,37 @@ export function buildShape(name) {
   ].join("");
 }
 
+/**
+ * Il pieno: lo stesso contorno esterno, chiuso e riempito, che nel DOM sta
+ * SOTTO il tracciato. Serve perche' una maschera CSS dipinge un colore solo:
+ * con un file solo un foglio, una scheda e un telefono restavano lo stesso
+ * grigio identico, e i quattro strati si leggevano come quattro contorni della
+ * stessa famiglia invece che come quattro tipi di cosa. Due superfici da
+ * colorare, e il colore continua a metterlo il CSS: il tema regge.
+ *
+ * Il seme e' quello della sagoma e il sorteggio e' il primo, lo stesso che fa
+ * buildShape: i due tracciati escono identici carattere per carattere, e per
+ * questo combaciano. Niente tratto — il tratto e' l'altro strato.
+ */
+export function buildFill(name) {
+  const spec = SHAPES[name];
+  const d = outerPath(name, spec, rng(SEEDS[name]));
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${spec.w} ${spec.h}"`,
+    ` fill="currentColor" aria-hidden="true">\n`,
+    `  <path d="${d}" />`,
+    `\n</svg>\n`,
+  ].join("");
+}
+
 async function main() {
   await mkdir(OUT, { recursive: true });
   for (const name of Object.keys(SHAPES)) {
     await writeFile(`${OUT}/${name}.svg`, buildShape(name), "utf8");
-    console.log(`  ${name}.svg`);
+    await writeFile(`${OUT}/${name}-fill.svg`, buildFill(name), "utf8");
+    console.log(`  ${name}.svg + ${name}-fill.svg`);
   }
-  console.log(`${Object.keys(SHAPES).length} sagome in ${OUT}`);
+  console.log(`${Object.keys(SHAPES).length} sagome (contorno e pieno) in ${OUT}`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) await main();

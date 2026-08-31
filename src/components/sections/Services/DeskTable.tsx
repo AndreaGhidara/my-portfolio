@@ -4,13 +4,12 @@ import {
   CAPTION_BEATS,
   CENTRE,
   OBJECTS_PER_LAYER,
-  SHAPE_BOX,
   WORLD,
   objectBeat,
   placeObject,
   type DeskLayout,
 } from "./layers";
-import { DeskObject } from "./DeskObject";
+import { DeskObject, DeskShapeArt } from "./DeskObject";
 import { DeskCables } from "./DeskCables";
 
 export type DeskLayerData = {
@@ -71,10 +70,10 @@ export function DeskTable({
         <DeskCables />
 
         <div data-desk-centre style={{ width: `${CENTRE.width}%` }}>
-          <span
-            data-desk-shape
-            style={{ aspectRatio: `${SHAPE_BOX.laptop.w} / ${SHAPE_BOX.laptop.h}` }}
-          />
+          {/* Due strati come ogni altra sagoma, ed e' il pieno scuro della
+              scocca che fa leggere acceso lo schermo qui sotto: un sito chiaro
+              dentro un contorno vuoto era un disegno appoggiato sul tavolo. */}
+          <DeskShapeArt drawing="laptop" />
 
           {/* Il sito finito, dentro lo schermo. La sezione si apre su "un sito
               finito riempie lo schermo" e si chiude dicendo che quello schermo

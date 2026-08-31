@@ -197,6 +197,62 @@ describe("lo schermo al centro", () => {
   });
 });
 
+/**
+ * I materiali. Una maschera CSS dipinge un colore solo: finche' la sagoma era
+ * un file solo, foglio, scheda e telefono erano lo stesso grigio identico e i
+ * quattro strati si leggevano come quattro contorni della stessa famiglia. Due
+ * strati sono due superfici da colorare — ed e' il DOM a doverli portare,
+ * perche' nel CSS un pieno che non ha dove appoggiarsi non esiste.
+ */
+describe("i materiali", () => {
+  it("ogni oggetto e' due strati: la superficie sotto, il tracciato sopra", () => {
+    const { container } = render(<ServicesView {...props} />);
+    const oggetti = container.querySelectorAll(SOLI_VERI);
+    expect(oggetti.length).toBeGreaterThan(0);
+    for (const oggetto of oggetti) {
+      const sagoma = oggetto.querySelector("[data-desk-shape]") as HTMLElement;
+      expect(sagoma, "un oggetto senza sagoma").not.toBeNull();
+      expect(sagoma.querySelector("[data-desk-fill]")).not.toBeNull();
+      expect(sagoma.querySelector("[data-desk-line]")).not.toBeNull();
+      // L'ordine e' il disegno: il pieno viene PRIMA, o coprirebbe il tracciato
+      // che dovrebbe stargli sopra. Nessuno z-index — l'ordine e' quello del DOM.
+      expect(sagoma.children[0]).toHaveAttribute("data-desk-fill");
+      expect(sagoma.children[1]).toHaveAttribute("data-desk-line");
+    }
+  });
+
+  it("anche il laptop al centro: e' il pieno scuro che fa leggere acceso lo schermo", () => {
+    const { container } = render(<ServicesView {...props} />);
+    const centro = container.querySelector(
+      "[data-desk-world]:not([aria-hidden]) [data-desk-centre] [data-desk-shape]",
+    ) as HTMLElement;
+    expect(centro.querySelector("[data-desk-fill]")).not.toBeNull();
+    expect(centro.querySelector("[data-desk-line]")).not.toBeNull();
+  });
+
+  it("i led stanno sul rack e su nient'altro: sono colore vero, non una maschera", () => {
+    // Il colore non puo' venire dal file: una maschera porta una forma, non un
+    // colore. I led sono l'unico posto del tavolo dove serve dipingere qualcosa
+    // dentro un oggetto, e quindi l'unico che ha uno strato in piu'.
+    const { container } = render(
+      <ServicesView
+        {...props}
+        layers={[
+          { ...layer("infra", 2), objects: [
+            { id: "infra-rack", shape: "rack" as const, label: "il server" },
+            { id: "infra-sheet", shape: "sheet" as const, label: "il foglio" },
+          ] },
+        ]}
+      />,
+    );
+    const oggetti = [...container.querySelectorAll(SOLI_VERI)];
+    const rack = oggetti.find((el) => el.getAttribute("data-shape") === "rack") as HTMLElement;
+    const foglio = oggetti.find((el) => el.getAttribute("data-shape") === "sheet") as HTMLElement;
+    expect(rack.querySelector("[data-desk-leds]")).not.toBeNull();
+    expect(foglio.querySelector("[data-desk-leds]")).toBeNull();
+  });
+});
+
 describe("il patto del fallback", () => {
   it("senza movimento si vede il tavolo completo: --p non scritta vale 1", () => {
     const { container } = render(<ServicesView {...props} />);
