@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { palette } from "../palette";
 
@@ -28,6 +28,23 @@ describe("tokens.css", () => {
 
     const bareRule = /\[data-work-dialog\]\s*\{[^}]*display\s*:/;
     expect(css).not.toMatch(bareRule);
+  });
+
+  it("ogni sagoma del tavolo ha due strati, e i due file esistono davvero", () => {
+    // Il pieno e il contorno sono due maschere, e una maschera che punta a un
+    // file che non c'e' non e' un errore: e' uno strato che semplicemente non
+    // si dipinge. Il tavolo resterebbe verde in ogni prova e piatto in pagina.
+    for (const sagoma of ["sheet", "card", "postit", "plate", "rack", "phone", "laptop"]) {
+      for (const file of [`${sagoma}.svg`, `${sagoma}-fill.svg`]) {
+        expect(css, `${file} non e' montato in tokens.css`).toContain(
+          `url("/brand/desk/${file}")`,
+        );
+        expect(
+          existsSync(path.resolve(__dirname, `../../../public/brand/desk/${file}`)),
+          `public/brand/desk/${file} non c'e': npm run assets`,
+        ).toBe(true);
+      }
+    }
   });
 
   it("contiene solo colori hex dalla palette", () => {
