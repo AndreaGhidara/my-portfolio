@@ -529,8 +529,11 @@ html[data-dialog-open] body { overflow: hidden; }
 [data-desk-object] {
   position: absolute;
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
-  color: var(--fg-muted);
-  /* left, top, width e la finestra --from/--span sono dati e arrivano inline.
+  /* Niente `color` qui: dei due strati nessuno lo legge piu' — il pieno e il
+     tratto hanno le loro tinte — e l'anello di fuoco e' var(--accent), non
+     currentColor (globals.css). Era una riga che sembrava dipingere e non
+     dipingeva nulla.
+     left, top, width e la finestra --from/--span sono dati e arrivano inline.
      L'opacita' pure: dipende da --from e --span, che sono dati dell'oggetto.
      Qui non si dichiara nessuna transizione — non c'e' niente che si muove, e
      quindi niente che reduced-motion debba spegnere. */
@@ -557,14 +560,18 @@ html[data-dialog-open] body { overflow: hidden; }
    tema — mai un colore scritto a mano — e ognuna dichiara a quale delle due
    famiglie appartiene:
 
-   - quello che e' CARTA (foglio, scheda, piastra) si misura su --bg/--fg e si
-     inverte con la pagina: un foglio e' chiaro sulla carta e scuro
-     sull'inchiostro, come il testo;
-   - quello che e' UN OGGETTO (rack, telefono, laptop, post-it) tiene il suo
-     colore vero in tutti e due i temi: un rack e' una scatola scura e un
-     post-it e' giallo anche di notte. Restano pero' legati ai token — la
-     scocca schiarisce con --fg-muted, che in scuro e' piu' chiaro, cosi' un
-     blocco nero su fondo inchiostro non diventa un buco. */
+   - quello che e' CARTA (foglio, scheda, piastra, e il post-it bianco) e'
+     quello che il piano NON e': in chiaro sta appena sotto il fondo, in scuro
+     e' la cosa che brilla;
+   - quello che e' UN APPARECCHIO (rack, telefono, laptop) e' una scatola
+     scura, e resta scura anche di notte: in chiaro precipita a nero, in scuro
+     si appiattisce sul piano e a tenerlo su restano il tratto e i led;
+   - il post-it e' fisso e basta: giallo su qualunque tavolo.
+
+   Le due famiglie devono percio' muoversi in DIREZIONI OPPOSTE quando il tema
+   si inverte. E' il motivo per cui la tavola si dichiara due volte — la prima
+   stesura ne aveva una sola, le due famiglie salivano insieme, e in tema scuro
+   si incrociavano sullo stesso identico grigio. */
 
 [data-desk-shape] {
   display: block;
@@ -577,8 +584,23 @@ html[data-dialog-open] body { overflow: hidden; }
      figlia, e un'ombra sotto una parola non e' un tavolo, e' un banner.
      E' la STESSA ombra per tutti, corta e vicina: gli oggetti stanno sullo
      stesso piano sotto la stessa luce, e un'ombra proporzionale alla sagoma
-     direbbe che il foglio piu' grande e' anche quello piu' sollevato. */
-  filter: drop-shadow(0 0.09em 0.14em color-mix(in oklab, var(--ink) 26%, transparent));
+     direbbe che il foglio piu' grande e' anche quello piu' sollevato.
+     Il colore sta in --desk-ombra e si dichiara due volte, una per tema: era
+     --ink al 26% per tutti e due, e in tema scuro --bg E' --ink — l'ombra
+     aveva la luminanza esatta del fondo su cui cadeva, cioe' non c'era.
+     Scostamento e sfocatura stanno sotto i 3px: l'ombra non entra nel modello
+     geometrico, e il pavimento d'aria fra due oggetti vale ~6,3px a 1440. */
+  --desk-ombra: color-mix(in oklab, var(--ink) 26%, transparent);
+  filter: drop-shadow(0 0.07em 0.11em var(--desk-ombra));
+}
+
+/* In una stanza buia sotto una scatola nera non c'e' niente di piu' scuro da
+   mettere: il piano E' il nero della palette. Quello che si vede davvero e' il
+   contatto che schiarisce appena attorno alla sagoma — il riflesso, non il
+   buio. Resta sotto al pieno della scocca, cosi' stacca l'oggetto dal piano
+   senza confondersi col suo bordo. */
+[data-theme="dark"] [data-desk-shape] {
+  --desk-ombra: color-mix(in oklab, var(--fg-muted) 14%, transparent);
 }
 
 /* I due strati (piu' i led del rack) stanno uno sull'altro. Nessuno z-index:
@@ -613,32 +635,53 @@ html[data-dialog-open] body { overflow: hidden; }
 
 /* La tavola dei materiali: ogni sagoma dichiara la sua coppia, i due strati la
    leggono. Sta in un posto solo apposta — e' la tavola della specifica, e
-   sparpagliata fra quattordici regole non si riconoscerebbe piu'. */
+   sparpagliata fra quattordici regole non si riconoscerebbe piu'.
+
+   E si dichiara DUE VOLTE, una per tema. La prima stesura ne aveva una sola, e
+   in tema scuro la scheda (--fg 15% su --bg) e la scocca (--ink 78% con
+   --fg-muted) cadevano sullo stesso identico colore: 1.00:1. Non era un valore
+   sbagliato, era strutturale — la carta segue il tema e in scuro SALE,
+   l'apparecchio e' fisso ma schiarito per non fare nero-su-nero e sale anche
+   lui. Le due famiglie si incrociano, e nessuna tavolozza unica puo' impedirlo.
+
+   Il disegno, in una riga: in chiaro la carta sta appena sotto il fondo e
+   l'apparecchio precipita a nero; in scuro si scambiano i mestieri — la carta
+   e' la cosa che brilla, l'apparecchio resta basso vicino al fondo e a tenerlo
+   su sono il tratto e i led. In una stanza buia una scatola nera su una
+   scrivania scura non si legge per il suo pieno: si legge per i suoi riflessi.
+
+   I numeri non sono gusto: stanno anche in materials.ts, dove una prova calcola
+   ogni miscela in oklab e verifica le distanze (famiglie >= 3.0, gradini della
+   carta >= 1.25, ogni pieno sul fondo >= 1.20) in tutti e due i temi. Una
+   seconda prova verifica che questo file dichiari esattamente quelle ricette:
+   il difetto era numerico, e un foglio di stile che diverge dal modulo lo
+   rimetterebbe in pagina senza che niente cada. */
+
+/* ── Tema chiaro ─────────────────────────────────────────────────────────── */
 
 /* Carta appena staccata dal fondo, bordo grafite: e' il foglio. */
 [data-desk-object][data-shape="sheet"] {
-  --desk-pieno: color-mix(in oklab, var(--fg) 7%, var(--bg));
+  --desk-pieno: color-mix(in oklab, var(--fg) 9%, var(--bg));
   --desk-tratto: var(--fg-muted);
 }
 
 /* Carta, e il bordo di inchiostro: la scheda e' stampata, il foglio no. */
 [data-desk-object][data-shape="card"] {
-  --desk-pieno: color-mix(in oklab, var(--fg) 15%, var(--bg));
+  --desk-pieno: color-mix(in oklab, var(--fg) 20%, var(--bg));
   --desk-tratto: color-mix(in oklab, var(--fg) 80%, var(--bg));
 }
 
 /* Grafite: la piastra e' l'unica cosa di metallo sul tavolo. Il tratto e' la
-   stessa grafite tirata verso il testo — piu' scura su carta, piu' chiara su
-   inchiostro, che e' la stessa cosa: staccare il bordo dal pieno. */
+   stessa grafite tirata verso il testo — staccare il bordo dal pieno. */
 [data-desk-object][data-shape="plate"] {
-  --desk-pieno: color-mix(in oklab, var(--fg-muted) 50%, var(--bg));
+  --desk-pieno: color-mix(in oklab, var(--fg-muted) 55%, var(--bg));
   --desk-tratto: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
 }
 
 /* La scocca: rack, telefono e laptop sono la stessa cosa — scatole scure. Non
-   e' --fg, e' --ink: un apparecchio non si inverte col tema. Schiarito con
-   --fg-muted, che in scuro e' chiaro: e' quel 22% a tenere il blocco staccato
-   dal fondo inchiostro invece di lasciarlo un buco nero su nero. */
+   e' --fg, e' --ink: un apparecchio non si inverte col tema. Su carta precipita
+   a nero, ed e' giusto che lo faccia: e' l'unica cosa del tavolo che non e'
+   fatta di carta. */
 [data-desk-object][data-shape="rack"],
 [data-desk-object][data-shape="phone"],
 [data-desk-centre] {
@@ -648,10 +691,56 @@ html[data-dialog-open] body { overflow: hidden; }
 
 /* Il post-it e' l'unico calore che non sia arancio, e --bulb pieno: un post-it
    giallo e' giallo su qualunque tavolo. Il bordo e' lo stesso giallo spento
-   nell'inchiostro — fisso anche lui, perche' fissa e' la carta che borda. */
+   nell'inchiostro — fisso anche lui, perche' fissa e' la carta che borda.
+   E' l'unica superficie che NON si dichiara due volte: se la ridichiarasse
+   uguale in tema scuro, direbbe che segue il tema, e non lo segue. */
 [data-desk-object][data-shape="postit"] {
   --desk-pieno: var(--bulb);
   --desk-tratto: color-mix(in oklab, var(--bulb) 55%, var(--ink));
+}
+
+/* Il post-it BIANCO. La spec (§3.2) lo chiama cosi': e' la ventiquattresima
+   cosa, quella che si preme, e non e' un'etichetta del tavolo. Finche' tutto
+   era contorno la differenza non si vedeva; da quando i pieni esistono, un
+   giallo identico agli altri cinque e' un'altra cosa da quella che la spec
+   dice. Prende il pieno della carta piu' chiara — lo STESSO del foglio — e
+   tiene il bordo giallo spento: resta un post-it, ma vuoto. Il tratto non lo
+   ridichiara, lo eredita. */
+[data-desk-object][data-shape="postit"] [data-desk-blank] {
+  --desk-pieno: color-mix(in oklab, var(--fg) 9%, var(--bg));
+}
+
+/* ── Tema scuro ──────────────────────────────────────────────────────────── */
+
+/* Qui la carta e' la cosa che brilla: sale netta sopra il fondo, e i segni
+   sopra restano scuri — una matita e' una matita anche di notte. */
+[data-theme="dark"] [data-desk-object][data-shape="sheet"] {
+  --desk-pieno: color-mix(in oklab, var(--fg) 68%, var(--bg));
+  --desk-tratto: color-mix(in oklab, var(--ink) 60%, var(--fg-muted));
+}
+
+[data-theme="dark"] [data-desk-object][data-shape="card"] {
+  --desk-pieno: color-mix(in oklab, var(--fg) 58%, var(--bg));
+  --desk-tratto: color-mix(in oklab, var(--ink) 85%, var(--fg-muted));
+}
+
+[data-theme="dark"] [data-desk-object][data-shape="plate"] {
+  --desk-pieno: color-mix(in oklab, var(--fg-muted) 75%, var(--bg));
+  --desk-tratto: color-mix(in oklab, var(--ink) 62%, var(--fg-muted));
+}
+
+/* E l'apparecchio scende: resta basso, vicino al fondo, e a tenerlo su sono il
+   tratto e i led. E' l'inverso del tema chiaro, ed e' l'unico modo perche' le
+   due famiglie non si incrocino quando il fondo diventa inchiostro. */
+[data-theme="dark"] [data-desk-object][data-shape="rack"],
+[data-theme="dark"] [data-desk-object][data-shape="phone"],
+[data-theme="dark"] [data-desk-centre] {
+  --desk-pieno: color-mix(in oklab, var(--ink) 82%, var(--fg-muted));
+  --desk-tratto: color-mix(in oklab, var(--ink) 30%, var(--fg-muted));
+}
+
+[data-theme="dark"] [data-desk-object][data-shape="postit"] [data-desk-blank] {
+  --desk-pieno: color-mix(in oklab, var(--fg) 68%, var(--bg));
 }
 
 /* I led del rack. Sono l'unica cosa del tavolo che una maschera non sa portare:
@@ -661,6 +750,12 @@ html[data-dialog-open] body { overflow: hidden; }
    Le quattro unita' del rack, nel viewBox 132x104, hanno il centro a 17,5,
    39,5, 61,5 e 83,5: sono le quattro quote qui sotto, in percentuale. */
 [data-desk-leds] {
+  /* La maschera del rack, esplicita. Le longhand (repeat/position/size) le
+     eredita da [data-desk-shape] > *, ma senza mask-image i quattro gradienti
+     non erano ritagliati da niente: stavano dentro la sagoma solo perche' le
+     percentuali capitavano giuste. E' il pieno e non il contorno perche' il
+     pieno E' il corpo del rack. */
+  mask-image: url("/brand/desk/rack-fill.svg");
   background-image:
     radial-gradient(ellipse 4% 5% at 85% 17%, var(--bulb) 45%, transparent 100%),
     radial-gradient(ellipse 4% 5% at 85% 38%, var(--bulb) 45%, transparent 100%),
@@ -672,9 +767,9 @@ html[data-dialog-open] body { overflow: hidden; }
     radial-gradient(ellipse 4% 5% at 85% 80%, var(--bulb) 45%, transparent 100%);
 }
 
-/* Il post-it bianco: l'unico oggetto del tavolo che si preme. Il colore resta
-   quello di sopra — e' un post-it come gli altri, e la differenza non e' che si
-   vede diverso, e' che si tocca.
+/* Il post-it bianco: l'unico oggetto del tavolo che si preme. Il suo pieno sta
+   nella tavola dei materiali qui sopra, con gli altri — e' bianco, come lo
+   chiama la spec, e non giallo come i cinque colleghi.
 
    La domanda sta DENTRO la sagoma e non sotto come le etichette. Non e' una
    scelta grafica: l'ingombro di questo oggetto, per layers.ts, e' il solo
@@ -766,11 +861,13 @@ html[data-dialog-open] body { overflow: hidden; }
   font-family: var(--font-mono), monospace;
   font-size: clamp(0.5rem, 2.6cqw, 0.72rem);
   color: var(--fg);
-  /* Il tavolo e' fitto e qualche etichetta finisce per forza sopra il disegno
-     di un altro oggetto: sotto ci va il colore del fondo, cosi' resta leggibile.
-     Non e' un riquadro — il fondo e' lo stesso della pagina, e quello che si
-     vede e' solo il disegno che si interrompe sotto la parola, come farebbe
-     un cartellino appoggiato sopra. */
+  /* Il fondo della pagina sotto la parola. Non serve piu' a salvare
+     un'etichetta finita sopra il disegno di un altro oggetto — da quando la
+     prova di collisione garantisce 1,2 punti d'aria fra ingombri COMPRENSIVI
+     dell'etichetta, quel caso non capita: e' la rete che tiene se un giorno
+     quel pavimento si abbassasse. Con gli oggetti pieni costerebbe caro —
+     un rettangolo del colore della pagina aperto dentro una superficie — ed e'
+     un motivo in piu' per non abbassarlo. */
   background-color: var(--bg);
   padding: 0.1em 0.2em;
 }
