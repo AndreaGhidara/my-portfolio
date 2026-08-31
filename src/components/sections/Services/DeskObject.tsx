@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { DeskShape } from "@/content/desk";
+import { hasLeds } from "./materials";
 import {
   LABEL,
   SHAPE_BOX,
@@ -27,7 +28,9 @@ import {
  *
  * I led del rack sono lo strato in piu' che nessuna maschera puo' portare:
  * una maschera e' una forma, e loro sono colore. Decorativi — niente da
- * annunciare, come tutto il resto del disegno.
+ * annunciare, come tutto il resto del disegno. Quali sagome li portino non lo
+ * sa questo componente: e' un fatto della sagoma, e sta con gli altri fatti
+ * per sagoma nella tavola dei materiali.
  */
 export function DeskShapeArt({ drawing }: { drawing: DeskDrawing }) {
   const box = SHAPE_BOX[drawing];
@@ -35,7 +38,7 @@ export function DeskShapeArt({ drawing }: { drawing: DeskDrawing }) {
     <span data-desk-shape style={{ aspectRatio: `${box.w} / ${box.h}` }}>
       <span data-desk-fill />
       <span data-desk-line />
-      {drawing === "rack" ? <span data-desk-leds /> : null}
+      {hasLeds(drawing) ? <span data-desk-leds /> : null}
     </span>
   );
 }

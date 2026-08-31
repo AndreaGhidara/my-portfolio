@@ -230,6 +230,22 @@ describe("i materiali", () => {
     expect(centro.querySelector("[data-desk-line]")).not.toBeNull();
   });
 
+  it("l'etichetta non e' dentro la sagoma: e' li' che l'ombra non la prende", () => {
+    // L'unico divieto esplicito di §4.4 bis: «un'ombra portata sulle sole
+    // superfici, MAI sull'etichetta». Il filtro sta su [data-desk-shape] (lo
+    // verifica il contratto in materials.test.ts) e non tocca l'etichetta
+    // soltanto perche' questa e' una SORELLA della sagoma, non una figlia.
+    // Portarla dentro — per esempio per farla ruotare insieme al disegno —
+    // lascerebbe verde tutto il resto e metterebbe un'ombra sotto ogni parola
+    // del tavolo, che non e' un tavolo: e' un banner.
+    const { container } = render(<ServicesView {...props} />);
+    const etichette = container.querySelectorAll("[data-desk-label]");
+    expect(etichette.length).toBeGreaterThan(0);
+    for (const etichetta of etichette) {
+      expect(etichetta.closest("[data-desk-shape]")).toBeNull();
+    }
+  });
+
   it("i led stanno sul rack e su nient'altro: sono colore vero, non una maschera", () => {
     // Il colore non puo' venire dal file: una maschera porta una forma, non un
     // colore. I led sono l'unico posto del tavolo dove serve dipingere qualcosa
