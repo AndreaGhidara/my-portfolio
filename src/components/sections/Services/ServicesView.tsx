@@ -1,5 +1,5 @@
-import { Reveal } from "@/animations/components/Reveal";
 import { DeskStage } from "./DeskStage";
+import { Practice } from "./Practice";
 import type { DeskLayerData } from "./DeskTable";
 
 export type ServiceItem = { id: string; title: string; description: string };
@@ -28,8 +28,10 @@ export type ServicesViewProps = {
  * il lavoro e' questo tavolo qui".
  *
  * "E in pratica?" viene dopo, ed e' deliberatamente separabile: il tavolo e' lo
- * spettacolo, quel blocco e' la sostanza, e conserva la risposta 1:1 alle quattro
- * voci. Se un giorno pesa, si toglie senza toccare il tavolo.
+ * spettacolo, quella scena e' la sostanza, e conserva la risposta 1:1 alle
+ * quattro voci. Costa una scena — quattro voci alternate testo|disegno, con gli
+ * stessi oggetti del tavolo ingranditi — e non piu' un elenco asciutto. Se un
+ * giorno pesa, si toglie senza toccare il tavolo.
  */
 export function ServicesView({
   eyebrow,
@@ -60,30 +62,11 @@ export function ServicesView({
         layers={layers}
       />
 
-      <div className="mx-auto max-w-5xl px-[var(--gutter)] pb-[var(--section-y)]">
-        <h3 className="text-2xl lg:text-4xl">{practice}</h3>
-        <p className="mt-4 max-w-2xl text-[var(--fg-muted)]">{intro}</p>
-
-        <Reveal as="ol" data-practice className="mt-10 border-t border-[var(--line)]" stagger={0.09}>
-          {items.map((item, index) => (
-            <li
-              key={item.id}
-              className="grid gap-2 border-b border-[var(--line)] py-7 lg:grid-cols-[13rem_1fr] lg:gap-8 lg:py-9"
-            >
-              <div className="lg:pt-1">
-                <span className="eyebrow">{String(index + 1).padStart(2, "0")}</span>
-                {/* Livello 4: queste quattro voci stanno dentro "E in pratica?",
-                    che e' il loro <h3>. Al livello 3 sarebbero fratelle del
-                    titolo che le contiene. */}
-                <h4 className="mt-1 text-lg font-bold leading-tight text-[var(--fg)] lg:text-xl">
-                  {item.title}
-                </h4>
-              </div>
-              <p className="max-w-2xl leading-relaxed text-[var(--fg-muted)]">{item.description}</p>
-            </li>
-          ))}
-        </Reveal>
-      </div>
+      {/* Il palco e' largo 74rem e non 64: non e' una colonna di lettura, e'
+          una scena in cui un braccio deve poter oscillare. Il testo dentro
+          resta a 36ch. La misura e' anche quella su cui il gesto e' stato
+          calibrato, cosi' i numeri partono vicini al punto giusto. */}
+      <Practice practice={practice} intro={intro} items={items} />
     </section>
   );
 }
