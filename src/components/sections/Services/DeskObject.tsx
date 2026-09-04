@@ -36,7 +36,7 @@ import {
 export function DeskShapeArt({ drawing }: { drawing: DeskDrawing }) {
   const box = SHAPE_BOX[drawing];
   return (
-    <span data-desk-shape style={{ aspectRatio: `${box.w} / ${box.h}` }}>
+    <span data-desk-shape data-shape={drawing} style={{ aspectRatio: `${box.w} / ${box.h}` }}>
       <span data-desk-fill />
       <span data-desk-line />
       {hasLeds(drawing) ? <span data-desk-leds /> : null}

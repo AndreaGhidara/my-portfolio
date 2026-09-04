@@ -618,20 +618,24 @@ html[data-dialog-open] body { overflow: hidden; }
 [data-desk-fill] { background-color: var(--desk-pieno, transparent); }
 [data-desk-line] { background-color: var(--desk-tratto, currentColor); }
 
-[data-desk-object][data-shape="sheet"] [data-desk-fill] { mask-image: url("/brand/desk/sheet-fill.svg"); }
-[data-desk-object][data-shape="sheet"] [data-desk-line] { mask-image: url("/brand/desk/sheet.svg"); }
-[data-desk-object][data-shape="card"] [data-desk-fill] { mask-image: url("/brand/desk/card-fill.svg"); }
-[data-desk-object][data-shape="card"] [data-desk-line] { mask-image: url("/brand/desk/card.svg"); }
-[data-desk-object][data-shape="postit"] [data-desk-fill] { mask-image: url("/brand/desk/postit-fill.svg"); }
-[data-desk-object][data-shape="postit"] [data-desk-line] { mask-image: url("/brand/desk/postit.svg"); }
-[data-desk-object][data-shape="plate"] [data-desk-fill] { mask-image: url("/brand/desk/plate-fill.svg"); }
-[data-desk-object][data-shape="plate"] [data-desk-line] { mask-image: url("/brand/desk/plate.svg"); }
-[data-desk-object][data-shape="rack"] [data-desk-fill] { mask-image: url("/brand/desk/rack-fill.svg"); }
-[data-desk-object][data-shape="rack"] [data-desk-line] { mask-image: url("/brand/desk/rack.svg"); }
-[data-desk-object][data-shape="phone"] [data-desk-fill] { mask-image: url("/brand/desk/phone-fill.svg"); }
-[data-desk-object][data-shape="phone"] [data-desk-line] { mask-image: url("/brand/desk/phone.svg"); }
-[data-desk-centre] [data-desk-fill] { mask-image: url("/brand/desk/laptop-fill.svg"); }
-[data-desk-centre] [data-desk-line] { mask-image: url("/brand/desk/laptop.svg"); }
+/* Le maschere pendono dalla SAGOMA e non dall'oggetto: cosi' chiunque disegni
+   una DeskShapeArt se le porta dietro, tavolo o no. «E in pratica?» usa le
+   stesse sagome molto piu' grandi, fuori dal tavolo, e senza questo non
+   avrebbe niente da mostrare. */
+[data-desk-shape][data-shape="sheet"]  [data-desk-fill] { mask-image: url("/brand/desk/sheet-fill.svg"); }
+[data-desk-shape][data-shape="sheet"]  [data-desk-line] { mask-image: url("/brand/desk/sheet.svg"); }
+[data-desk-shape][data-shape="card"]   [data-desk-fill] { mask-image: url("/brand/desk/card-fill.svg"); }
+[data-desk-shape][data-shape="card"]   [data-desk-line] { mask-image: url("/brand/desk/card.svg"); }
+[data-desk-shape][data-shape="postit"] [data-desk-fill] { mask-image: url("/brand/desk/postit-fill.svg"); }
+[data-desk-shape][data-shape="postit"] [data-desk-line] { mask-image: url("/brand/desk/postit.svg"); }
+[data-desk-shape][data-shape="plate"]  [data-desk-fill] { mask-image: url("/brand/desk/plate-fill.svg"); }
+[data-desk-shape][data-shape="plate"]  [data-desk-line] { mask-image: url("/brand/desk/plate.svg"); }
+[data-desk-shape][data-shape="rack"]   [data-desk-fill] { mask-image: url("/brand/desk/rack-fill.svg"); }
+[data-desk-shape][data-shape="rack"]   [data-desk-line] { mask-image: url("/brand/desk/rack.svg"); }
+[data-desk-shape][data-shape="phone"]  [data-desk-fill] { mask-image: url("/brand/desk/phone-fill.svg"); }
+[data-desk-shape][data-shape="phone"]  [data-desk-line] { mask-image: url("/brand/desk/phone.svg"); }
+[data-desk-shape][data-shape="laptop"] [data-desk-fill] { mask-image: url("/brand/desk/laptop-fill.svg"); }
+[data-desk-shape][data-shape="laptop"] [data-desk-line] { mask-image: url("/brand/desk/laptop.svg"); }
 
 /* La tavola dei materiali: ogni sagoma dichiara la sua coppia, i due strati la
    leggono. Sta in un posto solo apposta — e' la tavola della specifica, e

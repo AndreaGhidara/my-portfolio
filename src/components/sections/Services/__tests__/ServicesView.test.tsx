@@ -268,6 +268,21 @@ describe("i materiali", () => {
     expect(rack.querySelector("[data-desk-leds]")).not.toBeNull();
     expect(foglio.querySelector("[data-desk-leds]")).toBeNull();
   });
+
+  it("la sagoma sa che disegno e': la maschera pende da lei, non dall'oggetto", () => {
+    // Perche' questa prova esiste: «E in pratica?» usa le stesse sagome fuori
+    // dal tavolo, molto piu' grandi. Finche' le maschere pendevano da
+    // [data-desk-object], un disegno la' non le prendeva — e dargli
+    // data-desk-object avrebbe rotto il conteggio dei ventiquattro, che e' una
+    // prova giusta. La sagoma sa gia' che disegno e': glielo si chiede.
+    const { container } = render(<ServicesView {...props} />);
+    const sagoma = container.querySelector(`${SOLI_VERI} [data-desk-shape]`) as HTMLElement;
+    expect(sagoma).toHaveAttribute("data-shape", "sheet");
+    const laptop = container.querySelector(
+      "[data-desk-world]:not([aria-hidden]) [data-desk-centre] [data-desk-shape]",
+    ) as HTMLElement;
+    expect(laptop).toHaveAttribute("data-shape", "laptop");
+  });
 });
 
 describe("il patto del fallback", () => {
