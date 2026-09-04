@@ -61,7 +61,7 @@
     "stageLead": "A finished website. From here on, everything underneath it.",
     "centre": "the project",
     "blank": "And yours — what is it? Write to me.",
-    "punch": "What you call \"a website\" is the screen in the middle. The rest is the table.",
+    "punch": "What you call \"a website\" is the screen in the middle. The rest is the work behind it.",
     "practice": "And in practice?",
     "layers": {
       "site": {
@@ -104,7 +104,7 @@
         "title": "The services",
         "lead": "What makes it grow after launch. A site going live is where the work starts, not where it's delivered.",
         "objects": {
-          "ai": "The assistant",
+          "ai": "Support",
           "automation": "Automations",
           "analytics": "The numbers",
           "seo": "Being found",
@@ -199,6 +199,7 @@
     "aidifyConversations": "conversations handled per month",
     "customertrackBrands": "chains on the same system",
     "visualboostCatalog": "images in the catalogue",
+    "coffees": "coffees",
     "years": "years building for the web",
     "responseTime": "response time"
   },

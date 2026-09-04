@@ -704,8 +704,12 @@ html[data-dialog-open] body { overflow: hidden; }
    era contorno la differenza non si vedeva; da quando i pieni esistono, un
    giallo identico agli altri cinque e' un'altra cosa da quella che la spec
    dice. Prende il pieno della carta piu' chiara — lo STESSO del foglio — e
-   tiene il bordo giallo spento: resta un post-it, ma vuoto. Il tratto non lo
-   ridichiara, lo eredita. */
+   tiene il bordo giallo spento: resta un post-it, ma non e' uno degli altri.
+   Il tratto non lo ridichiara, lo eredita.
+
+   Non e' piu' VUOTO, ed e' un cambio recente: ci sta scritto sopra il conto dei
+   caffe'. Il grigio serve ancora, e anzi serve di piu' — e' l'unico oggetto del
+   tavolo che non e' un pezzo di lavoro, ed e' l'unico che si preme. */
 [data-desk-object][data-shape="postit"] [data-desk-blank] {
   --desk-pieno: color-mix(in oklab, var(--fg) 9%, var(--bg));
 }
@@ -807,6 +811,26 @@ html[data-dialog-open] body { overflow: hidden; }
   opacity: 0;
 }
 
+/* Quello che c'e' SCRITTO sul post-it, e che si vede sempre. Prima qui non
+   c'era niente: il post-it stava grigio e muto finche' qualcuno non ci passava
+   sopra col mouse, e nessuno passa il mouse su un quadrato che non sembra
+   niente. L'affordance esisteva solo dopo che l'avevi gia' trovata.
+   Sta nello stesso posto della domanda apposta — sono due cose che si danno il
+   cambio, non due cose da leggere insieme. */
+[data-desk-note] {
+  position: absolute;
+  inset: 12%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(0.42rem, 1cqw, 0.68rem);
+  line-height: 1.25;
+  /* Inchiostro fisso come la domanda, e per la stessa ragione: vedi sotto. */
+  color: var(--ink);
+  opacity: 0.75;
+}
+
 /* Al passaggio e al fuoco. E sempre, a tavolo fermo: li' nessuno passa di li'
    per caso — chi arriva col dito un hover non ce l'ha — e un post-it che non
    dice niente resterebbe un quadrato giallo che non si sa cos'e'. */
@@ -814,6 +838,16 @@ html[data-dialog-open] body { overflow: hidden; }
 [data-desk-blank]:focus-visible [data-desk-ask],
 [data-desk]:not([data-motion="full"]) [data-desk-ask] {
   opacity: 1;
+}
+
+/* ...e la nota si toglie di mezzo, o le due scritte si sovrappongono. */
+[data-desk-blank]:hover [data-desk-note],
+[data-desk-blank]:focus-visible [data-desk-note] {
+  opacity: 0;
+}
+
+[data-desk][data-motion="full"] [data-desk-note] {
+  transition: opacity 0.25s;
 }
 
 /* La dissolvenza sta solo a movimento pieno, e non serve un'altra media query
@@ -871,6 +905,360 @@ html[data-dialog-open] body { overflow: hidden; }
   background-color: var(--bg);
   padding: 0.1em 0.2em;
 }
+
+/* ── I campioni ─────────────────────────────────────────────────────────────
+   Quello che ogni oggetto mostra di se'. La regola sta in DeskSpecimen.tsx e
+   vale anche qui: un campione e' un FRAMMENTO della cosa, mai un suo simbolo.
+   Il che, tradotto in CSS, vuol dire che quasi tutto quello che segue e' una
+   disposizione di poche marche ricorrenti — una riga, un blocco, una tessera,
+   un testo mono — e non ventidue disegni.
+
+   Nessun colore scritto a mano: le marche nascono da --desk-tratto, che e' il
+   contorno del MATERIALE di quell'oggetto (la tavola qui sotto lo dichiara per
+   sagoma). Un campione dentro una scheda e' quindi automaticamente del colore
+   della scheda, e dentro un post-it del colore del post-it. Una prova legge
+   queste regole e cade se ci compare un esadecimale.
+
+   La misura: a riposo un campione e' largo una settantina di pixel, e i testi
+   mono ci stanno appena. Non e' un problema da risolvere, e' il patto — la
+   camera arretra da 3,69 a 1 durante lo scorrimento, quindi questi disegni si
+   leggono benissimo quando il tavolo e' ingrandito e diventano texture quando
+   e' fermo. Sono un premio per chi guarda mentre scorre, non un'informazione
+   che qualcuno deve riuscire a leggere. */
+
+[data-desk-object] [data-desk-sample] {
+  position: absolute;
+  /* Il rettangolo utile dentro la sagoma. Il <li> e' alto quanto il disegno
+     (l'etichetta e' assoluta e non lo alza), quindi questi inset misurano la
+     sagoma. Il default va bene per foglio e scheda; chi ha un corpo diverso lo
+     ridichiara qui sotto — sono i margini interni del disegno, non stile. */
+  inset: 9% 8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7%;
+  overflow: hidden;
+  /* Nessun filtro: l'ombra sta su [data-desk-shape], e queste marche sono
+     troppo piccole per reggerne una — a 98px impasterebbero. */
+}
+
+/* La linguetta della scheda occupa le prime 16 unita' del suo viewBox: il
+   campione comincia sotto, o gli finirebbe dentro. */
+[data-desk-object][data-shape="card"] [data-desk-sample] { inset: 28% 9% 11%; }
+/* Il telefono ha lo schermo, non il corpo: 9 unita' di scocca su 74x148. */
+[data-desk-object][data-shape="phone"] [data-desk-sample] { inset: 8% 14%; gap: 6%; }
+[data-desk-object][data-shape="rack"] [data-desk-sample] { inset: 11% 9%; gap: 5%; }
+[data-desk-object][data-shape="plate"] [data-desk-sample] { inset: 20%; }
+/* Il post-it lascia libero l'angolo che si solleva, in basso a destra. */
+[data-desk-object][data-shape="postit"] [data-desk-sample] { inset: 14% 16% 22% 14%; }
+
+/* ── Le marche ──────────────────────────────────────────────────────────── */
+[data-desk-sample] i { display: block; }
+
+[data-desk-sample] [data-m="riga"] {
+  width: var(--w, 100%);
+  height: 0.42em;
+  border-radius: 1px;
+  background-color: color-mix(in oklab, var(--desk-tratto) 34%, transparent);
+}
+[data-desk-sample] [data-m="riga"][data-titolo] {
+  background-color: var(--accent);
+  height: 0.5em;
+}
+[data-desk-sample] [data-m="riga"][data-url],
+[data-desk-sample] [data-m="riga"][data-testa] {
+  background-color: color-mix(in oklab, var(--desk-tratto) 62%, transparent);
+}
+
+[data-desk-sample] [data-m="blocco"] {
+  width: 100%;
+  border-radius: 1px;
+  background-color: color-mix(in oklab, var(--desk-tratto) 40%, transparent);
+}
+[data-desk-sample] [data-m="blocco"][data-b="testata"] { height: 18%; min-height: 0.5em; }
+[data-desk-sample] [data-m="blocco"][data-b="piede"] { height: 12%; min-height: 0.35em; }
+[data-desk-sample] [data-m="colonne"] { display: flex; gap: 6%; flex: 1; }
+[data-desk-sample] [data-m="blocco"][data-b="larga"] { flex: 1.7; height: 100%; }
+[data-desk-sample] [data-m="blocco"][data-b="stretta"] {
+  flex: 1;
+  height: 100%;
+  background-color: color-mix(in oklab, var(--desk-tratto) 22%, transparent);
+}
+
+[data-desk-sample] [data-m="campo"] {
+  width: 100%;
+  height: 22%;
+  min-height: 0.55em;
+  border-radius: 1px;
+  border: 1px solid color-mix(in oklab, var(--desk-tratto) 45%, transparent);
+}
+[data-desk-sample] [data-m="cta"] {
+  width: 52%;
+  height: 22%;
+  min-height: 0.55em;
+  border-radius: 1px;
+  background-color: var(--accent);
+}
+[data-desk-sample] [data-m="cta"][data-piccolo] { width: 38%; height: 18%; }
+
+[data-desk-sample] [data-m="pallini"] { display: flex; gap: 5%; align-items: center; height: 22%; }
+[data-desk-sample] [data-m="pallino"] {
+  width: 0.3em;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: color-mix(in oklab, var(--desk-tratto) 62%, transparent);
+}
+
+/* La scheda prodotto: un'immagine a sinistra, il dettaglio a destra, e il
+   prezzo in accento. Il prezzo e' l'unico segno che distingue un catalogo da
+   una galleria — senza, questo campione sarebbe "Le immagini" con del testo. */
+[data-desk-sample] [data-m="scheda"] { display: flex; gap: 8%; flex: 1; }
+[data-desk-sample] [data-m="tessera"] {
+  border-radius: 1px;
+  background-color: color-mix(in oklab, var(--desk-tratto) 30%, transparent);
+}
+[data-desk-sample] [data-m="tessera"][data-grande] { flex: 1; height: 100%; }
+[data-desk-sample] [data-m="dettaglio"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14%;
+  flex: 1.1;
+}
+[data-desk-sample] [data-m="prezzo"] {
+  width: 44%;
+  height: 0.44em;
+  border-radius: 1px;
+  background-color: var(--accent);
+}
+
+/* Il gestionale: il codice sopra, la descrizione, e la quantita' in fondo a
+   destra dove sta su ogni riga d'ordine che sia mai esistita. */
+[data-desk-sample] [data-m="qta"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6%;
+}
+[data-desk-sample] [data-m="mono"][data-piccolo] { font-size: 0.62cqw; }
+
+/* Farsi trovare: tre risultati, e il primo in accento. La riga in accento e'
+   il titolo del primo — cioe' l'unica cosa che "farsi trovare" aggiunge a
+   "esistere in una lista". */
+[data-desk-sample] [data-m="risultato"] {
+  display: flex;
+  flex-direction: column;
+  gap: 22%;
+  flex: 1;
+  justify-content: center;
+}
+[data-desk-sample] [data-m="risultato"][data-primo] [data-m="riga"]:first-child {
+  background-color: var(--accent);
+  height: 0.5em;
+}
+
+/* La ricevuta. La linea di strappo e' un fondo tratteggiato e non un elemento:
+   e' una sola riga di CSS invece di dodici <i>, e a 98px la differenza fra i
+   due modi non esiste. */
+[data-desk-sample] [data-m="ricevuta"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 11%;
+  flex: 1;
+}
+[data-desk-sample] [data-m="strappo"] {
+  width: 100%;
+  height: 1px;
+  flex: none;
+  background-image: repeating-linear-gradient(
+    to right,
+    color-mix(in oklab, var(--desk-tratto) 60%, transparent) 0 3px,
+    transparent 3px 6px
+  );
+}
+[data-desk-sample] [data-m="voce"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8%;
+}
+[data-desk-sample] [data-m="importo"] {
+  width: 22%;
+  height: 0.36em;
+  border-radius: 1px;
+  flex: none;
+  background-color: color-mix(in oklab, var(--desk-tratto) 55%, transparent);
+}
+/* Il totale e' l'unica cosa in accento: e' il numero che si guarda. */
+[data-desk-sample] [data-m="voce"][data-totale] [data-m="importo"] {
+  background-color: var(--accent);
+  height: 0.44em;
+}
+
+/* Il mese: sei colonne per tre righe, e un giorno preso. Quel giorno e' l'unica
+   cosa che una prenotazione aggiunge a un calendario, ed e' l'unico in accento. */
+[data-desk-sample] [data-m="mese"] {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6%;
+  flex: 1;
+}
+[data-desk-sample] [data-m="giorno"] {
+  border-radius: 1px;
+  background-color: color-mix(in oklab, var(--desk-tratto) 22%, transparent);
+}
+[data-desk-sample] [data-m="giorno"][data-preso] { background-color: var(--accent); }
+
+[data-desk-sample] [data-m="tabella"] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8% 6%;
+  flex: 1;
+}
+[data-desk-sample] [data-m="tabella"][data-fitta] { grid-template-columns: repeat(3, 1fr); gap: 6% 5%; }
+[data-desk-sample] [data-m="cella"] {
+  border-radius: 1px;
+  background-color: color-mix(in oklab, var(--desk-tratto) 26%, transparent);
+}
+
+/* Le copie: la stessa sagoma tre volte, sfalsata. Non e' un'icona di un backup,
+   e' letteralmente una cosa ripetuta — che e' quello che un backup e'. */
+[data-desk-object] [data-desk-sample="copie"] { display: block; }
+[data-desk-sample] [data-m="copia"] {
+  position: absolute;
+  inset: 0 22% 22% 0;
+  border-radius: 1px;
+  border: 1px solid color-mix(in oklab, var(--desk-tratto) 55%, transparent);
+  background-color: color-mix(in oklab, var(--desk-tratto) 12%, transparent);
+}
+[data-desk-sample] [data-m="copia"][data-i="2"] { transform: translate(11%, 11%); }
+[data-desk-sample] [data-m="copia"][data-i="3"] { transform: translate(22%, 22%); }
+
+[data-desk-sample] [data-m="bolla"] {
+  width: 68%;
+  height: 30%;
+  min-height: 0.7em;
+  border-radius: 0.35em;
+  background-color: color-mix(in oklab, var(--desk-tratto) 30%, transparent);
+}
+[data-desk-sample] [data-m="bolla"][data-lato="la"] {
+  align-self: flex-end;
+  background-color: color-mix(in oklab, var(--desk-tratto) 62%, transparent);
+}
+
+[data-desk-sample] [data-m="flusso"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  /* Il filo fra i nodi: un fondo, non tre elementi. */
+  background-image: linear-gradient(
+    to right,
+    color-mix(in oklab, var(--desk-tratto) 45%, transparent) 0 100%
+  );
+  background-size: 100% 1px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+[data-desk-sample] [data-m="nodo"] {
+  width: 0.55em;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: color-mix(in oklab, var(--desk-tratto) 72%, transparent);
+}
+
+[data-desk-sample] [data-m="istogramma"] {
+  display: flex;
+  align-items: flex-end;
+  gap: 8%;
+  flex: 1;
+}
+[data-desk-sample] [data-m="barra"] {
+  flex: 1;
+  height: var(--h, 50%);
+  border-radius: 1px 1px 0 0;
+  background-color: color-mix(in oklab, var(--desk-tratto) 48%, transparent);
+}
+[data-desk-sample] [data-m="barra"]:last-child { background-color: var(--accent); }
+
+/* L'immagine: un cielo, un sole, un profilo. E' il campione meno letterale dei
+   ventidue — un'immagine non ha un contenuto proprio da mostrare — e resta
+   dentro la regola solo perche' e' quello che si vede in un posto dove
+   un'immagine non e' ancora arrivata. */
+[data-desk-object] [data-desk-sample="immagini"] { display: block; }
+[data-desk-sample] [data-m="cielo"] {
+  position: absolute;
+  inset: 0;
+  background-color: color-mix(in oklab, var(--desk-tratto) 16%, transparent);
+}
+[data-desk-sample] [data-m="sole"] {
+  position: absolute;
+  right: 18%;
+  top: 16%;
+  width: 22%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: var(--accent);
+}
+[data-desk-sample] [data-m="monte"] {
+  position: absolute;
+  inset: 34% 0 0;
+  background-color: color-mix(in oklab, var(--desk-tratto) 52%, transparent);
+  clip-path: polygon(0 100%, 34% 12%, 62% 62%, 78% 40%, 100% 100%);
+}
+
+/* I tre colori veri del brand. Sono gli unici token "crudi" del tavolo — non
+   --fg e --bg, che si invertono col tema, ma le tinte come sono: e' il senso
+   del campione. Mostrare i colori del sito girati al buio sarebbe mostrare
+   altri colori. Il bordo li stacca dal materiale sotto. */
+[data-desk-sample] [data-m="tinta"] {
+  flex: 1;
+  width: 100%;
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--desk-tratto) 30%, transparent);
+}
+[data-desk-object] [data-desk-sample="colori"] { flex-direction: row; gap: 8%; }
+[data-desk-sample] [data-m="tinta"][data-t="carta"] { background-color: var(--paper); }
+[data-desk-sample] [data-m="tinta"][data-t="accento"] { background-color: var(--orange); }
+[data-desk-sample] [data-m="tinta"][data-t="inchiostro"] { background-color: var(--ink); }
+
+/* Il carattere dei titoli, nel suo peso. Non una A stilizzata: proprio quella. */
+[data-desk-sample] [data-m="aa"] {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-weight: 400;
+  font-size: 2.1cqw;
+  line-height: 1;
+  text-align: center;
+  color: color-mix(in oklab, var(--desk-tratto) 88%, transparent);
+}
+
+/* I tre campioni che sono testo perche' la cosa che mostrano E' testo: un
+   dominio, uno schema di connessione, un numero di secondi. */
+[data-desk-sample] [data-m="mono"] {
+  font-family: var(--font-mono), monospace;
+  font-weight: 400;
+  /* Tarato sul campione PIU' LUNGO, non su quello medio: "v2.4 → v2.5" sono
+     undici caratteri, e a 0,6em di avanzamento per carattere occupano 51px
+     dentro i 57 che un post-it lascia liberi. Gli altri tre (nome.it, https://,
+     0,4 s) hanno percio' aria di avanzo, che e' il verso giusto in cui
+     sbagliare: un campione un po' piccolo si legge come texture, uno tagliato a
+     meta' si legge come un difetto. */
+  font-size: 0.78cqw;
+  line-height: 1.2;
+  text-align: center;
+  letter-spacing: -0.02em;
+  /* Mai a capo: queste stringhe sono una cosa sola — un dominio spezzato su due
+     righe non e' piu' un dominio. Se un giorno una non ci sta, deve sbordare e
+     farsi vedere, non accartocciarsi in silenzio. */
+  white-space: nowrap;
+  color: color-mix(in oklab, var(--desk-tratto) 82%, transparent);
+}
+[data-desk-object] [data-desk-sample="dominio"],
+[data-desk-object] [data-desk-sample="sicurezza"],
+[data-desk-object] [data-desk-sample="velocita"],
+[data-desk-object] [data-desk-sample="manutenzione"],
+[data-desk-object] [data-desk-sample="caratteri"] { justify-content: center; }
 
 /* ── La camera ──────────────────────────────────────────────────────────────
    Da qui in giu' e' tutto movimento, e ha due chiavi per la stessa porta:
