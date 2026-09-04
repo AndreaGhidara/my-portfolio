@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import type { DeskShape } from "@/content/desk";
+import type { DeskShape, SampleId } from "@/content/desk";
+import { DeskSpecimen } from "./DeskSpecimen";
 import { hasLeds } from "./materials";
 import {
   LABEL,
@@ -67,6 +68,7 @@ export function DeskShapeArt({ drawing }: { drawing: DeskDrawing }) {
 export function DeskObject({
   shape,
   label,
+  sample,
   layout,
   placement,
   beat,
@@ -74,9 +76,13 @@ export function DeskObject({
   ghost,
   href,
   action,
+  note,
 }: {
   shape: DeskShape;
   label: string | null;
+  /** Il frammento che l'oggetto mostra di se'. Due oggetti non ce l'hanno, ed e'
+   *  dichiarato in content/desk.ts insieme alla ragione. */
+  sample?: SampleId;
   layout: DeskLayout;
   placement: Placement;
   beat: Beat;
@@ -89,8 +95,24 @@ export function DeskObject({
   /** Il nome accessibile del comando. Sul tavolo non si vede finche' non lo si
    *  sfiora, ma si legge sempre: e' il nome che annuncia uno screen reader. */
   action?: string;
+  /** Quello che c'e' SCRITTO sul post-it, e che si vede sempre. Non e' il nome
+   *  del comando — quello resta `action` — ed e' per questo che va aria-hidden:
+   *  visibile e annunciata insieme, uno screen reader leggerebbe due cose per
+   *  un comando solo. */
+  note?: string;
 }) {
   const sagoma = <DeskShapeArt drawing={shape} />;
+
+  // Solo nel mondo orizzontale, e non e' una scelta di gusto: nel mondo
+  // verticale le sagome si disegnano a DRAW_SCALE.tall, cioe' a meta'. Un
+  // campione li' sarebbe largo una cinquantina di pixel, e un calendario da
+  // cinquanta pixel non e' un calendario: e' sporco sul foglio. Il mondo
+  // verticale tiene le sagome nude, che a quella misura e' quanto si legge.
+  //
+  // Ci guadagna anche il DOM: i due mondi stanno tutti e due nella pagina, e
+  // disegnarli in tutti e due vorrebbe dire quarantaquattro sottoalberi invece
+  // di ventidue, meta' dei quali dentro un gemello che il CSS nasconde.
+  const campione = sample && layout === "wide" ? <DeskSpecimen sample={sample} /> : null;
 
   return (
     <li
@@ -122,6 +144,16 @@ export function DeskObject({
         // mondo, che sotto i 1024px e' quello che uno screen reader legge.
         <a href={href} data-desk-blank tabIndex={ghost ? -1 : undefined}>
           {sagoma}
+          {/* Quello che c'e' scritto sul post-it. Decorazione come ogni altro
+              campione del tavolo: il nome del comando e' la domanda qui sotto,
+              e due testi dentro un <a> sono un comando che si annuncia due
+              volte. Si scansa quando la domanda entra — non stanno nello stesso
+              posto per caso, ci stanno tutte e due al centro del foglio. */}
+          {note && !ghost ? (
+            <span data-desk-note aria-hidden="true">
+              {note}
+            </span>
+          ) : null}
           {/* La domanda e' il nome del comando: con opacity 0 non si vede, ma
               resta nell'albero di accessibilita' ed e' quella che uno screen
               reader annuncia. Niente data-desk-label — questa non e' una voce
@@ -131,6 +163,7 @@ export function DeskObject({
       ) : (
         <>
           {sagoma}
+          {campione}
           {/* La larghezza massima della striscia arriva da LABEL e non dal CSS:
               e' con quel numero che objectFootprint tiene le distanze, e se il
               foglio di stile ne usasse un altro la prova misurerebbe un tavolo

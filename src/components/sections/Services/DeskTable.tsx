@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { DeskShape } from "@/content/desk";
+import type { DeskShape, SampleId } from "@/content/desk";
 import {
   CAPTION_BEATS,
   CENTRE,
@@ -16,7 +16,7 @@ export type DeskLayerData = {
   id: string;
   title: string;
   lead: string;
-  objects: { id: string; shape: DeskShape; label: string | null }[];
+  objects: { id: string; shape: DeskShape; label: string | null; sample?: SampleId }[];
 };
 
 /**
@@ -41,6 +41,7 @@ export function DeskTable({
   layers,
   centre,
   blank,
+  note,
   layout,
   ghost = false,
 }: {
@@ -48,6 +49,8 @@ export function DeskTable({
   centre: string;
   /** Il nome del comando sul post-it bianco: l'unico oggetto che si preme. */
   blank: string;
+  /** Quello che c'e' scritto sul post-it prima che lo si prema. */
+  note: string;
   layout: DeskLayout;
   /** Il gemello che il CSS nasconde: sta nel DOM, ma non va letto due volte. */
   ghost?: boolean;
@@ -129,6 +132,7 @@ export function DeskTable({
                   key={object.id}
                   shape={object.shape}
                   label={object.label}
+                  sample={object.sample}
                   layout={layout}
                   placement={placeObject(layout, index, i % shown)}
                   beat={objectBeat(index, i % shown, shown)}
@@ -145,6 +149,7 @@ export function DeskTable({
                   // DeskObject — si preme, non si tabula.
                   href={object.label === null ? "#contact" : undefined}
                   action={object.label === null ? blank : undefined}
+                  note={object.label === null ? note : undefined}
                 />
               ))}
             </ul>

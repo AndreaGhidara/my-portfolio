@@ -5,7 +5,7 @@ import { ScrollTrigger } from "@/animations/gsap";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import { DeskTable, type DeskLayerData } from "./DeskTable";
-import { CENTRE, SHAPE_BOX, cameraScale } from "./layers";
+import { CENTRE, FIRST_RING_REACH, SHAPE_BOX, cameraScale } from "./layers";
 
 /** Quanta parte dell'altezza del palco occupa il laptop al fotogramma zero. */
 const OPENING_FILL = 0.7;
@@ -21,13 +21,28 @@ const OPENING_FILL = 0.7;
 const LAPTOP_ON_SURFACE = (CENTRE.width / 100) * (SHAPE_BOX.laptop.h / SHAPE_BOX.laptop.w);
 
 /**
+ * Quanto vale, in questa scena, "il primo anello arriva giusto al bordo mentre
+ * compare": e' il PRODOTTO fra la scala d'apertura e il raggio verticale del
+ * primo anello, ed e' quel prodotto — non la scala da sola — a restare costante
+ * quando i raggi cambiano. La coppia da cui viene e' 4,2 su un raggio di 25,2,
+ * cioe' l'apertura tarata a mano prima che gli anelli venissero separati.
+ */
+const OPENING_REACH = 4.2 * 25.2;
+
+/**
  * Gli estremi dell'inquadratura d'apertura. Il minimo perche' sotto non si
  * legge come una camera che arretra ma come un tavolo che sussulta; il massimo
  * perche' piu' in la' il primo anello comincia ad accendersi fuori dallo
- * schermo: a 4,2 l'oggetto piu' esterno del primo strato arriva giusto al bordo
- * mentre compare, e da li' in poi e' la camera che lo porta dentro.
+ * schermo, e da li' in poi e' la camera che lo porta dentro.
+ *
+ * Il massimo non e' piu' una cifra scritta: e' OPENING_REACH diviso il raggio
+ * che il primo anello ha ADESSO. Con gli anelli separati quel raggio e' passato
+ * da 25,2 a 28,68, e il massimo scende di conseguenza da 4,2 a circa 3,69 —
+ * l'anello e' piu' in fuori, quindi per tenerlo allo stesso punto dello schermo
+ * serve meno ingrandimento. Scritto a mano, il 4,2 sarebbe rimasto li' a far
+ * accendere il primo strato oltre il bordo.
  */
-const OPENING = { min: 1.6, max: 4.2 };
+const OPENING = { min: 1.6, max: OPENING_REACH / FIRST_RING_REACH };
 
 /** La scala d'apertura quando non c'e' niente da misurare (jsdom, o un piano
  *  che non ha ancora una larghezza). */
@@ -57,6 +72,7 @@ export function DeskStage({
   lead,
   centre,
   blank,
+  note,
   punch,
   layers,
 }: {
@@ -65,6 +81,8 @@ export function DeskStage({
   lead: string;
   centre: string;
   blank: string;
+  /** La nota sul post-it grigio. */
+  note: string;
   punch: string;
   layers: DeskLayerData[];
 }) {
@@ -209,8 +227,8 @@ export function DeskStage({
             <p>{lead}</p>
           </header>
 
-          <DeskTable layers={layers} centre={centre} blank={blank} layout="wide" />
-          <DeskTable layers={layers} centre={centre} blank={blank} layout="tall" ghost />
+          <DeskTable layers={layers} centre={centre} blank={blank} note={note} layout="wide" />
+          <DeskTable layers={layers} centre={centre} blank={blank} note={note} layout="tall" ghost />
 
           <p data-desk-punch>{punch}</p>
         </div>

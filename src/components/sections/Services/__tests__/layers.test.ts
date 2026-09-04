@@ -34,13 +34,38 @@ const LAYOUTS: DeskLayout[] = ["wide", "tall"];
  * passa con mezzo pixel di stacco come con mezzo centimetro — e mezzo pixel non
  * sopravvive a un carattere di ripiego o a un altro motore di rendering.
  *
- * 1,2 punti sono circa 7,6 px a 1440. Il tavolo ne tiene 1,395 (8,84 px), cioe'
+ * 1,7 punti sono circa 10,7 px a 1440. Il tavolo ne tiene 1,99 (12,6 px), cioe'
  * un sesto di margine sopra il pavimento: abbastanza perche' un ritocco piccolo
  * non faccia cadere la suite al primo carattere, poco abbastanza perche' una
  * ritaratura vera — un'etichetta piu' lunga, un settimo oggetto per strato —
  * la faccia cadere subito, che e' lo scopo.
+ *
+ * Era 1,2, e il tavolo ne teneva 1,395: la taratura che ha sciolto gli
+ * scostamenti angolari strato per strato ha alzato ANCHE questo minimo, non
+ * solo quello fra anelli. Il pavimento lo segue, o smetterebbe di essere una
+ * prova e diventerebbe un ricordo.
  */
-const CLEARANCE_FLOOR = 1.2;
+const CLEARANCE_FLOOR = 1.7;
+
+/**
+ * Il pavimento dell'aria fra due oggetti di ANELLI DIVERSI, nella stessa unita'.
+ * E' una prova a se' e non un numero piu' alto di CLEARANCE_FLOOR, perche'
+ * misura una cosa diversa: non "il tavolo non si accavalla" ma "i quattro
+ * anelli si leggono come quattro".
+ *
+ * Serviva perche' il minimo globale e' cieco alla differenza. Con la taratura
+ * che massimizzava solo lui, dentro un anello restavano da 6,8 a 21,5 punti di
+ * aria e FRA anelli vicini 1,53: ogni oggetto aveva il suo vicino piu' prossimo
+ * in un altro anello, da quattro a quattordici volte piu' vicino dei suoi
+ * compagni, e i quattro anelli si leggevano come una nuvola sola. Nessuna prova
+ * se ne accorgeva, perche' 1,53 sta sopra il pavimento globale.
+ *
+ * 3,0 punti sono circa 19 px a 1440. Non e' il massimo raggiungibile — il mondo
+ * orizzontale ne tiene 4,28 e quello verticale 3,52 — ma e' la soglia sotto la
+ * quale l'occhio ricomincia a raggruppare per vicinanza invece che per anello,
+ * ed e' il mondo verticale a fissare il margine.
+ */
+const RING_FLOOR = 3.0;
 
 type Rect = { x0: number; x1: number; y0: number; y1: number };
 
@@ -288,6 +313,44 @@ describe("dove finiscono gli oggetti", () => {
       }
       expect(peggiore, `${layout}: il punto piu' stretto e' ${dove}`).toBeGreaterThan(
         CLEARANCE_FLOOR,
+      );
+    }
+  });
+
+  it("gli anelli restano quattro: fra uno e l'altro c'e' piu' aria che dentro", () => {
+    // La prova qui sopra guarda il tavolo intero e non sa distinguere due fogli
+    // dello stesso anello da due anelli che si toccano. Questa guarda solo le
+    // coppie che stanno su anelli diversi: e' quella distanza che decide se si
+    // vedono quattro corone o una nuvola.
+    //
+    // Non e' il raggio a garantirla — gli anelli non sono omotetici apposta, e
+    // due raggi lontani possono comunque incrociarsi sull'asse dove uno e' alto
+    // e l'altro largo. Si misura dove si vede: fra i rettangoli veri.
+    for (const layout of LAYOUTS) {
+      const oggetti: { box: Rect; dove: string; anello: number }[] = [];
+      for (let layer = 0; layer < deskLayers.length; layer++) {
+        for (let i = 0; i < OBJECTS_PER_LAYER[layout]; i++) {
+          oggetti.push({
+            box: objectBox(layout, layer, i),
+            dove: `${layout} ${deskLayers[layer].id}/${deskLayers[layer].objects[i].id}`,
+            anello: layer,
+          });
+        }
+      }
+      let peggiore = Infinity;
+      let dove = "";
+      for (let a = 0; a < oggetti.length; a++) {
+        for (let b = a + 1; b < oggetti.length; b++) {
+          if (oggetti[a].anello === oggetti[b].anello) continue;
+          const aria = clearance(oggetti[a].box, oggetti[b].box, layout);
+          if (aria < peggiore) {
+            peggiore = aria;
+            dove = `${oggetti[a].dove} × ${oggetti[b].dove}`;
+          }
+        }
+      }
+      expect(peggiore, `${layout}: i due anelli piu' vicini si toccano in ${dove}`).toBeGreaterThan(
+        RING_FLOOR,
       );
     }
   });

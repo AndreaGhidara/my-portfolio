@@ -40,12 +40,22 @@ export const SHAPE_BOX: Record<DeskDrawing, { w: number; h: number }> = {
 };
 
 /**
- * Quanto si disegna piu' piccolo nel mondo verticale. A misura naturale un
- * foglio occuperebbe un quinto della larghezza del telefono (150 su 720) e i
- * quattro strati non ci starebbero: il mondo verticale e' largo la meta' di
- * quello orizzontale, e i disegni lo seguono.
+ * Quanto si disegna piu' piccolo del suo viewBox. Nel mondo verticale a misura
+ * naturale un foglio occuperebbe un quinto della larghezza del telefono (150 su
+ * 720) e i quattro strati non ci starebbero: il mondo verticale e' largo la
+ * meta' di quello orizzontale, e i disegni lo seguono.
+ *
+ * Nel mondo orizzontale non e' 1 ma 0,95, e quel cinque per cento e' l'unico
+ * spazio che il tavolo non aveva. Non e' una rifinitura estetica: e' la moneta
+ * con cui si compra l'aria FRA gli anelli. A misura piena il minimo globale
+ * raggiungibile e' 1,40 e fra anelli vicini restano 1,53 punti, cioe' ogni
+ * oggetto ha il suo vicino piu' prossimo fuori dal proprio anello — da quattro
+ * a quattordici volte piu' vicino dei suoi compagni — e i quattro anelli si
+ * leggono come una nuvola sola. Con 0,95 le due misure diventano 2,00 e 4,29:
+ * salgono INSIEME, che e' il motivo per cui il conto e' onesto. Su schermo un
+ * foglio passa da 103 a 98 pixel.
  */
-export const DRAW_SCALE: Record<DeskLayout, number> = { wide: 1, tall: 0.5 };
+export const DRAW_SCALE: Record<DeskLayout, number> = { wide: 0.95, tall: 0.5 };
 
 /**
  * Le cifre con cui una percentuale arriva al CSS. Non e' una rifinitura: quel
@@ -231,37 +241,46 @@ export const OBJECTS_PER_LAYER: Record<DeskLayout, number> = { wide: 6, tall: 4 
  * oggetti stanno sul perimetro di un rettangolo e non di un'ellisse: un tavolo
  * e' rettangolare, e agli angoli di un cerchio resta spazio sprecato.
  *
- * Questi otto raggi e i quattro angoli di partenza sono tarati insieme, contro
- * l'ingombro vero di objectFootprint(): sagoma PIU' etichetta, per tutte e 24 le
- * coppie del tavolo e non solo dentro uno strato. Il vincolo che li lega non e'
- * il raggio ma l'incastro: due strati vicini si toccano sull'asse verticale, e
- * l'unico modo di tenerli separati e' che dove uno sta in alto l'altro stia di
- * lato. Per questo gli anelli non sono omotetici — uno e' largo e basso, il
- * successivo stretto e alto — e per questo gli angoli non sono regolari.
+ * Gli anelli sono ANNIDATI: ogni raggio e' maggiore del precedente in tutte e
+ * due le direzioni. Non e' un vezzo di simmetria, e' il senso del disegno —
+ * l'ordine degli strati e' il movimento della telecamera, dal piu' vicino al
+ * piu' lontano — ed e' il vincolo che va tenuto a mano, perche' e' l'unico che
+ * una ricerca automatica ha tutto l'interesse a violare: lasciata libera mette
+ * il quarto anello dentro il secondo e guadagna aria su un tavolo che non
+ * racconta piu' niente.
  *
- * La taratura non punta a "non si sovrappongono" ma a un pavimento di aria
- * dichiarato: fra due cose qualsiasi del tavolo — due oggetti, un oggetto e il
- * centro, un oggetto e il bordo — resta piu' di 1,2 punti di altezza del mondo
- * (a 1440 sono piu' di sette pixel). Insieme ai raggi e agli angoli si tara
- * ANGLE_OFFSET, che e' quello che rende il pavimento raggiungibile: a passo
- * regolare il soffitto misurato e' 0,64 punti, e non si supera con nessuna
- * scelta di raggi.
+ * Questi otto raggi, i quattro angoli di partenza e i ventiquattro scostamenti
+ * sono tarati insieme, contro l'ingombro vero di objectFootprint(): sagoma PIU'
+ * etichetta, per tutte e 24 le coppie del tavolo e non solo dentro uno strato.
+ * Gli anelli non sono omotetici — il primo e' stretto e alto, gli ultimi due
+ * larghi e appena piu' alti — perche' due anelli vicini si toccherebbero
+ * sull'asse verticale, e li' lo spazio non c'e': dal bordo del laptop al bordo
+ * del mondo ci stanno meno di tre ingombri, non quattro. Quello che li tiene
+ * separati non e' il raggio, e' che dove uno mette un oggetto l'altro non ce
+ * l'ha — ed e' ANGLE_OFFSET a deciderlo.
  *
- * L'anello esterno e' stato ritarato quando il post-it bianco e' passato quarto
- * nel suo strato: l'oggetto che gli e' subentrato in sesta posizione porta
- * un'etichetta che li' prima non c'era, e il minimo del mondo orizzontale era
- * sceso a 1,23 — sopra il pavimento, ma senza piu' margine sopra. Mezzo punto di
- * raggio in meno in larghezza e tre decimi in piu' in altezza lo riportano a
- * 1,40, e il punto piu' stretto torna a essere un oggetto contro il BORDO del
- * mondo invece che due oggetti fra loro, che e' il vincolo meno fragile dei due.
- * Cambiarne uno solo a occhio rompe il tavolo: la prova sta in layers.test.ts.
+ * La taratura non punta a "non si sovrappongono" ma a DUE pavimenti di aria
+ * dichiarati, e sono due misure diverse:
+ *
+ *   - fra due cose qualsiasi del tavolo (due oggetti dello stesso anello, un
+ *     oggetto e il centro, un oggetto e il bordo) restano piu' di 2,0 punti di
+ *     altezza del mondo — a 1440 sono piu' di dodici pixel;
+ *   - fra due oggetti di ANELLI DIVERSI ne restano piu' di 4,2.
+ *
+ * Il secondo e' il pavimento che conta per come si legge il disegno, ed e'
+ * quello che prima non esisteva: massimizzando solo il minimo globale nessuno
+ * distingueva "due fogli dello stesso anello" da "due anelli che si toccano", e
+ * il tavolo finiva tarato con 1,53 punti fra anelli e da 6,8 a 21,5 dentro.
+ * Le due prove stanno in layers.test.ts, e sono due apposta.
+ *
+ * Cambiarne uno solo a occhio rompe il tavolo: si muovono tutti insieme.
  */
 const RADII: Record<DeskLayout, { rx: number; ry: number }[]> = {
   wide: [
-    { rx: 15.1, ry: 22.8 },
-    { rx: 27.3, ry: 25.5 },
-    { rx: 39.1, ry: 28.2 },
-    { rx: 40.7, ry: 33.6 },
+    { rx: 14.97, ry: 26.28 },
+    { rx: 28.17, ry: 30.16 },
+    { rx: 41.13, ry: 31.21 },
+    { rx: 42.43, ry: 32.74 },
   ],
   tall: [
     { rx: 15.7, ry: 11.6 },
@@ -274,7 +293,7 @@ const RADII: Record<DeskLayout, { rx: number; ry: number }[]> = {
 /** Da dove parte a distribuire gli oggetti ogni strato. Sfalsati apposta:
  *  allineati, i quattro strati formavano dei raggi e sembrava un sole. */
 const START_ANGLE: Record<DeskLayout, number[]> = {
-  wide: [159, -81, 120, -36],
+  wide: [81.09, 166.32, 115.17, 147.81],
   tall: [123, 164, -59, -149],
 };
 
@@ -284,25 +303,61 @@ const START_ANGLE: Record<DeskLayout, number[]> = {
  * oggetti ogni sessanta gradi si leggono come il quadrante di un orologio, non
  * come un piano su cui qualcuno lavora.
  *
- * E' anche l'unica cosa che fa spazio. A passo regolare il minimo raggiungibile
- * a 1440 e' 0,64% dell'altezza del mondo — quattro pixel, e li' finisce: non e'
- * una taratura sfortunata, e' il soffitto di quel modello, misurato. Con lo
- * scostamento si arriva a 1,40%, quasi nove pixel, con gli anelli che tornano
- * anche a crescere in tutte e due le direzioni invece di accavallarsi.
+ * E' anche l'unica cosa che fa spazio, e nel mondo orizzontale e' LA cosa che
+ * fa spazio. Dal bordo del laptop al bordo del mondo non ci stanno quattro
+ * ingombri incolonnati: i quattro anelli devono per forza intrecciarsi, e
+ * l'unico modo di tenerli leggibili e' che dove un anello mette un oggetto il
+ * vicino abbia un vuoto. Cioe' e' qui, non nei raggi, che si decide se si
+ * vedono quattro corone o una nuvola.
  *
- * Dipende dall'INDICE e non dallo strato: sei numeri per il mondo orizzontale e
- * quattro per quello verticale, non ventiquattro e sedici. I quattro strati non
- * si allineano lo stesso, perche' ognuno parte da un angolo suo. Chi li ritara
- * rilegga la nota su RADII: si muovono tutti insieme, e la prova che li tiene e'
- * "fra due cose qualsiasi resta aria vera".
+ * Per questo nel mondo orizzontale gli scostamenti sono VENTIQUATTRO e non sei:
+ * uno per ogni oggetto di ogni anello. Prima erano sei, condivisi dai quattro
+ * strati — meno numeri, e per un po' e' sembrata economia. Non lo era: con lo
+ * stesso schema di irregolarita' ripetuto quattro volte, i quattro anelli
+ * ripetevano anche i loro grappoli, li allineavano lungo gli stessi raggi, e il
+ * massimo raggiungibile fra anelli vicini era 1,53 punti. Sciogliendoli strato
+ * per strato — e senza cambiare nient'altro — si arriva a 3,45; con i disegni
+ * al 95% (vedi DRAW_SCALE) a 4,29, con il minimo globale che nel frattempo sale
+ * da 1,40 a 2,00.
+ *
+ * Il mondo verticale tiene le sue quattro cifre ripetute uguali per i quattro
+ * strati: li' il problema non c'e' — fra anelli vicini ci sono gia' 3,5 punti,
+ * perche' il mondo e' alto il doppio di quanto e' largo e gli anelli ci si
+ * annidano davvero — e quattro righe identiche dicono esattamente questo.
+ *
+ * Sono scostamenti, non una seconda rotazione: dentro ogni strato la loro media
+ * e' zero, e la rotazione dell'anello sta tutta in START_ANGLE. Chi li ritara
+ * rilegga la nota su RADII: si muovono tutti insieme, e le prove che li tengono
+ * sono i due pavimenti d'aria.
  */
-const ANGLE_OFFSET: Record<DeskLayout, number[]> = {
-  wide: [11, 3, -16, 11, 3, -16],
-  tall: [20, 8, 20, 8],
+const ANGLE_OFFSET: Record<DeskLayout, number[][]> = {
+  wide: [
+    [-12.71, 3.32, 1.05, 11.32, -1.78, -1.19],
+    [-1.17, -25.2, 27.49, -2.06, -24.23, 25.19],
+    [-0.49, 14.55, -7.05, -0.94, -4.15, -1.9],
+    [-7.06, 11.24, -17.12, -6.61, 14.34, 5.23],
+  ],
+  tall: [
+    [20, 8, 20, 8],
+    [20, 8, 20, 8],
+    [20, 8, 20, 8],
+    [20, 8, 20, 8],
+  ],
 };
 
 /** Distanza fra il perimetro dello strato e il centro dell'oggetto, in % di mezzo mondo. */
 const PAD = 2.4;
+
+/**
+ * Quanto in alto e in basso arriva il primo anello, PAD compreso. E' il raggio
+ * su cui e' tarata l'inquadratura d'apertura del palco, e sta qui perche' e' un
+ * dato della geometria: una copia a mano in DeskStage vorrebbe dire che il
+ * giorno in cui i raggi cambiano la camera apre sull'inquadratura sbagliata
+ * senza che niente lo dica. Che e' quello che e' successo — la ritaratura che
+ * ha separato gli anelli ha portato questo numero da 25,2 a 28,68, il quindici
+ * per cento piu' in fuori, e l'apertura era rimasta indietro.
+ */
+export const FIRST_RING_REACH = RADII.wide[0].ry + PAD;
 
 /**
  * Intersezione fra un raggio e il perimetro di un rettangolo. Restituisce lo
@@ -340,7 +395,8 @@ export function placeObject(layout: DeskLayout, layer: number, index: number): P
   const count = OBJECTS_PER_LAYER[layout];
   const { rx, ry } = RADII[layout][layer];
   const angle =
-    ((START_ANGLE[layout][layer] + index * (360 / count) + ANGLE_OFFSET[layout][index]) * Math.PI) /
+    ((START_ANGLE[layout][layer] + index * (360 / count) + ANGLE_OFFSET[layout][layer][index]) *
+      Math.PI) /
     180;
   const [dx, dy] = onRect(angle, rx + PAD, ry + PAD);
   // Deterministico: nessun Math.random. Il tavolo deve uscire identico a ogni

@@ -48,6 +48,19 @@ export const metrics: Metric[] = [
     howToVerify: "Contare le righe della tabella immagini nel database di VisualBoost.",
   },
   {
+    // Il post-it grigio del tavolo. E' l'unico numero del sito che non e' una
+    // metrica di lavoro: e' una battuta, e va letta come tale. Sta qui lo stesso
+    // — e con estimated: true come gli altri — perche' la regola di questo file
+    // e' "ogni numero inventato sta in un posto solo e si dichiara inventato",
+    // e un numero che si autorizza l'eccezione perche' e' simpatico e' esatta-
+    // mente il modo in cui quella regola smette di valere.
+    id: "coffees",
+    value: "23.777",
+    estimated: true,
+    howToVerify:
+      "Non si verifica, ed e' l'unico di questo file per cui va bene: e' una battuta sul lavoro fatto, non un dato. Se qualcuno lo cita in call, la risposta e' \"quello e' il post-it\".",
+  },
+  {
     id: "years",
     value: "6",
     estimated: true,

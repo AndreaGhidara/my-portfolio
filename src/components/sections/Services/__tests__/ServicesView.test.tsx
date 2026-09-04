@@ -33,6 +33,7 @@ const props: ServicesViewProps = {
   centre: "il progetto",
   punch: "Quello che chiami «un sito» è lo schermo al centro.",
   blank: "E la tua, qual è?",
+  note: "23.777 caffè",
   practice: "E in pratica?",
   intro: "Quattro modi di lavorare.",
   layers: [layer("site", 6), layer("logic", 6), layer("infra", 6), layer("growth", 6, true)],

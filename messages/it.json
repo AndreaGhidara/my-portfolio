@@ -61,7 +61,7 @@
     "stageLead": "Un sito finito. Da qui in poi, tutto quello che c'è sotto.",
     "centre": "il progetto",
     "blank": "E la tua, qual è? Scrivimi.",
-    "punch": "Quello che chiami «un sito» è lo schermo al centro. Il resto è il tavolo.",
+    "punch": "Quello che chiami «un sito» è lo schermo al centro. Il resto è il lavoro che c'è dietro.",
     "practice": "E in pratica?",
     "layers": {
       "site": {
@@ -104,7 +104,7 @@
         "title": "I servizi",
         "lead": "Quello che lo fa crescere dopo il lancio. Il sito online è l'inizio del lavoro, non la consegna.",
         "objects": {
-          "ai": "L'assistente",
+          "ai": "Assistenza",
           "automation": "Le automazioni",
           "analytics": "I numeri",
           "seo": "Farsi trovare",
@@ -199,6 +199,7 @@
     "aidifyConversations": "conversazioni gestite al mese",
     "customertrackBrands": "catene sullo stesso impianto",
     "visualboostCatalog": "immagini a catalogo",
+    "coffees": "caffè",
     "years": "anni di sviluppo web",
     "responseTime": "tempo di risposta"
   },

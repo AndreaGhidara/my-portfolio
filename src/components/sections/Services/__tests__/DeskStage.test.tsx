@@ -46,6 +46,7 @@ const props = {
   lead: "Un sito finito.",
   centre: "il progetto",
   blank: "E la tua, qual è?",
+  note: "23.777 caffè",
   punch: "Il resto è il tavolo.",
   layers,
 };
