@@ -1441,3 +1441,73 @@ html[data-dialog-open] body { overflow: hidden; }
   [data-practice-item][data-lato="sx"] [data-practice-art] { order: 1; }
   [data-pratica-coda] { height: 78vh; }
 }
+
+/* La freccia esiste solo a "full". E' un gesto disegnato, e' solo movimento:
+   ferma non vuol dire niente, sarebbe una freccia appoggiata a caso in mezzo
+   alla pagina. Sotto, la scena e' quattro voci e un filo. */
+[data-pratica-freccia] { display: none; }
+[data-pratica][data-motion="full"] [data-pratica-freccia] {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: clamp(84px, 12vw, 150px);
+  height: 40px;
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(var(--a, 0deg));
+  transform-origin: 50% 50%;
+}
+[data-pratica-freccia] svg { display: block; width: 100%; height: 100%; overflow: visible; }
+[data-pratica-freccia] path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+/* L'asta si allunga, la punta no. */
+[data-pratica-freccia] [data-asta] { transform: scaleX(var(--s, 1)); transform-origin: 40px 20px; }
+
+/* Il tracciato, non il disegno: sta nel DOM perche' getPointAtLength ha bisogno
+   di un path vero, e non si vede. Niente display:none — li' getPointAtLength
+   smetterebbe di rispondere, cioe' la sola ragione per cui questo path esiste. */
+[data-pratica-strada] {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Le voci non attive sbiadiscono SOLO a "full". Fuori di li' tre quarti della
+   sezione resterebbero al 40% per sempre, cioe' illeggibili — ed e' il modo
+   classico in cui una scena scrollytelling si rompe sul fallback. */
+[data-pratica][data-motion="full"] [data-practice-text],
+[data-pratica][data-motion="full"] [data-practice-art],
+[data-pratica][data-motion="full"] [data-practice-drawing] {
+  transition: opacity 0.45s ease, filter 0.45s ease, transform 0.45s ease;
+}
+[data-pratica][data-motion="full"] [data-practice-item]:not([data-attiva]) [data-practice-text] {
+  opacity: 0.4;
+}
+[data-pratica][data-motion="full"] [data-practice-item]:not([data-attiva]) [data-practice-art] {
+  filter: grayscale(0.4) opacity(0.5);
+  transform: scale(0.96);
+}
+/* Arrivando la voce, la pila si scompone appena: e' una mano che sposta i
+   fogli, non una card che si solleva. */
+[data-pratica][data-motion="full"] [data-practice-item][data-attiva] [data-practice-drawing]:nth-child(2) {
+  transform: rotate(var(--rot)) translate(3%, -4%);
+}
+[data-pratica][data-motion="full"] [data-practice-item][data-attiva] [data-practice-drawing]:nth-child(3) {
+  transform: rotate(var(--rot)) translate(5%, -6%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-practice-text],
+  [data-practice-art],
+  [data-practice-drawing] { transition: none; }
+}
