@@ -7,6 +7,7 @@ import { journey } from "../journey";
 import { metrics, metricById } from "../metrics";
 import { site } from "../site";
 import { deskLayers } from "../desk";
+import { practiceBlocks, practiceScenes } from "../practice";
 
 /** Elenco piatto di tutte le chiavi annidate, per confrontare due dizionari. */
 function flatKeys(obj: unknown, prefix = ""): string[] {
@@ -171,6 +172,53 @@ describe("il tavolo", () => {
   it("la sezione conserva i quattro testi lunghi: il tavolo non li sostituisce", () => {
     for (const id of ["sites", "ecommerce", "webapp", "ai"]) {
       expect(itKeys).toContain(`services.list.${id}.description`);
+    }
+  });
+});
+
+/**
+ * Le illustrazioni di «E in pratica?» non sono disegni nuovi: sono gli oggetti
+ * del tavolo, citati per id e ripresi da vicino. E' quella la ragione per cui
+ * qui non si dichiarano ne' sagome ne' campioni — si dichiara un nome.
+ */
+describe("E in pratica", () => {
+  it("risponde alle quattro voci, nel loro ordine", () => {
+    expect(practiceBlocks.map((b) => b.service)).toEqual(services.map((s) => s.id));
+  });
+
+  it("ogni disegno e' un oggetto che sta davvero sul tavolo", () => {
+    const sul = new Set(deskLayers.flatMap((l) => l.objects).map((o) => o.id));
+    for (const block of practiceBlocks) {
+      for (const shape of block.shapes) {
+        expect(sul.has(shape.object), `«${shape.object}» non sta sul tavolo`).toBe(true);
+      }
+    }
+  });
+
+  it("ogni disegno porta il suo campione: a questa misura una sagoma nuda e' vuota", () => {
+    // Sul tavolo un oggetto senza campione ci sta (hosting e il post-it bianco
+    // ne sono senza, e con una ragione scritta). Qui no: il disegno e' largo
+    // duecentocinquanta pixel, e a quella misura un contorno vuoto non e' un
+    // oggetto, e' un buco.
+    for (const scene of practiceScenes) {
+      for (const drawing of scene.drawings) {
+        expect(drawing.sample, `«${drawing.object}» non ha un campione`).toBeTruthy();
+      }
+    }
+  });
+
+  it("i lati si alternano: e' il vincolo da cui dipende tutto il resto", () => {
+    // La freccia deve passare SOLO sopra i disegni, mai sopra il testo. Due
+    // voci di fila con il disegno dallo stesso lato e la strada attraversa un
+    // paragrafo.
+    expect(practiceBlocks.map((b) => b.lato)).toEqual(["dx", "sx", "dx", "sx"]);
+  });
+
+  it("dentro una voce i disegni non stanno tutti sullo stesso piano", () => {
+    // Si sovrappongono apposta: e' una pila sulla scrivania, non una fila.
+    for (const block of practiceBlocks) {
+      const piani = new Set(block.shapes.map((s) => s.layer));
+      expect(piani.size).toBe(block.shapes.length);
     }
   });
 });
