@@ -103,3 +103,22 @@ describe("il filo in pagina", () => {
     expect(tratto.style.strokeDashoffset).toBe("");
   });
 });
+
+describe("la freccia", () => {
+  it("c'e', ed e' decorativa", () => {
+    const { container } = render(<Practice {...props} />);
+    const freccia = container.querySelector("[data-pratica-freccia]");
+    expect(freccia).not.toBeNull();
+    expect(freccia).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("la strada e' nel DOM ma non si vede: e' il tracciato, non il disegno", () => {
+    // Niente display:none — romperebbe getPointAtLength, che e' l'unica ragione
+    // per cui questo path esiste.
+    const { container } = render(<Practice {...props} />);
+    const strada = container.querySelector("[data-pratica-strada]");
+    expect(strada).not.toBeNull();
+    expect(strada).toHaveAttribute("aria-hidden", "true");
+    expect(container.querySelector("[data-pratica-strada] path")).not.toBeNull();
+  });
+});
