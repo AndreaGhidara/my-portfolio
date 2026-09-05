@@ -127,7 +127,10 @@ export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null
   const costruisci = () => {
     const m = misura();
     if (!m) return;
-    const s = strada(m.misure, m.coda, m.mondo, PARAM, largo);
+    const s = strada(m.misure, m.coda, m.mondo, PARAM, largo, {
+      w: window.innerWidth,
+      left: m.viewLeft,
+    });
     stradaEl.setAttribute("viewBox", `0 0 ${m.mondo.w} ${m.mondo.h}`);
     gpath.setAttribute("d", curva(s.punti));
     L = gpath.getTotalLength();

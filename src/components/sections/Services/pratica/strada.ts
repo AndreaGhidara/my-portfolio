@@ -205,6 +205,8 @@ export function strada(
   param: Param,
   /** Solo sopra i 900px gli scostamenti a mano hanno senso. */
   largo: boolean,
+  /** La pagina, per il solo punto d'uscita. Vedi sotto. */
+  pagina: Pagina,
 ): Strada {
   const punti: Punto[] = [];
   const nomi: string[] = [];
@@ -246,7 +248,21 @@ export function strada(
   // scostamenti gli restano attaccati.
   const rientroX = mondo.w * 0.5;
   const rientroY = coda.top + coda.h * 0.8;
-  const fineX = mondo.w * USCITA;
+  /**
+   * L'uscita si conta sulla PAGINA e poi si riporta nella scatola del
+   * percorso, che e' quella in cui la strada si disegna.
+   *
+   * Contarla sul percorso — com'era — la faceva finire altrove rispetto al
+   * filo, che sulla pagina ci si conta: lo scarto vale 0,38 x (pagina meno
+   * percorso), cioe' zero finche' la finestra sta sotto i 74rem e poi cresce
+   * senza fermarsi — 97px a 1440, 280 a 1920. In calibrazione era stato
+   * corretto a mano trascinando `coda.fine` di 0,14 della larghezza, che
+   * azzecca la finestra su cui si stava guardando e sbaglia tutte le altre:
+   * la correzione e' una frazione del percorso, che sopra i 74rem non cresce
+   * piu'. Contandola qui combaciano a ogni larghezza e la correzione non
+   * serve — infatti e' stata tolta da PARAM.
+   */
+  const fineX = pagina.w * USCITA - pagina.left;
   const fra = (a: number, b: number, t: number) => a + (b - a) * t;
   push([fra(rientroX, fineX, 1 / 3), fra(rientroY, mondo.h, 1 / 3)], "coda.scende");
   push([fra(rientroX, fineX, 2 / 3), fra(rientroY, mondo.h, 2 / 3)], "coda.punta");
