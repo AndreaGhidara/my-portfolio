@@ -1450,9 +1450,15 @@ html[data-dialog-open] body { overflow: hidden; }
   container-type: inline-size;
 }
 
-/* Il blocco vuoto della coda. Sotto i 900px non serve — li' la freccia non
-   c'e' — e mezzo schermo di vuoto sarebbe solo un buco. */
+/* Il blocco vuoto della coda: lo spazio in cui la freccia fa il suo 180 prima
+   di consegnare il filo ai Lavori. Esiste esattamente quando esiste la freccia,
+   e la freccia esiste solo a "full" — che vuole gia' il puntatore fine e i
+   1024px. Era invece appeso a una @media da 900px: chi ha la riduzione del
+   movimento accesa, chi non ha JavaScript e chiunque stia fra i 900 e i 1023
+   si trovava mezzo schermo di pagina bianca a chiudere la sezione, senza
+   niente dentro. Il vuoto e' respiro per un gesto, non un margine. */
 [data-pratica-coda] { position: relative; z-index: 1; height: 0; }
+[data-pratica][data-motion="full"] [data-pratica-coda] { height: 78vh; }
 
 /* Testo|disegno, disegno|testo, e cosi' via: e' quello che permette alla
    freccia di passare solo sopra i disegni. Sotto i 900px si impila e
@@ -1465,7 +1471,6 @@ html[data-dialog-open] body { overflow: hidden; }
   }
   [data-practice-item][data-lato="sx"] [data-practice-text] { order: 2; margin-inline-start: auto; }
   [data-practice-item][data-lato="sx"] [data-practice-art] { order: 1; }
-  [data-pratica-coda] { height: 78vh; }
 }
 
 /* La freccia esiste solo a "full". E' un gesto disegnato, e' solo movimento:
@@ -1532,8 +1537,7 @@ html[data-dialog-open] body { overflow: hidden; }
   transform: rotate(var(--rot)) translate(5%, -6%);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-practice-text],
-  [data-practice-art],
-  [data-practice-drawing] { transition: none; }
-}
+/* Niente blocco per prefers-reduced-motion: le uniche transizioni della scena
+   sono dichiarate qui sopra sotto [data-motion="full"], e "full" e' un livello
+   che chi ha chiesto la riduzione del movimento non ha mai. Spegnerle di nuovo
+   spegnerebbe qualcosa che non e' acceso. */
