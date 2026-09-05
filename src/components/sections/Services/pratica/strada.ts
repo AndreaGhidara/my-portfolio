@@ -236,7 +236,22 @@ export function strada(
   push([ultimo.cx + verso * mondo.w * 0.17, coda.top + coda.h * 0.28], "coda.apre");
   push([mondo.w * 0.5 - verso * mondo.w * 0.13, coda.top + coda.h * 0.54], "coda.colmo");
   push([mondo.w * 0.5, coda.top + coda.h * 0.8], "coda.rientra");
-  push([mondo.w * USCITA, mondo.h], "coda.fine");
+
+  // Due punti liberi sull'ultima corsa. Fra il rientro al centro e l'uscita
+  // c'era un tratto lungo senza un solo punto per piegarlo: la strada ci
+  // passava dritta e non c'era niente da prendere col calibratore. Questi due
+  // nascono ESATTAMENTE sul segmento fra i due estremi, a un terzo e a due
+  // terzi, quindi da fermi non cambiano la forma — cambiano solo cosa si puo'
+  // afferrare. Come tutti gli altri hanno un nome, ed e' per nome che gli
+  // scostamenti gli restano attaccati.
+  const rientroX = mondo.w * 0.5;
+  const rientroY = coda.top + coda.h * 0.8;
+  const fineX = mondo.w * USCITA;
+  const fra = (a: number, b: number, t: number) => a + (b - a) * t;
+  push([fra(rientroX, fineX, 1 / 3), fra(rientroY, mondo.h, 1 / 3)], "coda.scende");
+  push([fra(rientroX, fineX, 2 / 3), fra(rientroY, mondo.h, 2 / 3)], "coda.punta");
+
+  push([fineX, mondo.h], "coda.fine");
 
   // Le correzioni a mano si applicano DOPO che la geometria ha fatto il suo
   // mestiere: la strada resta calcolata dall'impaginato — che si muove quando
