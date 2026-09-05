@@ -1,12 +1,20 @@
 "use client";
 
-import { useCallback, useLayoutEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ComponentType,
+} from "react";
 import { practiceScenes } from "@/content/practice";
 import { weave } from "@/animations/presets";
 import { useMotionLevel, type MotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import { curva, filo, type Coda, type Misura, type Mondo } from "./pratica/strada";
-import { guidaFreccia } from "./pratica/freccia";
+import { guidaFreccia, type Guida } from "./pratica/freccia";
+import type { CalibratoreProps } from "./pratica/Calibratore";
 import { PracticeBlock } from "./PracticeBlock";
 import type { ServiceItem } from "./ServicesView";
 
@@ -37,6 +45,9 @@ export function Practice({
   // ref si dichiarano sempre: un ref e' un contenitore vuoto, non un'animazione.
   const stradaRef = useRef<SVGSVGElement | null>(null);
   const frecciaRef = useRef<HTMLDivElement | null>(null);
+  // Il manico del gesto, per chi arriva dopo che e' nato. Lo scrive e lo
+  // cancella l'effetto qui sotto; in produzione nessuno lo legge.
+  const guidaRef = useRef<Guida | null>(null);
   // La tessitura viva, se c'e'. Vive fuori dal gsap.context di useSectionAnimation
   // — la costruisce anche disegna(), che gsap.context non vede — quindi il
   // revert automatico non la raccoglie: deve passare da questo ref e da
@@ -172,12 +183,30 @@ export function Practice({
     if (livello !== "full" || !stradaEl || !gpath || !fre) return spegni;
 
     const voci = [...(scope.current?.querySelectorAll<HTMLElement>("[data-practice-item]") ?? [])];
-    const molla = guidaFreccia({ stradaEl, gpath, fre, voci, trigger: scope.current }, misura);
+    const guida = guidaFreccia({ stradaEl, gpath, fre, voci, trigger: scope.current }, misura);
+    guidaRef.current = guida;
     return () => {
-      molla();
+      guida.molla();
+      guidaRef.current = null;
       spegni();
     };
   }, scope);
+
+  /**
+   * Il calibratore si CARICA dietro la guardia su NODE_ENV, non solo si monta:
+   * un componente importato in cima al file finisce nel bundle anche se non lo
+   * si disegna mai. L'import() sta DENTRO l'if e non dopo un return anticipato
+   * apposta: cosi' in produzione e' il ramo di un `if (false)`, che il bundler
+   * non attraversa nemmeno — e non gli emette il pezzo. Una verifica sul
+   * bundle lo controlla, e sta nel rapporto del Task 7.
+   */
+  const [Calibratore, setCalibratore] = useState<ComponentType<CalibratoreProps> | null>(null);
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") {
+      if (!new URLSearchParams(window.location.search).has("calibra")) return;
+      void import("./pratica/Calibratore").then((m) => setCalibratore(() => m.Calibratore));
+    }
+  }, []);
 
   return (
     <div ref={scope} data-pratica data-motion={level}>
@@ -232,6 +261,8 @@ export function Practice({
           />
         ))}
       </ol>
+
+      {Calibratore ? <Calibratore guida={guidaRef} strada={stradaRef} /> : null}
 
       {/* Lo spazio in cui la freccia fara' il suo 180 prima di consegnare il
           filo ai Lavori. E' vuoto apposta: e' respiro, non un blocco mancante.
