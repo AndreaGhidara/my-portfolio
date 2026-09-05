@@ -181,6 +181,35 @@ describe("la strada della freccia", () => {
     }
   });
 
+  it("l'ultima corsa ha due punti liberi, e da fermi non cambiano la forma", () => {
+    // Servono al calibratore: fra il rientro al centro e l'uscita c'era un
+    // tratto lungo senza niente da afferrare. Nascono sul segmento fra i due
+    // estremi, a un terzo e a due terzi — cosi' aggiungerli non sposta la
+    // strada, aggiunge solo due maniglie. Se un giorno qualcuno li spostasse
+    // fuori da quella retta, la coda cambierebbe forma senza che nessuno
+    // l'abbia chiesto, e questa prova e' li' per dirlo.
+    // Sulla strada NUDA, senza gli scostamenti a mano: la collinearita' e' una
+    // proprieta' della geometria: `coda.rientra` ha una correzione grossa, e
+    // dopo di quella nessuno dei tre e' piu' dove la geometria l'aveva messo.
+    const { punti: P, nomi } = strada(MISURE, CODA, MONDO, PARAM, false);
+    const i = nomi.indexOf("coda.scende");
+    const j = nomi.indexOf("coda.punta");
+    const r = nomi.indexOf("coda.rientra");
+    const f = nomi.indexOf("coda.fine");
+    expect([i, j, r, f].every((k) => k >= 0)).toBe(true);
+    // In ordine, e in mezzo agli altri due.
+    expect(r).toBeLessThan(i);
+    expect(i).toBeLessThan(j);
+    expect(j).toBeLessThan(f);
+    // Sulla retta: l'area del triangolo con gli estremi e' zero.
+    const suRetta = (p: readonly [number, number]) =>
+      Math.abs(
+        (P[f][0] - P[r][0]) * (p[1] - P[r][1]) - (p[0] - P[r][0]) * (P[f][1] - P[r][1]),
+      );
+    expect(suRetta(P[i])).toBeLessThan(1);
+    expect(suRetta(P[j])).toBeLessThan(1);
+  });
+
   it("sotto i 900px gli scostamenti non si applicano", () => {
     // Li' i blocchi si impilano, i disegni stanno da tutt'altra parte, e una
     // correzione da mezzo schermo non corregge: sposta.
