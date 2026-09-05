@@ -44,8 +44,6 @@ const DEFAULT: Param = structuredClone(PARAM);
  *  `DEFAULT` per sapere se e' stato cambiato. */
 type Riga =
   | { t: "gruppo"; e: string }
-  | { t: "si"; e: string; leggi: (p: Param) => boolean; scrivi: (p: Param, v: boolean) => void }
-  | { t: "tratti"; e: string }
   | {
       t: "n";
       e: string;
@@ -57,41 +55,17 @@ type Riga =
       scrivi: (p: Param, v: number) => void;
     };
 
+/**
+ * Il pannello, riga per riga. Ogni riga qui e' una manopola che QUALCUNO LEGGE:
+ * il gruppo «Il cappio» — interruttore, tre tratti, «dove nel tratto», raggio —
+ * stava in cima e non faceva niente, perche' il giro di penna e' stato scartato
+ * in brainstorming (spec §7.4) e la geometria che lo disegnava non e' mai stata
+ * portata. Quattro manopole morte in cima al pannello sono peggio di nessun
+ * pannello: chi tara le gira, non vede cambiare niente, e smette di fidarsi
+ * anche di quelle che funzionano. Il calibratore e' la mitigazione dichiarata
+ * del rischio §6.1 — deve dire la verita' su cosa comanda.
+ */
 const SPEC: Riga[] = [
-  { t: "gruppo", e: "Il cappio" },
-  {
-    t: "si",
-    e: "acceso",
-    leggi: (p) => p.cappio.acceso,
-    scrivi: (p, v) => {
-      p.cappio.acceso = v;
-    },
-  },
-  { t: "tratti", e: "su quali discese" },
-  {
-    t: "n",
-    e: "dove nel tratto",
-    min: 0.15,
-    max: 0.85,
-    passo: 0.01,
-    dec: 2,
-    leggi: (p) => p.cappio.dove,
-    scrivi: (p, v) => {
-      p.cappio.dove = v;
-    },
-  },
-  {
-    t: "n",
-    e: "raggio",
-    min: 0.02,
-    max: 0.16,
-    passo: 0.005,
-    dec: 3,
-    leggi: (p) => p.cappio.raggio,
-    scrivi: (p, v) => {
-      p.cappio.raggio = v;
-    },
-  },
   { t: "gruppo", e: "Il movimento" },
   {
     t: "n",
@@ -410,46 +384,6 @@ export function Calibratore({ guida, strada }: CalibratoreProps) {
                 {r.e}
               </p>
             );
-          if (r.t === "si")
-            return (
-              <label key={i} data-cambiato={r.leggi(PARAM) !== r.leggi(DEFAULT) ? "" : undefined}>
-                <input
-                  type="checkbox"
-                  checked={r.leggi(PARAM)}
-                  onChange={(e) => {
-                    r.scrivi(PARAM, e.target.checked);
-                    rifaiPresto();
-                  }}
-                />{" "}
-                {r.e}
-              </label>
-            );
-          if (r.t === "tratti")
-            return (
-              <label
-                key={i}
-                data-cambiato={
-                  String(PARAM.cappio.tratti) !== String(DEFAULT.cappio.tratti) ? "" : undefined
-                }
-              >
-                <span data-et>{r.e}</span>
-                <div data-tratti>
-                  {["1→2", "2→3", "3→4"].map((et, x) => (
-                    <button
-                      type="button"
-                      key={et}
-                      data-on={PARAM.cappio.tratti[x] ? "" : undefined}
-                      onClick={() => {
-                        PARAM.cappio.tratti[x] = !PARAM.cappio.tratti[x];
-                        rifaiPresto();
-                      }}
-                    >
-                      {et}
-                    </button>
-                  ))}
-                </div>
-              </label>
-            );
           return (
             <label key={i} data-cambiato={r.leggi(PARAM) !== r.leggi(DEFAULT) ? "" : undefined}>
               <span data-et>
@@ -531,8 +465,8 @@ const STILE = `
 [data-calibro] [data-val]{color:var(--fg);font-variant-numeric:tabular-nums}
 [data-calibro] input[type=range]{width:100%;accent-color:var(--accent);margin-top:.1rem}
 [data-calibro] input[type=checkbox]{accent-color:var(--accent);vertical-align:-.1em}
-[data-calibro] [data-tratti],[data-calibro] [data-azioni]{display:flex;gap:.25rem;margin-top:.25rem}
-[data-calibro] [data-tratti] button,[data-calibro] [data-azioni] button{flex:1;font:inherit;
+[data-calibro] [data-azioni]{display:flex;gap:.25rem;margin-top:.25rem}
+[data-calibro] [data-azioni] button{flex:1;font:inherit;
  font-size:.62rem;padding:.22rem 0;cursor:pointer;background:transparent;color:var(--fg-muted);
  border:1px solid color-mix(in oklab,var(--fg) 22%,transparent);border-radius:.2rem}
 [data-calibro] [data-tratti] button[data-on]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
