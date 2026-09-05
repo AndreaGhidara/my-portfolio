@@ -117,6 +117,44 @@ export function campiona(segs: readonly Segmento[], passo = 0.01): Punto[] {
 }
 
 /**
+ * Quale voce e' in fuoco: quella il cui disegno sta piu' vicino al centro
+ * dello schermo, oppure -1 se nessuna e' abbastanza vicina.
+ *
+ * Perche' non lo decide piu' la freccia. Prima si accendeva la voce piu'
+ * vicina alla PUNTA, e la punta insegue lo scorrimento con inerzia dopo un
+ * ritardo: arrivava sempre in ritardo, e la voce si accendeva quando era gia'
+ * scesa sotto la meta' dello schermo. Il fuoco non e' un fatto della freccia,
+ * e' un fatto di dove sta guardando chi legge — quindi si misura li'.
+ *
+ * Staccarli non li fa litigare: la freccia arriva DENTRO una voce gia' accesa
+ * invece di trascinarsela dietro, che e' anche il verso giusto del gesto.
+ *
+ * Sta qui e non dentro il ciclo perche' e' aritmetica pura, e dentro il ciclo
+ * nessun test la vedrebbe piu' — e' la lezione del difetto che la review
+ * finale ha trovato.
+ */
+export function inFuoco(
+  /** La y del centro di ogni disegno, in coordinate dello SCHERMO. */
+  centri: readonly number[],
+  /** La y del centro dello schermo. */
+  centroSchermo: number,
+  /** Oltre questa distanza dal centro non si accende niente: fuori dai due
+   *  estremi della scena non c'e' nessuna voce da guardare. */
+  soglia: number,
+): number {
+  let scelta = -1;
+  let minima = Infinity;
+  centri.forEach((y, k) => {
+    const d = Math.abs(y - centroSchermo);
+    if (d < minima) {
+      minima = d;
+      scelta = k;
+    }
+  });
+  return minima <= soglia ? scelta : -1;
+}
+
+/**
  * La strada della freccia. Pochi punti e archi larghi: dietro un disegno, poi
  * un punto a meta' che tira la spline sulla retta, poi dietro il disegno
  * successivo dall'altro lato. Senza quel punto di mezzo due disegni su lati
