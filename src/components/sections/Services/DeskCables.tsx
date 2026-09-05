@@ -74,6 +74,16 @@ const BRANCH = `M50 50 C50 66, 30 72, 22 82`;
  * commit — e i cavi restano deliberatamente identici agli altri, perche' il
  * giorno in cui si aggiusta si aggiusti in un posto solo. Vedi il rapporto di
  * Task 5.
+ *
+ * Il fattore dieci viene dal viewBox 0-100: un'unita' di viewBox e' un
+ * centesimo della scatola, cioe' una decina di pixel. L'ottavo tratto — la
+ * serpentina di «E in pratica?», [data-pratica-filo] — NON ha questo difetto,
+ * ed e' l'unico: il suo viewBox e' in PIXEL su una scatola della stessa misura
+ * (`0 0 mondo.w mondo.h`, scritto da Practice.tsx dopo aver misurato), quindi
+ * un'unita' utente e' un pixel CSS e i due conti coincidono. Chi un giorno
+ * aggiusta il tratteggio in un posto solo deve percio' ESCLUDERLO dalla
+ * correzione: applicargli un fattore di scala romperebbe il solo segmento
+ * che oggi si disegna per intero.
  */
 export function DeskCables() {
   const scope = useRef<HTMLDivElement | null>(null);
