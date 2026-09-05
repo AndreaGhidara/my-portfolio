@@ -35,9 +35,31 @@ function rng(seed: number): () => number {
   return () => (((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296) * 2 - 1);
 }
 
-/** Dove esce il filo di questa scena, in frazione della larghezza. Il numero
- *  non si scrive a mano: e' l'ancora con cui la sezione si aggancia ai Lavori. */
+/** Dove entra il filo di questa scena, in frazione della larghezza della
+ *  PAGINA: e' l'ancora con cui riceve il tratto dai cavi del tavolo. Era
+ *  scritto a mano 0,86, che non e' l'88 dichiarato. */
+export const ENTRATA = THREAD_ANCHORS.practice.in / 100;
+
+/** Dove esce, sempre in frazione della PAGINA: l'ancora con cui la sezione si
+ *  aggancia ai Lavori. Il numero non si scrive a mano. */
 export const USCITA = THREAD_ANCHORS.practice.out / 100;
+
+/**
+ * La pagina, e dove la scena ci sta dentro. Le due x non sono la stessa cosa e
+ * confonderle e' il difetto che questo tipo esiste per rendere impossibile:
+ * `misure` e `coda` sono misurate nella scatola della SCENA, che e' larga
+ * 74rem e centrata, mentre l'88% degli ancoraggi e' una percentuale della
+ * PAGINA — e' li' che escono e entrano le sezioni vicine. A 1440 il gradino
+ * era di quasi cento pixel, e cresce con lo schermo. E' lo stesso conto, e lo
+ * stesso rimedio, dei due riquadri di DeskCables.
+ */
+export type Pagina = {
+  /** Larghezza della pagina, cioe' della scatola in cui il filo si disegna. */
+  w: number;
+  /** Dove comincia la scena dentro quella scatola. Le x delle misure vanno
+   *  sommate a questo per diventare x di pagina. */
+  left: number;
+};
 
 /**
  * Catmull-Rom CENTRIPETA (alfa 0,5), non uniforme.
@@ -232,15 +254,32 @@ export function strada(
 
 /** Il filo: serpentina per tutta la scena, seme suo. Entra e esce agli
  *  ancoraggi, e finisce insieme alla strada. */
-export function filo(misure: readonly Misura[], coda: Coda, mondo: Mondo): Punto[] {
+export function filo(
+  misure: readonly Misura[],
+  coda: Coda,
+  mondo: Mondo,
+  pagina: Pagina,
+): Punto[] {
   const rf = rng(778899);
   const A = 0.42;
-  const F: Punto[] = [[mondo.w * 0.86, 0]];
+  /** Da x della scena a x della pagina. La serpentina si disegna attorno ai
+   *  disegni, che stanno nella scena; i due capi invece sono ancore di pagina. */
+  const inPagina = (x: number) => x + pagina.left;
+
+  // I capi si contano sulla PAGINA, non sulla scena: e' li' che il tratto di
+  // sopra finisce e quello di sotto comincia.
+  const F: Punto[] = [[pagina.w * ENTRATA, 0]];
   for (const g of misure) {
-    F.push([mondo.w / 2 + (g.cx - mondo.w / 2) * A * (1 + rf() * 0.28), g.cy + rf() * 0.2 * g.h]);
+    F.push([
+      inPagina(mondo.w / 2 + (g.cx - mondo.w / 2) * A * (1 + rf() * 0.28)),
+      g.cy + rf() * 0.2 * g.h,
+    ]);
   }
   const ultimo = misure[misure.length - 1];
-  F.push([mondo.w / 2 - (ultimo.cx - mondo.w / 2) * A * 0.7, coda.top + coda.h * 0.45]);
-  F.push([mondo.w * USCITA, mondo.h]);
+  F.push([
+    inPagina(mondo.w / 2 - (ultimo.cx - mondo.w / 2) * A * 0.7),
+    coda.top + coda.h * 0.45,
+  ]);
+  F.push([pagina.w * USCITA, mondo.h]);
   return F;
 }

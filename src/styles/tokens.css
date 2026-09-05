@@ -1399,12 +1399,25 @@ html[data-dialog-open] body { overflow: hidden; }
 [data-pratica] > h3 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
 [data-pratica-intro] { max-width: 44ch; margin-block-start: 0.9rem; color: var(--fg-muted); }
 
+/* Il riquadro del filo e' largo quanto la PAGINA, non quanto la scena, ed e'
+   la stessa ragione — e lo stesso rimedio — di [data-desk-cables-ends]:
+   [data-pratica] e' largo min(74rem) e centrato, quindi il suo 88% non e'
+   l'88% della pagina, che e' invece dove esce il tratto di sopra e dove entra
+   quello di sotto. Misurato a 1440: la scena e' larga 1184 e comincia a 128,
+   quindi il suo 88% cade a 1170 mentre gli altri tratti passano per 1267 —
+   un gradino di 97px, che si allarga al crescere dello schermo.
+   In verticale invece resta la scena: il filo la attraversa da bordo a bordo.
+   overflow visibile perche' sopra i 74rem l'88% della pagina cade fuori dalla
+   scena, ed e' giusto che ci cada. */
 [data-pratica-filo] {
   position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
   height: 100%;
+  transform: translateX(-50%);
+  z-index: 0;
   overflow: visible;
   pointer-events: none;
 }
