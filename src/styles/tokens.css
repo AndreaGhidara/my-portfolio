@@ -1409,7 +1409,15 @@ html[data-dialog-open] body { overflow: hidden; }
   pointer-events: none;
 }
 
-[data-practice] { position: relative; z-index: 2; margin-block-start: 3rem; }
+/* Il percorso: dalla prima voce alla fine della coda. E' la scatola in cui la
+   freccia sta E quella che misura, e devono essere la stessa — il ciclo le
+   scrive `left` e `top` in pixel, e sono pixel dell'antenato posizionato.
+   Nessuno z-index: con `z-index: auto` non apre un contesto di impilamento, e
+   la strada, la freccia e le voci restano impilate contro il filo che sta
+   fuori, esattamente come prima. */
+[data-pratica-percorso] { position: relative; margin-block-start: 3rem; }
+
+[data-practice] { position: relative; z-index: 2; }
 
 [data-practice-item] {
   position: relative;
