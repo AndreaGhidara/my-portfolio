@@ -4,15 +4,28 @@ import { LARGO, PARAM } from "./param";
 
 /** Dove sta l'impaginato adesso: e' quello che `misura()` restituisce. */
 /**
- * Quanto lontano dal centro dello schermo puo' stare un disegno e restare in
- * fuoco, in frazione dell'altezza della finestra. Dentro questa distanza si
- * accende la voce piu' vicina al centro; oltre, nessuna — ai due estremi della
- * scena non c'e' niente che chi legge stia guardando.
+ * La meta' della fascia in cui una voce e' in fuoco, in frazione dell'altezza
+ * della finestra: il disegno e' in fuoco quando il suo centro sta entro questa
+ * distanza dal centro dello schermo, sopra o sotto.
+ *
+ * E' una FASCIA e non un "vince la piu' vicina", ed e' la differenza che si
+ * vede. Con la piu' vicina lo scambio fra due voci cade a meta' strada fra i
+ * loro disegni: la voce si accende quando il suo disegno e' ancora mezzo
+ * intervallo SOTTO il centro — che e' esattamente il difetto da correggere, e
+ * che allargando lo spazio fra le voci peggiora invece di migliorare. Sull'
+ * ultima voce si nota di piu' perche' dopo non c'e' nessuno che le tolga il
+ * fuoco.
+ *
+ * Con la fascia la regola e' simmetrica e dicibile in una riga: si accende
+ * salendo a un quarto di schermo sotto il centro, si spegne a un quarto sopra.
+ * Il prezzo e' che fra una voce e l'altra c'e' un tratto in cui non e' accesa
+ * nessuna — ed e' giusto cosi': li' non si sta guardando niente, si sta
+ * passando.
  *
  * Non e' una manopola del calibratore: le manopole di PARAM decidono il
  * MOVIMENTO della freccia, e il fuoco non e' piu' un fatto della freccia.
  */
-const FUOCO = 0.4;
+const FUOCO = 0.25;
 
 export type Impaginato = {
   misure: Misura[];

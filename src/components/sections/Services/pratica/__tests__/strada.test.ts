@@ -221,35 +221,40 @@ describe("il filo della scena", () => {
  * raggiunge.
  */
 describe("quale voce e' in fuoco", () => {
-  const CENTRO = 450;
-  const SOGLIA = 900 * 0.4;
+  const SCHERMO = 900;
+  const CENTRO = SCHERMO / 2;
+  /** La stessa frazione di FUOCO in freccia.ts: un quarto di schermo. */
+  const SOGLIA = SCHERMO * 0.25;
 
-  it("accende quella piu' vicina al centro dello schermo", () => {
-    expect(inFuoco([100, 430, 800], CENTRO, SOGLIA)).toBe(1);
+  it("accende la voce il cui disegno sta nella fascia attorno al centro", () => {
+    expect(inFuoco([CENTRO + 100], CENTRO, SOGLIA)).toBe(0);
   });
 
-  it("non accende niente quando nessuna e' abbastanza vicina", () => {
-    // Sopra e sotto la scena non c'e' nessuna voce che chi legge stia
-    // guardando: accendere comunque la meno lontana illuminerebbe la prima
-    // voce mentre si e' ancora sul tavolo.
-    expect(inFuoco([-2000, 3000], CENTRO, SOGLIA)).toBe(-1);
+  it("NON accende una voce che e' ancora troppo in basso", () => {
+    // E' il difetto da correggere, ed e' quello che "vince la piu' vicina"
+    // non sapeva evitare: con un solo disegno in campo lo accendeva comunque,
+    // fosse anche in fondo allo schermo.
+    expect(inFuoco([CENTRO + 400], CENTRO, SOGLIA)).toBe(-1);
   });
 
-  it("il cambio avviene a META' STRADA fra due voci, non dopo", () => {
-    // E' il difetto che questa funzione corregge, ed e' il caso che conta.
-    // Scorrendo sono i DISEGNI a salire mentre il centro sta fermo: qui la
-    // coppia si muove di dieci pixel attorno al punto in cui la seconda voce
-    // diventa la piu' vicina. Con i due a distanza 400 quel punto e' la loro
-    // mezzeria — non un istante piu' tardi, che e' quello che si vedeva prima.
-    const distanti = (primo: number) => [primo, primo + 400];
-    // La mezzeria e' ancora sotto il centro: comanda la prima.
-    expect(inFuoco(distanti(CENTRO - 195), CENTRO, SOGLIA)).toBe(0);
-    // La mezzeria l'ha superato: passa la seconda.
-    expect(inFuoco(distanti(CENTRO - 205), CENTRO, SOGLIA)).toBe(1);
+  it("la fascia e' simmetrica: si accende sotto e si spegne sopra alla stessa distanza", () => {
+    expect(inFuoco([CENTRO + SOGLIA + 1], CENTRO, SOGLIA)).toBe(-1);
+    expect(inFuoco([CENTRO + SOGLIA - 1], CENTRO, SOGLIA)).toBe(0);
+    expect(inFuoco([CENTRO - SOGLIA + 1], CENTRO, SOGLIA)).toBe(0);
+    expect(inFuoco([CENTRO - SOGLIA - 1], CENTRO, SOGLIA)).toBe(-1);
   });
 
-  it("una voce esattamente al centro e' in fuoco", () => {
-    expect(inFuoco([CENTRO], CENTRO, SOGLIA)).toBe(0);
+  it("fra due voci distanti c'e' un momento in cui non e' accesa nessuna", () => {
+    // La proprieta' che rende la scena una voce alla volta: passando da una
+    // all'altra non si scambiano il fuoco a meta' strada, si spegne la prima
+    // e piu' tardi si accende la seconda. Due disegni a 700px, che e' la
+    // distanza vera con la spaziatura attuale, e la mezzeria fra loro sul
+    // centro dello schermo.
+    expect(inFuoco([CENTRO - 350, CENTRO + 350], CENTRO, SOGLIA)).toBe(-1);
+  });
+
+  it("se due cadessero tutte e due nella fascia, vince la piu' vicina al centro", () => {
+    expect(inFuoco([CENTRO - 200, CENTRO + 60], CENTRO, SOGLIA)).toBe(1);
   });
 
   it("senza disegni non accende niente invece di lanciare", () => {
