@@ -43,6 +43,16 @@ export function PracticeBlock({
           <span
             key={`${drawing.object}-${k}`}
             data-practice-drawing
+            // Il gancio che questo disegno ha in comune con un oggetto del
+            // tavolo, e la sagoma che dice quale materiale gli tocca. Senza
+            // questi due la sagoma resterebbe il suo contorno in colore di
+            // testo — la tavola dei materiali pende da qui — e il campione si
+            // impaginerebbe DOPO la sagoma invece che dentro, perche' e' da
+            // qui che prende `position: absolute` e i suoi margini interni.
+            // Non `data-desk-object`: quello conta i ventiquattro del tavolo,
+            // e questi nove non stanno sul tavolo (spec §4.4).
+            data-desk-piece
+            data-shape={drawing.shape}
             aria-hidden="true"
             style={
               {
