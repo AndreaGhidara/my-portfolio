@@ -16,7 +16,9 @@ export type Elementi = {
   fre: HTMLElement;
   /** Le quattro voci: la piu' vicina prende data-attiva. */
   voci: HTMLElement[];
-  /** La scena, cioe' il trigger dello scorrimento. */
+  /** Il percorso — dalla prima voce alla fine della coda — che e' insieme il
+   *  trigger dello scorrimento e la scatola in cui `misura()` conta. Non la
+   *  scena intera: sotto il commento del porto, la quarta differenza. */
   trigger: Element | null;
 };
 
@@ -117,10 +119,26 @@ export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null
   let vivo = false;
 
   // Il corpo e' il porto di `passo()` del prototipo —
-  // docs/prototipi/2026-09-05-pratica-filo.html, righe 803-904 — con tre
+  // docs/prototipi/2026-09-05-pratica-filo.html, righe 803-904 — con quattro
   // differenze: `p` arriva dal ScrollTrigger invece che da un
-  // getBoundingClientRect a mano, `misura()` sostituisce `misuraImgs()`, e i
-  // nomi delle costanti sono quelli di `strada.ts`.
+  // getBoundingClientRect a mano, `misura()` sostituisce `misuraImgs()`, i
+  // nomi delle costanti sono quelli di `strada.ts`, e la quarta e' la sola che
+  // tocchi i NUMERI.
+  //
+  // La quarta: l'origine. Nel prototipo tutto si misurava su `.percorso`, che
+  // comincia alla prima voce; qui la scatola e' [data-pratica-percorso], che e'
+  // la stessa cosa. Per un po' non lo e' stata — si misurava la scena intera,
+  // titolo e occhiello compresi — e allora ogni numero di `PARAM` valeva un
+  // altro posto: «partenza» a 34px sotto il bordo alto cadeva sotto il titolo
+  // invece che sotto la prima voce, duecento e passa pixel piu' su di dove era
+  // stata trovata, e la finestra del ScrollTrigger si allungava di tutta
+  // l'intestazione, quindi `PARAM.ritardo` — che e' una frazione di quella
+  // finestra — segnava un altro momento. Chi ritara guardando non se ne
+  // accorge: assorbe la traslazione negli scostamenti e la ritrova identica
+  // il giorno in cui l'intro guadagna una riga.
+  //
+  // La sostanza sono i dodici punti numerati qui sotto: se il porto se ne
+  // discosta, si e' perso un difetto gia' corretto una volta.
   const passo = () => {
     // 1. Si rimisura a ogni fotogramma, e se l'impaginato si e' mosso la
     //    strada si rifa': i caratteri arrivano dopo il primo render, il testo
