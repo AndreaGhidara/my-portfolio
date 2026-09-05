@@ -36,6 +36,10 @@ export type Impaginato = {
    *  dove ogni disegno sta rispetto alla finestra, che e' quello che serve per
    *  decidere il fuoco. Costa zero — chi misura quel rettangolo ce l'ha gia'. */
   viewTop: number;
+  /** Dove sta il bordo SINISTRO della scatola misurata, in coordinate dello
+   *  schermo. Serve al filo, che si disegna in coordinate di pagina e non di
+   *  scena: vedi `Pagina` in strada.ts. Costa zero per la stessa ragione. */
+  viewLeft: number;
 };
 
 /** Gli elementi su cui il gesto scrive. Nessuno di questi e' React: questo

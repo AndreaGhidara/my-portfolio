@@ -105,7 +105,7 @@ export function Practice({
     // `r.top` e' gia' in mano: le misure sono relative a lui, e sommandolo si
     // sa dove ogni disegno sta rispetto alla finestra. E' quello che serve al
     // fuoco, e non costa un rettangolo in piu'.
-    return { misure, coda, mondo, viewTop: r.top };
+    return { misure, coda, mondo, viewTop: r.top, viewLeft: r.left };
   }, []);
 
   /**
@@ -216,8 +216,14 @@ export function Practice({
       const m = misuraScena();
       const tratto = filoRef.current?.querySelector("path");
       if (!m || !tratto || !filoRef.current) return;
-      filoRef.current.setAttribute("viewBox", `0 0 ${m.mondo.w} ${m.mondo.h}`);
-      tratto.setAttribute("d", curva(filo(m.misure, m.coda, m.mondo)));
+      // Il viewBox e' largo quanto la PAGINA, non quanto la scena: l'SVG del
+      // filo e' un riquadro a tutta larghezza (vedi [data-pratica-filo] in
+      // tokens.css), e le due scatole devono restare la stessa o il tratto si
+      // stira. L'altezza resta quella della scena — in verticale il filo la
+      // attraversa da bordo a bordo, e quello non cambia.
+      const pagina = { w: window.innerWidth, left: m.viewLeft };
+      filoRef.current.setAttribute("viewBox", `0 0 ${pagina.w} ${m.mondo.h}`);
+      tratto.setAttribute("d", curva(filo(m.misure, m.coda, m.mondo, pagina)));
       tessi(level);
     };
     disegna();
