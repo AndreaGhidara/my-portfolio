@@ -181,7 +181,20 @@ export function Practice({
    * ognuno richiama tessi(): vedi il suo commento per il perche'.
    */
   useLayoutEffect(() => {
+    // La bandiera che spegne quello che il cleanup non puo' staccare. Una
+    // promessa non si disiscrive: `document.fonts.ready` risolve quando decide
+    // lei, e la sua closure porta dentro il `level` di QUESTO giro. Se nel
+    // frattempo il livello e' cambiato — basta accendere la riduzione del
+    // movimento mentre i caratteri arrivano — quel `then` girerebbe DOPO
+    // spegni() e richiamerebbe tessi() col livello vecchio, cioe' ricostruirebbe
+    // un `weave` col tratteggio a lunghezza piena e uno ScrollTrigger vivo. Su
+    // un passaggio "full" → "none" il risultato e' un filo invisibile che si
+    // disegna solo scorrendo: esattamente quello che spegni() esiste per
+    // impedire. Il ResizeObserver e il listener si staccano; questa no, e
+    // allora si annulla.
+    let annullato = false;
     const disegna = () => {
+      if (annullato) return;
       const m = misuraScena();
       const tratto = filoRef.current?.querySelector("path");
       if (!m || !tratto || !filoRef.current) return;
@@ -195,6 +208,7 @@ export function Practice({
     if (ro && scope.current) ro.observe(scope.current);
     window.addEventListener("resize", disegna);
     return () => {
+      annullato = true;
       ro?.disconnect();
       window.removeEventListener("resize", disegna);
     };

@@ -17,10 +17,18 @@
  * ancora ritrovati su quello vero. Il calibratore adesso e' in pagina:
  * `Calibratore.tsx`, in sviluppo, aprendo l'indirizzo con `?calibra`. Vedi
  * §4.6 della spec.
+ *
+ * QUI NON C'E' PIU' IL CAPPIO, ed e' una cancellazione e non una svista. Il
+ * giro di penna a meta' discesa e' stato provato, guardato e scartato in
+ * brainstorming (spec §7.4): non aveva senso nel flusso. Il campo c'era ancora,
+ * spento — `cappio: { acceso: false, ... }` — ma il codice che lo onorava non
+ * e' stato portato dal prototipo: ne' `strada()` ne' `freccia.ts` lo leggevano.
+ * Non era un interruttore su off, era un interruttore staccato: quattro manopole
+ * del calibratore non facevano niente e il riquadro da incollare le riportava
+ * nell'oggetto. Il giorno in cui il cappio dovesse tornare, torna con la
+ * geometria che lo disegna — che e' la cosa che manca — e il parametro dopo.
  */
 export type Param = {
-  /** Il giro della penna a meta' discesa. Provato e scartato: resta spento. */
-  cappio: { acceso: boolean; dove: number; raggio: number; tratti: boolean[] };
   /** Quanto la freccia insegue lo scorrimento, per fotogramma. */
   inerziaPos: number;
   /** Quanto insegue la direzione. Piu' lenta della posizione: un oggetto vero
@@ -43,7 +51,6 @@ export type Param = {
 };
 
 export const PARAM: Param = {
-  cappio: { acceso: false, dove: 0.31, raggio: 0.07, tratti: [true, true, true] },
   inerziaPos: 0.14,
   inerziaDir: 0.055,
   gradiMax: 6.5,
