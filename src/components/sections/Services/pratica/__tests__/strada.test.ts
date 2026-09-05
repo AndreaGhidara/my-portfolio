@@ -20,6 +20,22 @@ const MISURE: Misura[] = [
   { cx: 0.28 * MONDO.w, cy: 2520, h: 300, lato: "sx" },
 ];
 
+/**
+ * Quanto la strada ha il permesso di sbordare a sinistra, IN FRAZIONE della
+ * larghezza del palco. E' una frazione e non un numero di pixel perche' la
+ * sbandata scala con la larghezza: gli scostamenti sono frazioni di `mondo.w`
+ * (vedi `strada()`) e i disegni si allontanano dalla mezzeria man mano che il
+ * palco si allarga. Un `-140` assoluto qui dichiarava una tolleranza vera a
+ * 1100 e nessuna tolleranza in particolare a qualunque altra larghezza — cioe'
+ * non misurava niente di stabile. Il valore e' lo stesso di prima, letto per
+ * quello che era: 140 su 1100.
+ *
+ * E' la sede della decisione del rischio §6.2 della spec, che resta aperto: se
+ * un giorno si decide di limitare la strada al bordo, si stringe questo numero
+ * e la strada lo segue.
+ */
+const SBORDO = 0.127;
+
 const tracciato = () => strada(MISURE, CODA, MONDO, PARAM, true);
 const puntiCampionati = () => campiona(segmenti(tracciato().punti), 0.01);
 
@@ -135,17 +151,34 @@ describe("la strada della freccia", () => {
   });
 
   it("resta dentro in orizzontale", () => {
-    // Il rischio §6.2 della spec: in prototipo sborda di 124px a sinistra fra
-    // la seconda e la terza voce. La tolleranza dichiarata qui E' la decisione:
-    // se un giorno si stringe, si stringe questo numero e la strada lo segue.
+    // Il rischio §6.2 della spec: in prototipo sborda a sinistra fra la seconda
+    // e la terza voce. La tolleranza e' SBORDO, una frazione del palco — vedi
+    // la sua nota. A destra non ci va nemmeno vicino (il massimo cade una
+    // sessantina di pixel dentro il bordo), e quei 20px sono il franco di una
+    // cosa che non succede, non una tolleranza dichiarata.
     const xs = puntiCampionati().map((p) => p[0]);
-    expect(Math.min(...xs)).toBeGreaterThan(-140);
+    expect(Math.min(...xs)).toBeGreaterThan(-MONDO.w * SBORDO);
     expect(Math.max(...xs)).toBeLessThan(MONDO.w + 20);
   });
 
   it("non sale mai sopra la partenza", () => {
     const ys = puntiCampionati().map((p) => p[1]);
     expect(Math.min(...ys)).toBeGreaterThanOrEqual(30);
+  });
+
+  it("ogni scostamento e' attaccato a un punto che esiste", () => {
+    // Il legame fra le chiavi di `PARAM.scostamenti` e i nomi che `strada()`
+    // da' ai suoi punti e' scritto in tre commenti e non lo teneva niente. Una
+    // chiave che non corrisponde a nessun nome non fallisce: non si applica, in
+    // silenzio, e la correzione a mano che qualcuno ha trovato guardando
+    // sparisce dal tracciato senza che nulla lo dica. E' il modo in cui una
+    // taratura si perde — «indicizzati per nome e non per indice» e' il patto
+    // che rende gli scostamenti sopravvivibili a un punto in piu' sulla strada,
+    // e vale solo finche' i nomi combaciano davvero.
+    const { nomi } = tracciato();
+    for (const chiave of Object.keys(PARAM.scostamenti)) {
+      expect(nomi, `PARAM.scostamenti.${chiave} non corrisponde a nessun punto`).toContain(chiave);
+    }
   });
 
   it("sotto i 900px gli scostamenti non si applicano", () => {
