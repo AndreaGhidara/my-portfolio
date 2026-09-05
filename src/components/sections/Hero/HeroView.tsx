@@ -3,6 +3,7 @@ import { InkCircle } from "@/components/brand/InkCircle";
 import { Wordmark } from "@/components/brand/Wordmark";
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { HeroMotion } from "./HeroMotion";
+import { CartaStropicciata } from "./CartaStropicciata";
 
 export type HeroViewProps = {
   eyebrow: string;
@@ -20,6 +21,12 @@ export function HeroView({
   return (
     <section id="hero" className="relative overflow-hidden px-[var(--gutter)] pb-16 pt-6">
       <ThreadSegment section="hero" className="pointer-events-none absolute inset-0 -z-10" />
+
+      {/* Le lettere del nome sono fogli, e si possono appallottolare. Non
+          sostituisce le <img>: si sovrappone alla lettera che si sta toccando
+          e ne segue il rettangolo, cosi' eredita il parallasse di HeroMotion e
+          lascia intatto l'elemento LCP della pagina. Si monta solo a "full". */}
+      <CartaStropicciata />
 
       <HeroMotion>
         <p className="eyebrow">{eyebrow}</p>
