@@ -166,7 +166,22 @@ export function Practice({
       spegni();
       const tratto = filoRef.current?.querySelector("path");
       if (!tratto) return;
-      tessitura.current = weave([tratto], { level: livello, trigger: scope.current, scrub: true });
+      // La finestra e' dichiarata, e non e' un dettaglio. Il default di `weave`
+      // sotto scrub e' `top bottom` -> `bottom top`: il tratto finirebbe di
+      // disegnarsi quando la sezione e' USCITA del tutto dallo schermo, cioe'
+      // con la sezione dopo gia' cominciata e la freccia da un pezzo in fondo.
+      // Il filo e' la cosa che consegna la pagina ai Lavori: deve chiudere
+      // QUI, e il 46% e' lo stesso estremo su cui finisce la corsa della
+      // freccia — cosi' arrivano insieme. E' la stessa ragione per cui i cavi
+      // del tavolo si danno `top top` / `bottom bottom` invece del default.
+      // L'inizio resta quello di serie: il filo comincia a colorarsi appena la
+      // scena entra, ben prima che la freccia si muova, ed e' voluto.
+      tessitura.current = weave([tratto], {
+        level: livello,
+        trigger: scope.current,
+        scrub: true,
+        end: "bottom 46%",
+      });
     },
     [spegni],
   );

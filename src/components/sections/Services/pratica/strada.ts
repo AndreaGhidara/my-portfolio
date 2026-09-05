@@ -117,8 +117,18 @@ export function campiona(segs: readonly Segmento[], passo = 0.01): Punto[] {
 }
 
 /**
- * Quale voce e' in fuoco: quella il cui disegno sta piu' vicino al centro
- * dello schermo, oppure -1 se nessuna e' abbastanza vicina.
+ * Quale voce e' in fuoco: quella il cui disegno cade dentro la fascia attorno
+ * al centro dello schermo, oppure -1 se nessuna ci cade.
+ *
+ * La FASCIA e' il punto, non la gara fra le distanze. Prendere sempre la piu'
+ * vicina fa cadere lo scambio fra due voci a meta' strada fra i loro disegni:
+ * la voce si accende quando il suo disegno e' ancora mezzo intervallo SOTTO il
+ * centro, e piu' si distanziano le voci piu' il difetto cresce. Con la soglia
+ * la regola diventa simmetrica — si accende salendo a `soglia` sotto il
+ * centro, si spegne a `soglia` sopra — e fra una voce e l'altra c'e' un tratto
+ * in cui non e' accesa nessuna, che e' onesto: li' non si sta guardando
+ * niente. La distanza minima resta come spareggio, per il caso in cui due
+ * disegni cadano tutti e due dentro la fascia.
  *
  * Perche' non lo decide piu' la freccia. Prima si accendeva la voce piu'
  * vicina alla PUNTA, e la punta insegue lo scorrimento con inerzia dopo un
