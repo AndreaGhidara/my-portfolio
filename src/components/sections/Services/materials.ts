@@ -106,28 +106,28 @@ const PALEST_PAPER: Record<Theme, Recipe> = {
 export const SURFACES: Record<SurfaceName, Surface> = {
   /* Il foglio: la carta piu' chiara della famiglia, bordo grafite. */
   sheet: {
-    anchor: '[data-desk-object][data-shape="sheet"] {',
+    anchor: '[data-desk-piece][data-shape="sheet"] {',
     family: "carta",
     light: { fill: PALEST_PAPER.light, line: { token: "fg-muted" } },
     dark: { fill: PALEST_PAPER.dark, line: mix("ink", 60, "fg-muted") },
   },
   /* La scheda: cartoncino, e il bordo di inchiostro — e' stampata. */
   card: {
-    anchor: '[data-desk-object][data-shape="card"] {',
+    anchor: '[data-desk-piece][data-shape="card"] {',
     family: "carta",
     light: { fill: mix("fg", 20, "bg"), line: mix("fg", 80, "bg") },
     dark: { fill: mix("fg", 58, "bg"), line: mix("ink", 85, "fg-muted") },
   },
   /* La piastra: l'unica cosa di metallo sul tavolo. */
   plate: {
-    anchor: '[data-desk-object][data-shape="plate"] {',
+    anchor: '[data-desk-piece][data-shape="plate"] {',
     family: "carta",
     light: { fill: mix("fg-muted", 55, "bg"), line: mix("fg-muted", 80, "fg") },
     dark: { fill: mix("fg-muted", 75, "bg"), line: mix("ink", 62, "fg-muted") },
   },
   /* La scocca: rack, telefono e laptop sono la stessa cosa, scatole scure. */
   shell: {
-    anchor: '[data-desk-object][data-shape="rack"],',
+    anchor: '[data-desk-piece][data-shape="rack"],',
     family: "apparecchio",
     light: { fill: mix("ink", 78, "fg-muted"), line: mix("ink", 42, "fg-muted") },
     dark: { fill: mix("ink", 82, "fg-muted"), line: mix("ink", 30, "fg-muted") },
@@ -135,7 +135,7 @@ export const SURFACES: Record<SurfaceName, Surface> = {
   /* Il post-it: fisso in tutti e due i temi. Un post-it giallo e' giallo di
      notte, ed e' l'unico calore del tavolo che non sia arancio. */
   postit: {
-    anchor: '[data-desk-object][data-shape="postit"] {',
+    anchor: '[data-desk-piece][data-shape="postit"] {',
     family: "fisso",
     light: { fill: { token: "bulb" }, line: mix("bulb", 55, "ink") },
     dark: { fill: { token: "bulb" }, line: mix("bulb", 55, "ink") },
@@ -147,7 +147,7 @@ export const SURFACES: Record<SurfaceName, Surface> = {
      ma vuoto, che e' quello che la spec chiede e che i pieni hanno smesso di
      dire il giorno in cui sono arrivati. */
   blank: {
-    anchor: '[data-desk-object][data-shape="postit"] [data-desk-blank] {',
+    anchor: '[data-desk-piece][data-shape="postit"] [data-desk-blank] {',
     family: "carta",
     light: { fill: PALEST_PAPER.light, line: null },
     dark: { fill: PALEST_PAPER.dark, line: null },

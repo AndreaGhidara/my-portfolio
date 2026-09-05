@@ -64,6 +64,16 @@ export function DeskShapeArt({ drawing }: { drawing: DeskDrawing }) {
  * Ventitre' oggetti su ventiquattro sono un disegno con una parola sotto. Il
  * ventiquattresimo — il post-it bianco — e' un comando, e allora la sagoma sta
  * dentro un <a>: l'unica cosa del tavolo che si preme.
+ *
+ * Porta DUE ganci e non uno, e dicono due cose diverse. `data-desk-object` vuol
+ * dire «una delle ventiquattro cose sul tavolo», ed e' quello che una prova
+ * conta: chi non sta sul tavolo non ce l'ha, o quel conteggio smetterebbe di
+ * misurare il tavolo. `data-desk-piece` vuol dire «un pezzo disegnato»: una
+ * sagoma, il suo materiale, il suo campione dentro. E' da li' che pendono la
+ * tavola dei materiali e la scatola del campione, e ce l'ha anche ogni disegno
+ * di «E in pratica?» — che e' la seconda cosa e non la prima. Senza,
+ * quei disegni sarebbero contorni nudi in colore di testo, col campione
+ * impaginato SOTTO la sagoma invece che dentro.
  */
 export function DeskObject({
   shape,
@@ -117,6 +127,7 @@ export function DeskObject({
   return (
     <li
       data-desk-object
+      data-desk-piece
       data-shape={shape}
       data-ghost={ghost ? "" : undefined}
       data-off={hidden ? "" : undefined}

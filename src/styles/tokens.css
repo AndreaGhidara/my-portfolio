@@ -641,6 +641,14 @@ html[data-dialog-open] body { overflow: hidden; }
    leggono. Sta in un posto solo apposta — e' la tavola della specifica, e
    sparpagliata fra quattordici regole non si riconoscerebbe piu'.
 
+   Pende da [data-desk-piece] e non da [data-desk-object]: «un pezzo disegnato»
+   e non «una delle ventiquattro cose sul tavolo». I nove disegni di «E in
+   pratica?» sono la prima cosa e non la seconda — dargli data-desk-object
+   romperebbe la prova che conta i ventiquattro (spec §4.4) — e con la tavola
+   agganciata all'oggetto restavano contorni nudi in colore di testo: le stesse
+   sagome senza i loro materiali, cioe' esattamente quello che quella scena
+   esiste per mostrare da vicino.
+
    E si dichiara DUE VOLTE, una per tema. La prima stesura ne aveva una sola, e
    in tema scuro la scheda (--fg 15% su --bg) e la scocca (--ink 78% con
    --fg-muted) cadevano sullo stesso identico colore: 1.00:1. Non era un valore
@@ -664,20 +672,20 @@ html[data-dialog-open] body { overflow: hidden; }
 /* ── Tema chiaro ─────────────────────────────────────────────────────────── */
 
 /* Carta appena staccata dal fondo, bordo grafite: e' il foglio. */
-[data-desk-object][data-shape="sheet"] {
+[data-desk-piece][data-shape="sheet"] {
   --desk-pieno: color-mix(in oklab, var(--fg) 9%, var(--bg));
   --desk-tratto: var(--fg-muted);
 }
 
 /* Carta, e il bordo di inchiostro: la scheda e' stampata, il foglio no. */
-[data-desk-object][data-shape="card"] {
+[data-desk-piece][data-shape="card"] {
   --desk-pieno: color-mix(in oklab, var(--fg) 20%, var(--bg));
   --desk-tratto: color-mix(in oklab, var(--fg) 80%, var(--bg));
 }
 
 /* Grafite: la piastra e' l'unica cosa di metallo sul tavolo. Il tratto e' la
    stessa grafite tirata verso il testo — staccare il bordo dal pieno. */
-[data-desk-object][data-shape="plate"] {
+[data-desk-piece][data-shape="plate"] {
   --desk-pieno: color-mix(in oklab, var(--fg-muted) 55%, var(--bg));
   --desk-tratto: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
 }
@@ -686,8 +694,8 @@ html[data-dialog-open] body { overflow: hidden; }
    e' --fg, e' --ink: un apparecchio non si inverte col tema. Su carta precipita
    a nero, ed e' giusto che lo faccia: e' l'unica cosa del tavolo che non e'
    fatta di carta. */
-[data-desk-object][data-shape="rack"],
-[data-desk-object][data-shape="phone"],
+[data-desk-piece][data-shape="rack"],
+[data-desk-piece][data-shape="phone"],
 [data-desk-centre] {
   --desk-pieno: color-mix(in oklab, var(--ink) 78%, var(--fg-muted));
   --desk-tratto: color-mix(in oklab, var(--ink) 42%, var(--fg-muted));
@@ -698,7 +706,7 @@ html[data-dialog-open] body { overflow: hidden; }
    nell'inchiostro — fisso anche lui, perche' fissa e' la carta che borda.
    E' l'unica superficie che NON si dichiara due volte: se la ridichiarasse
    uguale in tema scuro, direbbe che segue il tema, e non lo segue. */
-[data-desk-object][data-shape="postit"] {
+[data-desk-piece][data-shape="postit"] {
   --desk-pieno: var(--bulb);
   --desk-tratto: color-mix(in oklab, var(--bulb) 55%, var(--ink));
 }
@@ -714,7 +722,7 @@ html[data-dialog-open] body { overflow: hidden; }
    Non e' piu' VUOTO, ed e' un cambio recente: ci sta scritto sopra il conto dei
    caffe'. Il grigio serve ancora, e anzi serve di piu' — e' l'unico oggetto del
    tavolo che non e' un pezzo di lavoro, ed e' l'unico che si preme. */
-[data-desk-object][data-shape="postit"] [data-desk-blank] {
+[data-desk-piece][data-shape="postit"] [data-desk-blank] {
   --desk-pieno: color-mix(in oklab, var(--fg) 9%, var(--bg));
 }
 
@@ -722,17 +730,17 @@ html[data-dialog-open] body { overflow: hidden; }
 
 /* Qui la carta e' la cosa che brilla: sale netta sopra il fondo, e i segni
    sopra restano scuri — una matita e' una matita anche di notte. */
-[data-theme="dark"] [data-desk-object][data-shape="sheet"] {
+[data-theme="dark"] [data-desk-piece][data-shape="sheet"] {
   --desk-pieno: color-mix(in oklab, var(--fg) 68%, var(--bg));
   --desk-tratto: color-mix(in oklab, var(--ink) 60%, var(--fg-muted));
 }
 
-[data-theme="dark"] [data-desk-object][data-shape="card"] {
+[data-theme="dark"] [data-desk-piece][data-shape="card"] {
   --desk-pieno: color-mix(in oklab, var(--fg) 58%, var(--bg));
   --desk-tratto: color-mix(in oklab, var(--ink) 85%, var(--fg-muted));
 }
 
-[data-theme="dark"] [data-desk-object][data-shape="plate"] {
+[data-theme="dark"] [data-desk-piece][data-shape="plate"] {
   --desk-pieno: color-mix(in oklab, var(--fg-muted) 75%, var(--bg));
   --desk-tratto: color-mix(in oklab, var(--ink) 62%, var(--fg-muted));
 }
@@ -740,14 +748,14 @@ html[data-dialog-open] body { overflow: hidden; }
 /* E l'apparecchio scende: resta basso, vicino al fondo, e a tenerlo su sono il
    tratto e i led. E' l'inverso del tema chiaro, ed e' l'unico modo perche' le
    due famiglie non si incrocino quando il fondo diventa inchiostro. */
-[data-theme="dark"] [data-desk-object][data-shape="rack"],
-[data-theme="dark"] [data-desk-object][data-shape="phone"],
+[data-theme="dark"] [data-desk-piece][data-shape="rack"],
+[data-theme="dark"] [data-desk-piece][data-shape="phone"],
 [data-theme="dark"] [data-desk-centre] {
   --desk-pieno: color-mix(in oklab, var(--ink) 82%, var(--fg-muted));
   --desk-tratto: color-mix(in oklab, var(--ink) 30%, var(--fg-muted));
 }
 
-[data-theme="dark"] [data-desk-object][data-shape="postit"] [data-desk-blank] {
+[data-theme="dark"] [data-desk-piece][data-shape="postit"] [data-desk-blank] {
   --desk-pieno: color-mix(in oklab, var(--fg) 68%, var(--bg));
 }
 
@@ -930,9 +938,16 @@ html[data-dialog-open] body { overflow: hidden; }
    e' fermo. Sono un premio per chi guarda mentre scorre, non un'informazione
    che qualcuno deve riuscire a leggere. */
 
-[data-desk-object] [data-desk-sample] {
+/* La scatola del campione pende da [data-desk-piece], come i materiali: e' il
+   pezzo disegnato a dire dove sta il suo frammento, non il posto in cui il
+   pezzo si trova. Sul tavolo il pezzo e' il <li>; in «E in pratica?» e' lo
+   <span> del disegno, e la struttura dentro e' la stessa — la sagoma, e il
+   campione suo fratello. Senza questo il campione si impaginava DOPO la
+   sagoma invece che dentro: le marche in percentuale collassavano e quelle
+   assolute coprivano tutto il disegno. */
+[data-desk-piece] [data-desk-sample] {
   position: absolute;
-  /* Il rettangolo utile dentro la sagoma. Il <li> e' alto quanto il disegno
+  /* Il rettangolo utile dentro la sagoma. Il pezzo e' alto quanto il disegno
      (l'etichetta e' assoluta e non lo alza), quindi questi inset misurano la
      sagoma. Il default va bene per foglio e scheda; chi ha un corpo diverso lo
      ridichiara qui sotto — sono i margini interni del disegno, non stile. */
@@ -948,13 +963,13 @@ html[data-dialog-open] body { overflow: hidden; }
 
 /* La linguetta della scheda occupa le prime 16 unita' del suo viewBox: il
    campione comincia sotto, o gli finirebbe dentro. */
-[data-desk-object][data-shape="card"] [data-desk-sample] { inset: 28% 9% 11%; }
+[data-desk-piece][data-shape="card"] [data-desk-sample] { inset: 28% 9% 11%; }
 /* Il telefono ha lo schermo, non il corpo: 9 unita' di scocca su 74x148. */
-[data-desk-object][data-shape="phone"] [data-desk-sample] { inset: 8% 14%; gap: 6%; }
-[data-desk-object][data-shape="rack"] [data-desk-sample] { inset: 11% 9%; gap: 5%; }
-[data-desk-object][data-shape="plate"] [data-desk-sample] { inset: 20%; }
+[data-desk-piece][data-shape="phone"] [data-desk-sample] { inset: 8% 14%; gap: 6%; }
+[data-desk-piece][data-shape="rack"] [data-desk-sample] { inset: 11% 9%; gap: 5%; }
+[data-desk-piece][data-shape="plate"] [data-desk-sample] { inset: 20%; }
 /* Il post-it lascia libero l'angolo che si solleva, in basso a destra. */
-[data-desk-object][data-shape="postit"] [data-desk-sample] { inset: 14% 16% 22% 14%; }
+[data-desk-piece][data-shape="postit"] [data-desk-sample] { inset: 14% 16% 22% 14%; }
 
 /* ── Le marche ──────────────────────────────────────────────────────────── */
 [data-desk-sample] i { display: block; }
@@ -1128,7 +1143,7 @@ html[data-dialog-open] body { overflow: hidden; }
 
 /* Le copie: la stessa sagoma tre volte, sfalsata. Non e' un'icona di un backup,
    e' letteralmente una cosa ripetuta — che e' quello che un backup e'. */
-[data-desk-object] [data-desk-sample="copie"] { display: block; }
+[data-desk-piece] [data-desk-sample="copie"] { display: block; }
 [data-desk-sample] [data-m="copia"] {
   position: absolute;
   inset: 0 22% 22% 0;
@@ -1190,7 +1205,7 @@ html[data-dialog-open] body { overflow: hidden; }
    ventidue — un'immagine non ha un contenuto proprio da mostrare — e resta
    dentro la regola solo perche' e' quello che si vede in un posto dove
    un'immagine non e' ancora arrivata. */
-[data-desk-object] [data-desk-sample="immagini"] { display: block; }
+[data-desk-piece] [data-desk-sample="immagini"] { display: block; }
 [data-desk-sample] [data-m="cielo"] {
   position: absolute;
   inset: 0;
@@ -1222,7 +1237,7 @@ html[data-dialog-open] body { overflow: hidden; }
   border-radius: 1px;
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--desk-tratto) 30%, transparent);
 }
-[data-desk-object] [data-desk-sample="colori"] { flex-direction: row; gap: 8%; }
+[data-desk-piece] [data-desk-sample="colori"] { flex-direction: row; gap: 8%; }
 [data-desk-sample] [data-m="tinta"][data-t="carta"] { background-color: var(--paper); }
 [data-desk-sample] [data-m="tinta"][data-t="accento"] { background-color: var(--orange); }
 [data-desk-sample] [data-m="tinta"][data-t="inchiostro"] { background-color: var(--ink); }
@@ -1258,11 +1273,11 @@ html[data-dialog-open] body { overflow: hidden; }
   white-space: nowrap;
   color: color-mix(in oklab, var(--desk-tratto) 82%, transparent);
 }
-[data-desk-object] [data-desk-sample="dominio"],
-[data-desk-object] [data-desk-sample="sicurezza"],
-[data-desk-object] [data-desk-sample="velocita"],
-[data-desk-object] [data-desk-sample="manutenzione"],
-[data-desk-object] [data-desk-sample="caratteri"] { justify-content: center; }
+[data-desk-piece] [data-desk-sample="dominio"],
+[data-desk-piece] [data-desk-sample="sicurezza"],
+[data-desk-piece] [data-desk-sample="velocita"],
+[data-desk-piece] [data-desk-sample="manutenzione"],
+[data-desk-piece] [data-desk-sample="caratteri"] { justify-content: center; }
 
 /* ── La camera ──────────────────────────────────────────────────────────────
    Da qui in giu' e' tutto movimento, e ha due chiavi per la stessa porta:
@@ -1415,6 +1430,16 @@ html[data-dialog-open] body { overflow: hidden; }
    strada della freccia si misura, e un'altezza che dipende dal contenuto
    farebbe ballare il tracciato a ogni riflow. */
 [data-practice-art] { position: relative; height: clamp(230px, 32vw, 330px); }
+/* Il disegno e' anche il CONTENITORE DI INTERROGAZIONE del suo campione. Sul
+   tavolo quel mestiere lo fa [data-desk-world]: le marche che sono testo — il
+   mono dei tre campioni scritti, la A del campione dei caratteri — si misurano
+   in cqw, cioe' sulla larghezza del mondo e non su quella della finestra,
+   perche' lo stesso disegno stretto o largo deve restare lo stesso disegno.
+   Fuori dal tavolo quel contenitore non c'e', e senza questa riga quei due cqw
+   si risolverebbero sul viewport: una misura che non ha niente a che vedere col
+   disegno che la ospita. Nessuno dei nove oggetti che «E in pratica?» usa porta
+   oggi un campione di testo, quindi non si vede niente di sbagliato — ed e'
+   appunto il momento giusto per dichiararlo. */
 [data-practice-drawing] {
   position: absolute;
   left: var(--x);
@@ -1422,6 +1447,7 @@ html[data-dialog-open] body { overflow: hidden; }
   width: var(--w);
   max-width: 76%;
   transform: rotate(var(--rot));
+  container-type: inline-size;
 }
 
 /* Il blocco vuoto della coda. Sotto i 900px non serve — li' la freccia non
