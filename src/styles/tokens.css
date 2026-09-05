@@ -1566,3 +1566,44 @@ html[data-dialog-open] body { overflow: hidden; }
    sono dichiarate qui sopra sotto [data-motion="full"], e "full" e' un livello
    che chi ha chiesto la riduzione del movimento non ha mai. Spegnerle di nuovo
    spegnerebbe qualcosa che non e' acceso. */
+
+/* ──────────────────────────────────────────────────────────────────────────
+   La carta del nome. Le lettere dell'hero sono fogli: si sgualciscono al
+   passaggio, si prendono e si lanciano, e le palline cadono in fondo alla
+   finestra e ci restano mentre si scorre.
+
+   Lo strato e' fisso e copre la finestra perche' le palline devono restare
+   visibili scendendo per tutta la pagina, non solo dentro l'hero. Non riceve
+   il puntatore: quello lo prendono le <img> del nome, che stanno sotto e che
+   nessuna di queste regole tocca.
+
+   Niente qui e' condizionato al livello di movimento, e non e' una svista: il
+   componente non si monta nemmeno fuori da "full", quindi queste regole non
+   hanno su cosa applicarsi. Il fotogramma a riposo e' l'hero di sempre.
+   ────────────────────────────────────────────────────────────────────────── */
+[data-carta] {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+[data-carta-lettera],
+[data-carta-pezzo] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+/* La pallina ha un'ombra, il foglio che si sta ancora piegando no: una pallina
+   appoggiata senza ombra sembra disegnata sullo schermo invece che caduta. */
+[data-carta-pezzo] {
+  filter: drop-shadow(0 6px 10px color-mix(in oklab, var(--ink) 18%, transparent));
+}
+/* Mentre se ne tiene una in mano il testo non si seleziona. */
+[data-carta-presa] {
+  user-select: none;
+  cursor: grabbing;
+}
+#hero .wordmark-letter {
+  cursor: grab;
+}
