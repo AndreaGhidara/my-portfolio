@@ -20,6 +20,35 @@ export type Elementi = {
   trigger: Element | null;
 };
 
+/** La strada come sta adesso. Non e' un pezzo del gesto — al ciclo non serve
+ *  leggerla, la tiene lui — ma senza di questa chi la disegna dovrebbe
+ *  ricostruirla per conto suo, e disegnerebbe una strada diversa da quella che
+ *  la freccia percorre. */
+export type Lettura = {
+  punti: readonly Punto[];
+  nomi: readonly string[];
+  indiciDisegno: readonly number[];
+  mondo: Mondo;
+};
+
+/**
+ * Il manico del gesto. Prima di qui `guidaFreccia` restituiva la sola `molla`,
+ * ed e' ancora l'unica cosa che la pagina usa: le altre due servono a chi la
+ * strada la vuole vedere e rifare mentre gira, cioe' al calibratore. Il
+ * calibratore lo conosce questo modulo; questo modulo non conosce lui — e non
+ * deve, o in produzione resterebbe il suo buco.
+ */
+export type Guida = {
+  /** Spegne il gesto e ripulisce quello che ha scritto. */
+  molla: () => void;
+  /** Rifa' la strada da `PARAM`, adesso. Il ciclo la rifa' da solo quando si
+   *  muove l'impaginato, ma non sa che qualcuno gli ha cambiato le manopole
+   *  sotto: l'impaginato e' identico e la firma non cambia. */
+  ricostruisci: () => void;
+  /** La strada dell'ultima costruzione, o `null` se non ce n'e' ancora una. */
+  leggi: () => Lettura | null;
+};
+
 /**
  * Il gesto della freccia: costruisce la strada, la segue, e restituisce il modo
  * di spegnerla. Vive qui e non dentro `Practice.tsx` per tre ragioni: non c'e'
@@ -28,7 +57,7 @@ export type Elementi = {
  * contro il prototipo. Sepolto in fondo a un componente, quella rilettura non
  * la fa nessuno.
  */
-export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null): () => void {
+export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null): Guida {
   const { stradaEl, gpath, fre, voci, trigger } = elementi;
 
   const largo = window.matchMedia(LARGO).matches;
@@ -36,6 +65,7 @@ export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null
   let Limg: number[] = [];
   let Lcoda = 0;
   let firmaCorrente = "";
+  let ultima: Lettura | null = null;
 
   /** La firma dell'impaginato: se cambia, la strada va rifatta. Costa cinque
    *  getBoundingClientRect, cioe' niente, e rende il tracciato autoriparante
@@ -65,6 +95,7 @@ export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null
     Limg = s.indiciDisegno.map((i) => lungFinoA(s.punti, i));
     Lcoda = lungFinoA(s.punti, s.indiceCoda);
     firmaCorrente = firma(m);
+    ultima = { punti: s.punti, nomi: s.nomi, indiciDisegno: s.indiciDisegno, mondo: m.mondo };
   };
 
   /** Lo smoothstep del prototipo: 0 e 1 con le tangenti piatte, cioe' una
@@ -255,7 +286,7 @@ export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null
   });
   sveglia();
 
-  return () => {
+  const molla = () => {
     dormi();
     st.kill();
     // Le property inline della freccia nessun altro le toglierebbe: restassero
@@ -267,5 +298,17 @@ export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null
     fre.style.removeProperty("--a");
     fre.style.removeProperty("--s");
     for (const li of voci) li.removeAttribute("data-attiva");
+  };
+
+  return {
+    molla,
+    // `sveglia()` e non il solo `costruisci()`: girata una manopola la freccia
+    // e' quasi sempre gia' addormentata — si stacca appena arrivata — e la
+    // strada nuova resterebbe sotto una freccia ferma su quella vecchia.
+    ricostruisci: () => {
+      costruisci();
+      sveglia();
+    },
+    leggi: () => ultima,
   };
 }

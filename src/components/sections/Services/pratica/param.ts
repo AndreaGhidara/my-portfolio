@@ -1,10 +1,22 @@
 /**
- * TUTTI i numeri che decidono il gesto, in un posto solo. Nel prototipo erano
+ * I numeri che il calibratore gira, in un posto solo. Nel prototipo erano
  * sparsi in otto punti del file, e ogni taratura voleva una pubblicazione.
  *
- * Sono stati trovati col calibratore il 5 settembre 2026 — guardando, non a
- * tavolino — e andranno ritrovati sul vero impaginato: e' per quello che il
- * calibratore entra nell'app (Task 7). Vedi §4.6 della spec.
+ * NON sono tutti i numeri del gesto, e il commento che lo diceva era falso:
+ * una decina stanno inline in `freccia.ts` — i 70px sotto i quali smette di
+ * mirare un disegno, il 190/120 e lo 0.24 dei fondi delle gaussiane, lo 0.42
+ * che accende una voce, le finestre 0.3/0.72/0.28 della coda, il +3 con cui
+ * legge la tangente. Restano li' apposta: nel prototipo erano inline anche
+ * loro e la taratura e' riuscita con queste manopole sole, e dieci cursori in
+ * piu' renderebbero il pannello piu' difficile da usare, non piu' utile. Il
+ * confine e' questo: qui i numeri che si trovano guardando, li' quelli che
+ * descrivono COME il gesto e' fatto.
+ *
+ * Questi sono stati trovati col calibratore il 5 settembre 2026 — guardando,
+ * non a tavolino — ma su un impaginato che non e' quello del sito, e vanno
+ * ancora ritrovati su quello vero. Il calibratore adesso e' in pagina:
+ * `Calibratore.tsx`, in sviluppo, aprendo l'indirizzo con `?calibra`. Vedi
+ * §4.6 della spec.
  */
 export type Param = {
   /** Il giro della penna a meta' discesa. Provato e scartato: resta spento. */
