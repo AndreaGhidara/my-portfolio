@@ -36,7 +36,13 @@ const MISURE: Misura[] = [
  */
 const SBORDO = 0.127;
 
-const tracciato = () => strada(MISURE, CODA, MONDO, PARAM, true);
+/**
+ * La pagina e' piu' larga della scena, e la scena ci sta dentro centrata: e'
+ * la situazione vera sopra i 74rem. Tenerle distinte e' il punto di mezza
+ * suite — gli ancoraggi si contano sulla PAGINA, i disegni stanno nella SCENA.
+ */
+const PAGINA: Pagina = { w: 1400, left: (1400 - MONDO.w) / 2 };
+const tracciato = () => strada(MISURE, CODA, MONDO, PARAM, true, PAGINA);
 const puntiCampionati = () => campiona(segmenti(tracciato().punti), 0.01);
 
 /**
@@ -133,11 +139,31 @@ describe("la strada della freccia", () => {
     });
   });
 
-  it("esce dove esce il filo, e il numero non e' scritto a mano", () => {
+  it("esce dove esce il filo — sulla PAGINA, non sul percorso", () => {
+    // Il difetto che questa prova chiude: contata sul percorso, l'uscita della
+    // freccia finiva altrove rispetto a quella del filo, e lo scarto cresceva
+    // con lo schermo (97px a 1440, 280 a 1920). In calibrazione era stato
+    // corretto a mano trascinando `coda.fine`, che pero' azzecca una larghezza
+    // sola. Qui si verifica che combacino per costruzione: la x della strada,
+    // riportata in coordinate di pagina, E' quella del filo.
     const { punti: P, nomi } = tracciato();
     expect(nomi[nomi.length - 1]).toBe("coda.fine");
-    expect(P[P.length - 1][0]).toBeCloseTo((MONDO.w * THREAD_ANCHORS.practice.out) / 100, 6);
+    const suPagina = P[P.length - 1][0] + PAGINA.left;
+    expect(suPagina).toBeCloseTo((PAGINA.w * THREAD_ANCHORS.practice.out) / 100, 6);
     expect(P[P.length - 1][1]).toBe(MONDO.h);
+  });
+
+  it("l'uscita segue la finestra: piu' larga e' la pagina, piu' a destra esce", () => {
+    // La prova che la correzione a mano non puo' dare: contata sul percorso
+    // l'uscita sarebbe la stessa a ogni larghezza, che e' esattamente perche'
+    // si staccava dal filo.
+    const dove = (w: number) => {
+      const p = { w, left: Math.max(0, (w - MONDO.w) / 2) };
+      const P = strada(MISURE, CODA, MONDO, PARAM, true, p).punti;
+      return P[P.length - 1][0] + p.left;
+    };
+    expect(dove(1600)).toBeGreaterThan(dove(1400));
+    expect(dove(1400)).toBeGreaterThan(dove(1200));
   });
 
   it("non risale MAI prima della coda", () => {
@@ -150,15 +176,22 @@ describe("la strada della freccia", () => {
     expect(risalite().coda).toBeGreaterThan(150);
   });
 
-  it("resta dentro in orizzontale", () => {
+  it("resta dentro in orizzontale, dove ha senso chiederlo", () => {
     // Il rischio §6.2 della spec: in prototipo sborda a sinistra fra la seconda
     // e la terza voce. La tolleranza e' SBORDO, una frazione del palco — vedi
     // la sua nota. A destra non ci va nemmeno vicino (il massimo cade una
     // sessantina di pixel dentro il bordo), e quei 20px sono il franco di una
     // cosa che non succede, non una tolleranza dichiarata.
+    // A destra il limite non e' piu' il bordo del percorso: l'uscita si conta
+    // sulla PAGINA, quindi su una finestra larga cade fuori dalla colonna del
+    // contenuto — deliberatamente, ed e' dove esce anche il filo. Il vincolo
+    // vero e' che non superi quel punto.
     const xs = puntiCampionati().map((p) => p[0]);
+    const uscita = (PAGINA.w * THREAD_ANCHORS.practice.out) / 100 - PAGINA.left;
     expect(Math.min(...xs)).toBeGreaterThan(-MONDO.w * SBORDO);
-    expect(Math.max(...xs)).toBeLessThan(MONDO.w + 20);
+    // Il piu' esterno fra i due: la strada vive nel palco, ma la sua uscita puo'
+    // cadere fuori, e nella coda gonfia a destra PRIMA di uscire.
+    expect(Math.max(...xs)).toBeLessThan(Math.max(MONDO.w, uscita) + 20);
   });
 
   it("non sale mai sopra la partenza", () => {
@@ -191,7 +224,7 @@ describe("la strada della freccia", () => {
     // Sulla strada NUDA, senza gli scostamenti a mano: la collinearita' e' una
     // proprieta' della geometria: `coda.rientra` ha una correzione grossa, e
     // dopo di quella nessuno dei tre e' piu' dove la geometria l'aveva messo.
-    const { punti: P, nomi } = strada(MISURE, CODA, MONDO, PARAM, false);
+    const { punti: P, nomi } = strada(MISURE, CODA, MONDO, PARAM, false, PAGINA);
     const i = nomi.indexOf("coda.scende");
     const j = nomi.indexOf("coda.punta");
     const r = nomi.indexOf("coda.rientra");
@@ -213,7 +246,7 @@ describe("la strada della freccia", () => {
   it("sotto i 900px gli scostamenti non si applicano", () => {
     // Li' i blocchi si impilano, i disegni stanno da tutt'altra parte, e una
     // correzione da mezzo schermo non corregge: sposta.
-    const nudo = strada(MISURE, CODA, MONDO, PARAM, false);
+    const nudo = strada(MISURE, CODA, MONDO, PARAM, false, PAGINA);
     const i = nudo.indiciDisegno[1];
     expect(nudo.punti[i][0]).toBe(MISURE[1].cx);
     expect(nudo.punti[i][1]).toBe(MISURE[1].cy);
