@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { THREAD_ANCHORS } from "@/components/thread/anchors";
 import { PARAM } from "../param";
-import { campiona, curva, filo, segmenti, strada, type Misura, type Punto } from "../strada";
+import { campiona, curva, filo, inFuoco, segmenti, strada, type Misura, type Punto } from "../strada";
 
 /**
  * Un impaginato finto ma realistico: quattro disegni alternati, la coda in
@@ -209,5 +209,50 @@ describe("il filo della scena", () => {
     // L'irregolarita' viene da un LCG seminato, come le sagome del tavolo. Con
     // Math.random() il filo cambierebbe a ogni render e non sarebbe provabile.
     expect(filo(MISURE, CODA, MONDO)).toEqual(filo(MISURE, CODA, MONDO));
+  });
+});
+
+/**
+ * Il fuoco. Prima lo decideva la punta della freccia, che insegue lo
+ * scorrimento con inerzia dopo un ritardo: la voce si accendeva quando era
+ * gia' scesa sotto la meta' dello schermo. Adesso lo decide dove sta il
+ * disegno rispetto al centro della finestra, ed e' aritmetica pura — quindi
+ * sta qui, dove una prova la vede, e non dentro un ciclo che nessun test
+ * raggiunge.
+ */
+describe("quale voce e' in fuoco", () => {
+  const CENTRO = 450;
+  const SOGLIA = 900 * 0.4;
+
+  it("accende quella piu' vicina al centro dello schermo", () => {
+    expect(inFuoco([100, 430, 800], CENTRO, SOGLIA)).toBe(1);
+  });
+
+  it("non accende niente quando nessuna e' abbastanza vicina", () => {
+    // Sopra e sotto la scena non c'e' nessuna voce che chi legge stia
+    // guardando: accendere comunque la meno lontana illuminerebbe la prima
+    // voce mentre si e' ancora sul tavolo.
+    expect(inFuoco([-2000, 3000], CENTRO, SOGLIA)).toBe(-1);
+  });
+
+  it("il cambio avviene a META' STRADA fra due voci, non dopo", () => {
+    // E' il difetto che questa funzione corregge, ed e' il caso che conta.
+    // Scorrendo sono i DISEGNI a salire mentre il centro sta fermo: qui la
+    // coppia si muove di dieci pixel attorno al punto in cui la seconda voce
+    // diventa la piu' vicina. Con i due a distanza 400 quel punto e' la loro
+    // mezzeria — non un istante piu' tardi, che e' quello che si vedeva prima.
+    const distanti = (primo: number) => [primo, primo + 400];
+    // La mezzeria e' ancora sotto il centro: comanda la prima.
+    expect(inFuoco(distanti(CENTRO - 195), CENTRO, SOGLIA)).toBe(0);
+    // La mezzeria l'ha superato: passa la seconda.
+    expect(inFuoco(distanti(CENTRO - 205), CENTRO, SOGLIA)).toBe(1);
+  });
+
+  it("una voce esattamente al centro e' in fuoco", () => {
+    expect(inFuoco([CENTRO], CENTRO, SOGLIA)).toBe(0);
+  });
+
+  it("senza disegni non accende niente invece di lanciare", () => {
+    expect(inFuoco([], CENTRO, SOGLIA)).toBe(-1);
   });
 });

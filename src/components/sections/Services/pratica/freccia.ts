@@ -1,9 +1,29 @@
 import { gsap, ScrollTrigger } from "@/animations/gsap";
-import { curva, strada, type Coda, type Misura, type Mondo, type Punto } from "./strada";
+import { curva, inFuoco, strada, type Coda, type Misura, type Mondo, type Punto } from "./strada";
 import { LARGO, PARAM } from "./param";
 
 /** Dove sta l'impaginato adesso: e' quello che `misura()` restituisce. */
-export type Impaginato = { misure: Misura[]; coda: Coda; mondo: Mondo };
+/**
+ * Quanto lontano dal centro dello schermo puo' stare un disegno e restare in
+ * fuoco, in frazione dell'altezza della finestra. Dentro questa distanza si
+ * accende la voce piu' vicina al centro; oltre, nessuna — ai due estremi della
+ * scena non c'e' niente che chi legge stia guardando.
+ *
+ * Non e' una manopola del calibratore: le manopole di PARAM decidono il
+ * MOVIMENTO della freccia, e il fuoco non e' piu' un fatto della freccia.
+ */
+const FUOCO = 0.4;
+
+export type Impaginato = {
+  misure: Misura[];
+  coda: Coda;
+  mondo: Mondo;
+  /** Dove sta il bordo alto della scatola misurata, in coordinate dello
+   *  SCHERMO. Le `misure` sono relative a quel bordo: sommandolo si ottiene
+   *  dove ogni disegno sta rispetto alla finestra, che e' quello che serve per
+   *  decidere il fuoco. Costa zero — chi misura quel rettangolo ce l'ha gia'. */
+  viewTop: number;
+};
 
 /** Gli elementi su cui il gesto scrive. Nessuno di questi e' React: questo
  *  modulo e' DOM e numeri, ed e' per quello che sta fuori dal componente. */
@@ -247,24 +267,33 @@ export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null
     const ang = prec + delta;
     curA = ang;
 
-    // 11. L'asta si allunga arrivando, e la voce piu' vicina si accende.
+    // 11. L'asta si allunga arrivando: questo resta un fatto della FRECCIA,
+    //     perche' e' lei che si tende avvicinandosi a un disegno.
     const scala = Math.max(190, W * 0.24);
-    let vicino = -1;
     let best = 1e9;
-    imgs.forEach((g, k) => {
+    for (const g of imgs) {
       const d = Math.hypot(g.cx - pt.x, g.cy - pt.y);
-      if (d < best) {
-        best = d;
-        vicino = k;
-      }
-    });
+      if (d < best) best = d;
+    }
     const pr = Math.exp(-Math.pow(best / scala, 2));
+
+    // 11 bis. Il fuoco no: quello e' un fatto di dove sta guardando chi legge,
+    //     e si decide sul CENTRO DELLO SCHERMO. Legato alla punta si accendeva
+    //     in ritardo — la freccia insegue lo scorrimento con inerzia e parte
+    //     dopo `ritardo` — e la voce si illuminava quando era gia' scesa sotto
+    //     la meta'. Le due cose restano d'accordo lo stesso: la freccia arriva
+    //     DENTRO una voce gia' accesa, che e' anche il verso giusto del gesto.
+    const attiva = inFuoco(
+      imgs.map((g) => m.viewTop + g.cy),
+      window.innerHeight / 2,
+      window.innerHeight * FUOCO,
+    );
 
     fre.style.left = `${pt.x.toFixed(1)}px`;
     fre.style.top = `${pt.y.toFixed(1)}px`;
     fre.style.setProperty("--a", `${ang.toFixed(1)}deg`);
     fre.style.setProperty("--s", (PARAM.lungBase + PARAM.lungPunta * pr).toFixed(3));
-    voci.forEach((el, k) => el.toggleAttribute("data-attiva", k === vicino && pr > 0.42));
+    voci.forEach((el, k) => el.toggleAttribute("data-attiva", k === attiva));
 
     // 12. Si stacca quando e' arrivata — in posizione E in direzione: fermarsi
     //     sulla sola posizione lascerebbe la virata a meta'. Il ScrollTrigger

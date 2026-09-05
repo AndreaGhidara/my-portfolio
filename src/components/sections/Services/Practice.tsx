@@ -102,7 +102,10 @@ export function Practice({
     const c = codaEl?.getBoundingClientRect();
     const coda: Coda = { top: c ? c.top - r.top : r.height, h: c?.height ?? 0 };
     const mondo: Mondo = { w: r.width, h: r.height };
-    return { misure, coda, mondo };
+    // `r.top` e' gia' in mano: le misure sono relative a lui, e sommandolo si
+    // sa dove ogni disegno sta rispetto alla finestra. E' quello che serve al
+    // fuoco, e non costa un rettangolo in piu'.
+    return { misure, coda, mondo, viewTop: r.top };
   }, []);
 
   /**

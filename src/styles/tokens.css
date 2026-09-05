@@ -1424,7 +1424,11 @@ html[data-dialog-open] body { overflow: hidden; }
   display: grid;
   gap: 1.5rem;
   align-items: center;
-  padding-block: 2.5rem;
+  /* Le voci respirano, e non e' gusto: il fuoco si accende sulla voce piu'
+     vicina al centro dello schermo, quindi due voci troppo vicine se lo
+     passano prima che si sia finito di leggere la prima. Lo spazio e' quello
+     che rende la scena una voce alla volta invece di un elenco fitto. */
+  padding-block: 3.5rem;
 }
 [data-practice-text] { max-width: 36ch; }
 [data-practice-text] h4 {
@@ -1475,7 +1479,7 @@ html[data-dialog-open] body { overflow: hidden; }
   [data-practice-item] {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
     gap: 3.5rem;
-    padding-block: 4.5rem;
+    padding-block: 7rem;
   }
   [data-practice-item][data-lato="sx"] [data-practice-text] { order: 2; margin-inline-start: auto; }
   [data-practice-item][data-lato="sx"] [data-practice-art] { order: 1; }
