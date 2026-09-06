@@ -14,7 +14,16 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3777](http://localhost:3777) with your browser to see the result.
+
+The dev server runs on **3777** and `npm start` on **3778**, not on the usual 3000:
+so the project can sit next to another one without fighting for the port. The
+number is the `23.777` written on the grey post-it of the desk section — it is
+easier to remember than a random one. Both are overridable:
+
+```bash
+PORT=4000 npm run dev
+```
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
