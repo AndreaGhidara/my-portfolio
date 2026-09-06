@@ -18,23 +18,69 @@
   },
   "seeking": {
     "eyebrow": "Partiamo da qui",
-    "title": "Cosa stai cercando?",
-    "intro": "Se sei arrivato fin qui, una di queste frasi te la sei già detta.",
-    "list": {
-      "sites": {
-        "voice": "Il mio sito non dice quello che faccio davvero."
-      },
-      "ecommerce": {
-        "voice": "Voglio vendere online senza combattere ogni giorno col gestionale."
-      },
-      "webapp": {
-        "voice": "Ho un'idea in testa e nessuno che la costruisca."
-      },
-      "ai": {
-        "voice": "Voglio smettere di fare a mano quello che potrebbe farsi da solo."
-      }
+    "title": "Da dove parti?",
+    "intro": "Cinque modi in cui di solito comincia, dal più leggero al più grosso. Scegli il tuo e ti dico cosa significa davvero — anche se il tuo è l'ultimo.",
+    "attesa": "Non è un modulo: resta tutto qui, nessuno riceve niente finché non sei tu a scrivermi.",
+    "labels": {
+      "tipo": "Che tipo di lavoro è",
+      "prova": "La prova"
     },
-    "outro": "Ti ci sei riconosciuto? Allora la parte difficile l'hai già fatta: sai cosa ti serve."
+    "list": {
+      "capire": {
+        "nome": "Farsi capire",
+        "voice": "Il sito c'è, ma non dice quello che facciamo davvero: chi ci arriva non capisce.",
+        "et": "Quello che di solito significa",
+        "titolo": "Quasi mai è un problema di parole.",
+        "etPrima": "La prova che puoi fare oggi, in dieci minuti",
+        "prima": "Scrivi le tre domande che ti fanno al telefono prima di comprare. Poi apri la tua home e conta a quante risponde nella prima schermata. Se sono zero o una, il problema non è come è scritto: è l'ordine in cui è messo — il sito racconta com'è fatta l'azienda invece di rispondere a chi arriva.",
+        "tipo": "Il lavoro grosso è decidere cosa viene prima, non produrre testo. Poche settimane, e non serve rifare la grafica per scoprirlo.",
+        "prova": "Cosa c'è dietro un sito, per intero",
+        "cta": "Parliamone"
+      },
+      "strumento": {
+        "nome": "Uno strumento",
+        "voice": "Quello che ho funziona: mi serve qualcosa che acceleri i passaggi che mi rubano tempo.",
+        "et": "Quello che di solito significa",
+        "titolo": "È la richiesta più sana delle cinque, e la più sottovalutata.",
+        "etPrima": "La trappola in cui si cade",
+        "prima": "Lo strumento finisce quasi sempre sul passaggio che dà più fastidio invece che su quello che costa più tempo — e non sono mai lo stesso. Per una settimana segna quanto dura ogni cosa ripetitiva, non quanto ti pesa: la classifica che esce non è quella che avevi in testa.",
+        "tipo": "Piccolo e a sé stante. Non tocca quello che hai, e se sbaglia si butta senza aver rotto niente. È anche il modo meno caro di scoprire se ti serve il resto.",
+        "prova": "Aidify, che assorbe le domande ripetute",
+        "cta": "Parliamone"
+      },
+      "aggiunta": {
+        "nome": "Un'aggiunta",
+        "voice": "La struttura c'è già: devo aggiungerci delle funzionalità nuove.",
+        "et": "Quello che di solito significa",
+        "titolo": "Il costo non è la funzionalità. È quello che c'era prima.",
+        "etPrima": "La domanda che sposta il preventivo",
+        "prima": "Chiedi a chi l'ha costruito se esiste un modo di provare una modifica prima di pubblicarla. Se la risposta è no, quello è il primo lavoro — e vale per qualunque cosa aggiungerai dopo, non solo per questa.",
+        "tipo": "Si comincia leggendo, non scrivendo. Una stima onesta arriva dopo mezza giornata dentro il codice, non prima.",
+        "prova": "BDroppy, migrata senza mai spegnerla",
+        "cta": "Parliamone"
+      },
+      "fulcro": {
+        "nome": "Un fulcro",
+        "voice": "Voglio portare tutta l'operatività dentro un'unica applicazione, cucita su di noi.",
+        "et": "Quello che di solito significa",
+        "titolo": "È il progetto più grande dei cinque, e l'unico che può fallire in silenzio.",
+        "etPrima": "Dove va storto",
+        "prima": "Si costruisce tutto, si consegna, e le persone continuano a usare i vecchi fogli. Il software non è la parte difficile: farlo diventare il posto dove si lavora davvero lo è. Elenca dove vivono oggi i dati — gestionale, fogli, email, la testa di qualcuno. Il posto con più cose dentro di solito è la persona.",
+        "tipo": "A fasi, e la prima deve sostituire qualcosa per davvero. Un pezzo entrato in uso vale più di dieci pronti e spenti.",
+        "prova": "CustomerTrack, costruita per essere di più aziende",
+        "cta": "Parliamone"
+      },
+      "nonancora": {
+        "nome": "Non ancora",
+        "voice": "Non lo so ancora. So solo che qualcosa mi costa troppo tempo.",
+        "et": "È la risposta di quasi tutti",
+        "titolo": "Nessuno arriva sapendo se gli serve uno strumento o una piattaforma.",
+        "etPrima": "Una domanda a cui puoi rispondere da solo, oggi",
+        "prima": "Se domani sparisse una persona sola dall'azienda, cosa si fermerebbe? Quella cosa è il punto da cui parte qualunque progetto sensato — e quasi sempre è la stessa che ti costa troppo tempo adesso.",
+        "tipo": "Nessuno, per ora. Rispondere a quella domanda vale più di qualunque preventivo, e per farlo non servo io.",
+        "cta": "Se vuoi, scrivimi lo stesso"
+      }
+    }
   },
   "services": {
     "eyebrow": "Il metodo",

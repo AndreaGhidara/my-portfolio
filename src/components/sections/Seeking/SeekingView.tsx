@@ -1,38 +1,46 @@
-import { QuoteFrame } from "@/components/brand/QuoteFrame";
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
-import { SeekingVoices } from "./SeekingVoices";
-
-export type SeekingItem = { id: string; voice: string };
+import { SeekingStrade, type SeekingStrada } from "./SeekingStrade";
 
 export type SeekingViewProps = {
   eyebrow: string;
   title: string;
   intro: string;
-  outro: string;
-  items: SeekingItem[];
+  /** «Non e' un modulo»: il patto, scritto dove si prende la decisione. */
+  attesa: string;
+  etichettaTipo: string;
+  strade: SeekingStrada[];
 };
 
 /**
- * Il momento del riconoscimento, ed e' il piu' rumoroso della pagina: le
- * quattro frasi sono virgolettate perche' sono SUE, non mie. "Offro
- * automazioni" e' una descrizione; "voglio smettere di fare a mano quello che
- * potrebbe farsi da solo" e' una cosa che si e' gia' detto a voce alta.
+ * La seconda sezione: quella che deve guadagnarsi il diritto di dire tutto il
+ * resto. Prima erano quattro frasi che rispecchiavano il visitatore e una
+ * chiusa che gli faceva un complimento — «la parte difficile l'hai gia' fatta:
+ * sai cosa ti serve» — che era anche falsa: chi arriva conosce un sintomo, non
+ * il problema, e dirgli il contrario toglie a questo sito la ragione per cui
+ * dovrebbe scrivergli.
  *
- * Sta sull'arancio, e le virgolette grandi che prima incorniciavano i servizi
- * vengono qui: e' l'unico blocco della pagina che contiene delle citazioni
- * vere, e li' quel segno significa qualcosa.
+ * Adesso chiede e RISPONDE. Cinque strade ordinate per quanto toccano di
+ * quello che uno ha gia', e ognuna si porta dietro cosa significa davvero, una
+ * cosa da verificare da soli oggi, e dove nella pagina sta la prova.
  *
- * Vincolo di contrasto: sull'arancio la carta e' 3,3:1, ammessa solo per testo
- * grande. Le frasi lo sono; tutto il testo corrente resta inchiostro (5,1:1).
+ * Le virgolette attorno al blocco sono sparite con le frasi: aprivano e
+ * chiudevano quattro voci di persone diverse come se fossero un unico brano
+ * citato, e qui non c'e' piu' niente da citare — sono scelte, non voci.
  */
-export function SeekingView({ eyebrow, title, intro, outro, items }: SeekingViewProps) {
+export function SeekingView({
+  eyebrow,
+  title,
+  intro,
+  attesa,
+  etichettaTipo,
+  strade,
+}: SeekingViewProps) {
   return (
     <section
       id="seeking"
       className="relative overflow-hidden bg-[var(--accent)] px-[var(--gutter)] py-[var(--section-y)]"
     >
       <ThreadSegment section="seeking" className="pointer-events-none absolute inset-0 opacity-40" />
-
       <div className="relative mx-auto max-w-5xl">
         <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
         <h2 className="mt-3 text-4xl text-[var(--paper)] lg:text-6xl">{title}</h2>
@@ -40,24 +48,11 @@ export function SeekingView({ eyebrow, title, intro, outro, items }: SeekingView
           {intro}
         </p>
 
-        {/* Le virgolette aprono e chiudono le QUATTRO FRASI, non la sezione.
-            Agli angoli del blocco finivano sotto l'header fisso, e su mobile
-            sopra il contenuto non c'e' lo spazio per tenercele: qui invece
-            sono al posto giusto anche per quello che significano — sono
-            citazioni vere, e quel segno le apre. */}
-        <QuoteFrame
-          variant="open"
-          className="mt-12 block w-16 lg:mt-16 lg:w-24 [&_img]:h-auto [&_img]:w-full [&_img]:brightness-0 [&_img]:invert"
-        />
+        <SeekingStrade strade={strade} titolo={title} etichettaTipo={etichettaTipo} />
 
-        <SeekingVoices items={items} />
-
-        <QuoteFrame
-          variant="close"
-          className="ml-auto mt-6 block w-12 lg:w-16 [&_img]:h-auto [&_img]:w-full [&_img]:brightness-0 [&_img]:invert"
-        />
-
-        <p className="mt-10 max-w-2xl text-[var(--on-accent)] lg:mt-14">{outro}</p>
+        <p data-seeking-attesa className="mt-6 max-w-2xl text-[var(--on-accent)]">
+          {attesa}
+        </p>
       </div>
     </section>
   );
