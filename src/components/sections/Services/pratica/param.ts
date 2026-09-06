@@ -69,9 +69,24 @@ export const PARAM: Param = {
     disegno3: [-0.2309, -0.2523],
     "coda.giu": [-0.3198, -0.2641],
     "coda.apre": [0.1343, -0.2378],
-    "coda.colmo": [0.1934, -0.3534],
-    "coda.rientra": [0.5139, -0.3402],
-    "coda.punta": [-0.0167, -0.2959],
+    "coda.colmo": [-0.2198, -0.1641],
+    "coda.rientra": [0.3309, -0.4227],
+    "coda.scende": [0.2841, -0.292],
+    "coda.punta": [-0.2483, -0.0241],
+    /**
+     * Solo in verticale, e non e' una svista che manchi la x.
+     *
+     * La x dell'uscita e' l'ANCORA con cui la scena consegna il filo ai
+     * Lavori: si conta sulla pagina e deve combaciare, quindi non si corregge
+     * a mano — la calibrazione infatti l'ha riportata a 0,0002, cioe' due
+     * decimi di pixel, che e' il tremolio del trascinamento. Tolta.
+     *
+     * In verticale invece non c'e' nessuna ancora: sopra e sotto la scena
+     * finisce dove finisce la sua scatola, e far uscire la freccia una
+     * cinquantina di pixel piu' in basso e' una scelta di gusto come tutte le
+     * altre di questa tabella.
+     */
+    "coda.fine": [0, 0.0494],
   },
 };
 
