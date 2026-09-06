@@ -1607,3 +1607,128 @@ html[data-dialog-open] body { overflow: hidden; }
 #hero .wordmark-letter {
   cursor: grab;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Le cinque strade di «Da dove parti?».
+
+   SENZA JAVASCRIPT. La scelta e' un gruppo di radio nascosti alla vista ma non
+   all'accesso, e la risposta si scopre con :has(). Il browser regala quello
+   che altrimenti andrebbe imitato: un solo stop nel giro dei Tab, le frecce
+   per cambiare opzione, e lo stato annunciato senza doverlo dichiarare.
+
+   Le cinque regole posizionali qui sotto sono l'unica cosa da tenere allineata
+   al contenuto: una per strada, nell'ordine di `seekingRoutes`. Una prova
+   conta che siano tante quante le strade — se un giorno se ne aggiunge una
+   sesta e la regola manca, la sua risposta non si aprirebbe e nessuno se ne
+   accorgerebbe guardando il codice.
+
+   Il testo lungo e' in INCHIOSTRO e non in carta: carta su arancio fa 3,27:1,
+   che regge solo per il testo grande. A questa misura non basterebbe, e
+   inchiostro su arancio fa 5,08:1. E' anche quello che fa leggere la gerarchia
+   fra la scelta e la sua risposta.
+   ────────────────────────────────────────────────────────────────────────── */
+[data-strade] { margin-block-start: 2rem; }
+[data-scelte] { border: 0; margin: 0; padding: 0; }
+[data-scelte-lista] { display: flex; flex-direction: column; gap: 0.6rem; }
+
+[data-strada] {
+  display: block;
+  padding: 1rem 1.2rem;
+  border: 1.5px solid color-mix(in oklab, var(--ink) 55%, transparent);
+  color: var(--on-accent);
+  cursor: pointer;
+  line-height: 1.3;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+[data-strada] input {
+  /* Nascosto alla vista, non all'accesso: resta focalizzabile e resta un
+     radio, che e' tutto quello che serve perche' la tastiera funzioni. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+[data-strada]:hover { background: color-mix(in oklab, var(--ink) 9%, transparent); }
+[data-strada]:has(input:checked) {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+[data-strada]:has(input:focus-visible) { outline: 2px solid var(--paper); outline-offset: 3px; }
+[data-strada-nome] {
+  display: block;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-block-end: 0.3rem;
+}
+[data-strada-voce] { display: block; font-weight: 600; font-size: clamp(1rem, 2.1vw, 1.15rem); }
+
+/* Le risposte stanno tutte nel DOM: senza fogli di stile si leggono tutte e
+   cinque di fila — lunga, ma completa. E' il patto del fallback. */
+[data-risposta] { display: none; }
+[data-strade]:has([data-strada]:nth-child(1) input:checked) [data-risposta]:nth-child(1),
+[data-strade]:has([data-strada]:nth-child(2) input:checked) [data-risposta]:nth-child(2),
+[data-strade]:has([data-strada]:nth-child(3) input:checked) [data-risposta]:nth-child(3),
+[data-strade]:has([data-strada]:nth-child(4) input:checked) [data-risposta]:nth-child(4),
+[data-strade]:has([data-strada]:nth-child(5) input:checked) [data-risposta]:nth-child(5) {
+  display: block;
+}
+
+[data-risposte] { margin-block-start: 1.8rem; }
+[data-risposta] {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 1.4rem 1.5rem;
+}
+[data-risposta] h3 {
+  color: var(--paper);
+  font-size: clamp(1.2rem, 2.8vw, 1.75rem);
+  margin-block-start: 0.35rem;
+}
+[data-risposta-et] {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+[data-risposta-riga] {
+  margin-block-start: 1.05rem;
+  padding-block-start: 0.9rem;
+  border-block-start: 1px solid color-mix(in oklab, var(--paper) 20%, transparent);
+}
+[data-risposta-riga] p + p { margin-block-start: 0.3rem; opacity: 0.92; }
+[data-risposta-azioni] {
+  margin-block-start: 1.2rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+[data-risposta-cta] {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.2rem;
+  background: var(--accent);
+  color: var(--ink);
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 500;
+}
+/* La prova non e' un secondo bottone: e' un rimando. Due bottoni pari
+   costringerebbero a scegliere fra due cose che non sono alternative. */
+[data-risposta-prova] { font-size: 0.94rem; color: var(--paper); opacity: 0.85; }
+
+@media (min-width: 900px) {
+  [data-strada] { padding: 1.05rem 1.3rem; }
+  [data-risposta] { padding: 1.6rem 1.8rem; }
+}

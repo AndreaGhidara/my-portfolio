@@ -17,24 +17,70 @@
     "scrollHint": "Scroll"
   },
   "seeking": {
-    "eyebrow": "Where it starts",
-    "title": "What are you looking for?",
-    "intro": "If you've read this far, you've already said one of these out loud.",
-    "list": {
-      "sites": {
-        "voice": "My site doesn't say what I actually do."
-      },
-      "ecommerce": {
-        "voice": "I want to sell online without fighting my back office every day."
-      },
-      "webapp": {
-        "voice": "I have an idea in my head and nobody to build it."
-      },
-      "ai": {
-        "voice": "I want to stop doing by hand what could do itself."
-      }
+    "eyebrow": "Let's start here",
+    "title": "Where are you starting from?",
+    "intro": "Five ways it usually begins, from the lightest to the largest. Pick yours and I'll tell you what it actually means — even if yours is the last one.",
+    "attesa": "This isn't a form: it all stays here, and nobody receives anything until you write to me yourself.",
+    "labels": {
+      "tipo": "What kind of work it is",
+      "prova": "The proof"
     },
-    "outro": "Recognised yourself? Then you've done the hard part already: you know what you need."
+    "list": {
+      "capire": {
+        "nome": "Being understood",
+        "voice": "The site is there, but it doesn't say what we actually do: people arrive and don't get it.",
+        "et": "What it usually means",
+        "titolo": "It's almost never a wording problem.",
+        "etPrima": "A test you can run today, in ten minutes",
+        "prima": "Write down the three questions people ask you on the phone before they buy. Then open your homepage and count how many it answers in the first screenful. If it's none or one, the problem isn't how it's written: it's the order it's in — the site describes how the company is organised instead of answering the person who just arrived.",
+        "tipo": "The real work is deciding what comes first, not producing copy. A few weeks, and you don't need to redo the design to find out.",
+        "prova": "Everything behind a website",
+        "cta": "Let's talk"
+      },
+      "strumento": {
+        "nome": "A tool",
+        "voice": "What I have works: I need something to speed up the steps that eat my time.",
+        "et": "What it usually means",
+        "titolo": "It's the healthiest of the five, and the most underrated.",
+        "etPrima": "The trap people fall into",
+        "prima": "The tool almost always ends up on the step that annoys you most rather than the one that costs the most time — and they're never the same. For one week write down how long each repetitive thing takes, not how much it bothers you: the ranking that comes out isn't the one you had in mind.",
+        "tipo": "Small and self-contained. It doesn't touch what you have, and if it's wrong you throw it away without having broken anything. It's also the cheapest way to find out whether you need the rest.",
+        "prova": "Aidify, which absorbs the repeated questions",
+        "cta": "Let's talk"
+      },
+      "aggiunta": {
+        "nome": "An addition",
+        "voice": "The structure is already there: I need to add new features to it.",
+        "et": "What it usually means",
+        "titolo": "The cost isn't the feature. It's whatever was there before.",
+        "etPrima": "The question that moves the quote",
+        "prima": "Ask whoever built it whether there's a way to try a change before publishing it. If the answer is no, that's the first job — and it holds for anything you add afterwards, not just this one.",
+        "tipo": "You start by reading, not writing. An honest estimate comes after half a day inside the code, not before.",
+        "prova": "BDroppy, migrated without ever switching it off",
+        "cta": "Let's talk"
+      },
+      "fulcro": {
+        "nome": "A hub",
+        "voice": "I want to move all our operations into a single application, tailored to us.",
+        "et": "What it usually means",
+        "titolo": "It's the largest of the five, and the only one that can fail quietly.",
+        "etPrima": "Where it goes wrong",
+        "prima": "You build everything, you ship it, and people keep using the old spreadsheets. The software isn't the hard part: making it the place where the work actually happens is. List where your data lives today — the management system, spreadsheets, email, somebody's head. The place holding the most of it is usually the person.",
+        "tipo": "In stages, and the first one has to genuinely replace something. One piece that people actually use is worth more than ten that are finished and switched off.",
+        "prova": "CustomerTrack, built to belong to several companies",
+        "cta": "Let's talk"
+      },
+      "nonancora": {
+        "nome": "Not yet",
+        "voice": "I don't know yet. I only know that something is costing me too much time.",
+        "et": "It's what almost everyone answers",
+        "titolo": "Nobody arrives knowing whether they need a tool or a platform.",
+        "etPrima": "A question you can answer on your own, today",
+        "prima": "If one single person disappeared from the company tomorrow, what would stop? That thing is where any sensible project starts — and it's almost always the same thing costing you too much time right now.",
+        "tipo": "None, for now. Answering that question is worth more than any quote, and you don't need me to do it.",
+        "cta": "Write to me anyway, if you like"
+      }
+    }
   },
   "services": {
     "eyebrow": "The method",
