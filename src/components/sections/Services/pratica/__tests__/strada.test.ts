@@ -150,7 +150,11 @@ describe("la strada della freccia", () => {
     expect(nomi[nomi.length - 1]).toBe("coda.fine");
     const suPagina = P[P.length - 1][0] + PAGINA.left;
     expect(suPagina).toBeCloseTo((PAGINA.w * THREAD_ANCHORS.practice.out) / 100, 6);
-    expect(P[P.length - 1][1]).toBe(MONDO.h);
+    // In VERTICALE non c'e' nessuna ancora — sopra e sotto la scena finisce
+    // dove finisce la sua scatola — quindi la y si verifica sulla geometria
+    // nuda e la correzione a mano resta libera come per ogni altro punto.
+    const nudo = strada(MISURE, CODA, MONDO, PARAM, false, PAGINA).punti;
+    expect(nudo[nudo.length - 1][1]).toBe(MONDO.h);
   });
 
   it("l'uscita segue la finestra: piu' larga e' la pagina, piu' a destra esce", () => {
@@ -170,10 +174,39 @@ describe("la strada della freccia", () => {
     expect(risalite().prima).toBeLessThan(25);
   });
 
-  it("nella coda risale, ed e' il 180 voluto", () => {
-    // Una risalita qui NON e' un difetto: e' il disegno. Distinguere le due e'
-    // l'unico modo di avere una prova che significhi qualcosa.
-    expect(risalite().coda).toBeGreaterThan(150);
+  it("la coda gira ancora — ma non e' piu' un 180, ed e' una scelta", () => {
+    /**
+     * Questa prova chiedeva una risalita sopra i 150px, perche' la coda era
+     * nata come «un 180 largo». La calibrazione sull'impaginato vero l'ha
+     * cambiata di proposito: adesso la coda e' un raccordo che gira di una
+     * quindicina di gradi e va a INCONTRARE IL FILO — misurato, 113-115px di
+     * risalita e -15/-18 gradi di giro, stabili da 1100 a 1920 di larghezza.
+     *
+     * La soglia scende quindi da 150 a 60, e non e' una soglia allargata per
+     * far passare un test: e' cambiata la cosa da provare. Il 180 era una
+     * decisione di disegno (spec §3.3), l'allineamento e' quella che l'ha
+     * sostituita, ed e' la prova qui sotto a difenderla — con molta piu' forza
+     * di quanta ne avesse questa. Quello che resta da garantire qui e' solo
+     * che la coda NON SIA PIATTA: senza un po' di giro la freccia arriverebbe
+     * in fondo puntando dove capita.
+     */
+    expect(risalite().coda).toBeGreaterThan(60);
+  });
+
+  it("la freccia finisce esattamente dove esce il filo, a ogni larghezza", () => {
+    // E' la proprieta' per cui la coda e' stata ricalibrata, ed e' esatta per
+    // costruzione: l'uscita si conta sulla pagina in tutti e due i casi.
+    // Misurato: scarto 0,0px da 1100 a 1920. Prima che l'uscita si contasse
+    // sulla pagina lo scarto valeva 0,38 x (pagina meno percorso) — 97px a
+    // 1440, 280 a 1920 — e in calibrazione lo si correggeva a mano, il che
+    // poteva azzeccare una larghezza sola.
+    for (const w of [1100, 1400, 1600, 1920]) {
+      const pag = { w, left: Math.max(0, (w - MONDO.w) / 2) };
+      const P = strada(MISURE, CODA, MONDO, PARAM, true, pag).punti;
+      const freccia = P[P.length - 1][0] + pag.left;
+      const filo = (w * THREAD_ANCHORS.practice.out) / 100;
+      expect(freccia, `a ${w}px di larghezza`).toBeCloseTo(filo, 6);
+    }
   });
 
   it("resta dentro in orizzontale, dove ha senso chiederlo", () => {
