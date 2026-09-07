@@ -276,18 +276,24 @@
     "eyebrow": "Background",
     "title": "Where I learned",
     "present": "present",
+    "senzaTesserino": "No badge",
+    "etichettaLezione": "What it taught me",
+    "nota": "Nobody hands you a badge when you work for yourself.",
     "list": {
       "idt": {
         "role": "React Developer",
-        "body": "Complex features on an application used daily, and a shared component library that made the interface consistent across the product."
+        "body": "Complex features on an application used every day, and a shared component library.",
+        "lezione": "That a component library isn't a developer's indulgence. It's the only thing that keeps a product coherent when several people work on it, and you see it the day someone new joins."
       },
       "eroi": {
         "role": "Full Stack Developer",
-        "body": "A B2B e-commerce platform end to end: frontend, APIs, database and the dashboard they run it from every day."
+        "body": "A B2B e-commerce platform end to end: frontend, API, database and dashboard.",
+        "lezione": "That the hard part of an e-commerce isn't the shop. It's the dashboard people work inside every day, and it's also the part nobody expects to pay for."
       },
       "freelance": {
         "role": "Freelance developer",
-        "body": "Complete projects for small and medium businesses, from gathering requirements to release. This is where I learned to talk to people who aren't technical."
+        "body": "Complete projects for small and mid-sized businesses, from gathering requirements to release.",
+        "lezione": "To talk to people who aren't technical. It's the skill I use more than any language, and the only one you can't learn by reading."
       }
     }
   },
