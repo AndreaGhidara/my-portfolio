@@ -7,7 +7,7 @@ import { THREAD_ANCHORS } from "@/components/thread/anchors";
 /**
  * Niente stub di matchMedia: quello di vitest.setup.ts risponde "movimento
  * ridotto", il livello risolto e' "none" e `weave` non parte. E' quello che
- * serve — jsdom non sa dire quanto e' lungo un path, e un cavo che si tesse
+ * serve: jsdom non sa dire quanto e' lungo un path, e un cavo che si tesse
  * davvero qui dentro esploderebbe su getTotalLength senza provare niente.
  * E' anche la scelta di ThreadSegment.test.tsx, che prova la stessa cosa.
  */
@@ -34,7 +34,7 @@ describe("i cavi", () => {
 
   it("i capi stanno nella scatola della finestra, la derivazione in quella del piano", () => {
     // Non e' un vezzo che siano due SVG: il 14% e l'88% sono percentuali della
-    // pagina — e' li' che escono e entrano le sezioni vicine — mentre il rack in
+    // pagina (e' li' che escono e entrano le sezioni vicine) mentre il rack in
     // cui finisce la derivazione e' una percentuale del piano. Rimettere i tre
     // tratti in una scatola sola riapre il gradino da 170px alla giunzione,
     // oppure fa scivolare la derivazione fuori dal tavolo.
@@ -66,7 +66,7 @@ describe("i cavi", () => {
 /**
  * jsdom risponde a matchMedia con il mock di vitest.setup.ts, che dice sempre
  * "movimento ridotto": qui serve poterlo cambiare query per query, e a pagina
- * aperta. E' la stessa manopola di DeskStage.test.tsx, e prova la stessa cosa —
+ * aperta. E' la stessa manopola di DeskStage.test.tsx, e prova la stessa cosa:
  * cosa succede a chi cambia idea mentre la sezione e' gia' sullo schermo.
  */
 function mockMedia(matches: (q: string) => boolean) {
@@ -107,7 +107,7 @@ function suUnTrack() {
 /**
  * Quanti agganci allo scorrimento restano vivi, e non cosa disegnano: in jsdom
  * un path e' lungo zero (vedi vitest.setup.ts) e il tratteggio non prova
- * niente. Quello che conta e' comunque un'altra cosa — quanto vive l'aggancio —
+ * niente. Quello che conta e' comunque un'altra cosa (quanto vive l'aggancio)
  * ed e' esattamente li' che stava il difetto: `weave` restituisce una timeline
  * che nessuno teneva, e useGSAP con delle dipendenze rimanda il revert allo
  * smontaggio, non al cambio di livello. Il vecchio scrub restava appeso al
@@ -137,7 +137,7 @@ describe("i cavi lasciano andare lo scorrimento quando il livello cambia", () =>
     // `weave` scrive dasharray e dashoffset inline al momento della build, PRIMA
     // che si scorra di un pixel, tutti e due pari alla lunghezza del tratto:
     // cavo invisibile. A "none" `weave` non riparte, quindi se lo scrub muore e
-    // quelle due restano, i tre tratti spariscono per sempre — e il fotogramma a
+    // quelle due restano, i tre tratti spariscono per sempre, e il fotogramma a
     // riposo, il cui patto e' «il filo e' continuo», diventa un filo tagliato.
     // Uccidere e basta e' peggio di non uccidere: il vecchio scrub, almeno, il
     // cavo lo disegnava.

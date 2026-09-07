@@ -82,7 +82,7 @@ describe("la pallina", () => {
   const semi = [11, 24, 37, 50];
 
   it("e' piccola: il diametro sta sotto la meta' del foglio", () => {
-    // A 0,46 di raggio — la prima stesura — il foglio restava un quadrato
+    // A 0,46 di raggio (la prima stesura) il foglio restava un quadrato
     // rimpicciolito e si vedeva il suo bordo accartocciarsi.
     for (const s of semi) {
       const r = Math.max(...maglia(s).map((v) => Math.hypot(v.bx, v.by)));
@@ -94,7 +94,7 @@ describe("la pallina", () => {
   it("il foglio si ripiega su se stesso invece di rimpicciolirsi", () => {
     // LA proprieta' di questo modulo, e la ragione per cui la pallina si legge
     // come carta appallottolata. Se il raggio d'arrivo seguisse quello di
-    // partenza — mappatura quadrato -> disco — la correlazione sarebbe circa
+    // partenza (mappatura quadrato -> disco) la correlazione sarebbe circa
     // +1 e la forma del foglio sopravviverebbe intatta.
     for (const s of semi) {
       const v = maglia(s);

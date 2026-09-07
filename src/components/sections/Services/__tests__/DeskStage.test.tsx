@@ -6,7 +6,7 @@ import { cameraScale } from "../layers";
 /**
  * jsdom risponde a matchMedia con il mock di vitest.setup.ts, che dice sempre
  * "movimento ridotto": qui serve poterlo cambiare query per query. Restituisce
- * la manopola per cambiare idea a pagina aperta — che e' quello che fa un utente
+ * la manopola per cambiare idea a pagina aperta, che e' quello che fa un utente
  * vero quando accende la riduzione del movimento o stringe la finestra.
  */
 function mockMedia(matches: (q: string) => boolean) {
@@ -59,13 +59,13 @@ const palco = (container: HTMLElement) =>
  * solo quando vengono staccati.
  *
  * E' una prova che guarda dentro, e non e' pigrizia: misura QUANTO VIVE
- * l'ascoltatore, ed e' esattamente li' che il difetto stava — attaccato dentro
+ * l'ascoltatore, ed e' esattamente li' che il difetto stava: attaccato dentro
  * la build della camera, si staccava solo al revert di gsap.context, che al
  * cambio di livello non arriva mai.
  *
  * La vita non la misura la prova qui sotto, che pure c'e' e guarda dall'esterno:
- * quella esercita un percorso solo — il fuoco sul post-it dopo l'uscita da
- * «full» — e dello smontaggio, e del livello in cui l'ascoltatore non deve
+ * quella esercita un percorso solo (il fuoco sul post-it dopo l'uscita da
+ * «full») e dello smontaggio, e del livello in cui l'ascoltatore non deve
  * nascere proprio, non dice niente. Sono le due guardie in fondo, e poggiano
  * tutte e due su questo conto.
  */
@@ -142,7 +142,7 @@ describe("la camera", () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = render(<DeskStage {...props} />);
     // Il palco porta solo --p e --s. Se un giorno la camera cominciasse a
-    // scrivere opacita' o transform, questo conto cambia — ed e' il punto.
+    // scrivere opacita' o transform, questo conto cambia, ed e' il punto.
     const scritte = [...palco(container).style].filter((p) => p.startsWith("--"));
     expect(scritte.sort()).toEqual(["--p", "--s"]);
 
@@ -173,7 +173,7 @@ describe("la camera", () => {
     // che prende il fuoco e' ingrandito e ritagliato via. Fuori da "full" la
     // camera non c'e', il track torna alto quanto il suo contenuto, e quello
     // stesso salto diventa una pagina che si muove senza che nessuno l'abbia
-    // chiesto — nei due stati in cui questa sezione deve stare ferma, e sotto i
+    // chiesto: nei due stati in cui questa sezione deve stare ferma, e sotto i
     // 1024px per una fermata del Tab che nemmeno si vede.
     const vivi = ascoltatoriDelFuoco();
     const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
@@ -189,8 +189,8 @@ describe("la camera", () => {
   it("il fuoco da tastiera sul post-it porta la pagina al fotogramma di riposo, e smette all'uscita da «full»", () => {
     // La prova di sopra misura quanti ascoltatori vivono; questa misura cosa
     // sente un utente. Servono tutte e due: la prima passerebbe anche con una
-    // correzione sbagliata — l'ascoltatore lasciato dentro la build della camera
-    // e un removeEventListener appiccicato a spegni() — e non guarda ne' la
+    // correzione sbagliata (l'ascoltatore lasciato dentro la build della camera
+    // e un removeEventListener appiccicato a spegni()) e non guarda ne' la
     // guardia del :focus-visible ne' dove si va a finire.
     const salta = vi.fn();
     vi.stubGlobal("scrollTo", salta);
@@ -221,7 +221,7 @@ describe("la camera", () => {
     expect(salta).toHaveBeenCalledTimes(1);
   });
 
-  // Le due che seguono non provano la correzione — erano gia' vere prima, perche'
+  // Le due che seguono non provano la correzione: erano gia' vere prima, perche'
   // lo smontaggio passa dal revert di gsap.context e a livello ridotto la build
   // non gira nemmeno. Sono guardie: tengono i due lati che la correzione avrebbe
   // potuto rompere spostando l'ascoltatore in un effetto suo.
