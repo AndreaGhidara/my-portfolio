@@ -66,7 +66,7 @@ describe("«E in pratica?» come scena", () => {
   it("il patto del fallback: senza movimento nessuna voce e' sbiadita", () => {
     // useMotionLevel dice "none" in SSR e al primo render. Se lo sbiadire delle
     // voci non attive stesse fuori da data-motion="full", tre quarti della
-    // sezione resterebbero al 40% di opacita' per sempre — cioe' illeggibili —
+    // sezione resterebbero al 40% di opacita' per sempre, cioe' illeggibili,
     // ed e' il modo classico in cui una scena scrollytelling si rompe.
     //
     // Questa prova pero' guarda il MARKUP, e in jsdom il markup non e' vestito:
@@ -121,7 +121,7 @@ describe("la freccia", () => {
   });
 
   it("la strada e' nel DOM ma non si vede: e' il tracciato, non il disegno", () => {
-    // Niente display:none — romperebbe getPointAtLength, che e' l'unica ragione
+    // Niente display:none: romperebbe getPointAtLength, che e' l'unica ragione
     // per cui questo path esiste.
     const { container } = render(<Practice {...props} />);
     const strada = container.querySelector("[data-pratica-strada]");
@@ -136,19 +136,19 @@ describe("la freccia", () => {
  *
  * jsdom non applica `tokens.css`: qualunque asserzione su come questa scena si
  * VEDE, fatta sul DOM renderizzato, non guarda niente. «Il patto del fallback»
- * qui sopra ne e' un esempio dichiarato — verifica `data-motion="none"` e
+ * qui sopra ne e' un esempio dichiarato: verifica `data-motion="none"` e
  * l'assenza di `data-attiva`, che sono vere anche di un markup che sbiadisce
  * lo stesso, perche' a sbiadire e' il CSS e il CSS nessuno lo esegue.
  *
  * La tecnica per uscirne e' gia' in casa (DeskSpecimen.test.tsx, materials.test.ts):
  * si legge il foglio come stringa e si asserisce una sua PROPRIETA'. Le due
- * prove qui sotto lo fanno per le due cose che il DOM non puo' dire — che fuori
+ * prove qui sotto lo fanno per le due cose che il DOM non puo' dire: che fuori
  * da "full" non si spegne niente, e che nessuna regola da cui i disegni
  * dipendono e' appesa a un selettore che i disegni non portano.
  *
  * Non fissano il foglio di oggi: nessuna delle due nomina una regola. Contano
  * quelle che ci sono e chiedono a ognuna la stessa cosa. Una prova che
- * ricopiasse lo stile attuale sarebbe peggio di nessuna prova — cadrebbe a ogni
+ * ricopiasse lo stile attuale sarebbe peggio di nessuna prova: cadrebbe a ogni
  * modifica innocua e passerebbe su ogni modifica sbagliata che la ricopia.
  */
 const TOKENS = readFileSync(resolve(process.cwd(), "src/styles/tokens.css"), "utf8").replace(
@@ -211,27 +211,27 @@ const selettori = (r: Regola) =>
     .filter(Boolean);
 
 /** Le quattro cose che la scena FA LEGGERE. Il filo, la strada e la freccia sono
- *  decorazione aria-hidden — e la freccia e' gia' `display: none` fuori da
- *  "full" — mentre il patto del fallback riguarda quello che si legge. */
+ *  decorazione aria-hidden, e la freccia e' gia' `display: none` fuori da
+ *  "full", mentre il patto del fallback riguarda quello che si legge. */
 const CONTENUTO = /\[data-practice-(item|text|art|drawing)\]/;
 const PIENO = /\[data-motion="full"\]/;
 
 describe("il patto del fallback, letto in tokens.css", () => {
   /**
    * La regola: chi non ha chiesto il movimento non deve trovare la scena
-   * spenta. Una regola della scena e' DINAMICA — e allora deve stare sotto
-   * `[data-motion="full"]` — quando:
+   * spenta. Una regola della scena e' DINAMICA, e allora deve stare sotto
+   * `[data-motion="full"]`, quando:
    *
    *  - dipende da `[data-attiva]`, che e' uno stato che scrive solo il ciclo e
    *    che senza ciclo nessuna voce ha mai;
    *  - dichiara `opacity` o `filter`, cioe' toglie qualcosa alla vista;
    *  - dichiara `transition`, cioe' promette un movimento;
    *  - dichiara una `transform` che non venga per intero dai dati inline della
-   *    voce. La rotazione dei disegni — `rotate(var(--rot))` — non e' movimento:
+   *    voce. La rotazione dei disegni (`rotate(var(--rot))`) non e' movimento:
    *    e' il disegno, ed e' uguale a ogni livello. Uno `scale(0.96)` no.
    *
    * Senza questo vincolo tre quarti della sezione restano al 40% di opacita'
-   * per sempre — cioe' illeggibili — ed e' il modo classico in cui una scena
+   * per sempre, cioe' illeggibili, ed e' il modo classico in cui una scena
    * guidata dallo scorrimento si rompe su chi non la puo' guardare.
    */
   const soloDati = (valore: string) =>
@@ -297,7 +297,7 @@ describe("i disegni della scena e le regole che li vestono", () => {
   const MOMENTO = /\[data-attiva\]|\[data-motion=/;
 
   /** Quello che sta DENTRO un ospite: la sagoma coi suoi strati, il campione con
-   *  le sue marche. L'ospite stesso resta fuori — dove sta e quanto e' grande
+   *  le sue marche. L'ospite stesso resta fuori: dove sta e quanto e' grande
    *  sono le due cose che i due ospiti hanno il diritto di dire in modo diverso:
    *  uno sta su un tavolo, l'altro in una pila. Quello che devono avere uguale
    *  e' il contenuto, ed e' esattamente quello che si guarda qui. */
@@ -313,7 +313,7 @@ describe("i disegni della scena e le regole che li vestono", () => {
   /**
    * Gli stessi nove oggetti, disegnati come stanno SUL TAVOLO. Non e' markup
    * scritto a mano: e' `DeskObject`, cioe' l'originale, costruito con le due
-   * sole cose che «E in pratica?» riprende — la sagoma e il campione. Niente
+   * sole cose che «E in pratica?» riprende: la sagoma e il campione. Niente
    * etichetta e niente comando, che la scena non riprende e che infatti non
    * ha (il significato sta nell'<h4> e nel testo accanto).
    */
@@ -349,7 +349,7 @@ describe("i disegni della scena e le regole che li vestono", () => {
     /**
      * E' la prova che avrebbe colto il difetto da cui nasce questo giro: la
      * scatola del campione pendeva da `[data-desk-object]`, che i disegni della
-     * scena non hanno e non possono avere — glielo vieta la prova che conta i
+     * scena non hanno e non possono avere: glielo vieta la prova che conta i
      * ventiquattro oggetti del tavolo (spec §4.4). Il campione si impaginava
      * DOPO la sagoma invece che dentro, e non cadeva niente: nessuna prova
      * guardava il foglio di stile da questa parte.
@@ -357,7 +357,7 @@ describe("i disegni della scena e le regole che li vestono", () => {
      * La forma, ed e' quella della spec e non una mia invenzione: «le stesse
      * sagome, con gli stessi materiali e gli stessi campioni». Allora si
      * disegnano i nove oggetti anche come stanno sul tavolo, e si chiede al
-     * foglio una cosa sola — OGNI regola che tocca qualcosa dentro un oggetto
+     * foglio una cosa sola: OGNI regola che tocca qualcosa dentro un oggetto
      * del tavolo deve toccare la stessa cosa dentro il disegno della scena. Se
      * una non ci arriva, quel disegno e' meno di quello che dice di essere.
      *
@@ -385,7 +385,7 @@ describe("i disegni della scena e le regole che li vestono", () => {
     // Il verso opposto della prova qui sopra, e la ragione per cui la scena
     // esiste: «le stesse sagome con gli stessi materiali». Senza un
     // `--desk-pieno` che le arrivi, una sagoma e' il suo contorno in colore di
-    // testo — cioe' il tavolo com'era prima dei materiali, ingrandito.
+    // testo, cioe' il tavolo com'era prima dei materiali, ingrandito.
     const vestono = regole(TOKENS).filter((r) => dichiara(r.corpo, "--desk-pieno").length > 0);
     for (const tema of ["light", "dark"] as const) {
       if (tema === "dark") document.documentElement.dataset.theme = "dark";

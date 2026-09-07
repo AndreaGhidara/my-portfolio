@@ -96,7 +96,7 @@ describe("il tavolo è la lista", () => {
     const oggetti = container.querySelectorAll(SOLI_VERI);
     expect(oggetti).toHaveLength(24);
     // Ventitre' etichette e un post-it. Quella che manca non e' una traduzione
-    // dimenticata: e' l'unico oggetto che non si legge, si preme — e il nome
+    // dimenticata: e' l'unico oggetto che non si legge, si preme, e il nome
     // che uno screen reader annuncia e' il nome del comando, non una voce
     // dell'elenco. Per questo il conteggio delle etichette resta ventitre'.
     const senzaEtichetta = [...oggetti].filter((el) => !el.querySelector("[data-desk-label]"));
@@ -123,7 +123,7 @@ describe("il tavolo è la lista", () => {
     // Un post-it che porta da qualche parte e non si preme sarebbe il disegno di
     // un comando, percio' l'<a> c'e'. Ma il gemello e' aria-hidden per intero:
     // una seconda fermata del Tab annuncerebbe il nulla, e il nome del comando
-    // sta nell'altro mondo — quello che uno screen reader legge davvero.
+    // sta nell'altro mondo: quello che uno screen reader legge davvero.
     const { container } = render(<ServicesView {...props} />);
     const gemello = container.querySelector("[data-desk-world][aria-hidden]") as HTMLElement;
     const muti = [...gemello.querySelectorAll("[data-desk-object]")].filter(
@@ -202,7 +202,7 @@ describe("lo schermo al centro", () => {
  * I materiali. Una maschera CSS dipinge un colore solo: finche' la sagoma era
  * un file solo, foglio, scheda e telefono erano lo stesso grigio identico e i
  * quattro strati si leggevano come quattro contorni della stessa famiglia. Due
- * strati sono due superfici da colorare — ed e' il DOM a doverli portare,
+ * strati sono due superfici da colorare, ed e' il DOM a doverli portare,
  * perche' nel CSS un pieno che non ha dove appoggiarsi non esiste.
  */
 describe("i materiali", () => {
@@ -216,7 +216,7 @@ describe("i materiali", () => {
       expect(sagoma.querySelector("[data-desk-fill]")).not.toBeNull();
       expect(sagoma.querySelector("[data-desk-line]")).not.toBeNull();
       // L'ordine e' il disegno: il pieno viene PRIMA, o coprirebbe il tracciato
-      // che dovrebbe stargli sopra. Nessuno z-index — l'ordine e' quello del DOM.
+      // che dovrebbe stargli sopra. Nessuno z-index: l'ordine e' quello del DOM.
       expect(sagoma.children[0]).toHaveAttribute("data-desk-fill");
       expect(sagoma.children[1]).toHaveAttribute("data-desk-line");
     }
@@ -236,7 +236,7 @@ describe("i materiali", () => {
     // superfici, MAI sull'etichetta». Il filtro sta su [data-desk-shape] (lo
     // verifica il contratto in materials.test.ts) e non tocca l'etichetta
     // soltanto perche' questa e' una SORELLA della sagoma, non una figlia.
-    // Portarla dentro — per esempio per farla ruotare insieme al disegno —
+    // Portarla dentro (per esempio per farla ruotare insieme al disegno)
     // lascerebbe verde tutto il resto e metterebbe un'ombra sotto ogni parola
     // del tavolo, che non e' un tavolo: e' un banner.
     const { container } = render(<ServicesView {...props} />);
@@ -272,7 +272,7 @@ describe("i materiali", () => {
   it("la sagoma sa che disegno e': la maschera pende da lei, non dall'oggetto", () => {
     // Perche' questa prova esiste: «E in pratica?» usa le stesse sagome fuori
     // dal tavolo, molto piu' grandi. Finche' le maschere pendevano da
-    // [data-desk-object], un disegno la' non le prendeva — e dargli
+    // [data-desk-object], un disegno la' non le prendeva, e dargli
     // data-desk-object avrebbe rotto il conteggio dei ventiquattro, che e' una
     // prova giusta. La sagoma sa gia' che disegno e': glielo si chiede.
     const { container } = render(<ServicesView {...props} />);

@@ -7,7 +7,7 @@ import { campiona, curva, filo, inFuoco, segmenti, strada, type Misura, type Pag
  * Un impaginato finto ma realistico: quattro disegni alternati, la coda in
  * fondo. Sono le stesse misure con cui girava verifica.mjs nel prototipo, ed e'
  * quello script che questo file porta dentro la suite. Ha gia' trovato tre
- * difetti che a occhio non si vedevano — una spline che sparava fuori, un
+ * difetti che a occhio non si vedevano: una spline che sparava fuori, un
  * cappio che faceva risalire la freccia sopra lo schermo, e posizioni misurate
  * una volta sola: merita di girare in CI, non a mano.
  */
@@ -26,7 +26,7 @@ const MISURE: Misura[] = [
  * sbandata scala con la larghezza: gli scostamenti sono frazioni di `mondo.w`
  * (vedi `strada()`) e i disegni si allontanano dalla mezzeria man mano che il
  * palco si allarga. Un `-140` assoluto qui dichiarava una tolleranza vera a
- * 1100 e nessuna tolleranza in particolare a qualunque altra larghezza — cioe'
+ * 1100 e nessuna tolleranza in particolare a qualunque altra larghezza, cioe'
  * non misurava niente di stabile. Il valore e' lo stesso di prima, letto per
  * quello che era: 140 su 1100.
  *
@@ -39,7 +39,7 @@ const SBORDO = 0.127;
 /**
  * La pagina e' piu' larga della scena, e la scena ci sta dentro centrata: e'
  * la situazione vera sopra i 74rem. Tenerle distinte e' il punto di mezza
- * suite — gli ancoraggi si contano sulla PAGINA, i disegni stanno nella SCENA.
+ * suite: gli ancoraggi si contano sulla PAGINA, i disegni stanno nella SCENA.
  */
 const PAGINA: Pagina = { w: 1400, left: (1400 - MONDO.w) / 2 };
 const tracciato = () => strada(MISURE, CODA, MONDO, PARAM, true, PAGINA);
@@ -51,7 +51,7 @@ const puntiCampionati = () => campiona(segmenti(tracciato().punti), 0.01);
  *
  * La misura e' CUMULATIVA e non fra due campioni consecutivi: la prima stesura
  * di questa verifica leggeva 2px e passava, mentre il tracciato risaliva di
- * 150. E' il difetto che una prova scritta male non vede — e passa lo stesso.
+ * 150. E' il difetto che una prova scritta male non vede, e passa lo stesso.
  */
 function risalite(): { prima: number; coda: number } {
   const { punti: P, indiceCoda } = tracciato();
@@ -131,7 +131,7 @@ describe("la strada della freccia", () => {
     const { punti: P, indiciDisegno } = tracciato();
     expect(indiciDisegno).toHaveLength(MISURE.length);
     // Prima degli scostamenti il punto E' il centro; dopo, gli scostamenti lo
-    // spostano — ed e' voluto, sono le correzioni a mano. Qui si verifica che
+    // spostano, ed e' voluto, sono le correzioni a mano. Qui si verifica che
     // ogni disegno abbia il suo punto e che nessuno sia finito da un'altra parte.
     indiciDisegno.forEach((i, k) => {
       const d = Math.hypot(P[i][0] - MISURE[k].cx, P[i][1] - MISURE[k].cy);
@@ -139,7 +139,7 @@ describe("la strada della freccia", () => {
     });
   });
 
-  it("esce dove esce il filo — sulla PAGINA, non sul percorso", () => {
+  it("esce dove esce il filo: sulla PAGINA, non sul percorso", () => {
     // Il difetto che questa prova chiude: contata sul percorso, l'uscita della
     // freccia finiva altrove rispetto a quella del filo, e lo scarto cresceva
     // con lo schermo (97px a 1440, 280 a 1920). In calibrazione era stato
@@ -150,8 +150,8 @@ describe("la strada della freccia", () => {
     expect(nomi[nomi.length - 1]).toBe("coda.fine");
     const suPagina = P[P.length - 1][0] + PAGINA.left;
     expect(suPagina).toBeCloseTo((PAGINA.w * THREAD_ANCHORS.practice.out) / 100, 6);
-    // In VERTICALE non c'e' nessuna ancora — sopra e sotto la scena finisce
-    // dove finisce la sua scatola — quindi la y si verifica sulla geometria
+    // In VERTICALE non c'e' nessuna ancora: sopra e sotto la scena finisce
+    // dove finisce la sua scatola, quindi la y si verifica sulla geometria
     // nuda e la correzione a mano resta libera come per ogni altro punto.
     const nudo = strada(MISURE, CODA, MONDO, PARAM, false, PAGINA).punti;
     expect(nudo[nudo.length - 1][1]).toBe(MONDO.h);
@@ -174,18 +174,18 @@ describe("la strada della freccia", () => {
     expect(risalite().prima).toBeLessThan(25);
   });
 
-  it("la coda gira ancora — ma non e' piu' un 180, ed e' una scelta", () => {
+  it("la coda gira ancora, ma non e' piu' un 180, ed e' una scelta", () => {
     /**
      * Questa prova chiedeva una risalita sopra i 150px, perche' la coda era
      * nata come «un 180 largo». La calibrazione sull'impaginato vero l'ha
      * cambiata di proposito: adesso la coda e' un raccordo che gira di una
-     * quindicina di gradi e va a INCONTRARE IL FILO — misurato, 113-115px di
+     * quindicina di gradi e va a INCONTRARE IL FILO: misurato, 113-115px di
      * risalita e -15/-18 gradi di giro, stabili da 1100 a 1920 di larghezza.
      *
      * La soglia scende quindi da 150 a 60, e non e' una soglia allargata per
      * far passare un test: e' cambiata la cosa da provare. Il 180 era una
      * decisione di disegno (spec §3.3), l'allineamento e' quella che l'ha
-     * sostituita, ed e' la prova qui sotto a difenderla — con molta piu' forza
+     * sostituita, ed e' la prova qui sotto a difenderla, con molta piu' forza
      * di quanta ne avesse questa. Quello che resta da garantire qui e' solo
      * che la coda NON SIA PIATTA: senza un po' di giro la freccia arriverebbe
      * in fondo puntando dove capita.
@@ -197,8 +197,8 @@ describe("la strada della freccia", () => {
     // E' la proprieta' per cui la coda e' stata ricalibrata, ed e' esatta per
     // costruzione: l'uscita si conta sulla pagina in tutti e due i casi.
     // Misurato: scarto 0,0px da 1100 a 1920. Prima che l'uscita si contasse
-    // sulla pagina lo scarto valeva 0,38 x (pagina meno percorso) — 97px a
-    // 1440, 280 a 1920 — e in calibrazione lo si correggeva a mano, il che
+    // sulla pagina lo scarto valeva 0,38 x (pagina meno percorso): 97px a
+    // 1440, 280 a 1920, e in calibrazione lo si correggeva a mano, il che
     // poteva azzeccare una larghezza sola.
     for (const w of [1100, 1400, 1600, 1920]) {
       const pag = { w, left: Math.max(0, (w - MONDO.w) / 2) };
@@ -211,13 +211,13 @@ describe("la strada della freccia", () => {
 
   it("resta dentro in orizzontale, dove ha senso chiederlo", () => {
     // Il rischio §6.2 della spec: in prototipo sborda a sinistra fra la seconda
-    // e la terza voce. La tolleranza e' SBORDO, una frazione del palco — vedi
+    // e la terza voce. La tolleranza e' SBORDO, una frazione del palco: vedi
     // la sua nota. A destra non ci va nemmeno vicino (il massimo cade una
     // sessantina di pixel dentro il bordo), e quei 20px sono il franco di una
     // cosa che non succede, non una tolleranza dichiarata.
     // A destra il limite non e' piu' il bordo del percorso: l'uscita si conta
     // sulla PAGINA, quindi su una finestra larga cade fuori dalla colonna del
-    // contenuto — deliberatamente, ed e' dove esce anche il filo. Il vincolo
+    // contenuto, deliberatamente, ed e' dove esce anche il filo. Il vincolo
     // vero e' che non superi quel punto.
     const xs = puntiCampionati().map((p) => p[0]);
     const uscita = (PAGINA.w * THREAD_ANCHORS.practice.out) / 100 - PAGINA.left;
@@ -238,7 +238,7 @@ describe("la strada della freccia", () => {
     // chiave che non corrisponde a nessun nome non fallisce: non si applica, in
     // silenzio, e la correzione a mano che qualcuno ha trovato guardando
     // sparisce dal tracciato senza che nulla lo dica. E' il modo in cui una
-    // taratura si perde — «indicizzati per nome e non per indice» e' il patto
+    // taratura si perde: «indicizzati per nome e non per indice» e' il patto
     // che rende gli scostamenti sopravvivibili a un punto in piu' sulla strada,
     // e vale solo finche' i nomi combaciano davvero.
     const { nomi } = tracciato();
@@ -250,7 +250,7 @@ describe("la strada della freccia", () => {
   it("l'ultima corsa ha due punti liberi, e da fermi non cambiano la forma", () => {
     // Servono al calibratore: fra il rientro al centro e l'uscita c'era un
     // tratto lungo senza niente da afferrare. Nascono sul segmento fra i due
-    // estremi, a un terzo e a due terzi — cosi' aggiungerli non sposta la
+    // estremi, a un terzo e a due terzi, cosi' aggiungerli non sposta la
     // strada, aggiunge solo due maniglie. Se un giorno qualcuno li spostasse
     // fuori da quella retta, la coda cambierebbe forma senza che nessuno
     // l'abbia chiesto, e questa prova e' li' per dirlo.
@@ -289,7 +289,7 @@ describe("la strada della freccia", () => {
 describe("il filo della scena", () => {
   /**
    * La pagina e' piu' larga della scena, e la scena ci sta dentro centrata:
-   * e' la situazione vera — [data-pratica] e' largo al massimo 74rem mentre la
+   * e' la situazione vera: [data-pratica] e' largo al massimo 74rem mentre la
    * pagina e' la finestra. Distinguerle e' tutto il punto di questa suite:
    * gli ancoraggi sono percentuali della PAGINA, i disegni stanno nella SCENA.
    */

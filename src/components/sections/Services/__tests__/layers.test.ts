@@ -30,14 +30,14 @@ const LAYOUTS: DeskLayout[] = ["wide", "tall"];
 
 /**
  * Il pavimento dell'aria fra due cose sul tavolo, in percentuale dell'ALTEZZA
- * del mondo. Non e' zero apposta: "non si sovrappongono" e' una prova cieca —
- * passa con mezzo pixel di stacco come con mezzo centimetro — e mezzo pixel non
+ * del mondo. Non e' zero apposta: "non si sovrappongono" e' una prova cieca:
+ * passa con mezzo pixel di stacco come con mezzo centimetro, e mezzo pixel non
  * sopravvive a un carattere di ripiego o a un altro motore di rendering.
  *
  * 1,7 punti sono circa 10,7 px a 1440. Il tavolo ne tiene 1,99 (12,6 px), cioe'
  * un sesto di margine sopra il pavimento: abbastanza perche' un ritocco piccolo
  * non faccia cadere la suite al primo carattere, poco abbastanza perche' una
- * ritaratura vera — un'etichetta piu' lunga, un settimo oggetto per strato —
+ * ritaratura vera (un'etichetta piu' lunga, un settimo oggetto per strato)
  * la faccia cadere subito, che e' lo scopo.
  *
  * Era 1,2, e il tavolo ne teneva 1,395: la taratura che ha sciolto gli
@@ -60,8 +60,8 @@ const CLEARANCE_FLOOR = 1.7;
  * compagni, e i quattro anelli si leggevano come una nuvola sola. Nessuna prova
  * se ne accorgeva, perche' 1,53 sta sopra il pavimento globale.
  *
- * 3,0 punti sono circa 19 px a 1440. Non e' il massimo raggiungibile — il mondo
- * orizzontale ne tiene 4,28 e quello verticale 3,52 — ma e' la soglia sotto la
+ * 3,0 punti sono circa 19 px a 1440. Non e' il massimo raggiungibile: il mondo
+ * orizzontale ne tiene 4,28 e quello verticale 3,52, ma e' la soglia sotto la
  * quale l'occhio ricomincia a raggruppare per vicinanza invece che per anello,
  * ed e' il mondo verticale a fissare il margine.
  */
@@ -76,8 +76,8 @@ function overlap(a: Rect, b: Rect) {
 
 /**
  * Quanta aria c'e' fra due rettangoli, in percentuale dell'ALTEZZA del mondo.
- * Le due coordinate non hanno la stessa unita' — x e' una quota della larghezza,
- * y dell'altezza — quindi lo stacco orizzontale va riportato sull'altezza prima
+ * Le due coordinate non hanno la stessa unita': x e' una quota della larghezza,
+ * y dell'altezza, quindi lo stacco orizzontale va riportato sull'altezza prima
  * di confrontarlo con quello verticale, o si sommano mele e pere. Negativo
  * vuol dire sovrapposti.
  */
@@ -97,7 +97,7 @@ function clearanceFromWorld(a: Rect, layout: DeskLayout) {
 /**
  * Tutti gli oggetti disegnati in un formato, ognuno col suo rettangolo vero:
  * sagoma piu' striscia dell'etichetta, inclinazione compresa. E' l'unica lista
- * su cui abbia senso provare qualcosa — un tavolo non si controlla uno strato
+ * su cui abbia senso provare qualcosa: un tavolo non si controlla uno strato
  * per volta, perche' le collisioni che si vedono sono quelle FRA strati.
  */
 function everyObject(layout: DeskLayout) {
@@ -175,7 +175,7 @@ describe("quanto e' grande un oggetto", () => {
   it("inclinato occupa il rettangolo che il browser disegna, non uno isotropo", () => {
     // La trappola: x e' una quota della larghezza del mondo, y dell'altezza, e
     // il CSS ruota in PIXEL. Ruotare quella coppia mista con [cos -sin; sin cos]
-    // misura un rettangolo che non esiste — nel mondo orizzontale tiene troppo
+    // misura un rettangolo che non esiste: nel mondo orizzontale tiene troppo
     // largo e troppo poco alto, e l'errore cresce con l'inclinazione.
     // Qui il conto si rifa' dall'altra parte: si va in pixel, si ruota li', e si
     // torna. Due strade diverse per lo stesso rettangolo.
@@ -323,7 +323,7 @@ describe("dove finiscono gli oggetti", () => {
     // coppie che stanno su anelli diversi: e' quella distanza che decide se si
     // vedono quattro corone o una nuvola.
     //
-    // Non e' il raggio a garantirla — gli anelli non sono omotetici apposta, e
+    // Non e' il raggio a garantirla: gli anelli non sono omotetici apposta, e
     // due raggi lontani possono comunque incrociarsi sull'asse dove uno e' alto
     // e l'altro largo. Si misura dove si vede: fra i rettangoli veri.
     for (const layout of LAYOUTS) {
@@ -357,7 +357,7 @@ describe("dove finiscono gli oggetti", () => {
 
   it("dentro uno strato non stanno a distanze uguali, ma non si ammucchiano", () => {
     // Sei oggetti ogni sessanta gradi si leggono come il quadrante di un
-    // orologio. Lo scostamento angolare e' quello che li rimette su un tavolo —
+    // orologio. Lo scostamento angolare e' quello che li rimette su un tavolo:
     // ed e' anche l'unica cosa che fa spazio: a passo regolare il minimo
     // raggiungibile a 1440 e' 0,64 punti, sotto il pavimento qui sopra.
     // Le due prove sono una coppia: senza la seconda "irregolare" si otterrebbe
@@ -468,7 +468,7 @@ describe("la camera", () => {
  * L'etichetta e' un contratto fra due file che non si parlano: layers.ts tiene
  * il posto, tokens.css lo disegna. Cambiare interlinea, respiro o stacco nel
  * foglio di stile senza dirlo a LABEL fa misurare alla geometria un rettangolo
- * piu' piccolo di quello vero — e nessuna prova di sovrapposizione se ne
+ * piu' piccolo di quello vero, e nessuna prova di sovrapposizione se ne
  * accorge, perche' una prova di collisione e' cieca per costruzione a un
  * ingombro che si restringe. Leggere il CSS come testo e' brutto: e' anche
  * l'unica cosa in questo repository che possa cogliere quella modifica.
@@ -533,8 +533,8 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
   });
 
   it("LABEL.em e' il corpo dichiarato diviso il mondo piu' stretto che lo porta", () => {
-    // 1em in percentuale della LARGHEZZA del mondo. Il caso peggiore — quello da
-    // riservare — e' il mondo piu' stretto: il carattere li' e' al minimo, ma il
+    // 1em in percentuale della LARGHEZZA del mondo. Il caso peggiore (quello da
+    // riservare) e' il mondo piu' stretto: il carattere li' e' al minimo, ma il
     // mondo si stringe di piu' di lui.
     const [minimo, cqw, massimo] = misura(
       ETICHETTA,
@@ -559,7 +559,7 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
   });
 
   it("nessuna etichetta va a tre righe: LABEL.height ne conta due", () => {
-    // Il rischio vero non e' la parola lunga — il max-width la manda a capo — ma
+    // Il rischio vero non e' la parola lunga (il max-width la manda a capo) ma
     // la frase che di righe ne fa tre senza avere una sola parola lunga
     // ("Il tuo gestionale online"). Qui ogni etichetta vera, in tutte e due le
     // lingue, viene impaginata contro la larghezza che le e' riservata.
@@ -572,7 +572,7 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
     // la tabella hmtx dentro un .woff2 in un test costa piu' di quanto valga.
     // I valori veri: JetBrains Mono avanza esattamente 0,600em, Cascadia Code
     // 0,586em (1200 unita' su 2048); i ripieghi generici stanno sotto o poco
-    // sopra — Menlo e DejaVu Sans Mono 0,602, Courier New 0,600, Consolas 0,550.
+    // sopra: Menlo e DejaVu Sans Mono 0,602, Courier New 0,600, Consolas 0,550.
     // Si tiene il piu' largo dei due caratteri veri. Il margine e' dichiarato,
     // non sperato: la prova qui sotto verifica che la parola piu' lunga ci stia,
     // e ci sta finche' l'avanzamento non supera 0,608em (7,3em diviso dodici
@@ -615,7 +615,7 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
 
 /**
  * La domanda sul post-it bianco non e' un'etichetta: sta DENTRO la sagoma, e
- * per la geometria quell'oggetto e' muto — objectBox lo misura senza striscia.
+ * per la geometria quell'oggetto e' muto: objectBox lo misura senza striscia.
  * Vuol dire che nessuna delle quattro prove di LABEL la guarda, e che se un
  * giorno una traduzione la allunga, il testo esce dal post-it e non se ne
  * accorge nessuno: [data-desk-ask] non ha overflow, e l'ingombro dichiarato non
@@ -648,7 +648,7 @@ describe("la domanda sul post-it ci sta dentro il post-it", () => {
 
     // Il post-it si disegna solo nel mondo orizzontale, che vive dai 1024px in
     // su: sotto, il disegno e' il gemello e li' la domanda non si scrive. Le due
-    // finestre sono gli estremi — la piu' stretta che lo disegna e una in cui il
+    // finestre sono gli estremi: la piu' stretta che lo disegna e una in cui il
     // mondo ha gia' toccato il suo massimo.
     for (const finestra of [FINESTRA.wide, 2560]) {
       const mondo = Math.min((finestra * vw) / 100, rem * REM);
@@ -687,7 +687,7 @@ describe("la domanda sul post-it ci sta dentro il post-it", () => {
  * L'altra copia dichiarata. Le finestre del titolo e della tesi vivono in
  * layers.ts, ma chi le applica e' il foglio di stile, e il CSS una costante di
  * TypeScript non la sa importare: i numeri stanno in due posti. Rileggerli da
- * qui e' l'unico modo perche' cambiarne uno solo non passi liscio — e passare
+ * qui e' l'unico modo perche' cambiarne uno solo non passi liscio, e passare
  * liscio vorrebbe dire un titolo che se ne va mentre entra il primo foglio,
  * cioe' i due testi da leggere insieme.
  */
@@ -721,13 +721,13 @@ describe("il titolo e la tesi hanno gli stessi numeri nei due file", () => {
 });
 
 /**
- * I cavi. La forma del DOM — due SVG e non uno — la tiene gia' DeskCables.test,
+ * I cavi. La forma del DOM (due SVG e non uno) la tiene gia' DeskCables.test,
  * ma da sola non prova niente: e' la GEOMETRIA delle due scatole a dare un senso
  * a quella divisione, e sta tutta nel foglio di stile. Rimettere i capi a
  * `width: 100%` li riporta nella scatola del piano, che e' larga min(94vw, 62rem)
  * e centrata: il 14% e l'88% da cui il filo entra e esce smettono di essere
  * percentuali della PAGINA, e alla giunzione torna il gradino da 170px misurato
- * a 1440. Nessuna prova di DeskCables se ne accorgerebbe — i path non cambiano
+ * a 1440. Nessuna prova di DeskCables se ne accorgerebbe: i path non cambiano
  * di un carattere. Questa se ne accorge.
  */
 describe("le due scatole dei cavi", () => {
@@ -779,7 +779,7 @@ const CAMERA = (() => {
  * guardava. Sono invarianti del FOGLIO DI STILE, non del modello: una modifica
  * che porti i 380vh fuori dalla media query, o che scriva una regola di camera
  * senza la chiave [data-motion="full"], o che tolga un `, 1` a una lettura di
- * --p, lascia verdi tutte le altre prove di questo file — e rompe la sezione
+ * --p, lascia verdi tutte le altre prove di questo file, e rompe la sezione
  * per chi ha chiesto di non muovere niente, o per chi il JavaScript non ce l'ha.
  * Fin qui l'unica prova era un curl fatto a mano una volta, che nel repository
  * non c'e'.
@@ -789,7 +789,7 @@ describe("il patto del fallback e' scritto in ogni riga che legge la camera", ()
     // Senza JavaScript nessuno le scrive: --p vale 1 e --s vale 1, il tavolo si
     // vede intero e il fotogramma a riposo e' anche quello finale. Basta un
     // `, 1` dimenticato perche' l'opacita' diventi invalida e mezzo tavolo
-    // sparisca per chi non ha il JavaScript — e nient'altro se ne accorgerebbe.
+    // sparisca per chi non ha il JavaScript, e nient'altro se ne accorgerebbe.
     const letture = [...TOKENS.matchAll(/var\(\s*--[ps]\b[^)]*\)/g)].map((m) => m[0]);
     // Se un giorno le letture sparissero tutte, il ciclo qui sotto sarebbe vero
     // per vuoto: il conto dice che ce ne sono ancora.
@@ -825,7 +825,7 @@ describe("il movimento ha una porta sola, e due chiavi per quella porta", () => 
     // Sono le due righe che trasformano la sezione in una camera: 380vh di
     // corsa e un palco che sta fermo mentre passano. Fuori da quella porta
     // vorrebbero dire tre schermi di vuoto da scorrere a mano, con il tavolo
-    // gia' finito e fermo — che e' il modo peggiore di rompere il fallback.
+    // gia' finito e fermo, che e' il modo peggiore di rompere il fallback.
     expect(CAMERA.dentro).toContain("380vh");
     expect(CAMERA.dentro).toContain("position: sticky");
     expect(CAMERA.fuori).not.toContain("380vh");

@@ -6,7 +6,7 @@ import type { Guida } from "../freccia";
 
 /**
  * Il calibratore non va in produzione, ma le due cose che il pannello deve fare
- * bene si sentono solo trascinando — e trascinando non le prova nessuno.
+ * bene si sentono solo trascinando, e trascinando non le prova nessuno.
  *
  * Sono queste: i pallini si AGGIORNANO e non si ricreano (ricrearli
  * staccherebbe il pointer capture a meta' trascinamento), e lo scostamento si

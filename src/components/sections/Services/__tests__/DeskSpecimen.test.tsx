@@ -15,9 +15,9 @@ import { SPECIMENS } from "../DeskSpecimen";
  * proposta lontana dal catalogo di icone, ed e' anche quello che la limita.
  *
  * - `hosting` ("Dove sta"): l'hosting non ha una faccia. Qualunque cosa gli si
- *   metta dentro — una nuvola, un globo, un server — e' un simbolo travestito da
+ *   metta dentro (una nuvola, un globo, un server) e' un simbolo travestito da
  *   campione, e il primo che sfonda la regola la sfonda per tutti.
- * - `blank`: il post-it grigio ha qualcosa scritto sopra — il conto dei caffe' —
+ * - `blank`: il post-it grigio ha qualcosa scritto sopra (il conto dei caffe')
  *   ma e' testo TRADOTTO, e i campioni sono disegni fissi dentro un componente.
  *   Gli arriva percio' dalle traduzioni, come `note`, e non da SPECIMENS. E' una
  *   ragione tecnica, non un'eccezione alla regola dei campioni.
@@ -108,7 +108,7 @@ describe("il post-it grigio", () => {
 
   it("il numero sta dove stanno gli altri numeri inventati, e si dichiara tale", () => {
     // La regola di content/metrics.ts: ogni numero non misurato sta in un posto
-    // solo e dichiara di essere stimato. Questo e' una battuta e non un dato —
+    // solo e dichiara di essere stimato. Questo e' una battuta e non un dato,
     // ragione in piu' perche' non se ne stia per conto suo dentro un componente,
     // dove nessuno lo troverebbe il giorno che qualcuno chiede "e questo?".
     const caffe = metricById("coffees");
@@ -141,14 +141,14 @@ describe("i campioni sanno disegnarsi", () => {
   it("due campioni non sono lo stesso disegno: fatti di marche diverse, o di parole diverse", () => {
     // La prova qui sopra guarda gli ID e non vede niente. Serviva questa, e
     // servirla PRIMA: "Il tuo gestionale" era una tabella di celle, e "I dati"
-    // e' una tabella di celle piu' fitta — due oggetti col medesimo disegno, che
+    // e' una tabella di celle piu' fitta: due oggetti col medesimo disegno, che
     // e' esattamente il difetto che i campioni erano li' per risolvere. Nessuna
     // prova se n'e' accorta, e l'ha visto un occhio.
     //
     // La firma e' l'INSIEME delle marche piu' il testo, senza i conteggi: due
     // tabelle restano due tabelle anche con dodici celle una e diciotto l'altra,
     // ed e' quel caso che va colto. Il testo entra perche' i quattro campioni
-    // mono — nome.it, https://, 0,4 s, v2.4 → v2.5 — sono la stessa marca e cose
+    // mono (nome.it, https://, 0,4 s, v2.4 → v2.5) sono la stessa marca e cose
     // diverse: li' e' la parola a essere il disegno.
     //
     // Resta un proxy, e vale la pena dirlo: coglie "lo stesso disegno", non
@@ -196,7 +196,7 @@ describe("dove stanno e come si comportano", () => {
 
   it("non si annunciano: sono decorazione, e il nome dell'oggetto lo porta gia' l'etichetta", () => {
     // Un campione che entra nell'albero di accessibilita' fa leggere "I colori,
-    // I colori" — o peggio, "Aa". L'etichetta e' il nome; questo e' il disegno.
+    // I colori", o peggio, "Aa". L'etichetta e' il nome; questo e' il disegno.
     const { container } = render(
       <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
     );
@@ -221,7 +221,7 @@ describe("di che colore sono", () => {
     // La stessa regola dei materiali (vedi materials.ts): una tinta scritta a
     // mano non sa girare col tema, e questi campioni si vedono su carta e su
     // inchiostro. L'unica eccezione ammessa sarebbe un colore che NON deve
-    // seguire il tema — e qui non ce n'e' nessuno: anche i tre campioni de
+    // seguire il tema, e qui non ce n'e' nessuno: anche i tre campioni de
     // "I colori" sono i token del brand, che e' esattamente il motivo per cui
     // quel campione e' onesto.
     const css = readFileSync(resolve(__dirname, "../../../../styles/tokens.css"), "utf8");
@@ -239,7 +239,7 @@ describe("di che colore sono", () => {
   });
 
   it("il foglio di stile conosce ogni marca: nessun campione resta un quadrato invisibile", () => {
-    // Il difetto vero non e' un campione senza regola — quasi tutti si disegnano
+    // Il difetto vero non e' un campione senza regola: quasi tutti si disegnano
     // con le marche condivise, e chiedere una regola col loro nome sarebbe una
     // prova che impone un CSS ridondante. Il difetto e' una MARCA senza regola:
     // uno <i data-m="qualcosa"> mai dichiarato e' un elemento largo zero, che si

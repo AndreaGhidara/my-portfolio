@@ -179,7 +179,7 @@ describe("il tavolo", () => {
 /**
  * Le illustrazioni di «E in pratica?» non sono disegni nuovi: sono gli oggetti
  * del tavolo, citati per id e ripresi da vicino. E' quella la ragione per cui
- * qui non si dichiarano ne' sagome ne' campioni — si dichiara un nome.
+ * qui non si dichiarano ne' sagome ne' campioni: si dichiara un nome.
  */
 describe("E in pratica", () => {
   it("risponde alle quattro voci, nel loro ordine", () => {

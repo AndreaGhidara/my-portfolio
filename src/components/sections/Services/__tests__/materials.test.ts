@@ -31,7 +31,7 @@ const NOMI = Object.keys(SURFACES) as SurfaceName[];
  * calcolando i numeri.
  *
  * Le soglie non sono gusto. Sono il minimo perche' il tavolo resti quattro tipi
- * di cosa invece di quattro contorni della stessa famiglia — che e' esattamente
+ * di cosa invece di quattro contorni della stessa famiglia, che e' esattamente
  * cio' che §4.4 bis della spec esiste per superare.
  */
 describe("la scala dei materiali", () => {
@@ -55,7 +55,7 @@ describe("la scala dei materiali", () => {
           const superficie = SURFACES[nome];
           // Il post-it e' l'eccezione dichiarata, ed e' una scelta e non una
           // dimenticanza: un post-it giallo e' giallo di notte. Su carta fa
-          // 1.08:1 — a tenerlo su sono la tinta e il bordo, non la luminanza.
+          // 1.08:1: a tenerlo su sono la tinta e il bordo, non la luminanza.
           if (superficie.family === "fisso") continue;
           const pieno = tint(tema, superficie[tema].fill);
           expect(
@@ -111,7 +111,7 @@ describe("la scala dei materiali", () => {
       it("l'ombra portata esiste davvero, composta sul fondo", () => {
         // Era `--ink` al 26% in tutti e due i temi. In tema scuro `--bg` E'
         // `--ink`: l'ombra aveva la luminanza esatta del fondo su cui cadeva,
-        // cioe' 1.00:1 — matematicamente non c'era, e il report la dava per
+        // cioe' 1.00:1: matematicamente non c'era, e il report la dava per
         // verificata in tutti e due i temi.
         const composta = shadowOverBg(tema);
         expect(
@@ -153,7 +153,7 @@ describe("la scala dei materiali", () => {
  * IL CONTRATTO CSS-COME-TESTO.
  *
  * Il modulo qui sopra e' la specifica; `tokens.css` e' l'unico che dipinge. Se
- * i due divergono, la prova della scala misura un tavolo che nessuno vede — che
+ * i due divergono, la prova della scala misura un tavolo che nessuno vede, che
  * e' il modo piu' silenzioso di non provare niente. E' lo stesso pattern gia'
  * in uso per il contratto dell'etichetta e per la porta del movimento.
  */
@@ -245,8 +245,8 @@ describe("tokens.css dichiara esattamente la tavola dei materiali", () => {
 });
 
 /**
- * L'OMBRA. E' l'unico divieto esplicito di §4.4 bis — «un'ombra portata sulle
- * sole superfici, MAI sull'etichetta» — e non aveva una prova: spostare il
+ * L'OMBRA. E' l'unico divieto esplicito di §4.4 bis: «un'ombra portata sulle
+ * sole superfici, MAI sull'etichetta», e non aveva una prova: spostare il
  * filtro su `[data-desk-object]` lasciava verdi tutte e 210 le prove e metteva
  * un'ombra sotto ogni parola del tavolo.
  */
