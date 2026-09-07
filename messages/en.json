@@ -219,23 +219,56 @@
   },
   "process": {
     "eyebrow": "How I work",
-    "title": "Four steps, always the same",
-    "steps": {
-      "understand": {
-        "title": "We understand",
-        "body": "Before talking technology, I work out what has to happen in your business for the project to have been worth anything."
+    "title": "Four things you get, in this order",
+    "intro": "This isn't a list of what I do: it's what you end up holding, and when. If you don't have these four things by the end, the project isn't finished, even if the site is live.",
+    "list": {
+      "documento": {
+        "quando": "Within three days of the first meeting",
+        "titolo": "A document",
+        "lead": "Two pages, not twenty. What has to happen for the project to have been worth anything, and what we won't do: written down, not implied.",
+        "dentro": {
+          "uno": "The three things that have to work, in order of importance",
+          "due": "What stays out, and why it stays out",
+          "tre": "The questions we can't answer yet"
+        },
+        "nonlo": "It isn't a quote. Numbers come later, when there is something to count.",
+        "perche": "If you don't recognise yourself in it, we misunderstood each other here and not in three months, when fixing it costs ten times as much."
       },
-      "design": {
-        "title": "I design",
-        "body": "Structure, screens and technical choices. We make the important decisions together — you don't discover them once the work is done."
+      "schermo": {
+        "quando": "Before a single line of code exists",
+        "titolo": "A drawn screen",
+        "lead": "The screens that matter, before they exist. Not all of them: only the ones where somebody decides something.",
+        "dentro": {
+          "uno": "The screen where someone who doesn't know you lands",
+          "due": "The one where somebody buys, books or writes",
+          "tre": "The one you'll use yourself, every day, for years"
+        },
+        "nonlo": "It isn't finished design, and it's black and white on purpose: colour gets discussed later, order gets discussed now.",
+        "perche": "We make the important decisions looking at this, together. Changing a drawing costs an afternoon; changing something already built costs a week."
       },
-      "build": {
-        "title": "I build",
-        "body": "I work in deliverable pieces: you see something working early and often, not only at the end."
+      "link": {
+        "quando": "Every two weeks, until the end",
+        "titolo": "A link that works",
+        "lead": "Not a screenshot and not a presentation: an address you open on your phone while the work goes on.",
+        "dentro": {
+          "uno": "You can click around inside it",
+          "due": "You can show it to a colleague without explaining it",
+          "tre": "You can reject it, which is exactly why I give it to you"
+        },
+        "nonlo": "It isn't a release. It's the same thing, incomplete, but real: what's there actually works.",
+        "perche": "It's the difference between finding a problem two weeks in and finding it two days from the end."
       },
-      "stay": {
-        "title": "I stay",
-        "body": "I don't disappear after launch. Fixes, changes and a person who answers: it's why clients come back."
+      "numero": {
+        "quando": "From launch on, with no end date",
+        "titolo": "A phone number",
+        "lead": "After launch a person answers, and the person is me. Not a ticket, not a form, not another supplier.",
+        "dentro": {
+          "uno": "Fixes: if I broke it, I fix it",
+          "due": "Changes, quoted one at a time",
+          "tre": "«Can this be done?», even when the answer is no"
+        },
+        "nonlo": "It isn't a support contract you have to sign. If you don't need it you don't pay for it, and if you do, you already know who to call.",
+        "perche": "It's why clients come back, and it's the only one of the four with no end date."
       }
     }
   },
