@@ -2011,3 +2011,160 @@ html[data-dialog-open] body { overflow: hidden; }
   [data-process-item][data-lato="sx"] [data-process-art] { order: 1; }
 }
 
+
+/* ══════════════════════════════════════════════════════════════════════════
+   DOVE HO IMPARATO: i tre fogli in fila, su fondo arancio
+
+   Ogni tappa è un tesserino appuntato sopra il foglio della lezione. In FILA e
+   non in colonna alternata: quel gesto lo fanno già «E in pratica?» e le quattro
+   consegne, e questa sarebbe stata la terza volta.
+
+   LA REGOLA DEI COLORI, e non è negoziabile. La sezione è arancione e di notte
+   resta arancione: qui dentro --fg, --bg, --line e --fg-muted si ribaltano
+   mentre il fondo no, e tesserini e fogli diventerebbero carta su carta. È lo
+   stesso difetto che la casella di posta ha già avuto, ed è la stessa
+   soluzione: carta e inchiostro sempre, e le sfumature nascono qui da --ink e
+   --paper. Una prova lo verifica, perché nel DOM non si vede.
+
+   Le tre ricette sono le stesse di `.casella` e non sono condivise di proposito:
+   è ogni blocco a dichiarare la carta su cui sta, e un blocco che le eredita da
+   lontano è un blocco che non sa di che colore è.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+[data-journey-list] {
+  list-style: none;
+  /* Il respiro sotto il titolo sta QUI e non in una classe di utilita' sul
+     componente: `margin: 0` la azzererebbe, stessa specificita' e piu' avanti
+     nel foglio, e la classe resterebbe scritta senza fare niente. E' 6rem e non
+     4 perche' il tesserino sborda di 1,25 sopra il foglio: l'aria vera fra il
+     titolo e la fila e' quella meno lo sbordo, e a 4rem il cartellino della
+     prima tappa finiva sopra la coda della «p» di «imparato». */
+  margin: 6rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: start;
+
+  color: var(--ink);
+  --riga: color-mix(in oklab, var(--ink) 16%, var(--paper));
+  --fioco: color-mix(in oklab, var(--ink) 62%, var(--paper));
+  /* L'arancio pieno su carta fa 3,27:1 e l'etichetta e' 0,6rem: non basta.
+     Scurito con l'inchiostro fa 5,42:1 e resta arancio. */
+  --accento-su-carta: color-mix(in oklab, var(--accent) 72%, var(--ink));
+}
+
+/* Il <li> è il contenitore di posizionamento del tesserino, ed è largo quanto
+   il foglio: appeso a qualcosa di più largo, il cartellino finirebbe a mezza
+   colonna di distanza dalla cosa a cui dovrebbe essere appuntato. */
+[data-journey-item] { position: relative; }
+
+/* Le tre inclinazioni sono diverse una dall'altra, e uno dei fogli è più basso.
+   Non è un vezzo: tre fogli con lo stesso angolo sono un errore di stampa e tre
+   fogli dritti sono una tabella. Quello che li fa leggere come cose appoggiate
+   su un piano è che non combaciano, e una prova verifica che restino diversi. */
+[data-journey-item]:nth-child(1) { transform: rotate(-1.1deg); }
+[data-journey-item]:nth-child(2) { transform: rotate(0.7deg); margin-block-start: 2.75rem; }
+[data-journey-item]:nth-child(3) { transform: rotate(-0.4deg); margin-block-start: 1rem; }
+
+/* ── Il tesserino ───────────────────────────────────────────────────────── */
+
+[data-journey-badge] {
+  position: absolute;
+  top: -1.25rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 2;
+}
+
+/* La clip: mezzo rettangolo aperto in basso, che è il modo in cui si legge un
+   gancio senza disegnarne uno. */
+[data-journey-clip] {
+  display: block;
+  width: 2.4rem;
+  height: 0.8rem;
+  margin: 0 auto -0.4rem;
+  border: 1.5px solid color-mix(in oklab, var(--ink) 45%, transparent);
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+  background-color: var(--paper);
+  position: relative;
+  z-index: 2;
+}
+
+/* Appena più scuro del foglio su cui sta: due carte identiche sovrapposte non
+   si leggono come due cose, e il bordo da solo non basta a staccarle. */
+[data-journey-badge-body] {
+  border: 1.5px solid color-mix(in oklab, var(--ink) 45%, transparent);
+  border-radius: 4px;
+  background-color: color-mix(in oklab, var(--ink) 7%, var(--paper));
+  padding: 0.9rem 0.85rem;
+  box-shadow: 0 2px 0 color-mix(in oklab, var(--ink) 20%, transparent);
+}
+[data-journey-badge-body] h3 {
+  margin-block-start: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.15;
+}
+/* `.eyebrow` porta --fg-muted, che qui dentro si ribalterebbe: l'anno è la
+   prima cosa che si legge su un tesserino, e di notte sparirebbe. La prova
+   sopra non lo vedrebbe mai, perché quella regola non nomina il percorso. */
+[data-journey-badge-body] .eyebrow { color: var(--fioco); }
+[data-journey-company] {
+  margin-block-start: 0.25rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  color: var(--fioco);
+}
+
+/* Il posto che un tesserino non te lo ha dato: tratteggiato e senza fondo. Non
+   è uno stato disabilitato, è un fatto. */
+[data-journey-item][data-tesserino="no"] [data-journey-badge-body] {
+  background-color: transparent;
+  border-style: dashed;
+  box-shadow: none;
+}
+[data-journey-item][data-tesserino="no"] [data-journey-clip] { border-style: dashed; }
+
+/* ── Il foglio ──────────────────────────────────────────────────────────── */
+
+/* Il respiro in cima è il posto del tesserino, che sborda di 1,25rem e ne è
+   alto circa 5: senza, il cartellino coprirebbe l'occhiello della lezione. */
+[data-journey-sheet] {
+  border: 1px solid var(--riga);
+  border-radius: 4px;
+  background-color: var(--paper);
+  padding: 5.25rem 1.5rem 1.75rem;
+}
+[data-journey-label] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accento-su-carta);
+}
+[data-journey-lesson] { margin-block-start: 0.6rem; font-size: 0.92rem; line-height: 1.55; }
+[data-journey-body] {
+  margin-block-start: 0.9rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--fioco);
+}
+
+/* La nota sta sull'arancio e non sulla carta: --on-accent è l'inchiostro, e a
+   differenza di --fg non si ribalta col tema. */
+[data-journey-note] {
+  margin-block-start: 1.5rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: var(--on-accent);
+}
+
+/* Sotto gli 860px i tre fogli si impilano. Le inclinazioni restano, gli
+   scostamenti verticali no: in colonna non sfalsano niente, aprono solo buchi. */
+@media (max-width: 860px) {
+  [data-journey-list] { grid-template-columns: 1fr; gap: 3.5rem; }
+  [data-journey-item]:nth-child(2),
+  [data-journey-item]:nth-child(3) { margin-block-start: 0; }
+}

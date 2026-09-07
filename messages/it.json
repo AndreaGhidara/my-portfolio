@@ -275,19 +275,25 @@
   "journey": {
     "eyebrow": "Percorso",
     "title": "Dove ho imparato",
-    "present": "oggi",
+    "present": "a oggi",
+    "senzaTesserino": "Nessun tesserino",
+    "etichettaLezione": "Cosa mi ha insegnato",
+    "nota": "Da freelance il tesserino non te lo dà nessuno.",
     "list": {
       "idt": {
         "role": "React Developer",
-        "body": "Funzionalità complesse su un'applicazione usata ogni giorno, e una libreria di componenti condivisa che ha reso l'interfaccia coerente in tutto il prodotto."
+        "body": "Funzionalità complesse su un'applicazione usata ogni giorno, e una libreria di componenti condivisa.",
+        "lezione": "Che una libreria di componenti non è un vezzo da sviluppatori. È la sola cosa che tiene coerente un prodotto su cui lavorano in tanti, e si vede il giorno in cui entra la persona nuova."
       },
       "eroi": {
         "role": "Full Stack Developer",
-        "body": "Una piattaforma e-commerce B2B dall'inizio alla fine: frontend, API, database e la dashboard con cui la gestiscono ogni giorno."
+        "body": "Una piattaforma e-commerce B2B dall'inizio alla fine: frontend, API, database e dashboard.",
+        "lezione": "Che il pezzo difficile di un e-commerce non è il negozio. È la dashboard con cui ci lavorano dentro tutti i giorni, ed è anche quella che nessuno pensa di dover pagare."
       },
       "freelance": {
         "role": "Sviluppatore freelance",
-        "body": "Progetti completi per piccole e medie imprese, dalla raccolta dei requisiti al rilascio. È qui che ho imparato a parlare con chi non è tecnico."
+        "body": "Progetti completi per piccole e medie imprese, dalla raccolta dei requisiti al rilascio.",
+        "lezione": "A parlare con chi non è tecnico. È la competenza che uso più di qualunque linguaggio, ed è l'unica che non si impara leggendo."
       }
     }
   },

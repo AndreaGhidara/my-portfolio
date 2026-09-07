@@ -7,7 +7,7 @@ import { useSectionAnimation } from "@/animations/useSectionAnimation";
 /**
  * Il valore finale è già nel markup: se JavaScript non parte, il numero
  * si legge lo stesso. Il conteggio parte solo se il valore è puramente
- * numerico — "24h" e "5.000+" restano fermi invece di produrre conteggi
+ * numerico: "24h" e "5.000+" restano fermi invece di produrre conteggi
  * senza senso.
  */
 export function Counter({ value, label }: { value: string; label: string }) {
@@ -39,11 +39,16 @@ export function Counter({ value, label }: { value: string; label: string }) {
     // Stessa forma della lista metriche nei case study: l'etichetta compare
     // UNA volta sola, in <dt>, e flex-col-reverse mostra il numero sopra
     // mantenendo nel DOM l'ordine dt -> dd che la specifica richiede.
+    // I colori non sono quelli del tema: questi due numeri stanno sul fondo
+    // arancio della sezione, che di notte resta arancio. --fg e --fg-muted si
+    // ribalterebbero e sparirebbero. Il numero e' carta come il titolo, la sua
+    // etichetta e' inchiostro come il resto del testo corrente: e' la stessa
+    // scala di toni della seconda sezione.
     <div ref={scope} className="flex flex-col-reverse gap-2">
-      <dt className="text-xs text-[var(--fg-muted)]">{label}</dt>
+      <dt className="text-xs text-[var(--on-accent)]">{label}</dt>
       <dd
         data-counter-value
-        className="text-4xl font-black leading-none text-[var(--fg)] lg:text-5xl"
+        className="text-4xl font-black leading-none text-[var(--paper)] lg:text-5xl"
       >
         {value}
       </dd>
