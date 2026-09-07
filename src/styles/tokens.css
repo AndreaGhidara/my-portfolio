@@ -1872,3 +1872,142 @@ html[data-dialog-open] body { overflow: hidden; }
   [data-msg-oggetto] { font-size: 1.6rem; }
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   COME LAVORO: le quattro consegne
+
+   Testo|disegno, disegno|testo, scendendo. L'impaginato e' quello di «E in
+   pratica?», ma il gesto no: li' l'alternanza serve alla freccia, che deve
+   passare solo sopra i disegni; qui serve a una cosa piu' semplice, evitare
+   quattro voci in colonna con mezza pagina bianca accanto.
+
+   I disegni sono le sagome del tavolo (DeskShapeArt) coi campioni di questa
+   sezione (ProcessSpecimen): il materiale del sito e' uno solo, il frammento
+   che mostrano e' loro.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Stessa ragione della lista del percorso: la spaziatura sta qui, o la
+   azzererebbe il `margin` di questa stessa regola. */
+[data-process-list] { list-style: none; margin: 3.5rem 0 0; padding: 0; }
+
+[data-process-item] {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+  padding-block: 3rem;
+  border-block-start: 1px solid var(--line);
+}
+/* La prima non ha filetto: sopra di lei c'e' gia' l'introduzione, e due righe
+   a due centimetri di distanza si leggono come un errore di impaginazione. */
+[data-process-item]:first-child { border-block-start: 0; padding-block-start: 1rem; }
+
+[data-process-text] { max-width: 34rem; }
+[data-process-text] h3 {
+  margin-block-start: 0.35rem;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  line-height: 1.15;
+}
+[data-process-lead] { margin-block-start: 0.75rem; line-height: 1.6; }
+
+/* Le tre cose che la consegna contiene. Il segno e' disegnato e non e' il
+   segnaposto della lista: quello si eredita dal tema del browser e cambia da
+   uno all'altro, e questa e' l'unica lista del sito in cui il segno conta:
+   sono voci di un contenuto, non passi di una procedura. */
+[data-process-dentro] {
+  list-style: none;
+  margin: 1.15rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+[data-process-dentro] li {
+  position: relative;
+  padding-inline-start: 1.2rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+[data-process-dentro] li::before {
+  content: "\0000B7";
+  position: absolute;
+  inset-inline-start: 0;
+  color: var(--accent);
+}
+
+/* Cosa NON e'. In monospaziato e staccata dal filetto: e' una nota a margine
+   del venditore, non una riga del depliant, ed e' la riga che impedisce alle
+   altre di diventare promesse. */
+[data-process-non] {
+  margin-block-start: 1.15rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+  border-inline-start: 2px solid var(--line);
+  padding-inline-start: 0.9rem;
+}
+[data-process-perche] { margin-block-start: 1.15rem; line-height: 1.6; }
+
+/* ── Il disegno ─────────────────────────────────────────────────────────── */
+
+[data-process-art] { display: flex; justify-content: center; }
+
+/* Il pezzo e' il contenitore di posizionamento del suo campione (che e'
+   assoluto) ED e' il suo contenitore di interrogazione. La seconda cosa qui
+   non e' teorica come in «E in pratica?»: «Il numero» E' un campione di testo,
+   il primo disegnato fuori dal tavolo, e senza container-type i suoi cqw si
+   risolverebbero sul viewport. */
+[data-process-art] [data-desk-piece] {
+  position: relative;
+  display: block;
+  width: 100%;
+  /* 18rem e non di piu': il foglio del tavolo porta tre righe stampate DENTRO
+     la sagoma (sono nella maschera, non nel campione), e piu' lo si ingrandisce
+     piu' quelle righe si vedono attraversare il frammento. A questa misura
+     tornano quello che sono (la rigatura di un foglio) invece di sembrare
+     graffi sopra al disegno. */
+  max-width: 18rem;
+  container-type: inline-size;
+}
+/* Il telefono e' alto il doppio di quanto e' largo: alla larghezza degli altri
+   verrebbe una torre alta mezzo schermo. La misura non e' gusto, e' il suo
+   viewBox: 74x148 contro i 150x96 del foglio. */
+[data-process-art] [data-desk-piece][data-shape="phone"] { max-width: 8.5rem; }
+[data-process-art] [data-desk-piece][data-shape="card"] { max-width: 16rem; }
+
+/* Le marche del campione sono in `em`, e senza una misura qui erediterebbero
+   il corpo del testo: righe alte uguali dentro un disegno grande il triplo di
+   un oggetto del tavolo, cioe' proporzioni sbagliate. In cqw scalano col
+   disegno, che e' quello che «un frammento della cosa» vuol dire. */
+[data-process-art] [data-desk-sample] { font-size: clamp(0.5rem, 4.6cqw, 1.05rem); }
+/* E il mono va ridichiarato: 0,78cqw e' tarato sul MONDO del tavolo, che e'
+   largo quanto la sezione. Qui il contenitore e' il pezzo, ed e' venti volte
+   piu' stretto: quella misura darebbe due pixel. */
+[data-process-art] [data-desk-sample] [data-m="mono"] { font-size: 5.4cqw; }
+
+/* Lo schermo acceso. Le marche di un campione sono il TRATTO al 34%, e il
+   telefono e' l'unica sagoma con la scocca scura: sul tavolo e' alto 98px e
+   quel campione si legge come texture, qui e' l'unica cosa che il disegno ha
+   da dire, e su nero non si legge affatto. Ribaltate sulla carta diventano
+   quello che sono: uno schermo acceso, che e' esattamente cosa vuol dire «un
+   indirizzo che apri». L'accento (la barra e il pulsante) si legge gia' da
+   se' e resta com'e'. */
+/* `:not([data-titolo])` non e' una precauzione: senza, questa regola vince per
+   specificita' sulla riga in accento (quattro attributi contro tre) e la
+   barra dell'indirizzo, che e' tutto il motivo per cui questo campione esiste,
+   diventa carta come le altre. */
+[data-process-art] [data-desk-piece][data-shape="phone"] [data-m="riga"]:not([data-titolo]),
+[data-process-art] [data-desk-piece][data-shape="phone"] [data-m="blocco"] {
+  background-color: color-mix(in oklab, var(--paper) 58%, transparent);
+}
+
+@media (min-width: 900px) {
+  [data-process-item] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 4rem;
+    padding-block: 4.5rem;
+  }
+  /* `lato` dice dove sta il DISEGNO: il testo va dall'altra parte. */
+  [data-process-item][data-lato="sx"] [data-process-text] { order: 2; }
+  [data-process-item][data-lato="sx"] [data-process-art] { order: 1; }
+}
+

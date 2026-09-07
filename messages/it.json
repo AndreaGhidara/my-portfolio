@@ -219,23 +219,56 @@
   },
   "process": {
     "eyebrow": "Come lavoro",
-    "title": "Quattro passi, sempre gli stessi",
-    "steps": {
-      "understand": {
-        "title": "Capiamo",
-        "body": "Prima di parlare di tecnologia, capisco cosa deve succedere nella tua azienda perché il progetto sia servito a qualcosa."
+    "title": "Quattro cose che ricevi, in quest'ordine",
+    "intro": "Non è l'elenco di quello che faccio io: è quello che ti resta in mano, e quando. Se a fine progetto non hai queste quattro cose, il progetto non è finito, anche se il sito è online.",
+    "list": {
+      "documento": {
+        "quando": "Entro tre giorni dal primo incontro",
+        "titolo": "Un documento",
+        "lead": "Due pagine, non venti. Cosa deve succedere perché il progetto sia servito a qualcosa, e cosa non faremo: scritto, non sottinteso.",
+        "dentro": {
+          "uno": "Le tre cose che devono funzionare, in ordine di importanza",
+          "due": "Quello che resta fuori, e perché resta fuori",
+          "tre": "Le domande a cui non sappiamo ancora rispondere"
+        },
+        "nonlo": "Non è un preventivo. I numeri arrivano dopo, quando c'è qualcosa da contare.",
+        "perche": "Se non ti ci riconosci, ci siamo capiti male qui e non fra tre mesi, quando correggere costa dieci volte tanto."
       },
-      "design": {
-        "title": "Progetto",
-        "body": "Struttura, schermate e scelte tecniche. Le decisioni importanti le prendiamo insieme, non te le trovi a lavoro finito."
+      "schermo": {
+        "quando": "Prima che esista una riga di codice",
+        "titolo": "Uno schermo disegnato",
+        "lead": "Le schermate che contano, prima che esistano. Non tutte: solo quelle dove qualcuno decide qualcosa.",
+        "dentro": {
+          "uno": "La schermata dove arriva chi non ti conosce",
+          "due": "Quella dove qualcuno compra, prenota o scrive",
+          "tre": "Quella che userai tu, ogni giorno, per anni"
+        },
+        "nonlo": "Non è la grafica finita, ed è in bianco e nero apposta: sul colore si discute dopo, sull'ordine si discute adesso.",
+        "perche": "Le decisioni importanti le prendiamo guardando questo, insieme. Cambiare un disegno costa un pomeriggio; cambiare una cosa già costruita costa una settimana."
       },
-      "build": {
-        "title": "Costruisco",
-        "body": "Lavoro a pezzi consegnabili: vedi qualcosa di funzionante presto e spesso, non solo alla fine."
+      "link": {
+        "quando": "Ogni due settimane, fino alla fine",
+        "titolo": "Un link che funziona",
+        "lead": "Non uno screenshot e non una presentazione: un indirizzo che apri dal telefono mentre il lavoro va avanti.",
+        "dentro": {
+          "uno": "Ci puoi cliccare dentro",
+          "due": "Lo puoi far vedere a un collega senza spiegarlo",
+          "tre": "Lo puoi bocciare, ed è il motivo per cui te lo do"
+        },
+        "nonlo": "Non è un rilascio. È la stessa cosa, incompleta, ma vera: quello che c'è funziona davvero.",
+        "perche": "È la differenza fra scoprire un problema a due settimane dall'inizio e scoprirlo a due giorni dalla fine."
       },
-      "stay": {
-        "title": "Resto",
-        "body": "Dopo il lancio non sparisco. Correzioni, evoluzioni e una persona che risponde: è il motivo per cui i clienti tornano."
+      "numero": {
+        "quando": "Dal lancio in poi, senza scadenza",
+        "titolo": "Un numero di telefono",
+        "lead": "Dopo il lancio risponde una persona, e la persona sono io. Non un ticket, non un modulo, non un altro fornitore.",
+        "dentro": {
+          "uno": "Le correzioni: se l'ho rotto io, lo aggiusto io",
+          "due": "Le evoluzioni, preventivate una per una",
+          "tre": "«Si può fare?», anche quando la risposta è no"
+        },
+        "nonlo": "Non è un contratto di assistenza da firmare per forza. Se non ti serve non lo paghi, e se ti serve sai già chi chiamare.",
+        "perche": "È il motivo per cui i clienti tornano, ed è l'unica delle quattro consegne che non ha una data di fine."
       }
     }
   },

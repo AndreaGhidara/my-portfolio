@@ -1,15 +1,28 @@
 import { Reveal } from "@/animations/components/Reveal";
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
+import { processDeliveries } from "@/content/process";
+import { ProcessBlock } from "./ProcessBlock";
 
-export type ProcessStep = { id: string; title: string; body: string };
+/** Il testo di una consegna. La forma (sagoma, campione, lato) sta nel
+ *  contenuto e non qui: qui arrivano solo le parole, gia' tradotte. */
+export type ProcessDeliveryView = {
+  id: string;
+  quando: string;
+  titolo: string;
+  lead: string;
+  dentro: string[];
+  nonlo: string;
+  perche: string;
+};
 
 export type ProcessViewProps = {
   eyebrow: string;
   title: string;
-  steps: ProcessStep[];
+  intro: string;
+  deliveries: ProcessDeliveryView[];
 };
 
-export function ProcessView({ eyebrow, title, steps }: ProcessViewProps) {
+export function ProcessView({ eyebrow, title, intro, deliveries }: ProcessViewProps) {
   return (
     <section id="process" className="relative px-[var(--gutter)] py-[var(--section-y)]">
       {/* Qui il filo e' agganciato allo scroll: e' la sezione in cui la
@@ -17,23 +30,23 @@ export function ProcessView({ eyebrow, title, steps }: ProcessViewProps) {
           Su mobile lo scrub viene ignorato da weave(). */}
       <ThreadSegment section="process" scrub className="pointer-events-none absolute inset-0 -z-10" />
 
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-[64rem]">
         <p className="eyebrow">{eyebrow}</p>
         <h2 className="mt-3 text-3xl lg:text-5xl">{title}</h2>
+        <p className="mt-5 max-w-[38rem] leading-relaxed text-[var(--fg-muted)]">{intro}</p>
 
-        <Reveal as="ol" className="mt-10 space-y-8" stagger={0.1}>
-          {steps.map((step, index) => (
-            <li key={step.id} className="flex gap-5">
-              <span
-                aria-hidden="true"
-                className="mt-2 size-3 shrink-0 rounded-full bg-[var(--accent)]"
-              />
-              <div>
-                <span className="eyebrow">{String(index + 1).padStart(2, "0")}</span>
-                <h3 className="mt-1 text-2xl font-bold text-[var(--fg)]">{step.title}</h3>
-                <p className="mt-2 leading-relaxed text-[var(--fg-muted)]">{step.body}</p>
-              </div>
-            </li>
+        {/* Ordinata, e non e' un dettaglio: «in quest'ordine» e' meta' del
+            titolo, e una <ol> e' il modo in cui quell'ordine arriva anche a chi
+            la pagina non la vede. Le voci si accoppiano al contenuto per
+            posizione, come fa Practice con le sue scene. */}
+        <Reveal as="ol" data-process-list stagger={0.1}>
+          {deliveries.map((delivery, index) => (
+            <ProcessBlock
+              key={delivery.id}
+              delivery={delivery}
+              piece={processDeliveries[index]}
+              index={index}
+            />
           ))}
         </Reveal>
       </div>
