@@ -24,7 +24,7 @@ export const contentType = "image/png";
  * solo testo alternativo per lo screen reader, non mostrato all'utente.
  * Si ripiega sull'italiano, la lingua primaria del progetto.
  */
-export const alt = `Andrea Ghidara — ${itMessages.hero.eyebrow}`;
+export const alt = `Andrea Ghidara, ${itMessages.hero.eyebrow}`;
 
 type HeroMessages = { eyebrow: string; claim: string };
 type Messages = { hero: HeroMessages };

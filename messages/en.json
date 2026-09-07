@@ -18,67 +18,86 @@
   },
   "seeking": {
     "eyebrow": "Let's start here",
-    "title": "Where are you starting from?",
-    "intro": "Five ways it usually begins, from the lightest to the largest. Pick yours and I'll tell you what it actually means — even if yours is the last one.",
+    "title": "The five emails I get most often",
+    "intro": "Rewritten by me, not copied: none of them is anyone's actual email. Open them and read what I reply. It's what you'd get by writing to me.",
     "attesa": "This isn't a form: it all stays here, and nobody receives anything until you write to me yourself.",
     "labels": {
       "tipo": "What kind of work it is",
       "prova": "The proof"
     },
+    "casella": {
+      "etichettaDa": "From",
+      "etichettaA": "To",
+      "da": "a request like yours",
+      "a": "Andrea",
+      "vuoto": "Open one. The replies are the ones I actually write: not a quote, but where I'd start. And one in five ends with «you don't need this».",
+      "firma": "Andrea Ghidara",
+      "ruolo": "Web developer · Full stack"
+    },
     "list": {
       "capire": {
         "nome": "Being understood",
-        "voice": "The site is there, but it doesn't say what we actually do: people arrive and don't get it.",
+        "frequenza": "almost every week",
+        "oggetto": "Our site doesn't say what we do",
+        "anteprima": "We have a site but the people who land on it don't understand what we actually do. We'd like to redo it, but we don't know where to start…",
         "et": "What it usually means",
         "titolo": "It's almost never a wording problem.",
         "etPrima": "A test you can run today, in ten minutes",
-        "prima": "Write down the three questions people ask you on the phone before they buy. Then open your homepage and count how many it answers in the first screenful. If it's none or one, the problem isn't how it's written: it's the order it's in — the site describes how the company is organised instead of answering the person who just arrived.",
+        "prima": "Write down the three questions people ask you on the phone before they buy. Then open your homepage and count how many it answers in the first screenful. If it's none or one, the problem isn't how it's written, it's the order it's in: the site describes how the company is organised instead of answering the person who just arrived.",
         "tipo": "The real work is deciding what comes first, not producing copy. A few weeks, and you don't need to redo the design to find out.",
         "prova": "Everything behind a website",
-        "cta": "Let's talk"
+        "cta": "Reply to this email"
       },
       "strumento": {
         "nome": "A tool",
-        "voice": "What I have works: I need something to speed up the steps that eat my time.",
+        "frequenza": "a couple a month",
+        "oggetto": "We need something to speed things up",
+        "anteprima": "What we have works, but there are steps that eat hours out of every week. Can it be automated?",
         "et": "What it usually means",
         "titolo": "It's the healthiest of the five, and the most underrated.",
         "etPrima": "The trap people fall into",
-        "prima": "The tool almost always ends up on the step that annoys you most rather than the one that costs the most time — and they're never the same. For one week write down how long each repetitive thing takes, not how much it bothers you: the ranking that comes out isn't the one you had in mind.",
+        "prima": "The tool almost always ends up on the step that annoys you most rather than the one that costs the most time, and they're never the same. For one week write down how long each repetitive thing takes, not how much it bothers you: the ranking that comes out isn't the one you had in mind.",
         "tipo": "Small and self-contained. It doesn't touch what you have, and if it's wrong you throw it away without having broken anything. It's also the cheapest way to find out whether you need the rest.",
         "prova": "Aidify, which absorbs the repeated questions",
-        "cta": "Let's talk"
+        "cta": "Reply to this email"
       },
       "aggiunta": {
         "nome": "An addition",
-        "voice": "The structure is already there: I need to add new features to it.",
+        "frequenza": "a couple a month",
+        "oggetto": "We need to add some features",
+        "anteprima": "The platform is already there and it works, but we need a couple of new things. Roughly how long would it take?",
         "et": "What it usually means",
         "titolo": "The cost isn't the feature. It's whatever was there before.",
         "etPrima": "The question that moves the quote",
-        "prima": "Ask whoever built it whether there's a way to try a change before publishing it. If the answer is no, that's the first job — and it holds for anything you add afterwards, not just this one.",
+        "prima": "Ask whoever built it whether there's a way to try a change before publishing it. If the answer is no, that's the first job, and it holds for anything you add afterwards, not just this one.",
         "tipo": "You start by reading, not writing. An honest estimate comes after half a day inside the code, not before.",
         "prova": "BDroppy, migrated without ever switching it off",
-        "cta": "Let's talk"
+        "cta": "Reply to this email"
       },
       "fulcro": {
         "nome": "A hub",
-        "voice": "I want to move all our operations into a single application, tailored to us.",
+        "frequenza": "a few times a year",
+        "oggetto": "We'd like a system of our own",
+        "anteprima": "We work across five different tools and none of them talk to each other. We'd like one single thing, built around us…",
         "et": "What it usually means",
         "titolo": "It's the largest of the five, and the only one that can fail quietly.",
         "etPrima": "Where it goes wrong",
-        "prima": "You build everything, you ship it, and people keep using the old spreadsheets. The software isn't the hard part: making it the place where the work actually happens is. List where your data lives today — the management system, spreadsheets, email, somebody's head. The place holding the most of it is usually the person.",
+        "prima": "You build everything, you ship it, and people keep using the old spreadsheets. The software isn't the hard part: making it the place where the work actually happens is. List where your data lives today: the management system, spreadsheets, email, somebody's head. The place holding the most of it is usually the person.",
         "tipo": "In stages, and the first one has to genuinely replace something. One piece that people actually use is worth more than ten that are finished and switched off.",
         "prova": "CustomerTrack, built to belong to several companies",
-        "cta": "Let's talk"
+        "cta": "Reply to this email"
       },
       "nonancora": {
         "nome": "Not yet",
-        "voice": "I don't know yet. I only know that something is costing me too much time.",
-        "et": "It's what almost everyone answers",
+        "frequenza": "more than any other",
+        "oggetto": "I'm not sure what I need",
+        "anteprima": "I'm writing a bit blindly: I know something isn't working but I wouldn't know what to ask for…",
+        "et": "What it usually means",
         "titolo": "Nobody arrives knowing whether they need a tool or a platform.",
         "etPrima": "A question you can answer on your own, today",
-        "prima": "If one single person disappeared from the company tomorrow, what would stop? That thing is where any sensible project starts — and it's almost always the same thing costing you too much time right now.",
+        "prima": "If one single person disappeared from the company tomorrow, what would stop? That thing is where any sensible project starts, and it's almost always the same thing costing you too much time right now.",
         "tipo": "None, for now. Answering that question is worth more than any quote, and you don't need me to do it.",
-        "cta": "Write to me anyway, if you like"
+        "cta": "Write to me anyway"
       }
     }
   },
@@ -92,7 +111,7 @@
       },
       "ecommerce": {
         "title": "E-commerce",
-        "description": "I connect the catalogue to what you already run — back office, warehouse, courier — instead of asking you to update two systems by hand. Payments and shipping stay configurable: tomorrow you can switch provider without rebuilding the shop."
+        "description": "I connect the catalogue to what you already run (back office, warehouse, courier) instead of asking you to update two systems by hand. Payments and shipping stay configurable: tomorrow you can switch provider without rebuilding the shop."
       },
       "webapp": {
         "title": "Web apps and platforms",
@@ -106,13 +125,13 @@
     "stageTitle": "Everything you don't see",
     "stageLead": "A finished website. From here on, everything underneath it.",
     "centre": "the project",
-    "blank": "And yours — what is it? Write to me.",
+    "blank": "And yours, what is it? Write to me.",
     "punch": "What you call \"a website\" is the screen in the middle. The rest is the work behind it.",
     "practice": "And in practice?",
     "layers": {
       "site": {
         "title": "The site",
-        "lead": "What you see. Colour, type, hierarchy, words, images — and how all of it holds up on a six-inch screen.",
+        "lead": "What you see. Colour, type, hierarchy, words, images. And how all of it holds up on a six-inch screen.",
         "objects": {
           "colors": "Colour",
           "type": "Type",
@@ -136,7 +155,7 @@
       },
       "infra": {
         "title": "The infrastructure",
-        "lead": "What keeps it standing at three in the morning. You never see it — until it's missing, and then it's all you see.",
+        "lead": "What keeps it standing at three in the morning. You never see it, until it's missing. And then it's all you see.",
         "objects": {
           "hosting": "Where it lives",
           "database": "The data",

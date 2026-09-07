@@ -1,5 +1,9 @@
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
-import { SeekingStrade, type SeekingStrada } from "./SeekingStrade";
+import {
+  SeekingCasella,
+  type SeekingMail,
+  type SeekingCasellaChrome,
+} from "./SeekingCasella";
 
 export type SeekingViewProps = {
   eyebrow: string;
@@ -8,24 +12,25 @@ export type SeekingViewProps = {
   /** «Non e' un modulo»: il patto, scritto dove si prende la decisione. */
   attesa: string;
   etichettaTipo: string;
-  strade: SeekingStrada[];
+  casella: SeekingCasellaChrome;
+  mail: SeekingMail[];
 };
 
 /**
  * La seconda sezione: quella che deve guadagnarsi il diritto di dire tutto il
  * resto. Prima erano quattro frasi che rispecchiavano il visitatore e una
  * chiusa che gli faceva un complimento — «la parte difficile l'hai gia' fatta:
- * sai cosa ti serve» — che era anche falsa: chi arriva conosce un sintomo, non
- * il problema, e dirgli il contrario toglie a questo sito la ragione per cui
- * dovrebbe scrivergli.
+ * sai cosa ti serve» — che era anche falsa. Poi sono diventate cinque strade
+ * con la risposta dentro: chiedeva e rispondeva.
  *
- * Adesso chiede e RISPONDE. Cinque strade ordinate per quanto toccano di
- * quello che uno ha gia', e ognuna si porta dietro cosa significa davvero, una
- * cosa da verificare da soli oggi, e dove nella pagina sta la prova.
+ * Adesso non chiede piu' niente. «Queste sono le cinque email che ricevo piu'
+ * spesso, e queste sono le mie risposte»: il visitatore non compila, legge la
+ * posta di qualcun altro e ci si riconosce. E' generoso, e' una prova di
+ * competenza invece di una promessa, e giustifica da solo la riga sotto — che
+ * resta, perche' e' vera: la scelta non parte da nessuna parte.
  *
- * Le virgolette attorno al blocco sono sparite con le frasi: aprivano e
- * chiudevano quattro voci di persone diverse come se fossero un unico brano
- * citato, e qui non c'e' piu' niente da citare — sono scelte, non voci.
+ * I contenuti delle cinque non sono cambiati con la forma. Quello che e'
+ * cambiato e' da che parte si guardano.
  */
 export function SeekingView({
   eyebrow,
@@ -33,13 +38,18 @@ export function SeekingView({
   intro,
   attesa,
   etichettaTipo,
-  strade,
+  casella,
+  mail,
 }: SeekingViewProps) {
   return (
     <section
       id="seeking"
       className="relative overflow-hidden bg-[var(--accent)] px-[var(--gutter)] py-[var(--section-y)]"
     >
+      {/* Il filo passa dietro, e per il tratto centrale la casella se lo
+          mangia: e' un blocco di carta pieno, non un riquadro arancione come
+          quelli di prima. Entra sopra il titolo ed esce sotto il patto, ed e'
+          li' che si vede — la continuita' con le sezioni vicine e' salva. */}
       <ThreadSegment section="seeking" className="pointer-events-none absolute inset-0 opacity-40" />
       <div className="relative mx-auto max-w-5xl">
         <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
@@ -48,7 +58,12 @@ export function SeekingView({
           {intro}
         </p>
 
-        <SeekingStrade strade={strade} titolo={title} etichettaTipo={etichettaTipo} />
+        <SeekingCasella
+          mail={mail}
+          titolo={title}
+          etichettaTipo={etichettaTipo}
+          casella={casella}
+        />
 
         <p data-seeking-attesa className="mt-6 max-w-2xl text-[var(--on-accent)]">
           {attesa}
