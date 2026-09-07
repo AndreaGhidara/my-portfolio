@@ -1609,38 +1609,69 @@ html[data-dialog-open] body { overflow: hidden; }
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Le cinque strade di «Da dove parti?».
+   La casella di posta di «Le cinque email che ricevo piu' spesso».
 
    SENZA JAVASCRIPT. La scelta e' un gruppo di radio nascosti alla vista ma non
-   all'accesso, e la risposta si scopre con :has(). Il browser regala quello
-   che altrimenti andrebbe imitato: un solo stop nel giro dei Tab, le frecce
-   per cambiare opzione, e lo stato annunciato senza doverlo dichiarare.
+   all'accesso, e la mail si apre con :has(). Il browser regala quello che
+   altrimenti andrebbe imitato: un solo stop nel giro dei Tab, le frecce per
+   cambiare opzione, e lo stato annunciato senza doverlo dichiarare.
 
    Le cinque regole posizionali qui sotto sono l'unica cosa da tenere allineata
-   al contenuto: una per strada, nell'ordine di `seekingRoutes`. Una prova
-   conta che siano tante quante le strade — se un giorno se ne aggiunge una
-   sesta e la regola manca, la sua risposta non si aprirebbe e nessuno se ne
-   accorgerebbe guardando il codice.
+   al contenuto: una per mail, nell'ordine di `seekingRoutes`. Una prova conta
+   che siano tante quante le strade — se un giorno se ne aggiunge una sesta e
+   la regola manca, la sua mail non si aprirebbe e nessuno se ne accorgerebbe
+   guardando il codice.
 
-   Il testo lungo e' in INCHIOSTRO e non in carta: carta su arancio fa 3,27:1,
-   che regge solo per il testo grande. A questa misura non basterebbe, e
-   inchiostro su arancio fa 5,08:1. E' anche quello che fa leggere la gerarchia
-   fra la scelta e la sua risposta.
+   I COLORI QUI DENTRO NON GIRANO COL TEMA, e non e' una dimenticanza. La
+   casella e' carta e inchiostro sempre, perche' sta dentro una sezione arancio
+   che di notte resta arancio: chiedendo --fg, --line o --fg-muted si sarebbe
+   ribaltata da sola e sarebbe diventata testo carta su fondo carta — sparita.
+   Le due sfumature che le servono nascono qui da --ink e --paper, e la riga
+   aperta se le ribalta addosso, cosi' quello che ci sta dentro non deve sapere
+   su che fondo si trova. Una prova legge questo foglio come testo e non lascia
+   piu' rientrare i token del tema: nel DOM non si vedrebbe.
+
+   Fuori dalla casella il testo corrente e' in INCHIOSTRO e non in carta: carta
+   su arancio fa 3,27:1, che regge solo per il titolo. Inchiostro fa 5,08:1.
    ────────────────────────────────────────────────────────────────────────── */
-[data-strade] { margin-block-start: 2rem; }
-[data-scelte] { border: 0; margin: 0; padding: 0; }
-[data-scelte-lista] { display: flex; flex-direction: column; gap: 0.6rem; }
+[data-casella] {
+  /* <fieldset>: azzerare i suoi difetti prima di poterla usare come griglia.
+     min-inline-size perche' altrimenti e' il contenuto a dettare la larghezza
+     e la colonna di lettura non si stringe mai. */
+  margin: 2.5rem 0 0;
+  padding: 0;
+  min-inline-size: 0;
+  border: 1.5px solid color-mix(in oklab, var(--ink) 35%, transparent);
 
-[data-strada] {
-  display: block;
-  padding: 1rem 1.2rem;
-  border: 1.5px solid color-mix(in oklab, var(--ink) 55%, transparent);
-  color: var(--on-accent);
-  cursor: pointer;
-  line-height: 1.3;
-  transition: background-color 0.18s ease, color 0.18s ease;
+  /* Il tratto fra i due riquadri e' il fondo che si vede nel gap da 1px. */
+  display: grid;
+  gap: 1px;
+  background: color-mix(in oklab, var(--ink) 30%, transparent);
+
+  color: var(--ink);
+  --riga: color-mix(in oklab, var(--ink) 16%, var(--paper));
+  --fioco: color-mix(in oklab, var(--ink) 62%, var(--paper));
+  /* L'arancio pieno su carta fa 3,27:1 e l'etichetta e' 0,6rem: non basta.
+     Scurito con l'inchiostro fa 5,42:1 e resta arancio. */
+  --accento-su-carta: color-mix(in oklab, var(--accent) 72%, var(--ink));
 }
-[data-strada] input {
+
+/* ── L'elenco: le cinque anteprime si leggono TUTTE prima di scegliere. Chi
+      non apre niente esce comunque avendo letto cinque volte che problemi
+      tratti, ed e' la ragione per cui questa forma ha vinto sulle altre. ── */
+[data-elenco] {
+  background: var(--paper);
+  padding: 0.35rem;
+}
+[data-mail] {
+  display: block;
+  padding: 0.85rem 0.9rem;
+  border-block-end: 1px solid var(--riga);
+  cursor: pointer;
+  transition: background-color 0.14s ease;
+}
+[data-mail]:last-child { border-block-end: 0; }
+[data-mail] input {
   /* Nascosto alla vista, non all'accesso: resta focalizzabile e resta un
      radio, che e' tutto quello che serve perche' la tastiera funzioni. */
   position: absolute;
@@ -1652,83 +1683,192 @@ html[data-dialog-open] body { overflow: hidden; }
   clip-path: inset(50%);
   white-space: nowrap;
 }
-[data-strada]:hover { background: color-mix(in oklab, var(--ink) 9%, transparent); }
-[data-strada]:has(input:checked) {
+[data-mail]:hover { background: color-mix(in oklab, var(--ink) 6%, transparent); }
+[data-mail]:has(input:checked) {
   background: var(--ink);
   color: var(--paper);
-  border-color: var(--ink);
+  --riga: color-mix(in oklab, var(--paper) 26%, var(--ink));
+  --fioco: color-mix(in oklab, var(--paper) 72%, var(--ink));
 }
-[data-strada]:has(input:focus-visible) { outline: 2px solid var(--paper); outline-offset: 3px; }
-[data-strada-nome] {
-  display: block;
+/* currentColor: inchiostro sulla riga a riposo, carta su quella aperta. Un
+   colore fisso sparirebbe su uno dei due fondi — e l'arancio, che era la
+   scelta ovvia, sparisce contro la sezione. */
+[data-mail]:has(input:focus-visible) {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}
+
+[data-mail-testa] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+[data-mail-da] {
   font-family: var(--font-mono), monospace;
-  font-size: 0.66rem;
-  letter-spacing: 0.14em;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  opacity: 0.7;
-  margin-block-end: 0.3rem;
+  color: var(--fioco);
 }
-[data-strada-voce] { display: block; font-weight: 600; font-size: clamp(1rem, 2.1vw, 1.15rem); }
-
-/* Le risposte stanno tutte nel DOM: senza fogli di stile si leggono tutte e
-   cinque di fila — lunga, ma completa. E' il patto del fallback. */
-[data-risposta] { display: none; }
-[data-strade]:has([data-strada]:nth-child(1) input:checked) [data-risposta]:nth-child(1),
-[data-strade]:has([data-strada]:nth-child(2) input:checked) [data-risposta]:nth-child(2),
-[data-strade]:has([data-strada]:nth-child(3) input:checked) [data-risposta]:nth-child(3),
-[data-strade]:has([data-strada]:nth-child(4) input:checked) [data-risposta]:nth-child(4),
-[data-strade]:has([data-strada]:nth-child(5) input:checked) [data-risposta]:nth-child(5) {
+/* Al posto del pallino del «non letto», che era una piccola bugia: non c'e'
+   niente di non letto. Stessa informazione — quali contano di piu' — ma vera. */
+[data-mail-freq] {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--fioco);
+}
+[data-mail-ogg] {
   display: block;
-}
-
-[data-risposte] { margin-block-start: 1.8rem; }
-[data-risposta] {
-  background: var(--ink);
-  color: var(--paper);
-  padding: 1.4rem 1.5rem;
-}
-[data-risposta] h3 {
-  color: var(--paper);
-  font-size: clamp(1.2rem, 2.8vw, 1.75rem);
   margin-block-start: 0.35rem;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.25;
 }
-[data-risposta-et] {
+[data-mail-ant] {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-block-start: 0.25rem;
+  font-size: 0.87rem;
+  line-height: 1.4;
+  color: var(--fioco);
+}
+
+/* ── La lettura ── */
+[data-lettura] {
+  background: var(--paper);
+  padding: 1.3rem 1.2rem;
+}
+[data-vuoto] {
+  color: var(--fioco);
+  font-size: 0.96rem;
+  max-inline-size: 26rem;
+}
+
+/* Le mail stanno tutte nel DOM: senza fogli di stile si leggono tutte e cinque
+   di fila — lunga, ma completa. E' il patto del fallback. */
+[data-msg] { display: none; }
+[data-casella]:has([data-mail]:nth-child(1) input:checked) [data-msg]:nth-child(1),
+[data-casella]:has([data-mail]:nth-child(2) input:checked) [data-msg]:nth-child(2),
+[data-casella]:has([data-mail]:nth-child(3) input:checked) [data-msg]:nth-child(3),
+[data-casella]:has([data-mail]:nth-child(4) input:checked) [data-msg]:nth-child(4),
+[data-casella]:has([data-mail]:nth-child(5) input:checked) [data-msg]:nth-child(5) {
+  display: block;
+}
+[data-casella]:has(input:checked) [data-vuoto] { display: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-msg] { animation: casella-apri 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
+}
+@keyframes casella-apri {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+[data-msg-testa] {
+  padding-block-end: 1rem;
+  border-block-end: 1px solid var(--riga);
+}
+[data-msg-testa] dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem 0.9rem;
   font-family: var(--font-mono), monospace;
-  font-size: 0.66rem;
+  font-size: 0.68rem;
+}
+[data-msg-testa] dt {
+  color: var(--fioco);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+[data-msg-testa] dd { margin: 0; }
+[data-msg-oggetto] {
+  margin-block-start: 0.85rem;
+  font-size: 1.35rem;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+[data-msg-corpo] { margin-block-start: 1.3rem; }
+[data-msg-corpo] p { margin-block-start: 1rem; font-size: 1rem; }
+[data-msg-corpo] p:first-child { margin-block-start: 0; }
+[data-msg-et] {
+  display: block;
+  margin-block-end: 0.2rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accento-su-carta);
 }
-[data-risposta-riga] {
-  margin-block-start: 1.05rem;
-  padding-block-start: 0.9rem;
-  border-block-start: 1px solid color-mix(in oklab, var(--paper) 20%, transparent);
+
+[data-firma] {
+  margin-block-start: 1.5rem;
+  padding-block-start: 1rem;
+  border-block-start: 1px solid var(--riga);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
 }
-[data-risposta-riga] p + p { margin-block-start: 0.3rem; opacity: 0.92; }
-[data-risposta-azioni] {
-  margin-block-start: 1.2rem;
+[data-firma-faccia] {
+  inline-size: 2.4rem;
+  block-size: 2.4rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  object-fit: cover;
+}
+[data-firma-testo] {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: var(--fioco);
+}
+
+[data-msg-azioni] {
+  margin-block-start: 1.4rem;
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
   align-items: center;
 }
-[data-risposta-cta] {
+[data-msg-cta] {
   font-family: var(--font-mono), monospace;
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 0.7rem 1.2rem;
-  background: var(--accent);
-  color: var(--ink);
+  padding: 0.75rem 1.25rem;
+  background: var(--ink);
+  color: var(--paper);
   border-radius: 999px;
   text-decoration: none;
   font-weight: 500;
+  transition: background-color 0.16s ease, color 0.16s ease;
 }
+[data-msg-cta]:hover { background: var(--accent); color: var(--ink); }
 /* La prova non e' un secondo bottone: e' un rimando. Due bottoni pari
    costringerebbero a scegliere fra due cose che non sono alternative. */
-[data-risposta-prova] { font-size: 0.94rem; color: var(--paper); opacity: 0.85; }
+[data-msg-prova] { font-size: 0.93rem; font-weight: 500; color: var(--fioco); }
 
-@media (min-width: 900px) {
-  [data-strada] { padding: 1.05rem 1.3rem; }
-  [data-risposta] { padding: 1.6rem 1.8rem; }
+@media (max-width: 899.98px) {
+  /* I due riquadri si impilano, e cinque anteprime da due righe sarebbero un
+     muro di testo prima ancora di arrivare a una risposta: sul telefono
+     l'elenco resta cinque righe di solo oggetto. */
+  [data-mail] { padding: 0.7rem 0.8rem; }
+  [data-mail-ant] { display: none; }
+  [data-mail-ogg] { font-size: 0.95rem; }
 }
+@media (min-width: 900px) {
+  [data-casella] { grid-template-columns: 21rem 1fr; }
+  /* L'altezza minima tiene in piedi il telaio solo affiancata. Impilata non
+     terrebbe niente: sarebbe mezzo schermo di carta vuota fra l'elenco e la
+     fine della sezione, prima ancora di aver scelto. */
+  [data-lettura] { min-block-size: 32rem; padding: 1.6rem 1.7rem; }
+  [data-msg-oggetto] { font-size: 1.6rem; }
+}
+
