@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
+import { site } from "@/content/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://a-ghidara-dev.vercel.app";
+  const baseUrl = site.url;
   const locales = ["it", "en"];
 
   const routes = locales.map((locale) => ({

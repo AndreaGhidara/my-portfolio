@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { routing } from "@/i18n/routing";
 import itMessages from "../../../messages/it.json";
 import enMessages from "../../../messages/en.json";
+import { site } from "@/content/site";
 
 /**
  * Niente "edge": il runtime edge non permette di importare qui i file JSON
@@ -69,7 +70,7 @@ export default async function OpengraphImage({
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <div style={{ width: 26, height: 26, borderRadius: 999, background: "#E4572E" }} />
-          <div style={{ fontSize: 28, color: "#6E6759" }}>a-ghidara-dev.vercel.app</div>
+          <div style={{ fontSize: 28, color: "#6E6759" }}>{site.url.replace("https://", "")}</div>
         </div>
       </div>
     ),

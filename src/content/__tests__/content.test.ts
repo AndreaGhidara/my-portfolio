@@ -8,6 +8,8 @@ import { metrics, metricById } from "../metrics";
 import { site } from "../site";
 import { deskLayers } from "../desk";
 import { practiceBlocks, practiceScenes } from "../practice";
+import { readFileSync, readdirSync } from "node:fs";
+import path from "node:path";
 
 /** Elenco piatto di tutte le chiavi annidate, per confrontare due dizionari. */
 function flatKeys(obj: unknown, prefix = ""): string[] {
@@ -219,6 +221,43 @@ describe("E in pratica", () => {
     for (const block of practiceBlocks) {
       const piani = new Set(block.shapes.map((s) => s.layer));
       expect(piani.size).toBe(block.shapes.length);
+    }
+  });
+});
+
+describe("il dominio sta in un posto solo", () => {
+  /**
+   * Difetto vero, gia' successo: il sito era passato ad andreaghidara.dev e sei
+   * file continuavano a cablare quello di Vercel. Il canonical diceva quindi a
+   * Google che l'originale stava altrove, e tutto quello che il dominio nuovo
+   * guadagnava lo regalava al vecchio. Non e' una cosa che si vede guardando il
+   * sito: si vede solo leggendo l'HTML servito.
+   */
+  const APP = path.resolve(__dirname, "../../app");
+
+  function file(dir: string): string[] {
+    return readdirSync(dir, { withFileTypes: true }).flatMap((voce) =>
+      voce.isDirectory()
+        ? file(path.join(dir, voce.name))
+        : /\.tsx?$/.test(voce.name)
+          ? [path.join(dir, voce.name)]
+          : [],
+    );
+  }
+
+  it("e' il dominio vero, in https e senza barra finale", () => {
+    expect(site.url).toBe("https://www.andreaghidara.dev");
+    expect(site.url.endsWith("/")).toBe(false);
+  });
+
+  it("nessuna pagina si scrive un dominio suo", () => {
+    for (const percorso of file(APP)) {
+      const codice = readFileSync(percorso, "utf8");
+      const domini = [...codice.matchAll(/https?:\/\/[a-z0-9.-]+/gi)]
+        .map((m) => m[0])
+        // schema.org non e' il sito: e' il vocabolario dei dati strutturati.
+        .filter((u) => !u.startsWith("https://schema.org"));
+      expect(domini, `${path.basename(percorso)} caccia un dominio a mano`).toEqual([]);
     }
   });
 });

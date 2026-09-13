@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { site } from "@/content/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -6,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://a-ghidara-dev.vercel.app/sitemap.xml",
+    sitemap: `${site.url}/sitemap.xml`,
   };
 }
