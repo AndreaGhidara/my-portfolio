@@ -15,7 +15,7 @@ import { routing } from "@/i18n/routing";
 import Script from "next/script";
 import { site } from "@/content/site";
 
-const SITE_URL = "https://a-ghidara-dev.vercel.app";
+const SITE_URL = site.url;
 const DEFAULT_LOCALE = "it";
 
 const archivo = Archivo({
@@ -43,6 +43,20 @@ const monoLight = JetBrains_Mono({
   preload: false,
 });
 
+/**
+ * Il testo che compare sotto il titolo nei risultati di ricerca, e la stessa
+ * frase che finisce nei dati strutturati: e' uno dei pochi posti in cui le
+ * parole con cui qualcuno cerca ci stanno tutte senza forzare niente.
+ *
+ * Quella di prima ("progetti, competenze e contatti") descriveva la STRUTTURA
+ * del sito invece del mestiere, e nessuno cerca "progetti competenze contatti".
+ */
+function descrizione(locale: string): string {
+  return locale === "en"
+    ? "Andrea Ghidara, full stack web developer in Italy. Custom websites, online stores and platforms, built with React, Next.js and TypeScript."
+    : "Andrea Ghidara, sviluppatore e programmatore web full stack in Italia. Siti, e-commerce e piattaforme su misura, in React, Next.js e TypeScript.";
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -57,8 +71,7 @@ export async function generateMetadata({
   );
 
   const title = "Andrea Ghidara";
-  const description =
-    "Andrea Ghidara: progetti, competenze e contatti. Sviluppo web e UI/UX.";
+  const description = descrizione(locale);
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -114,13 +127,34 @@ export default async function RootLayout({
     notFound();
   }
 
+  /* I dati strutturati sono il posto legittimo dei metadati: nessuno li vede,
+     e non sono testo nascosto per posizionarsi. Sono anche la fonte che gli
+     assistenti leggono piu' volentieri, ed e' per questo che qui ci stanno le
+     tecnologie: nel testo della pagina React e Next.js compaiono una volta
+     sola, dentro il racconto di un lavoro.
+
+     `knowsAbout` dice solo cose che il sito dimostra altrove. Se un giorno ci
+     si aggiunge qualcosa che in pagina non c'e', questo smette di essere un
+     dato e diventa una dichiarazione. */
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
     name: site.name,
     url: `${SITE_URL}/${locale}`,
-    jobTitle: "Sviluppatore Web",
+    jobTitle: locale === "en" ? "Full Stack Web Developer" : "Sviluppatore web full stack",
+    description: descrizione(locale),
+    image: `${SITE_URL}/brand/avatar.webp`,
     email: site.email,
+    knowsAbout: [
+      "React",
+      "Next.js",
+      "TypeScript",
+      "JavaScript",
+      "Sviluppo web full stack",
+      "E-commerce",
+      "UI/UX",
+    ],
+    address: { "@type": "PostalAddress", addressCountry: "IT" },
     sameAs: site.socials.map((social) => social.url),
   };
 
