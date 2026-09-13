@@ -35,6 +35,7 @@ export async function Services() {
       stageTitle={t("stageTitle")}
       stageLead={t("stageLead")}
       centre={t("centre")}
+      composto={t("composto")}
       blank={t("blank")}
       note={`${caffe.value} ${tMetrics(caffe.id)}`}
       punch={t("punch")}

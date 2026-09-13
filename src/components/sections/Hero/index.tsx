@@ -8,6 +8,7 @@ export async function Hero() {
     <HeroView
       eyebrow={t("eyebrow")}
       wordmarkAlt={t("wordmarkAlt")}
+      heading={t("heading")}
       claim={t("claim")}
       subclaim={t("subclaim")}
       ctaPrimary={t("ctaPrimary")}

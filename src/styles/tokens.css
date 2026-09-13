@@ -13,6 +13,14 @@
   --accent: var(--orange);
   --on-accent: var(--ink);
 
+  /* Il filo che attraversa la pagina ha un colore suo, e non e' --line.
+     --line e' il colore dei bordi, scelto contro il fondo di PAGINA: sulla
+     carta fa 1,32:1 e sull'arancio 2,47:1, tutti e due sotto la soglia 3:1
+     di WCAG per gli elementi non testuali. --muted invece fa 4,97:1 sulla
+     carta e 3,34:1 sull'inchiostro, e vale per tutti e due i temi senza
+     ribaltarsi. Non entra nessun colore nuovo in tavolozza. */
+  --filo: var(--muted);
+
   --radius: 10px;
   --section-y: 4.5rem;
   --gutter: 1.25rem;
@@ -24,6 +32,12 @@
     --gutter: 2.5rem;
   }
 }
+
+/* Le sezioni a fondo pieno arancione ridefiniscono il filo, e nient'altro:
+   li' il colore giusto e' quello del testo che ci sta sopra (5,08:1). La
+   regola sta su un attributo e non sugli id perche' domani puo' diventare
+   arancione una terza sezione. */
+[data-fondo="accento"] { --filo: var(--on-accent); }
 
 [data-theme="dark"] {
   --bg: var(--ink);
@@ -324,12 +338,24 @@ html[data-dialog-open] body { overflow: hidden; }
 [data-desk-title] h2 { margin-top: 0.75rem; font-size: clamp(1.9rem, 5vw, 3rem); }
 [data-desk-title] p:last-child { margin-top: 1rem; color: var(--fg-muted); }
 
+/* La tesi che chiude la scena. Prima era un paragrafo centrato appoggiato
+   subito sotto le quattro didascalie, e si leggeva come una quinta voce invece
+   che come una conclusione: stessa misura, stesso peso, e quarantotto pixel di
+   stacco da quelle sopra.
+
+   Adesso ha un filo sopra e il respiro per starci: il filo e' corto quanto lei
+   e centrato, quindi non taglia la pagina, dice solo "qui finisce il discorso".
+   E il corpo sale, perche' fra le didascalie a 0,9rem e i titoli di sezione a
+   3rem non c'era niente in mezzo. */
 [data-desk-punch] {
   max-width: 40rem;
   text-align: center;
-  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
-  line-height: 1.35;
+  font-size: clamp(1.25rem, 2.8vw, 1.85rem);
+  line-height: 1.3;
   text-wrap: balance;
+  margin-block-start: 1.5rem;
+  padding-block-start: 2.75rem;
+  border-block-start: 1px solid var(--line);
 }
 
 /* Il mondo e' due cose impilate: il piano del tavolo, che ha le proporzioni
@@ -359,56 +385,6 @@ html[data-dialog-open] body { overflow: hidden; }
   width: 100%;
 }
 
-/* I cavi restano FIGLI del piano — e' l'unico modo perche' la camera li scali
-   insieme al laptop da cui escono, e staccarli sarebbe la cosa che il concept
-   vieta. Nessuno z-index: l'ordine di sovrapposizione e' gia' quello del DOM.
-   I cavi sono il primo figlio del piano, quindi il laptop scritto dopo li copre
-   — ed e' per questo che sembrano uscire da dietro la scocca — e le <ul> degli
-   oggetti, che vengono dopo il piano, passano sopra tutti e due. Mettere qui
-   uno z-index non cambierebbe niente; darlo ai fratelli, come verrebbe
-   spontaneo, renderebbe posizionato [data-desk-layers] e i ventiquattro
-   oggetti finirebbero tutti in un angolo (vedi la nota della camera). */
-[data-desk-cables] {
-  position: absolute;
-  inset: 0;
-}
-
-/* La scatola di giunzione: larga quanto la FINESTRA e concentrica al piano.
-   Il perche' e' misurato: il piano e' largo min(94vw, 62rem) e centrato,
-   quindi il suo 14% non e' il 14% della pagina, che e' invece dove esce il filo
-   della sezione di sopra. A 1440 il gradino era di 161px in entrata e 170px in
-   uscita. Due scatole concentriche condividono il centro, quindi il 50/50 del
-   viewBox e' ancora il laptop, mentre il 14% e l'88% diventano quelli della
-   finestra e la giunzione si richiude — senza staccare i cavi dal piano.
-   overflow visible perche' l'SVG di suo taglia: i due capi stanno esattamente
-   sul bordo, e con il taglio la testa tonda del cavo si vedrebbe mozzata.
-   Quello che sborda di lato lo tiene [data-desk-stage] con il suo overflow
-   clip: la pagina non scorre di traverso, verificato a 1440 e a 390. */
-[data-desk-cables-ends] {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 100vw;
-  height: 100%;
-  transform: translateX(-50%);
-  overflow: visible;
-}
-
-/* La derivazione no: quella resta nella scatola del PIANO, perche' il rack in
-   cui finisce sta nel piano e si misura in percentuali del piano. Nella
-   scatola larga quanto la finestra il suo capo scivolerebbe via man mano che
-   lo schermo si allarga — misurato: al 22% resterebbe al 9,4% del piano a
-   1440, e al -4,2% a 1920, cioe' fuori dal tavolo. Le due scatole hanno lo
-   stesso centro e la stessa altezza, quindi il (50 / 50) da cui partono tutti
-   e tre i tratti e' lo stesso punto: il laptop. */
-[data-desk-cables-branch] {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
 
 /* Il gemello nascosto e' aria-hidden e puo' sparire del tutto. L'altro no: e'
    quello che porta le etichette che legge uno screen reader, e sotto i 1024px,
@@ -416,19 +392,7 @@ html[data-dialog-open] body { overflow: hidden; }
    con display:none il tavolo sul telefono non lo leggerebbe piu' nessuno. */
 [data-desk-world][data-layout="tall"] { display: none; }
 
-@media (max-width: 1023px) {
-  [data-desk-world][data-layout="wide"] {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-  [data-desk-world][data-layout="tall"] {
-    display: block;
-    width: min(92vw, 26rem);
-  }
-}
+
 
 /* Il centro. La sua larghezza arriva inline da CENTRE.width, perche' e' con
    quel numero che i test verificano che nessun oggetto lo copra. */
@@ -542,6 +506,123 @@ html[data-dialog-open] body { overflow: hidden; }
 /* Fuori dai primi quattro: sparisce dal disegno sul telefono, non dalla lista.
    Sono gli oggetti del solo mondo verticale, che e' gia' aria-hidden. */
 [data-desk-object][data-off] { display: none; }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Il tavolo sotto i 1024px.
+
+   Da desktop la sezione e' una camera: il piano sta fermo, arretra, e ogni
+   didascalia arriva insieme ai suoi oggetti. Quel meccanismo qui e' spento
+   (`resolveMotionLevel` da' "full" solo con `(pointer: fine)` E
+   `(min-width: 1024px)`), e quello che restava era il disegno del tavolo
+   schiacciato in verticale piu' quattro paragrafi staccati: gli oggetti si
+   sovrapponevano tutti sullo stesso rettangolo e il testo non diceva piu' a
+   quali si riferiva.
+
+   Qui la sezione diventa un elenco, in quest'ordine: il titolo con i suoi
+   testi, «il progetto» a tutta larghezza, e poi i quattro strati, ognuno con
+   le sue forme. Niente sticky e niente altezze di schermo: sono le due cose
+   che su un telefono costano di piu' e rendono di meno.
+
+   NOTA D'ORDINE: questo blocco sta QUI e non piu' su, vicino alle altre regole
+   del mondo, e non e' pignoleria. Deve disfare
+   `[data-desk-object] { position: absolute }` qui sopra, e una @media non
+   aggiunge specificita': a parita' decide l'ordine. Scritto prima, il blocco
+   perdeva e gli oggetti restavano assoluti dentro una griglia.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  /* ── «Il progetto», a tutta larghezza ─────────────────────────────────── */
+  /* Era un francobollo in mezzo a un rettangolo alto e vuoto: le proporzioni
+     del mondo (720x1280) servono a tenere gli oggetti attorno al laptop, e qui
+     gli oggetti non ci stanno piu'. Senza di loro il piano e' solo la cornice
+     dello schermo, e tanto vale che lo schermo si veda. */
+  [data-desk-surface] { aspect-ratio: 3 / 2; }
+  /* La larghezza del centro arriva inline da CENTRE.width ed e' misurata sul
+     mondo largo: un valore inline si disfa solo cosi'. */
+  [data-desk-centre] { inline-size: 94% !important; }
+
+  /* ── «Da cosa e' composto» ────────────────────────────────────────────── */
+  [data-desk-composto] { margin-block-start: 2.75rem; }
+
+  /* ── I quattro strati ─────────────────────────────────────────────────── */
+  [data-desk-layers] { gap: 2.75rem; margin-top: 0.9rem; }
+
+  [data-desk-layer] {
+    padding-block-start: 1.1rem;
+    border-block-start: 1px solid var(--line);
+  }
+
+  [data-desk-num] {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+  }
+  [data-desk-caption] h3 { margin-block-start: 0.15rem; }
+
+  /* Le forme dello strato, sotto la sua frase. Due per riga: a quattro, su un
+     mondo largo 26rem, ognuna verrebbe larga un quarto, cioe' un francobollo
+     con l'etichetta piu' larga del disegno che nomina. */
+  [data-desk-layer] > ul {
+    position: static;
+    aspect-ratio: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* Il vuoto fra le righe e' grande perche' ci deve stare l'etichetta, che
+       e' assoluta a `top: 104%` e non occupa altezza: con un gap normale la
+       riga di sotto se la mangia. */
+    gap: 2.4rem 1.1rem;
+    align-items: end;
+    margin-block-start: 1.5rem;
+  }
+
+  [data-desk-object] {
+    position: static;
+    /* La larghezza arriva INLINE da layers.ts ed e' una percentuale del piano,
+       che qui non esiste piu': la cella la decide la griglia. Il primo
+       tentativo era `min-width: 100%` per evitare l'!important, ed e' stato
+       peggio: su un elemento di griglia quella percentuale si misura sulla
+       cella che la percentuale stessa sta dimensionando, e gli oggetti sono
+       venuti larghi quanto la pagina. */
+    width: 100% !important;
+    /* Senza il mezzo passo indietro: serviva a centrare l'oggetto sulle sue
+       coordinate, e le coordinate non si applicano piu'. */
+    transform: rotate(var(--rot, 0deg));
+    /* E QUESTA e' la riga che fa vedere le forme per quello che sono. I
+       campioni dentro le sagome si misurano in cqw, e il contenitore di
+       interrogazione e' il MONDO: sul tavolo un oggetto e' il 10% del mondo e
+       il campione gli sta dentro in proporzione, ma qui l'oggetto e' quasi
+       meta' del mondo e il campione restava della misura di prima. Risultato:
+       quattro sagome vuote con dentro una briciola. E' la stessa cosa che «Come
+       lavoro» ha gia' risolto cosi'. */
+    container-type: inline-size;
+  }
+
+  /* Le marche del campione, rimisurate sulla SAGOMA. I valori sono quelli del
+     tavolo moltiplicati per il rapporto fra le due scatole: un oggetto era il
+     ~10% del mondo, quindi 1cqw di la' vale ~10cqw di qua. */
+  [data-desk-object] [data-desk-sample] [data-m="aa"] { font-size: 21cqw; }
+  [data-desk-object] [data-desk-sample] [data-m="mono"] { font-size: 7.8cqw; }
+  [data-desk-object] [data-desk-sample] [data-m="mono"][data-piccolo] { font-size: 6.2cqw; }
+
+  [data-desk-world][data-layout="wide"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  [data-desk-world][data-layout="tall"] {
+    display: block;
+    width: min(92vw, 26rem);
+  }
+}
+
+/* Il titolino e i numeri sono roba da elenco: da desktop gli strati arrivano
+   uno alla volta con la camera, contarli non serve e un titolo fisso sopra la
+   scena sarebbe una didascalia che non aspetta nessuno. */
+@media (min-width: 1024px) {
+  [data-desk-composto], [data-desk-num] { display: none; }
+}
 
 /* ── I materiali ────────────────────────────────────────────────────────────
    Le sagome sono maschere e non <img>: dentro una <img> il currentColor degli
@@ -1331,16 +1412,51 @@ html[data-dialog-open] body { overflow: hidden; }
      test rilegge QUESTO file per tenere i due posti uguali.
      z-index perche' nella stessa cella vince chi e' scritto dopo, e il titolo
      nel DOM viene prima del mondo. */
+  /* Il titolo sta sopra il laptop mentre lo riempie, ed e' voluto. Quello che
+     non era voluto e' che a tema chiaro fosse inchiostro SU inchiostro: al
+     primo fotogramma il piano e' quattro volte lo schermo, quindi dietro a
+     queste tre righe c'e' la scocca scura del laptop, e il contrasto misurato
+     era 1,00:1. Cioe' il titolo non c'era. A tema scuro il testo e' carta e si
+     salvava da solo, ed e' per questo che il difetto si vedeva da una parte
+     sola.
+
+     Il fondo e' PIENO e non un velo. Un velo parziale sembra la risposta
+     elegante e invece peggiora: al 72% il fondo diventa un grigio medio, e il
+     sottotitolo e' anche lui un grigio medio, quindi scende a 2,68:1, peggio
+     dei 3,34:1 che aveva sul laptop nudo. (Niente valori scritti a mano qui
+     dentro nemmeno nei commenti: una prova legge questo file e pretende che
+     ogni esadecimale venga dalla tavolozza, commenti compresi. Giusto cosi'.) Con il fondo pieno
+     ognuna delle due righe torna al contrasto che ha sul resto della pagina:
+     16,59:1 il titolo e 4,97:1 il sottotitolo.
+
+     E' anche la stessa risposta che ha gia' la didascalia degli strati, che
+     vive nello stesso posto e aveva lo stesso problema: un blocco di carta
+     posato sul tavolo. */
   [data-desk][data-motion="full"] [data-desk-title] {
     z-index: 1;
     opacity: clamp(0, 1 - (var(--p, 1) - 0.02) / 0.08, 1);
+    background-color: var(--bg);
+    padding: 1.75rem 1.5rem 1.9rem;
+    border-radius: 4px;
   }
 
   /* La tesi non sta al centro: al centro c'e' lo schermo che la frase indica,
      e coprirlo mentre la si legge sarebbe togliere la battuta. */
+  /* Dentro la camera la tesi non chiude una colonna: galleggia sul tavolo
+     finito, quindi il filo e lo stacco di sopra non servono e anzi sarebbero
+     una riga per aria.
+
+     Il margine sotto invece sale da 3vh a 9vh, e non e' gusto: qui il palco
+     azzera il proprio `padding-block`, quindi quei 3vh erano TUTTO lo spazio
+     fra la tesi e la scena successiva. Su uno schermo da 900px facevano
+     ventisette pixel, ed e' il motivo per cui sembrava incollata a quello che
+     viene dopo. */
   [data-desk][data-motion="full"] [data-desk-punch] {
     align-self: end;
-    margin-bottom: 3vh;
+    margin-bottom: 9vh;
+    margin-block-start: 0;
+    padding-block-start: 0;
+    border-block-start: 0;
     opacity: clamp(0, (var(--p, 1) - 0.9) / 0.07, 1);
   }
 
@@ -1373,8 +1489,23 @@ html[data-dialog-open] body { overflow: hidden; }
     margin-top: 0.75rem;
     z-index: 1;
     max-width: 32rem;
-    padding: 0.35rem 1rem 0.35rem 0;
+    /* Un cartellino posato sul tavolo, non un fondo. Il fondo serve comunque,
+       per la ragione detta qui sopra, ma da solo era una lastra che abbracciava
+       il testo: larga quanto la frase, quindi di forma diversa per ognuna delle
+       quattro, e con il padding sinistro a zero cominciava esattamente sul
+       primo carattere, allineata a niente. Adesso e' un oggetto, con lo stesso
+       vocabolario dei tesserini di «Dove ho imparato»: contorno da 1,5px,
+       raggio 4px, ombra secca da 2px.
+
+       --fg/--bg e non --ink/--paper come i tesserini: quelli stanno sull'arancio,
+       dove la scala dei toni non si ribalta col tema. Qui siamo sul fondo di
+       pagina, che si ribalta eccome, e con --ink il cartellino sarebbe nero di
+       notte. */
+    padding: 0.85rem 1.1rem 0.95rem;
     background-color: var(--bg);
+    border: 1.5px solid color-mix(in oklab, var(--fg) 45%, transparent);
+    border-radius: 4px;
+    box-shadow: 0 2px 0 color-mix(in oklab, var(--fg) 20%, transparent);
     opacity: clamp(
       0,
       min((var(--p, 1) - var(--from)) / 0.05, (var(--until) - var(--p, 1)) / 0.05),
@@ -1399,28 +1530,6 @@ html[data-dialog-open] body { overflow: hidden; }
 [data-pratica] > h3 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
 [data-pratica-intro] { max-width: 44ch; margin-block-start: 0.9rem; color: var(--fg-muted); }
 
-/* Il riquadro del filo e' largo quanto la PAGINA, non quanto la scena, ed e'
-   la stessa ragione — e lo stesso rimedio — di [data-desk-cables-ends]:
-   [data-pratica] e' largo min(74rem) e centrato, quindi il suo 88% non e'
-   l'88% della pagina, che e' invece dove esce il tratto di sopra e dove entra
-   quello di sotto. Misurato a 1440: la scena e' larga 1184 e comincia a 128,
-   quindi il suo 88% cade a 1170 mentre gli altri tratti passano per 1267 —
-   un gradino di 97px, che si allarga al crescere dello schermo.
-   In verticale invece resta la scena: il filo la attraversa da bordo a bordo.
-   overflow visibile perche' sopra i 74rem l'88% della pagina cade fuori dalla
-   scena, ed e' giusto che ci cada. */
-[data-pratica-filo] {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 100vw;
-  height: 100%;
-  transform: translateX(-50%);
-  z-index: 0;
-  overflow: visible;
-  pointer-events: none;
-}
 
 /* Il percorso: dalla prima voce alla fine della coda. E' la scatola in cui la
    freccia sta E quella che misura, e devono essere la stessa — il ciclo le
@@ -1698,26 +1807,14 @@ html[data-dialog-open] body { overflow: hidden; }
   outline-offset: -3px;
 }
 
-[data-mail-testa] {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.6rem;
-}
+/* Un elemento solo da quando la frequenza non c'e' piu': niente da separare
+   ai due estremi, e la riga resta un blocco. */
+[data-mail-testa] { display: block; }
 [data-mail-da] {
   font-family: var(--font-mono), monospace;
   font-size: 0.6rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--fioco);
-}
-/* Al posto del pallino del «non letto», che era una piccola bugia: non c'e'
-   niente di non letto. Stessa informazione — quali contano di piu' — ma vera. */
-[data-mail-freq] {
-  font-family: var(--font-mono), monospace;
-  font-size: 0.58rem;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
   color: var(--fioco);
 }
 [data-mail-ogg] {
@@ -2167,4 +2264,341 @@ html[data-dialog-open] body { overflow: hidden; }
   [data-journey-list] { grid-template-columns: 1fr; gap: 3.5rem; }
   [data-journey-item]:nth-child(2),
   [data-journey-item]:nth-child(3) { margin-block-start: 0; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   IL TUO TURNO: il foglio, i tempi, e il tesserino
+
+   Non piu' due colonne pari. Il cliente ha meta' pagina e un foglio su cui
+   scrivere; chi assume ha una riga sola e un tesserino, che e' l'oggetto di
+   «Dove ho imparato»: la pagina si chiude con la stessa cosa con cui ha
+   raccontato dove si e' lavorato.
+
+   Qui i token del tema vanno bene, a differenza del percorso: sotto non c'e'
+   nessun fondo arancione, quindi carta e inchiostro si ribaltano insieme a
+   tutto il resto ed e' giusto che lo facciano.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+[data-contact-due] {
+  margin-block-start: 3rem;
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: 1fr 0.85fr;
+  align-items: start;
+}
+@media (max-width: 860px) { [data-contact-due] { grid-template-columns: 1fr; } }
+
+/* ── Il foglio ──────────────────────────────────────────────────────────── */
+
+[data-contact-foglio] {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background-color: color-mix(in oklab, var(--fg) 3%, var(--bg));
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+[data-contact-foglio-et] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+[data-contact-foglio] h3 { margin-block-start: 0.5rem; font-size: 1.6rem; }
+[data-contact-foglio-testo] {
+  margin-block-start: 0.6rem;
+  color: var(--fg-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+[data-contact-foglio] form { margin-block-start: 1.75rem; display: grid; gap: 1.4rem; }
+
+/* ── I campi: righe, non riquadri ───────────────────────────────────────── */
+
+[data-contact-etichetta] {
+  display: block;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+[data-contact-campo] {
+  display: block;
+  width: 100%;
+  margin-block-start: 0.35rem;
+  border: 0;
+  border-block-end: 1.5px solid color-mix(in oklab, var(--fg) 30%, transparent);
+  border-radius: 0;
+  background-color: transparent;
+  padding: 0.5rem 0;
+  /* Quello che la scatola dava gratis: un bersaglio che si tocca. Una riga e'
+     alta quanto il testo, e sotto i 44px il pollice sbaglia. Una prova la
+     verifica, perche' e' l'unico prezzo vero di questo disegno. */
+  min-height: 2.75rem;
+  color: var(--fg);
+  font: inherit;
+}
+[data-contact-campo]::placeholder { color: color-mix(in oklab, var(--fg-muted) 70%, transparent); }
+
+/* Tolto il contorno, il fuoco della tastiera resta l'unica cosa che dice dove
+   sei: senza questa regola il browser non ne disegna nessuno su un campo cosi'.
+   Una prova esige che ci sia. */
+[data-contact-campo]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Il messaggio, a righe come un foglio vero. Il gradiente si ripete sull'altezza
+   di riga, e `background-attachment: local` lo fa scorrere col testo invece di
+   restare incollato alla scatola: scrivendo oltre il fondo, le righe seguono. */
+textarea[data-contact-campo] {
+  border-block-end: 0;
+  line-height: 2rem;
+  padding-block: 0.25rem 0;
+  min-height: 8rem;
+  resize: vertical;
+  background-attachment: local;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(2rem - 1.5px),
+    color-mix(in oklab, var(--fg) 30%, transparent) calc(2rem - 1.5px) 2rem
+  );
+}
+
+[data-contact-errore] {
+  margin-block-start: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+[data-contact-invia] {
+  margin-block-start: 0.5rem;
+  justify-self: start;
+  border-radius: 99px;
+  background-color: var(--fg);
+  color: var(--bg);
+  padding: 0.95rem 1.75rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+[data-contact-invia]:disabled { opacity: 0.6; }
+
+[data-contact-esito] {
+  min-height: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--fg-muted);
+}
+
+/* ── Cosa succede dopo ──────────────────────────────────────────────────── */
+
+[data-contact-dopo-et] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-block-end: 1.2rem;
+}
+[data-contact-tempi] { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.5rem; }
+/* Colonna contata e non `auto`: ogni <li> e' una griglia sua, e con `auto` la
+   prima colonna sarebbe larga quanto l'etichetta DI QUELLA RIGA. Le tre hanno
+   lunghezze diverse, quindi i titoli partirebbero da tre x diverse. */
+[data-contact-tempi] > li {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+[data-contact-quando] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+  padding-block-start: 0.15rem;
+}
+[data-contact-tempi] b { display: block; font-size: 1rem; }
+[data-contact-tempi] p {
+  margin-block-start: 0.3rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--fg-muted);
+}
+@media (max-width: 480px) {
+  [data-contact-tempi] > li { grid-template-columns: 1fr; gap: 0.35rem; }
+}
+
+/* ── Il tesserino, largo tutta la riga ──────────────────────────────────── */
+
+/* 0,3 gradi e non 1 come quelli del percorso: a 56rem di larghezza un grado non
+   si legge come una cosa appoggiata, si legge come una riga storta. */
+[data-contact-badge] { margin-block-start: 3rem; position: relative; transform: rotate(-0.3deg); }
+
+/* La clip sta in mezzo e non in un angolo: su un cartellino stretto l'angolo
+   funziona, su uno largo il centro e' l'unico punto in cui si legge come un
+   gancio invece che come un dettaglio dimenticato. */
+[data-contact-clip] {
+  display: block;
+  width: 2.6rem;
+  height: 0.85rem;
+  margin: 0 auto -0.45rem;
+  border: 1.5px solid color-mix(in oklab, var(--fg) 45%, transparent);
+  border-block-end: 0;
+  border-radius: 3px 3px 0 0;
+  background-color: var(--bg);
+  position: relative;
+  z-index: 2;
+}
+[data-contact-badge-body] {
+  border: 1.5px solid color-mix(in oklab, var(--fg) 45%, transparent);
+  border-radius: 6px;
+  background-color: color-mix(in oklab, var(--fg) 7%, var(--bg));
+  box-shadow: 0 2px 0 color-mix(in oklab, var(--fg) 20%, transparent);
+  padding: clamp(1.4rem, 3vw, 2rem) clamp(1.4rem, 3vw, 2.25rem);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem 2.5rem;
+  align-items: center;
+}
+[data-contact-badge-et] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+[data-contact-badge] h3 { margin-block-start: 0.45rem; font-size: 1.35rem; }
+[data-contact-badge-testo] {
+  margin-block-start: 0.5rem;
+  color: var(--fg-muted);
+  line-height: 1.6;
+  font-size: 0.92rem;
+  max-width: 30rem;
+}
+[data-contact-badge-uscite] { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: flex-end; }
+[data-contact-cta] {
+  border-radius: 99px;
+  padding: 0.85rem 1.4rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 2px solid transparent;
+}
+[data-contact-cta="pieno"] { background-color: var(--accent); color: var(--on-accent); }
+[data-contact-cta="vuoto"] { border-color: var(--fg); color: var(--fg); }
+
+@media (max-width: 760px) {
+  [data-contact-badge] { transform: none; }
+  [data-contact-badge-body] { grid-template-columns: 1fr; }
+  [data-contact-badge-uscite] { justify-content: flex-start; }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Il filo non attraversa il telefono.
+
+   Il filo e' l'unico indicatore di avanzamento della pagina, e su uno schermo
+   largo funziona: serpeggia da un bordo all'altro, e quel serpeggiare e' la
+   misura di quanto si e' scesi. Sotto i 1024px i bordi sono a venti centimetri
+   l'uno dall'altro: la stessa corsa diventa una linea che taglia il testo in
+   diagonale senza avere piu' niente da misurare.
+
+   Restano solo i segmenti di sezione: i cavi del tavolo non esistono piu'
+   (vedi anchors.ts), e il tavolo non e' mai stato attraversato dal filo su
+   nessuna larghezza.
+
+   NOTA D'ORDINE: in fondo al foglio, e non per pigrizia. Queste tre regole
+   devono vincere su `position: absolute` e sulle geometrie dichiarate piu' su,
+   e a parita' di specificita' una @media non aggiunge peso: decide l'ordine.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  [data-thread] {
+    display: none;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   I due bottoni dell'apertura: l'anello si sposta su quello che stai per
+   scegliere.
+
+   Di suo sta su «Parliamone», che e' l'azione suggerita. Quando il puntatore
+   va sull'altro, passa di la': in ogni istante si vede quale dei due si sta
+   per premere, e non c'e' mai un momento in cui l'anello e' su tutti e due o
+   su nessuno.
+
+   E' un anello INTERNO, e non e' un dettaglio di gusto: il fuoco da tastiera
+   di questo sito e' gia' un anello arancione (globals.css: `outline: 2px solid
+   var(--accent)` con `outline-offset: 3px`). Disegnando anche questo fuori dal
+   bottone, chi naviga da tastiera non avrebbe piu' modo di sapere dove si
+   trova, e chi usa il mouse vedrebbe comparire in hover una cosa che sul resto
+   del sito significa «sei qui». Dentro contro fuori li tiene distinti a colpo
+   d'occhio, e sono due segnali diversi che possono anche coesistere.
+
+   `:has()` e' gia' nel vocabolario del foglio (la casella di posta lo usa per
+   sapere quale mail e' aperta). Su touch l'hover non esiste: l'anello resta
+   dov'e', che e' il comportamento giusto e non un ripiego.
+   ────────────────────────────────────────────────────────────────────────── */
+[data-hero-cta] > a {
+  box-shadow: inset 0 0 0 0 transparent;
+  transition: box-shadow 220ms ease;
+}
+
+[data-hero-cta] > a:first-child {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+/* Solo dove il puntatore esiste davvero. Su touch molti browser lasciano
+   l'hover appiccicato dopo il tocco: senza questa guardia, chi tocca «Guarda i
+   lavori» e torna indietro si ritroverebbe l'anello fermo sul bottone
+   sbagliato, cioe' il contrario di quello che deve dire. Li' resta a riposo. */
+@media (hover: hover) {
+  [data-hero-cta]:has(> a:last-child:hover) > a:first-child {
+    box-shadow: inset 0 0 0 0 transparent;
+  }
+
+  [data-hero-cta]:has(> a:last-child:hover) > a:last-child {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-hero-cta] > a { transition: none; }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Il piede della mail sta in fondo al riquadro, non sotto al testo.
+
+   Le cinque risposte sono lunghe diverso. Con il piede (la firma e i due
+   bottoni) appeso alla fine del testo, passando da una mail all'altra quel
+   blocco saltava su e giu' di centinaia di pixel dentro una scatola che invece
+   sta ferma, ed era la cosa che faceva sembrare instabile una forma nata per
+   essere stabile. Inchiodato in fondo, cambia solo il testo.
+
+   Serve una catena di flex fino al messaggio: il riquadro di lettura, la pila
+   dei messaggi e il messaggio stesso. L'ultimo `margin-block-start: auto`
+   spinge firma e bottoni contro il fondo, e si porta dietro anche i bottoni
+   perche' vengono dopo.
+
+   Solo da 900px in su: sotto, il riquadro e' alto quanto il contenuto e "in
+   fondo" e' gia' dove finisce il testo. La `min-block-size: 32rem` che da' lo
+   spazio da riempire vive nella stessa soglia.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (min-width: 900px) {
+  [data-lettura] { display: flex; flex-direction: column; }
+  [data-messaggi] { display: flex; flex: 1; min-block-size: 0; }
+  [data-casella]:has([data-mail]:nth-child(1) input:checked) [data-msg]:nth-child(1),
+  [data-casella]:has([data-mail]:nth-child(2) input:checked) [data-msg]:nth-child(2),
+  [data-casella]:has([data-mail]:nth-child(3) input:checked) [data-msg]:nth-child(3),
+  [data-casella]:has([data-mail]:nth-child(4) input:checked) [data-msg]:nth-child(4),
+  [data-casella]:has([data-mail]:nth-child(5) input:checked) [data-msg]:nth-child(5) {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  [data-firma] { margin-block-start: auto; }
 }

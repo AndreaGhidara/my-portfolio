@@ -3,16 +3,14 @@
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
   type ComponentType,
 } from "react";
 import { practiceScenes } from "@/content/practice";
-import { weave } from "@/animations/presets";
-import { useMotionLevel, type MotionLevel } from "@/animations/motionPolicy";
+import { useMotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
-import { curva, filo, type Coda, type Misura, type Mondo } from "./pratica/strada";
+import type { Coda, Misura, Mondo } from "./pratica/strada";
 import { guidaFreccia, type Guida, type Impaginato } from "./pratica/freccia";
 import type { CalibratoreProps } from "./pratica/Calibratore";
 import { PracticeBlock } from "./PracticeBlock";
@@ -53,7 +51,6 @@ export function Practice({
    */
   const percorso = useRef<HTMLDivElement | null>(null);
   const level = useMotionLevel();
-  const filoRef = useRef<SVGSVGElement | null>(null);
   // Il tracciato della freccia e la freccia stessa. Vivono solo a "full", ma i
   // ref si dichiarano sempre: un ref e' un contenitore vuoto, non un'animazione.
   const stradaRef = useRef<SVGSVGElement | null>(null);
@@ -61,12 +58,6 @@ export function Practice({
   // Il manico del gesto, per chi arriva dopo che e' nato. Lo scrive e lo
   // cancella l'effetto qui sotto; in produzione nessuno lo legge.
   const guidaRef = useRef<Guida | null>(null);
-  // La tessitura viva, se c'e'. Vive fuori dal gsap.context di useSectionAnimation
-  // — la costruisce anche disegna(), che gsap.context non vede — quindi il
-  // revert automatico non la raccoglie: deve passare da questo ref e da
-  // spegni(), come cavo.current in DeskCables.
-  const tessitura = useRef<gsap.core.Timeline | null>(null);
-
   /**
    * Dove stanno DAVVERO i disegni, adesso, misurati dentro la scatola che gli
    * si da'. Nel prototipo si misuravano una volta sola alla costruzione, e il
@@ -108,155 +99,23 @@ export function Practice({
     return { misure, coda, mondo, viewTop: r.top, viewLeft: r.left };
   }, []);
 
-  /**
-   * Il filo misura la SCENA INTERA, titolo e occhiello compresi, e non il
-   * percorso. Non e' una svista rimasta: il filo e' il tratto della pagina, non
-   * il gesto. Entra al bordo alto della sezione, dove lo consegnano i cavi del
-   * tavolo, ed esce al bordo basso, dove lo prendono i Lavori — `filo()` mette
-   * il primo punto a y=0 e l'ultimo a y=mondo.h, quindi la scatola che gli si
-   * da' E' la sua corsa. Misurato sul percorso, il filo comincerebbe sotto il
-   * titolo e finirebbe sopra il fondo della sezione: due buchi in un tratto che
-   * attraversa tutta la pagina. Il suo SVG copre infatti la scena intera
-   * (`inset: 0` su [data-pratica]), e il viewBox che l'effetto gli scrive e'
-   * questo stesso mondo: le due scatole devono restare la stessa.
-   */
-  const misuraScena = useCallback(() => misuraIn(scope.current), [misuraIn]);
 
   /** La freccia misura il PERCORSO, che e' la scatola in cui i suoi numeri sono
    *  stati trovati — e dentro la quale sta lei stessa. */
   const misuraPercorso = useCallback(() => misuraIn(percorso.current), [misuraIn]);
 
-  /**
-   * Toglie il tratteggio inline e ferma la tessitura viva. Serve, e per la
-   * stessa ragione di DeskCables: `weave` scrive dasharray e dashoffset al
-   * momento della build, cioe' filo invisibile, ed e' lo scrub che poi lo
-   * disegna. Chi arriva a "full" e poi accende la riduzione del movimento va
-   * a "none", dove `weave` non riparte piu': il tratto resterebbe invisibile
-   * per sempre, e il fotogramma a riposo — quello il cui patto e' che il filo
-   * sia continuo — sarebbe un filo tagliato.
-   *
-   * Il trigger va ucciso PRIMA della timeline, e per la stessa ragione di
-   * DeskCables.spegni(): finche' e' vivo il ScrollTrigger riscrive lo
-   * stroke-dashoffset a ogni giro di rotellina, quindi ucciderlo dopo la
-   * timeline lo lascerebbe libero di riscrivere un valore su una timeline
-   * gia' morta.
-   */
-  const spegni = useCallback(() => {
-    tessitura.current?.scrollTrigger?.kill();
-    tessitura.current?.kill();
-    tessitura.current = null;
-    const tratto = filoRef.current?.querySelector("path");
-    tratto?.style.removeProperty("stroke-dasharray");
-    tratto?.style.removeProperty("stroke-dashoffset");
-  }, []);
 
-  /**
-   * Ricostruisce la tessitura sul `d` ATTUALE del filo. Serve perche' questo
-   * tratto e' diverso dagli altri sei segmenti: quelli vivono in un
-   * viewBox 0-100 con preserveAspectRatio="none", quindi le loro coordinate
-   * sono percentuali e la lunghezza del tratto in unita' di viewBox non
-   * cambia mai. Questo filo scrive un `d` in PIXEL e lo ricalcola a ogni
-   * riflow (vedi disegna(), sotto): se dopo un riflow non si richiamasse
-   * weave(), il dasharray/dashoffset resterebbero tarati sulla lunghezza
-   * vecchia mentre il path e' gia' un altro, e lo scrub finirebbe con uno
-   * strappo o un buco invece di disegnare il tratto per intero.
-   */
-  const tessi = useCallback(
-    (livello: MotionLevel) => {
-      spegni();
-      const tratto = filoRef.current?.querySelector("path");
-      if (!tratto) return;
-      // La finestra e' dichiarata, e non e' un dettaglio. Il default di `weave`
-      // sotto scrub e' `top bottom` -> `bottom top`: il tratto finirebbe di
-      // disegnarsi quando la sezione e' USCITA del tutto dallo schermo, cioe'
-      // con la sezione dopo gia' cominciata e la freccia da un pezzo in fondo.
-      // Il filo e' la cosa che consegna la pagina ai Lavori: deve chiudere
-      // QUI, e il 46% e' lo stesso estremo su cui finisce la corsa della
-      // freccia — cosi' arrivano insieme. E' la stessa ragione per cui i cavi
-      // del tavolo si danno `top top` / `bottom bottom` invece del default.
-      // L'inizio resta quello di serie: il filo comincia a colorarsi appena la
-      // scena entra, ben prima che la freccia si muova, ed e' voluto.
-      tessitura.current = weave([tratto], {
-        level: livello,
-        trigger: scope.current,
-        scrub: true,
-        end: "bottom 46%",
-      });
-    },
-    [spegni],
-  );
-
-  /**
-   * Il filo si disegna a OGNI livello di movimento: a "reduced" e a "none" e'
-   * intero e fermo, ed e' giusto cosi' — quello che non parte e' lo scrub.
-   * useLayoutEffect e non useEffect: passivo, il browser dipingerebbe prima un
-   * fotogramma con il path vuoto, cioe' una sezione senza filo.
-   *
-   * I tre momenti in cui l'impaginato cambia senza che nessuno tocchi la
-   * rotellina, e nessuno dei tre e' il primo render: i caratteri che finiscono
-   * di caricare, la finestra che cambia misura, e qualunque cosa faccia
-   * cambiare altezza alla scena. Ognuno di questi puo' cambiare il `d`, quindi
-   * ognuno richiama tessi(): vedi il suo commento per il perche'.
-   */
-  useLayoutEffect(() => {
-    // La bandiera che spegne quello che il cleanup non puo' staccare. Una
-    // promessa non si disiscrive: `document.fonts.ready` risolve quando decide
-    // lei, e la sua closure porta dentro il `level` di QUESTO giro. Se nel
-    // frattempo il livello e' cambiato — basta accendere la riduzione del
-    // movimento mentre i caratteri arrivano — quel `then` girerebbe DOPO
-    // spegni() e richiamerebbe tessi() col livello vecchio, cioe' ricostruirebbe
-    // un `weave` col tratteggio a lunghezza piena e uno ScrollTrigger vivo. Su
-    // un passaggio "full" → "none" il risultato e' un filo invisibile che si
-    // disegna solo scorrendo: esattamente quello che spegni() esiste per
-    // impedire. Il ResizeObserver e il listener si staccano; questa no, e
-    // allora si annulla.
-    let annullato = false;
-    const disegna = () => {
-      if (annullato) return;
-      const m = misuraScena();
-      const tratto = filoRef.current?.querySelector("path");
-      if (!m || !tratto || !filoRef.current) return;
-      // Il viewBox e' largo quanto la PAGINA, non quanto la scena: l'SVG del
-      // filo e' un riquadro a tutta larghezza (vedi [data-pratica-filo] in
-      // tokens.css), e le due scatole devono restare la stessa o il tratto si
-      // stira. L'altezza resta quella della scena — in verticale il filo la
-      // attraversa da bordo a bordo, e quello non cambia.
-      const pagina = { w: window.innerWidth, left: m.viewLeft };
-      filoRef.current.setAttribute("viewBox", `0 0 ${pagina.w} ${m.mondo.h}`);
-      tratto.setAttribute("d", curva(filo(m.misure, m.coda, m.mondo, pagina)));
-      tessi(level);
-    };
-    disegna();
-    void document.fonts?.ready?.then(disegna);
-    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(disegna) : null;
-    if (ro && scope.current) ro.observe(scope.current);
-    window.addEventListener("resize", disegna);
-    return () => {
-      annullato = true;
-      ro?.disconnect();
-      window.removeEventListener("resize", disegna);
-    };
-  }, [misuraScena, level, tessi]);
 
   // A ogni cambio di livello, non solo all'uscita da "full": useGSAP con delle
   // dipendenze rimanda il revert allo smontaggio, non al cambio di livello.
-  // spegni() qui e spegni() come cleanup di useSectionAnimation qui sotto
-  // finiscono per girare due volte sullo stesso cambio di livello: e'
-  // innocuo, removeProperty e uccidere una timeline gia' morta sono entrambi
-  // idempotenti, e non va "semplificato" a una sola chiamata.
-  useLayoutEffect(() => spegni, [level, spegni]);
-
   useSectionAnimation((livello) => {
-    // Il filo si tesse a OGNI livello sopra "none": e' il tratto della pagina,
-    // non il gesto. La freccia invece esiste solo a "full", ed e' per questo
-    // che tessi() sta prima dell'uscita anticipata qui sotto e spegni() e' il
-    // cleanup anche quando la freccia non nasce.
-    tessi(livello);
-
+    // Qui dentro resta solo la freccia, che esiste solo a "full". Il filo di
+    // pagina non passa piu' da questa sezione (vedi anchors.ts), quindi la
+    // tessitura e il suo spegnimento se ne sono andati con lui.
     const stradaEl = stradaRef.current;
     const gpath = stradaEl?.querySelector("path");
     const fre = frecciaRef.current;
-    if (livello !== "full" || !stradaEl || !gpath || !fre) return spegni;
+    if (livello !== "full" || !stradaEl || !gpath || !fre) return;
 
     const voci = [...(scope.current?.querySelectorAll<HTMLElement>("[data-practice-item]") ?? [])];
     // Il trigger e' il percorso e non la scena: la finestra dello scorrimento
@@ -272,7 +131,6 @@ export function Practice({
     return () => {
       guida.molla();
       guidaRef.current = null;
-      spegni();
     };
   }, scope);
 
@@ -297,21 +155,6 @@ export function Practice({
       <h3>{practice}</h3>
       <p data-pratica-intro>{intro}</p>
 
-      {/* Il filo di pagina, che qui serpeggia. Non e' un <ThreadSegment>:
-          quello disegna una cubica dall'ancoraggio d'entrata a quello d'uscita,
-          e qui serve una serpentina misurata sui disegni. Stesso `weave` e
-          stesso non-scaling-stroke di tutti gli altri sei tratti: il giorno in
-          cui si aggiusta il tratteggio, si aggiusta in un posto solo.
-          Il `d` e il viewBox li scrive l'effetto qui sotto, quando ha misurato. */}
-      <svg ref={filoRef} data-pratica-filo aria-hidden="true" preserveAspectRatio="none">
-        <path
-          d=""
-          fill="none"
-          stroke="var(--line)"
-          strokeWidth="0.3"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
 
       {/* Il percorso: dalla prima voce alla fine della coda, e niente altro. E'
           la `.percorso` del prototipo, ed e' due cose insieme — la scatola che

@@ -8,6 +8,15 @@ import { CartaStropicciata } from "./CartaStropicciata";
 export type HeroViewProps = {
   eyebrow: string;
   wordmarkAlt: string;
+  /**
+   * Il titolo della pagina come TESTO. Il nome e' disegnato, cioe' sei
+   * immagini: un motore di ricerca legge i nodi di testo e gli `alt`, non
+   * `aria-label`, quindi l'h1 di questo sito era una stringa vuota e il
+   * cognome non compariva in nessun titolo. Qui il testo c'e' davvero, e serve
+   * due volte: al crawler e a chi naviga con uno screen reader, che prima
+   * sentiva soltanto «Andrea».
+   */
+  heading: string;
   claim: string;
   subclaim: string;
   ctaPrimary: string;
@@ -16,7 +25,7 @@ export type HeroViewProps = {
 };
 
 export function HeroView({
-  eyebrow, wordmarkAlt, claim, subclaim, ctaPrimary, ctaSecondary, scrollHint,
+  eyebrow, wordmarkAlt, heading, claim, subclaim, ctaPrimary, ctaSecondary, scrollHint,
 }: HeroViewProps) {
   return (
     <section id="hero" className="relative overflow-hidden px-[var(--gutter)] pb-16 pt-6">
@@ -33,12 +42,21 @@ export function HeroView({
 
         {/* Il nome a filo dei bordi: e' la differenza fra il prototipo
             composto e la versione che ferma qualcuno. */}
-        <h1 className="mt-4 flex justify-between gap-[1px]">
-          <Wordmark
-            text="ANDREA"
-            label={wordmarkAlt}
-            className="flex w-full justify-between gap-[1px] [&>img]:h-auto [&>img]:w-[15.5%]"
-          />
+        <h1 className="mt-4">
+          <span className="sr-only">{heading}</span>
+          {/* Il nome disegnato e' la stessa cosa detta a occhio: dentro un h1
+              che ha gia' il suo testo diventa decorazione, o uno screen reader
+              leggerebbe due volte lo stesso nome. */}
+          <span aria-hidden="true" className="flex justify-between gap-[1px]">
+            <Wordmark
+              text="ANDREA"
+              label={wordmarkAlt}
+              /* E' l'elemento LCP della pagina, e usciva con loading="lazy":
+                 il browser lo metteva in coda proprio mentre lo aspetta. */
+              priority
+              className="flex w-full justify-between gap-[1px] [&>img]:h-auto [&>img]:w-[15.5%]"
+            />
+          </span>
         </h1>
 
         <div data-hero-avatar className="relative z-10 -mt-[6%] flex justify-center">
@@ -47,11 +65,52 @@ export function HeroView({
           </InkCircle>
         </div>
 
-        <div data-hero-copy className="mx-auto mt-6 max-w-xl text-center">
-          <p className="text-xl font-semibold text-[var(--fg)] lg:text-2xl">{claim}</p>
-          <p className="mt-3 text-[var(--fg-muted)]">{subclaim}</p>
+        {/* Sul telefono il blocco sta a sinistra, da desktop al centro.
+            L'apertura e' l'unico posto del sito con un asse centrale, e da
+            larghi funziona: il nome occupa tutta la riga e l'avatar sta in
+            mezzo, quindi il testo centrato continua quell'asse. Su uno schermo
+            stretto quell'asse non c'e' piu': l'occhiello e' a sinistra, ogni
+            altra sezione comincia a sinistra, e un sottotitolo di due righe
+            centrato fa una sagoma a farfalla che si legge piu' piano. */}
+        <div data-hero-copy className="mt-6 max-w-2xl lg:mx-auto lg:text-center">
+          {/* La scala della pagina, su desktop: il nome disegnato ~110px, i
+              due inviti (le cinque email, il tuo turno) 60px, le quattro
+              sezioni che spiegano 48px, il corpo 16px.
 
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
+              Questo claim stava a 24px, cioe' SOTTO tutti e sei i titoli di
+              sezione: la tesi che regge la pagina leggeva come didascalia del
+              nome. A 48px sta alla pari con le quattro sezioni che spiegano e
+              sotto ai due inviti, ed e' giusto che quei due restino i piu'
+              forti: sono i momenti in cui si chiede qualcosa a chi legge.
+
+              48 e non 52 o 60 per una ragione misurata, non di gusto: da 52 in
+              su la frase va a tre righe, e le tre righe spingono i bottoni
+              sotto la piega su uno schermo da 900px.
+
+              `display` e' la classe che in tokens.css veste gli h2: stesso
+              carattere dei titoli di sezione. Niente `font-bold` accanto:
+              Archivo Black esiste in un peso solo, e chiedergliene un altro
+              fa ingrassare le lettere al browser invece che al disegnatore. */}
+          <p className="display text-balance text-[2rem] leading-[1.1] text-[var(--fg)] lg:text-[3rem]">
+            {claim}
+          </p>
+          {/* text-balance distribuisce le righe invece di riempirle: senza,
+              su schermo stretto "e-commerce" si spezzava in "un e-" e
+              "commerce", perche' il browser puo' andare a capo dopo un
+              trattino. La parola non si tocca: col trattino unificatore non
+              corrisponderebbe piu' a come la gente la cerca. */}
+          {/* Il sottotitolo resta nella colonna stretta anche se il claim si e'
+              allargato: e' testo da leggere, e oltre le ~75 battute per riga
+              l'occhio fatica a trovare l'inizio della riga dopo. */}
+          <p className="mt-3 max-w-xl text-balance text-[var(--fg-muted)] lg:mx-auto">
+            {subclaim}
+          </p>
+
+          {/* L'anello arancione sta di suo su «Parliamone», che e' l'azione
+              suggerita, e passa all'altro bottone quando ci si porta sopra: si
+              vede sempre quale dei due si sta per scegliere. Il disegno e' in
+              tokens.css, sotto [data-hero-cta]. */}
+          <div data-hero-cta className="mt-7 flex flex-wrap gap-3 lg:justify-center">
             <a
               href="#contact"
               className="rounded-full bg-[var(--fg)] px-6 py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--bg)]"

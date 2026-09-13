@@ -10,8 +10,9 @@
   "hero": {
     "eyebrow": "Sviluppatore web · Full stack · Italia",
     "wordmarkAlt": "Andrea",
-    "claim": "Costruisco siti, e-commerce e piattaforme su misura.",
-    "subclaim": "Per aziende che hanno un'idea chiara e nessuno che la sappia costruire.",
+    "heading": "Andrea Ghidara, sviluppatore e programmatore web full stack",
+    "claim": "Il tuo sito, cucito addosso alla tua azienda.",
+    "subclaim": "Prima le misure: cosa vendi e a chi. Poi un sito che spiega, un e-commerce che vende, una piattaforma che fa lavorare.",
     "ctaPrimary": "Parliamone",
     "ctaSecondary": "Guarda i lavori",
     "scrollHint": "Scorri"
@@ -37,8 +38,7 @@
     "list": {
       "capire": {
         "nome": "Farsi capire",
-        "frequenza": "quasi ogni settimana",
-        "oggetto": "Il sito non dice quello che facciamo",
+        "oggetto": "Il sito non esprime la nostra direzione",
         "anteprima": "Abbiamo un sito ma chi ci arriva non capisce di cosa ci occupiamo. Vorremmo rifarlo, ma non sappiamo da dove cominciare…",
         "et": "Quello che di solito significa",
         "titolo": "Quasi mai è un problema di parole.",
@@ -50,21 +50,19 @@
       },
       "strumento": {
         "nome": "Uno strumento",
-        "frequenza": "un paio al mese",
-        "oggetto": "Ci serve qualcosa per velocizzare",
-        "anteprima": "Quello che abbiamo funziona, ma ci sono passaggi che ci rubano ore ogni settimana. Si può automatizzare?",
+        "oggetto": "Un passaggio ci ruba ore a settimana",
+        "anteprima": "Quello che abbiamo funziona, ma ci sono cose che rifacciamo a mano ogni settimana. Si può automatizzare?",
         "et": "Quello che di solito significa",
-        "titolo": "È la richiesta più sana delle cinque, e la più sottovalutata.",
-        "etPrima": "La trappola in cui si cade",
-        "prima": "Lo strumento finisce quasi sempre sul passaggio che dà più fastidio invece che su quello che costa più tempo, e non sono mai lo stesso. Per una settimana segna quanto dura ogni cosa ripetitiva, non quanto ti pesa: la classifica che esce non è quella che avevi in testa.",
-        "tipo": "Piccolo e a sé stante. Non tocca quello che hai, e se sbaglia si butta senza aver rotto niente. È anche il modo meno caro di scoprire se ti serve il resto.",
+        "titolo": "È l'unica delle cinque in cui sai se conviene prima di cominciare.",
+        "etPrima": "Il conto che puoi fare oggi",
+        "prima": "Ore a settimana, per quanto costa un'ora di quella persona, per quarantacinque settimane. Se il numero che esce non è almeno il doppio di quanto costa lo strumento, il passaggio da automatizzare è un altro.",
+        "tipo": "Piccolo e a sé stante: non tocca quello che hai, e se sbaglia si butta senza aver rotto niente. È anche il modo meno caro di scoprire se ti serve il resto.",
         "prova": "Aidify, che assorbe le domande ripetute",
         "cta": "Rispondi a questa mail"
       },
       "aggiunta": {
         "nome": "Un'aggiunta",
-        "frequenza": "un paio al mese",
-        "oggetto": "Dobbiamo aggiungere delle funzionalità",
+        "oggetto": "La piattaforma c'è, ma deve fare di più",
         "anteprima": "La piattaforma c'è già e funziona, ma servono un paio di cose nuove. Quanto ci vuole più o meno?",
         "et": "Quello che di solito significa",
         "titolo": "Il costo non è la funzionalità. È quello che c'era prima.",
@@ -76,8 +74,7 @@
       },
       "fulcro": {
         "nome": "Un fulcro",
-        "frequenza": "qualche volta l'anno",
-        "oggetto": "Vorremmo un gestionale nostro",
+        "oggetto": "Un posto solo, non cinque strumenti",
         "anteprima": "Lavoriamo su cinque strumenti diversi e nessuno parla con gli altri. Vorremmo una cosa sola, fatta su di noi…",
         "et": "Quello che di solito significa",
         "titolo": "È il progetto più grande dei cinque, e l'unico che può fallire in silenzio.",
@@ -89,9 +86,8 @@
       },
       "nonancora": {
         "nome": "Non ancora",
-        "frequenza": "più di tutte",
-        "oggetto": "Non so bene cosa mi serve",
-        "anteprima": "Le scrivo un po' alla cieca: so che qualcosa non va ma non saprei dire cosa chiedere…",
+        "oggetto": "Ho un'idea, ma non so se si può fare sui miei processi",
+        "anteprima": "Ho in mente una cosa che ci semplificherebbe la vita, ma non so se è fattibile con quello che usiamo…",
         "et": "Quello che di solito significa",
         "titolo": "Nessuno arriva sapendo se gli serve uno strumento o una piattaforma.",
         "etPrima": "Una domanda a cui puoi rispondere da solo, oggi",
@@ -125,6 +121,7 @@
     "stageTitle": "Tutto quello che non si vede",
     "stageLead": "Un sito finito. Da qui in poi, tutto quello che c'è sotto.",
     "centre": "il progetto",
+    "composto": "Da cosa è composto",
     "blank": "E la tua, qual è? Scrivimi.",
     "punch": "Quello che chiami «un sito» è lo schermo al centro. Il resto è il lavoro che c'è dietro.",
     "practice": "E in pratica?",
@@ -311,12 +308,34 @@
     "eyebrow": "Contatti",
     "title": "Il tuo turno",
     "client": {
-      "title": "Ho un progetto",
-      "body": "Raccontami cosa ti serve. Rispondo entro 24 ore, anche se la risposta è no."
+      "eyebrow": "Ho un progetto",
+      "title": "Raccontami cosa ti serve",
+      "body": "Due righe bastano. Rispondo entro 24 ore, anche se la risposta è no."
+    },
+    "dopo": {
+      "etichetta": "Cosa succede dopo",
+      "momenti": {
+        "risposta": {
+          "quando": "Entro 24 ore",
+          "titolo": "Una risposta, anche se è no",
+          "testo": "Non un preventivo automatico e non un «grazie, ti ricontatteremo». Se non è roba per me te lo dico, e ti dico chi cercherei."
+        },
+        "chiamata": {
+          "quando": "Se ci sentiamo",
+          "titolo": "Mezz'ora, senza impegno",
+          "testo": "Al telefono o in video. Serve a me per capire il problema e a te per capire come ragiono. Non si vende niente."
+        },
+        "preventivo": {
+          "quando": "Solo dopo",
+          "titolo": "Due pagine, e i numeri",
+          "testo": "Cosa deve succedere e cosa no, quanto costa e quanto dura. Prima di questo non ci sono numeri, perché non ci sarebbe niente da contare."
+        }
+      }
     },
     "recruiter": {
-      "title": "Ti sto valutando per un ruolo",
-      "body": "Qui trovi il CV aggiornato e i profili dove puoi guardare il codice che scrivo.",
+      "eyebrow": "L'altra uscita",
+      "title": "Mi stai valutando per un ruolo?",
+      "body": "Allora non ti serve un modulo. Qui c'è il CV aggiornato, e i due posti dove il codice che scrivo si legge davvero invece che raccontato.",
       "cv": "Scarica il CV",
       "linkedin": "LinkedIn",
       "github": "GitHub"

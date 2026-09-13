@@ -1,4 +1,3 @@
-import { THREAD_ANCHORS } from "@/components/thread/anchors";
 import type { Param } from "./param";
 
 export type Punto = readonly [number, number];
@@ -24,25 +23,22 @@ export type Strada = {
 
 export type Segmento = readonly [Punto, Punto, Punto, Punto];
 
+
 /**
- * Lo stesso generatore di scripts/build-desk.mjs: seme fisso, cosi'
- * l'irregolarita' e' identica a ogni caricamento. E' duplicato e non importato
- * perche' `src` non importa da `scripts` — quello e' un attrezzo di build, non
- * una dipendenza dell'applicazione.
+ * Dove finisce la corsa della freccia, in frazione della larghezza della
+ * PAGINA.
+ *
+ * Era `THREAD_ANCHORS.practice.out`, perche' il filo di pagina attraversava
+ * anche questa scena e la freccia doveva arrivare dove arrivava lui. Il filo
+ * qui non c'e' piu' (vedi la nota in anchors.ts: il tavolo e' una camera, e
+ * una linea non puo' attraversarla), ma la freccia finisce ancora dove
+ * finiva: quel punto e' il bordo destro dei disegni, non un residuo.
+ *
+ * Il numero resta qui e non fra gli ancoraggi proprio per questo: adesso
+ * descrive un gesto, non piu' un tratto che deve combaciare con la sezione
+ * vicina.
  */
-function rng(seed: number): () => number {
-  let s = seed >>> 0;
-  return () => (((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296) * 2 - 1);
-}
-
-/** Dove entra il filo di questa scena, in frazione della larghezza della
- *  PAGINA: e' l'ancora con cui riceve il tratto dai cavi del tavolo. Era
- *  scritto a mano 0,86, che non e' l'88 dichiarato. */
-export const ENTRATA = THREAD_ANCHORS.practice.in / 100;
-
-/** Dove esce, sempre in frazione della PAGINA: l'ancora con cui la sezione si
- *  aggancia ai Lavori. Il numero non si scrive a mano. */
-export const USCITA = THREAD_ANCHORS.practice.out / 100;
+export const USCITA = 0.88;
 
 /**
  * La pagina, e dove la scena ci sta dentro. Le due x non sono la stessa cosa e
@@ -283,34 +279,3 @@ export function strada(
   return { punti, nomi, indiciDisegno, indiceCoda };
 }
 
-/** Il filo: serpentina per tutta la scena, seme suo. Entra e esce agli
- *  ancoraggi, e finisce insieme alla strada. */
-export function filo(
-  misure: readonly Misura[],
-  coda: Coda,
-  mondo: Mondo,
-  pagina: Pagina,
-): Punto[] {
-  const rf = rng(778899);
-  const A = 0.42;
-  /** Da x della scena a x della pagina. La serpentina si disegna attorno ai
-   *  disegni, che stanno nella scena; i due capi invece sono ancore di pagina. */
-  const inPagina = (x: number) => x + pagina.left;
-
-  // I capi si contano sulla PAGINA, non sulla scena: e' li' che il tratto di
-  // sopra finisce e quello di sotto comincia.
-  const F: Punto[] = [[pagina.w * ENTRATA, 0]];
-  for (const g of misure) {
-    F.push([
-      inPagina(mondo.w / 2 + (g.cx - mondo.w / 2) * A * (1 + rf() * 0.28)),
-      g.cy + rf() * 0.2 * g.h,
-    ]);
-  }
-  const ultimo = misure[misure.length - 1];
-  F.push([
-    inPagina(mondo.w / 2 - (ultimo.cx - mondo.w / 2) * A * 0.7),
-    coda.top + coda.h * 0.45,
-  ]);
-  F.push([pagina.w * USCITA, mondo.h]);
-  return F;
-}

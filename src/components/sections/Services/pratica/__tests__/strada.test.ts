@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { THREAD_ANCHORS } from "@/components/thread/anchors";
 import { PARAM } from "../param";
-import { campiona, curva, filo, inFuoco, segmenti, strada, type Misura, type Pagina, type Punto } from "../strada";
+import { campiona, curva, inFuoco, segmenti, strada, type Misura, type Pagina, type Punto, USCITA } from "../strada";
 
 /**
  * Un impaginato finto ma realistico: quattro disegni alternati, la coda in
@@ -139,7 +138,7 @@ describe("la strada della freccia", () => {
     });
   });
 
-  it("esce dove esce il filo: sulla PAGINA, non sul percorso", () => {
+  it("esce al suo punto sulla PAGINA, non sul percorso", () => {
     // Il difetto che questa prova chiude: contata sul percorso, l'uscita della
     // freccia finiva altrove rispetto a quella del filo, e lo scarto cresceva
     // con lo schermo (97px a 1440, 280 a 1920). In calibrazione era stato
@@ -149,7 +148,7 @@ describe("la strada della freccia", () => {
     const { punti: P, nomi } = tracciato();
     expect(nomi[nomi.length - 1]).toBe("coda.fine");
     const suPagina = P[P.length - 1][0] + PAGINA.left;
-    expect(suPagina).toBeCloseTo((PAGINA.w * THREAD_ANCHORS.practice.out) / 100, 6);
+    expect(suPagina).toBeCloseTo(PAGINA.w * USCITA, 6);
     // In VERTICALE non c'e' nessuna ancora: sopra e sotto la scena finisce
     // dove finisce la sua scatola, quindi la y si verifica sulla geometria
     // nuda e la correzione a mano resta libera come per ogni altro punto.
@@ -193,7 +192,7 @@ describe("la strada della freccia", () => {
     expect(risalite().coda).toBeGreaterThan(60);
   });
 
-  it("la freccia finisce esattamente dove esce il filo, a ogni larghezza", () => {
+  it("la freccia finisce sempre nello stesso punto della pagina, a ogni larghezza", () => {
     // E' la proprieta' per cui la coda e' stata ricalibrata, ed e' esatta per
     // costruzione: l'uscita si conta sulla pagina in tutti e due i casi.
     // Misurato: scarto 0,0px da 1100 a 1920. Prima che l'uscita si contasse
@@ -204,8 +203,8 @@ describe("la strada della freccia", () => {
       const pag = { w, left: Math.max(0, (w - MONDO.w) / 2) };
       const P = strada(MISURE, CODA, MONDO, PARAM, true, pag).punti;
       const freccia = P[P.length - 1][0] + pag.left;
-      const filo = (w * THREAD_ANCHORS.practice.out) / 100;
-      expect(freccia, `a ${w}px di larghezza`).toBeCloseTo(filo, 6);
+      const bersaglio = w * USCITA;
+      expect(freccia, `a ${w}px di larghezza`).toBeCloseTo(bersaglio, 6);
     }
   });
 
@@ -220,7 +219,7 @@ describe("la strada della freccia", () => {
     // contenuto, deliberatamente, ed e' dove esce anche il filo. Il vincolo
     // vero e' che non superi quel punto.
     const xs = puntiCampionati().map((p) => p[0]);
-    const uscita = (PAGINA.w * THREAD_ANCHORS.practice.out) / 100 - PAGINA.left;
+    const uscita = PAGINA.w * USCITA - PAGINA.left;
     expect(Math.min(...xs)).toBeGreaterThan(-MONDO.w * SBORDO);
     // Il piu' esterno fra i due: la strada vive nel palco, ma la sua uscita puo'
     // cadere fuori, e nella coda gonfia a destra PRIMA di uscire.
@@ -286,58 +285,6 @@ describe("la strada della freccia", () => {
   });
 });
 
-describe("il filo della scena", () => {
-  /**
-   * La pagina e' piu' larga della scena, e la scena ci sta dentro centrata:
-   * e' la situazione vera: [data-pratica] e' largo al massimo 74rem mentre la
-   * pagina e' la finestra. Distinguerle e' tutto il punto di questa suite:
-   * gli ancoraggi sono percentuali della PAGINA, i disegni stanno nella SCENA.
-   */
-  const PAGINA: Pagina = { w: 1400, left: (1400 - MONDO.w) / 2 };
-  const F = () => filo(MISURE, CODA, MONDO, PAGINA);
-
-  it("entra e esce agli ancoraggi, contati sulla PAGINA e non sulla scena", () => {
-    // Il difetto che questa prova chiude: contati sulla scena i due capi
-    // cadevano un centinaio di pixel piu' dentro degli altri tratti della
-    // pagina, e il filo faceva un gradino a ogni giunzione.
-    const f = F();
-    expect(f[0][1]).toBe(0);
-    expect(f[0][0]).toBeCloseTo((PAGINA.w * THREAD_ANCHORS.practice.in) / 100, 6);
-    expect(f[f.length - 1][0]).toBeCloseTo((PAGINA.w * THREAD_ANCHORS.practice.out) / 100, 6);
-    expect(f[f.length - 1][1]).toBe(MONDO.h);
-  });
-
-  it("l'entrata non e' piu' scritta a mano: segue l'ancora se cambia", () => {
-    // Era 0,86 contro un ancoraggio dichiarato 88. Un capo che non segue la
-    // sua ancora e' un gradino che nessuna prova vedrebbe.
-    expect(F()[0][0]).not.toBeCloseTo(PAGINA.w * 0.86, 2);
-  });
-
-  it("i punti in mezzo restano attaccati ai disegni, spostati nella pagina", () => {
-    // La serpentina si disegna attorno ai disegni, che stanno nella scena: le
-    // loro x vanno traslate, non ricontate sulla pagina.
-    const f = F();
-    const mezzo = f.slice(1, 1 + MISURE.length);
-    for (const p of mezzo) {
-      expect(p[0]).toBeGreaterThan(PAGINA.left);
-      expect(p[0]).toBeLessThan(PAGINA.left + MONDO.w);
-    }
-  });
-
-  it("serpeggia: passa da una parte e dall'altra della mezzeria della scena", () => {
-    const mezzeria = PAGINA.left + MONDO.w / 2;
-    const lati = F()
-      .slice(1, 1 + MISURE.length)
-      .map((p) => Math.sign(p[0] - mezzeria));
-    expect(new Set(lati).size).toBe(2);
-  });
-
-  it("e' deterministico: due chiamate danno lo stesso filo", () => {
-    // L'irregolarita' viene da un LCG seminato, come le sagome del tavolo. Con
-    // Math.random() il filo cambierebbe a ogni render e non sarebbe provabile.
-    expect(F()).toEqual(F());
-  });
-});
 
 describe("quale voce e' in fuoco", () => {
   const SCHERMO = 900;

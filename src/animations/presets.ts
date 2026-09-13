@@ -40,6 +40,108 @@ export function stamp(
  * Lo scrub è consentito solo al livello "full": su touch è la prima
  * causa di scatti.
  */
+/**
+ * La finestra in cui il filo si tesse, ed e' la ragione per cui la pagina ha
+ * UN filo e non sette.
+ *
+ * Il fondo di una sezione e' la cima della successiva. Se la corsa di sopra
+ * chiude a una quota dello schermo e quella di sotto apre a un'altra, le due
+ * si sovrappongono (o lasciano un buco) per tutta la distanza fra le due
+ * quote. Aprendo e chiudendo sulla STESSA riga la consegna e' esatta: la corsa
+ * di sotto comincia nell'istante in cui quella di sopra ha finito, e quello
+ * che si vede e' una testa sola che scende.
+ *
+ * Il default di prima era `top bottom` -> `bottom top`, cioe' apertura quando
+ * la sezione entra dal basso e chiusura quando esce dall'alto: una
+ * sovrapposizione di una schermata intera. Misurato nel DOM al caricamento, il
+ * filo dell'apertura era disegnato al 59% e quello della sezione dopo gia' al
+ * 17%.
+ *
+ * L'85% e' la riga su cui il filo si tesse: sta in basso, poco sotto quello
+ * che si sta leggendo, e tutto quello che e' gia' passato di li' e' cucito.
+ */
+export const TESSITURA = { inizio: "top 85%", fine: "bottom 85%" } as const;
+
+/**
+ * L'entrata del filo al caricamento, tarata sulla timeline di HeroMotion e non
+ * scelta a caso: i timbri delle lettere finiscono verso 1,0s e la copy entra
+ * fra 1,15s e 2,1s. Il filo parte con la copy e chiude verso 2,4s, cioe'
+ * insieme alle frecce che invitano a scorrere. Ha senso: il filo E' l'invito a
+ * scendere, e arriva quando c'e' gia' qualcosa da guardare.
+ */
+/**
+ * Dove sta la riga di tessitura, come frazione dell'altezza della finestra.
+ * Derivata da TESSITURA e non riscritta a mano: se le due divergono l'entrata
+ * consegna allo scorrimento in un punto diverso da dove lo scorrimento si
+ * aspetta di trovarla, e si vede un salto.
+ */
+export const FINESTRA = Number.parseFloat(TESSITURA.inizio.split(" ")[1]) / 100;
+
+/**
+ * Quanto e' disegnata UNA corsa quando la testa del filo sta a `testa` pixel
+ * dalla cima della finestra.
+ *
+ * E' quello che rende l'entrata una testa sola che scende invece di sette
+ * corse che si accendono insieme. Su uno schermo alto la riga di tessitura al
+ * caricamento cade gia' dentro la seconda sezione: dando a ognuna la propria
+ * entrata, le prime due si disegnerebbero in parallelo. Facendo scendere la
+ * testa da 0 fino alla riga, invece, ogni corsa si disegna quando la testa
+ * attraversa la SUA fascia, e le altre stanno ferme. Alla fine della corsa la
+ * testa e' esattamente dove la vuole lo scorrimento, quindi la consegna e'
+ * senza salti.
+ */
+export function frazioneDiEntrata(testa: number, cima: number, altezza: number): number {
+  if (altezza <= 0) return 0;
+  return Math.min(1, Math.max(0, (testa - cima) / altezza));
+}
+
+export const INTRO_FILO = { ritardo: 1.1, durata: 1.3 } as const;
+
+/**
+ * La lunghezza da dare a `stroke-dasharray` perche' il tratto si disegni da
+ * capo a coda, misurata NELLO SPAZIO IN CUI IL BROWSER CALCOLA IL TRATTEGGIO.
+ *
+ * Difetto vero, in pagina dal primo commit e diventato visibile solo quando il
+ * filo ha smesso di essere quasi invisibile. Con `vector-effect:
+ * non-scaling-stroke` il tratteggio si calcola in PIXEL DI SCHERMO, mentre
+ * `getTotalLength()` misura in UNITA' DI VIEWBOX. I sei segmenti del filo
+ * vivono in un viewBox 0-100 stirato a tutta pagina, quindi i due numeri
+ * differiscono di un fattore che dipende da quanto e' grande la sezione:
+ * misurato 7,6x su una corsa larga 1200px. Col dasharray in unita' di viewBox
+ * il tratto non si disegna affatto: sfila un tratteggio di sette trattini.
+ *
+ * `pathLength` non serve: Chrome lo onora, ma lo risolve in unita' di viewBox
+ * e poi non-scaling-stroke ri-scala lo stesso, quindi l'errore sopravvive.
+ * Provato su banco, non dedotto.
+ *
+ * Senza quel vector-effect il tratteggio e' gia' in unita' di viewBox e
+ * `getTotalLength()` e' la risposta giusta: e' il caso della ragnatela.
+ */
+export function lunghezzaDelTratteggio(path: SVGPathElement): number {
+  const lunghezza = path.getTotalLength?.() ?? 0;
+  if (!lunghezza) return 0;
+  // L'attributo e non lo stile calcolato: tutti e tre i tratti del filo lo
+  // dichiarano in JSX, e getComputedStyle qui costerebbe un reflow per path.
+  if (path.getAttribute?.("vector-effect") !== "non-scaling-stroke") return lunghezza;
+
+  const matrice = path.getScreenCTM?.();
+  if (!matrice || !path.getPointAtLength) return lunghezza;
+
+  const CAMPIONI = 128;
+  let pixel = 0;
+  let prima: { x: number; y: number } | null = null;
+  for (let i = 0; i <= CAMPIONI; i++) {
+    const q = path.getPointAtLength((lunghezza * i) / CAMPIONI);
+    const p = {
+      x: q.x * matrice.a + q.y * matrice.c + matrice.e,
+      y: q.x * matrice.b + q.y * matrice.d + matrice.f,
+    };
+    if (prima) pixel += Math.hypot(p.x - prima.x, p.y - prima.y);
+    prima = p;
+  }
+  return pixel || lunghezza;
+}
+
 export function weave(
   paths: SVGPathElement[],
   {
@@ -49,47 +151,121 @@ export function weave(
     stagger = 0.12,
     start,
     end,
+    intro = false,
   }: Common & {
     scrub?: boolean;
     stagger?: number;
     /**
-     * La finestra dello scrub, per chi ne ha una sua. Il filo di sezione si
-     * tesse per tutto il tempo in cui la sezione attraversa lo schermo, ed e'
-     * il default; i cavi del tavolo no, perche' devono arrivare al loro stato
-     * finale esattamente quando ci arriva la camera — che e' il fotogramma a
-     * riposo, e l'unico in cui il filo va a posto. Ignorati fuori dallo scrub.
+     * La finestra dello scrub, per chi ne ha una sua. Il default e' TESSITURA:
+     * apre e chiude sulla stessa riga dello schermo, perche' il filo si legga
+     * come una testa sola che scende invece che come sette corse che partono
+     * quando vogliono. Chi lo sovrascrive rinuncia alla consegna esatta con la
+     * sezione vicina, e deve avere un motivo: i cavi del tavolo devono
+     * arrivare al loro stato finale esattamente quando ci arriva la camera,
+     * che e' il fotogramma a riposo e l'unico in cui il filo va a posto.
+     * Ignorati fuori dallo scrub.
      */
     start?: string;
     end?: string;
+    /**
+     * Il filo si disegna al caricamento invece di essere gia' li'. Serve
+     * all'apertura: quando la pagina si apre la riga di tessitura e' gia'
+     * oltre il fondo di quella sezione, quindi senza entrata il suo tratto
+     * risulta fatto prima che qualcuno lo guardi. Ignorato fuori da "full":
+     * a movimento ridotto il filo c'e' e basta.
+     */
+    intro?: boolean;
   },
 ): gsap.core.Timeline | null {
   if (level === "none" || paths.length === 0) return null;
 
   const useScrub = scrub && level === "full";
+  const conIntro = intro && level === "full";
 
-  paths.forEach((path) => {
-    const length = path.getTotalLength();
-    gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
-  });
+  // Quanto e' tessuta ogni corsa, da 0 a 1. Il tween anima QUESTI numeri e non
+  // direttamente lo stroke-dashoffset, e il giro in piu' si paga da solo:
+  //  - l'entrata al caricamento e lo scorrimento si MOLTIPLICANO invece di
+  //    contendersi la stessa proprieta', quindi l'entrata disegna fino al
+  //    punto in cui lo scorrimento e' gia' arrivato, e da li' si prosegue
+  //    senza salti;
+  //  - il dasharray puo' cambiare a ogni riflow senza che il tween ne sappia
+  //    niente, perche' il tween va sempre da 0 a 1. Prima serviva invalidate()
+  //    per rifargli imparare il valore di partenza.
+  const quote = paths.map(() => ({ v: 0 }));
+  const entrata = { v: conIntro ? 0 : 1 };
+  let lunghezze: number[] = paths.map(() => 0);
+
+  // Mentre l'entrata e' in corso comanda lei e lo scorrimento aspetta: sono due
+  // descrizioni della stessa cosa (dove sta la testa del filo), e se
+  // scrivessero tutte e due si contenderebbero la stessa proprieta'.
+  //
+  // Il riquadro della sezione si rilegge a ogni fotogramma invece di
+  // memorizzarlo al caricamento, ed e' la scelta che semplifica tutto: se la
+  // pagina si muove durante l'entrata il filo la segue da solo, e quando
+  // l'entrata finisce la testa E' la riga di tessitura, cioe' esattamente dove
+  // la vuole lo scorrimento, a qualunque altezza si sia arrivati. Niente resa
+  // da negoziare e nessun ascoltatore da staccare: la prima versione ne aveva
+  // uno, e Lenis lo faceva scattare all'avvio senza che la pagina si fosse
+  // mossa, uccidendo l'entrata a intermittenza.
+  const scrivi = () => {
+    let entrante: number | null = null;
+    if (entrata.v < 1 && trigger instanceof Element) {
+      const riquadro = trigger.getBoundingClientRect();
+      entrante = frazioneDiEntrata(
+        entrata.v * FINESTRA * window.innerHeight,
+        riquadro.top,
+        riquadro.height,
+      );
+    }
+    paths.forEach((path, i) => {
+      gsap.set(path, { strokeDashoffset: lunghezze[i] * (1 - (entrante ?? quote[i].v)) });
+    });
+  };
+
+  // La lunghezza a schermo dipende da quanto e' grande la sezione, quindi
+  // cambia a ogni riflow, mentre quella in unita' di viewBox non cambiava mai:
+  // e' il prezzo di misurare nello spazio giusto. ScrollTrigger si aggiorna da
+  // solo al resize, e `onRefreshInit` e' il momento in cui ristendere.
+  const stendi = () => {
+    lunghezze = paths.map(lunghezzaDelTratteggio);
+    paths.forEach((path, i) => gsap.set(path, { strokeDasharray: lunghezze[i] }));
+    scrivi();
+  };
+  stendi();
 
   const timeline = gsap.timeline({
     scrollTrigger: trigger
       ? {
           trigger,
-          start: useScrub ? (start ?? "top bottom") : "top 85%",
-          end: useScrub ? (end ?? "bottom top") : undefined,
+          start: useScrub ? (start ?? TESSITURA.inizio) : "top 85%",
+          end: useScrub ? (end ?? TESSITURA.fine) : undefined,
           scrub: useScrub ? 0.6 : false,
           once: !useScrub,
+          onRefreshInit: stendi,
         }
       : undefined,
   });
 
-  timeline.to(paths, {
-    strokeDashoffset: 0,
+  timeline.to(quote, {
+    v: 1,
     duration: level === "full" ? 1.1 : 0.6,
     ease: useScrub ? "none" : "power2.inOut",
     stagger: level === "full" ? stagger : 0,
+    onUpdate: scrivi,
+    onComplete: scrivi,
   });
+
+  if (conIntro) {
+    scrivi();
+    gsap.to(entrata, {
+      v: 1,
+      duration: INTRO_FILO.durata,
+      delay: INTRO_FILO.ritardo,
+      ease: "power2.inOut",
+      onUpdate: scrivi,
+      onComplete: scrivi,
+    });
+  }
 
   return timeline;
 }

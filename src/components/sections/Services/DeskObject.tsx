@@ -113,16 +113,23 @@ export function DeskObject({
 }) {
   const sagoma = <DeskShapeArt drawing={shape} />;
 
-  // Solo nel mondo orizzontale, e non e' una scelta di gusto: nel mondo
-  // verticale le sagome si disegnano a DRAW_SCALE.tall, cioe' a meta'. Un
-  // campione li' sarebbe largo una cinquantina di pixel, e un calendario da
-  // cinquanta pixel non e' un calendario: e' sporco sul foglio. Il mondo
-  // verticale tiene le sagome nude, che a quella misura e' quanto si legge.
+  // Il campione si disegna in tutti e due i mondi, ma nel verticale solo per gli
+  // oggetti che si vedono davvero.
   //
-  // Ci guadagna anche il DOM: i due mondi stanno tutti e due nella pagina, e
-  // disegnarli in tutti e due vorrebbe dire quarantaquattro sottoalberi invece
-  // di ventidue, meta' dei quali dentro un gemello che il CSS nasconde.
-  const campione = sample && layout === "wide" ? <DeskSpecimen sample={sample} /> : null;
+  // Prima era solo nell'orizzontale, e la ragione era buona finche' e' durata:
+  // nel mondo verticale le sagome stavano sul piano a DRAW_SCALE.tall, larghe
+  // una cinquantina di pixel, e un calendario da cinquanta pixel non e' un
+  // calendario, e' sporco sul foglio. Sotto i 1024px il piano non esiste piu':
+  // gli oggetti sono in griglia a due per riga e stanno sui 180px, cioe' PIU'
+  // larghi dei 98 che hanno sul tavolo da desktop. A quella misura il campione
+  // e' esattamente quello che distingue "I colori" da "I caratteri", che senza
+  // sono due fogli identici.
+  //
+  // `!hidden` tiene il conto del DOM dove stava: nel verticale se ne vedono
+  // quattro per strato, e gli altri due sono display:none. Disegnare il
+  // campione anche a quelli sarebbe pagarlo per niente.
+  const campione =
+    sample && (layout === "wide" || !hidden) ? <DeskSpecimen sample={sample} /> : null;
 
   return (
     <li

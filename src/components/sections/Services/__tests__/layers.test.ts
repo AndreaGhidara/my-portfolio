@@ -712,6 +712,20 @@ describe("il titolo e la tesi hanno gli stessi numeri nei due file", () => {
     expect(quanto).toBeCloseTo(PUNCH_BEAT.span, 6);
   });
 
+  it("la didascalia e' un cartellino, non una lastra", () => {
+    // Il fondo serve davvero: finche' la camera e' arretrata il piano
+    // ingrandito le passa dietro. Ma da solo era una lastra larga quanto la
+    // frase, quindi di forma diversa per ognuna delle quattro, e col padding
+    // sinistro a zero cominciava esattamente sul primo carattere. Adesso e' un
+    // oggetto posato sul tavolo, con il vocabolario dei tesserini di «Dove ho
+    // imparato»: se qualcuno toglie contorno e ombra, torna la lastra.
+    expect(DIDASCALIA).toMatch(/border:\s*1\.5px solid color-mix/);
+    expect(DIDASCALIA).toMatch(/box-shadow:\s*0 2px 0 color-mix/);
+    // Tre valori e nessuno zero: il padding vecchio ne aveva quattro e finiva
+    // con lo zero che appiccicava il fondo al primo carattere.
+    expect(DIDASCALIA).toMatch(/padding:\s*[\d.]+rem [\d.]+rem [\d.]+rem;/);
+  });
+
   it("la didascalia legge i due estremi da CAPTION_BEATS e non da un numero suo", () => {
     // Se il CSS smettesse di leggere --until, le quattro didascalie si
     // accatasterebbero nello stesso posto senza che niente lo dica.
@@ -720,40 +734,6 @@ describe("il titolo e la tesi hanno gli stessi numeri nei due file", () => {
   });
 });
 
-/**
- * I cavi. La forma del DOM (due SVG e non uno) la tiene gia' DeskCables.test,
- * ma da sola non prova niente: e' la GEOMETRIA delle due scatole a dare un senso
- * a quella divisione, e sta tutta nel foglio di stile. Rimettere i capi a
- * `width: 100%` li riporta nella scatola del piano, che e' larga min(94vw, 62rem)
- * e centrata: il 14% e l'88% da cui il filo entra e esce smettono di essere
- * percentuali della PAGINA, e alla giunzione torna il gradino da 170px misurato
- * a 1440. Nessuna prova di DeskCables se ne accorgerebbe: i path non cambiano
- * di un carattere. Questa se ne accorge.
- */
-describe("le due scatole dei cavi", () => {
-  const CAPI = blocco("[data-desk-cables-ends] {");
-  const DERIVAZIONE = blocco("[data-desk-cables-branch] {");
-
-  it("i capi si misurano sulla finestra: e' li' che il filo entra e esce", () => {
-    expect(CAPI).toMatch(/width:\s*100vw/);
-    // Larga quanto la finestra ma concentrica al piano: senza queste due il 50/50
-    // del viewBox non sarebbe piu' il laptop, e i cavi non uscirebbero da li'.
-    expect(CAPI).toMatch(/left:\s*50%/);
-    expect(CAPI).toMatch(/transform:\s*translateX\(-50%\)/);
-  });
-
-  it("la derivazione resta nella scatola del piano: e' nel piano che sta il rack", () => {
-    // Nella scatola larga quanto la finestra il suo capo scivolerebbe fuori dal
-    // tavolo man mano che lo schermo si allarga: al -4,2% del piano a 1920.
-    expect(DERIVAZIONE).toMatch(/width:\s*100%/);
-    expect(DERIVAZIONE).not.toMatch(/vw/);
-  });
-
-  it("le due scatole hanno la stessa altezza: i tre tratti partono dallo stesso punto", () => {
-    expect(CAPI).toMatch(/height:\s*100%/);
-    expect(DERIVAZIONE).toMatch(/height:\s*100%/);
-  });
-});
 
 /**
  * Il blocco della camera, e tutto il resto del foglio di stile. Le graffe si
@@ -829,7 +809,17 @@ describe("il movimento ha una porta sola, e due chiavi per quella porta", () => 
     expect(CAMERA.dentro).toContain("380vh");
     expect(CAMERA.dentro).toContain("position: sticky");
     expect(CAMERA.fuori).not.toContain("380vh");
-    expect(CAMERA.fuori).not.toContain("position: sticky");
+
+    // Non la PAROLA sticky: il PALCO. Sotto i 1024px gli oggetti di uno strato
+    // si appiccicano in alto mentre si legge la loro frase, ed e' un
+    // impaginato, non una camera: nessun binario, nessuna altezza di schermo,
+    // niente da agganciare. Quello che non deve uscire di qui e' il palco che
+    // sta fermo con i suoi 380vh dietro, e sono questi due selettori.
+    for (const blocco of CAMERA.fuori.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (!/position:\s*sticky/.test(blocco[2])) continue;
+      expect(blocco[1], `${blocco[1].trim()} rende sticky il palco fuori dalla porta`)
+        .not.toMatch(/data-desk-stage|data-desk-track/);
+    }
   });
 });
 

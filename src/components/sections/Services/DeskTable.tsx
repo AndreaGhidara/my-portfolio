@@ -10,7 +10,6 @@ import {
   type DeskLayout,
 } from "./layers";
 import { DeskObject, DeskShapeArt } from "./DeskObject";
-import { DeskCables } from "./DeskCables";
 
 export type DeskLayerData = {
   id: string;
@@ -40,6 +39,7 @@ export type DeskLayerData = {
 export function DeskTable({
   layers,
   centre,
+  composto,
   blank,
   note,
   layout,
@@ -47,6 +47,8 @@ export function DeskTable({
 }: {
   layers: DeskLayerData[];
   centre: string;
+  /** Il titolino sopra gli strati. Il CSS lo mostra solo sotto i 1024px. */
+  composto: string;
   /** Il nome del comando sul post-it bianco: l'unico oggetto che si preme. */
   blank: string;
   /** Quello che c'e' scritto sul post-it prima che lo si prema. */
@@ -70,7 +72,6 @@ export function DeskTable({
       }
     >
       <div data-desk-surface>
-        <DeskCables />
 
         <div data-desk-centre style={{ width: `${CENTRE.width}%` }}>
           {/* Due strati come ogni altra sagoma, ed e' il pieno scuro della
@@ -103,6 +104,11 @@ export function DeskTable({
         </div>
       </div>
 
+      {/* Sotto i 1024px gli strati diventano un elenco, e un elenco vuole un
+          nome: senza, quattro titoli si leggono come quattro sezioni nuove
+          invece che come le parti di una cosa sola. */}
+      <p data-desk-composto className="eyebrow">{composto}</p>
+
       <ol data-desk-layers>
         {layers.map((layer, index) => (
           <li key={layer.id} data-desk-layer={layer.id}>
@@ -119,6 +125,13 @@ export function DeskTable({
                 } as CSSProperties
               }
             >
+              {/* Il numero e' presentazione, non contenuto: dice che gli
+                  strati sono quattro e che questo e' l'ennesimo. Da desktop
+                  il CSS lo nasconde, perche' li' gli strati arrivano uno alla
+                  volta e contarli non serve. */}
+              <span data-desk-num aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
               <h3>{layer.title}</h3>
               <p>{layer.lead}</p>
             </div>

@@ -70,7 +70,7 @@ describe("il post-it grigio", () => {
 
   const tavolo = () =>
     render(
-      <DeskTable layers={finto()} centre="il progetto" blank="E la tua, qual è? Scrivimi." note={NOTA} layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="E la tua, qual è? Scrivimi." note={NOTA} layout="wide" />,
     );
 
   it("porta la sua nota, e si vede senza che nessuno ci passi sopra", () => {
@@ -101,7 +101,7 @@ describe("il post-it grigio", () => {
 
   it("il gemello nascosto non la ripete", () => {
     const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note={NOTA} layout="tall" ghost />,
+      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note={NOTA} layout="tall" ghost />,
     );
     expect(container.querySelectorAll("[data-desk-note]")).toHaveLength(0);
   });
@@ -173,22 +173,31 @@ describe("i campioni sanno disegnarsi", () => {
 });
 
 describe("dove stanno e come si comportano", () => {
-  it("si disegnano solo nel mondo orizzontale: a meta' scala sarebbero poltiglia", () => {
-    // Sul telefono le sagome si disegnano a DRAW_SCALE.tall, cioe' meta': un
-    // campione li' sarebbe largo una cinquantina di pixel, e un calendario da
-    // cinquanta pixel non e' un calendario, e' sporco sul foglio.
-    const largo = render(<DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" layout="wide" />);
+  it("si disegnano anche nel mondo verticale, ma solo per gli oggetti che si vedono", () => {
+    // Il campione e' quello che distingue "I colori" da "I caratteri": senza,
+    // sotto i 1024px sono due fogli identici. Prima era solo nel mondo
+    // orizzontale, perche' nel verticale le sagome stavano sul piano a meta'
+    // scala; da quando quel piano non c'e' piu' e gli oggetti sono in griglia,
+    // stanno sui 180px e il campione si legge meglio che da desktop.
+    const largo = render(<DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note="23.777 caffè" layout="wide" />);
     expect(largo.container.querySelectorAll("[data-desk-sample]").length).toBeGreaterThan(0);
 
     const alto = render(
-      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" layout="tall" ghost />,
+      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note="23.777 caffè" layout="tall" ghost />,
     );
-    expect(alto.container.querySelectorAll("[data-desk-sample]")).toHaveLength(0);
+    // Quelli oltre il quarto sono display:none: un campione li' si pagherebbe
+    // nel DOM senza che nessuno lo veda.
+    const visibili = alto.container.querySelectorAll(
+      "[data-desk-object]:not([data-off]) [data-desk-sample]",
+    );
+    expect(visibili.length).toBeGreaterThan(0);
+    expect(alto.container.querySelectorAll("[data-desk-object][data-off] [data-desk-sample]"))
+      .toHaveLength(0);
   });
 
   it("ce n'e' esattamente uno per ogni oggetto che lo dichiara", () => {
     const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
     );
     const attesi = oggetti.filter((o) => o.sample).length;
     expect(container.querySelectorAll("[data-desk-sample]")).toHaveLength(attesi);
@@ -198,7 +207,7 @@ describe("dove stanno e come si comportano", () => {
     // Un campione che entra nell'albero di accessibilita' fa leggere "I colori,
     // I colori", o peggio, "Aa". L'etichetta e' il nome; questo e' il disegno.
     const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
     );
     for (const campione of container.querySelectorAll("[data-desk-sample]")) {
       expect(
@@ -210,7 +219,7 @@ describe("dove stanno e come si comportano", () => {
 
   it("non toccano il conteggio delle etichette: restano ventitre'", () => {
     const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
     );
     expect(container.querySelectorAll("[data-desk-label]")).toHaveLength(23);
   });

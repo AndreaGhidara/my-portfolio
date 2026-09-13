@@ -10,8 +10,9 @@
   "hero": {
     "eyebrow": "Web developer · Full stack · Italy",
     "wordmarkAlt": "Andrea",
-    "claim": "I build custom websites, online stores and platforms.",
-    "subclaim": "For companies with a clear idea and nobody to build it.",
+    "heading": "Andrea Ghidara, full stack web developer",
+    "claim": "Your website, cut to fit your company.",
+    "subclaim": "Measurements first: what you sell, and to whom. Then a site that explains, a store that sells, a platform that gets the work done.",
     "ctaPrimary": "Let's talk",
     "ctaSecondary": "See the work",
     "scrollHint": "Scroll"
@@ -37,8 +38,7 @@
     "list": {
       "capire": {
         "nome": "Being understood",
-        "frequenza": "almost every week",
-        "oggetto": "Our site doesn't say what we do",
+        "oggetto": "Our site doesn't reflect our direction",
         "anteprima": "We have a site but the people who land on it don't understand what we actually do. We'd like to redo it, but we don't know where to start…",
         "et": "What it usually means",
         "titolo": "It's almost never a wording problem.",
@@ -50,21 +50,19 @@
       },
       "strumento": {
         "nome": "A tool",
-        "frequenza": "a couple a month",
-        "oggetto": "We need something to speed things up",
-        "anteprima": "What we have works, but there are steps that eat hours out of every week. Can it be automated?",
+        "oggetto": "One step costs us hours a week",
+        "anteprima": "What we have works, but there are things we redo by hand every week. Can it be automated?",
         "et": "What it usually means",
-        "titolo": "It's the healthiest of the five, and the most underrated.",
-        "etPrima": "The trap people fall into",
-        "prima": "The tool almost always ends up on the step that annoys you most rather than the one that costs the most time, and they're never the same. For one week write down how long each repetitive thing takes, not how much it bothers you: the ranking that comes out isn't the one you had in mind.",
-        "tipo": "Small and self-contained. It doesn't touch what you have, and if it's wrong you throw it away without having broken anything. It's also the cheapest way to find out whether you need the rest.",
+        "titolo": "It's the only one of the five where you know if it's worth it before you start.",
+        "etPrima": "The maths you can do today",
+        "prima": "Hours a week, times what an hour of that person costs, times forty-five weeks. If the number that comes out isn't at least double what the tool costs, the step to automate is a different one.",
+        "tipo": "Small and self-contained: it doesn't touch what you have, and if it's wrong you throw it away without having broken anything. It's also the cheapest way to find out whether you need the rest.",
         "prova": "Aidify, which absorbs the repeated questions",
         "cta": "Reply to this email"
       },
       "aggiunta": {
         "nome": "An addition",
-        "frequenza": "a couple a month",
-        "oggetto": "We need to add some features",
+        "oggetto": "The platform is there, but it needs to do more",
         "anteprima": "The platform is already there and it works, but we need a couple of new things. Roughly how long would it take?",
         "et": "What it usually means",
         "titolo": "The cost isn't the feature. It's whatever was there before.",
@@ -76,8 +74,7 @@
       },
       "fulcro": {
         "nome": "A hub",
-        "frequenza": "a few times a year",
-        "oggetto": "We'd like a system of our own",
+        "oggetto": "One place, not five tools",
         "anteprima": "We work across five different tools and none of them talk to each other. We'd like one single thing, built around us…",
         "et": "What it usually means",
         "titolo": "It's the largest of the five, and the only one that can fail quietly.",
@@ -89,9 +86,8 @@
       },
       "nonancora": {
         "nome": "Not yet",
-        "frequenza": "more than any other",
-        "oggetto": "I'm not sure what I need",
-        "anteprima": "I'm writing a bit blindly: I know something isn't working but I wouldn't know what to ask for…",
+        "oggetto": "I have an idea, but I don't know if it fits our processes",
+        "anteprima": "I have something in mind that would make our life easier, but I don't know if it's doable with what we use…",
         "et": "What it usually means",
         "titolo": "Nobody arrives knowing whether they need a tool or a platform.",
         "etPrima": "A question you can answer on your own, today",
@@ -125,6 +121,7 @@
     "stageTitle": "Everything you don't see",
     "stageLead": "A finished website. From here on, everything underneath it.",
     "centre": "the project",
+    "composto": "What it's made of",
     "blank": "And yours, what is it? Write to me.",
     "punch": "What you call \"a website\" is the screen in the middle. The rest is the work behind it.",
     "practice": "And in practice?",
@@ -311,12 +308,34 @@
     "eyebrow": "Contact",
     "title": "Your turn",
     "client": {
-      "title": "I have a project",
-      "body": "Tell me what you need. I reply within 24 hours, even when the answer is no."
+      "eyebrow": "I have a project",
+      "title": "Tell me what you need",
+      "body": "Two lines are enough. I answer within 24 hours, even when the answer is no."
+    },
+    "dopo": {
+      "etichetta": "What happens next",
+      "momenti": {
+        "risposta": {
+          "quando": "Within 24 hours",
+          "titolo": "An answer, even if it's no",
+          "testo": "Not an automated quote and not a «thanks, we'll be in touch». If it isn't work for me I'll say so, and I'll tell you who I would look for."
+        },
+        "chiamata": {
+          "quando": "If we talk",
+          "titolo": "Half an hour, no strings",
+          "testo": "On the phone or on video. It is for me to understand the problem and for you to see how I think. Nothing gets sold."
+        },
+        "preventivo": {
+          "quando": "Only after that",
+          "titolo": "Two pages, and the numbers",
+          "testo": "What has to happen and what does not, what it costs and how long it takes. Before this there are no numbers, because there would be nothing to count."
+        }
+      }
     },
     "recruiter": {
-      "title": "I'm considering you for a role",
-      "body": "Here's the current CV and the profiles where you can look at the code I write.",
+      "eyebrow": "The other way out",
+      "title": "Are you considering me for a role?",
+      "body": "Then you don't need a form. Here is the up to date CV, and the two places where the code I write can actually be read instead of described.",
       "cv": "Download the CV",
       "linkedin": "LinkedIn",
       "github": "GitHub"

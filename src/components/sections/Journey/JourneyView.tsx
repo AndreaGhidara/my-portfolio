@@ -43,12 +43,15 @@ export function JourneyView({
   return (
     <section
       id="journey"
+      data-fondo="accento"
       className="relative overflow-hidden bg-[var(--accent)] px-[var(--gutter)] py-[var(--section-y)]"
     >
       {/* Il filo passa dietro e non sotto: su un fondo pieno `-z-10` lo
           manderebbe dietro il fondo stesso, cioe' a sparire. Stessa
           impostazione della casella di posta, sezione arancio come questa. */}
-      <ThreadSegment section="journey" className="pointer-events-none absolute inset-0 opacity-40" />
+      {/* Niente opacity, stesso motivo della casella di posta: su arancio
+          sbiadiva un filo gia' quasi invisibile. Il colore lo da' --filo. */}
+      <ThreadSegment section="journey" className="pointer-events-none absolute inset-0" />
 
       <div className="relative mx-auto max-w-[64rem]">
         {/* Titolo in carta e occhiello in inchiostro, come nella seconda
