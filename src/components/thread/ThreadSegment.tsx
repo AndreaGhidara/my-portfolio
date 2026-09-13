@@ -13,6 +13,7 @@ import { THREAD_ANCHORS, type SectionId } from "./anchors";
 export function ThreadSegment({
   section,
   scrub = true,
+  intro = true,
   className,
 }: {
   section: SectionId;
@@ -26,6 +27,14 @@ export function ThreadSegment({
    * prima causa di scatti.
    */
   scrub?: boolean;
+  /**
+   * Il tratto si disegna al caricamento invece di essere gia' li'. Acceso su
+   * tutte, non solo sull'apertura: su uno schermo alto la riga di tessitura al
+   * primo fotogramma cade gia' dentro la SECONDA sezione, che quindi partirebbe
+   * con un pezzo gia' fatto. Le corse piu' in basso non ci perdono niente,
+   * perche' la testa dell'entrata non arriva mai fino a loro.
+   */
+  intro?: boolean;
   className?: string;
 }) {
   const scope = useRef<HTMLDivElement | null>(null);
@@ -37,8 +46,8 @@ export function ThreadSegment({
 
   useSectionAnimation((level) => {
     const paths = Array.from(scope.current?.querySelectorAll("path") ?? []);
-    weave(paths as SVGPathElement[], { level, trigger: scope.current, scrub });
-  }, scope);
+    weave(paths as SVGPathElement[], { level, trigger: scope.current, scrub, intro });
+  }, scope, [intro]);
 
   return (
     <div ref={scope} className={className} data-thread={section}>
@@ -46,8 +55,8 @@ export function ThreadSegment({
         <path
           d={d}
           fill="none"
-          stroke="var(--line)"
-          strokeWidth="0.3"
+          stroke="var(--filo)"
+          strokeWidth="1"
           vectorEffect="non-scaling-stroke"
         />
       </svg>

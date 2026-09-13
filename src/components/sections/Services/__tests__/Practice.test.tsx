@@ -92,23 +92,14 @@ describe("«E in pratica?» come scena", () => {
 });
 
 describe("il filo in pagina", () => {
-  it("c'e', ed e' decorativo", () => {
+  it("non c'e' piu': questa sezione non lo disegna", () => {
+    // Il tavolo e' una camera alta 380vh col palco inchiodato, e «E in
+    // pratica?» sta dentro la stessa sezione: una linea che la attraversa o
+    // taglia in diagonale la scena o resta coperta dal palco per tutta la
+    // corsa. Il filo si interrompe quindi alla fine di «Cosa stai cercando?» e
+    // riprende con «I lavori», ed e' dichiarato in anchors.ts.
     const { container } = render(<Practice {...props} />);
-    const svg = container.querySelector("[data-pratica-filo]");
-    expect(svg).not.toBeNull();
-    expect(svg).toHaveAttribute("aria-hidden", "true");
-  });
-
-  it("senza movimento e' gia' disegnato per intero", () => {
-    // weave scrive dasharray e dashoffset inline, tutti e due pari alla
-    // lunghezza del tratto: filo invisibile, ed e' lo scrub che poi lo disegna.
-    // A livello "none" useSectionAnimation non chiama nemmeno la build, quindi
-    // quelle due property non esistono e il filo si vede intero. E' il patto
-    // del fallback, ed e' lo stesso dei cavi del tavolo.
-    const { container } = render(<Practice {...props} />);
-    const tratto = container.querySelector("[data-pratica-filo] path") as SVGPathElement;
-    expect(tratto.style.strokeDasharray).toBe("");
-    expect(tratto.style.strokeDashoffset).toBe("");
+    expect(container.querySelector("[data-pratica-filo]")).toBeNull();
   });
 });
 

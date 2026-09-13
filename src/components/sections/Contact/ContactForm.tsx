@@ -18,9 +18,13 @@ export type ContactFormCopy = {
   };
 };
 
-const field =
-  "mt-2 w-full rounded-[var(--radius)] border border-[var(--line)] bg-[var(--bg)] px-4 py-3 text-[var(--fg)] placeholder:text-[var(--fg-muted)]/70";
-
+/**
+ * I campi non sono piu' riquadri ma righe su cui si scrive, e il vestito sta
+ * in tokens.css: un campo senza contorno ha due cose da difendere che una
+ * scatola dava gratis, il fuoco della tastiera e la dimensione del bersaglio
+ * sotto il pollice. Due prove le verificano nel foglio di stile, perche' nel
+ * DOM non si vedono.
+ */
 export function ContactForm({ copy }: { copy: ContactFormCopy }) {
   const schema = useMemo(
     () =>
@@ -60,7 +64,7 @@ export function ContactForm({ copy }: { copy: ContactFormCopy }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <div>
-        <label htmlFor="name" className="text-sm font-semibold text-[var(--fg)]">
+        <label htmlFor="name" data-contact-etichetta>
           {copy.labels.name}
         </label>
         <input
@@ -70,16 +74,16 @@ export function ContactForm({ copy }: { copy: ContactFormCopy }) {
           placeholder={copy.placeholders.name}
           aria-invalid={Boolean(errors.name)}
           aria-describedby={errors.name ? "name-error" : undefined}
-          className={field}
+          data-contact-campo
           {...register("name")}
         />
         {errors.name && (
-          <p id="name-error" className="mt-1 text-sm font-semibold text-[var(--fg)]">{errors.name.message}</p>
+          <p id="name-error" data-contact-errore>{errors.name.message}</p>
         )}
       </div>
 
-      <div className="mt-5">
-        <label htmlFor="email" className="text-sm font-semibold text-[var(--fg)]">
+      <div>
+        <label htmlFor="email" data-contact-etichetta>
           {copy.labels.email}
         </label>
         <input
@@ -89,16 +93,16 @@ export function ContactForm({ copy }: { copy: ContactFormCopy }) {
           placeholder={copy.placeholders.email}
           aria-invalid={Boolean(errors.email)}
           aria-describedby={errors.email ? "email-error" : undefined}
-          className={field}
+          data-contact-campo
           {...register("email")}
         />
         {errors.email && (
-          <p id="email-error" className="mt-1 text-sm font-semibold text-[var(--fg)]">{errors.email.message}</p>
+          <p id="email-error" data-contact-errore>{errors.email.message}</p>
         )}
       </div>
 
-      <div className="mt-5">
-        <label htmlFor="message" className="text-sm font-semibold text-[var(--fg)]">
+      <div>
+        <label htmlFor="message" data-contact-etichetta>
           {copy.labels.message}
         </label>
         <textarea
@@ -107,25 +111,25 @@ export function ContactForm({ copy }: { copy: ContactFormCopy }) {
           placeholder={copy.placeholders.message}
           aria-invalid={Boolean(errors.message)}
           aria-describedby={errors.message ? "message-error" : undefined}
-          className={field}
+          data-contact-campo
           {...register("message")}
         />
         {errors.message && (
-          <p id="message-error" className="mt-1 text-sm font-semibold text-[var(--fg)]">{errors.message.message}</p>
+          <p id="message-error" data-contact-errore>{errors.message.message}</p>
         )}
       </div>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-7 w-full rounded-full bg-[var(--fg)] px-6 py-4 text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--bg)] disabled:opacity-60"
+        data-contact-invia
       >
         {isSubmitting ? copy.button.sending : copy.button.default}
       </button>
 
       {/* role=status annuncia l'esito senza rubare il focus: chi usa uno
           screen reader sa se il messaggio e' partito. */}
-      <p role="status" aria-live="polite" className="mt-4 min-h-6 text-sm text-[var(--fg-muted)]">
+      <p role="status" aria-live="polite" data-contact-esito>
         {state === "success" ? copy.status.success : state === "error" ? copy.status.error : ""}
       </p>
     </form>

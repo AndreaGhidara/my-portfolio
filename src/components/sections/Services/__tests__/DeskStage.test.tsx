@@ -45,6 +45,7 @@ const props = {
   title: "Tutto quello che non si vede",
   lead: "Un sito finito.",
   centre: "il progetto",
+  composto: "Da cosa e\' composto",
   blank: "E la tua, qual è?",
   note: "23.777 caffè",
   punch: "Il resto è il tavolo.",

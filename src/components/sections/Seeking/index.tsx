@@ -19,7 +19,6 @@ export async function Seeking() {
   const mail: SeekingMail[] = seekingRoutes.map((r) => ({
     id: r.id,
     nome: t(`list.${r.id}.nome`),
-    frequenza: t(`list.${r.id}.frequenza`),
     oggetto: t(`list.${r.id}.oggetto`),
     anteprima: t(`list.${r.id}.anteprima`),
     et: t(`list.${r.id}.et`),

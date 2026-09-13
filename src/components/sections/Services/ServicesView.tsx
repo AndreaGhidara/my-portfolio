@@ -9,6 +9,10 @@ export type ServicesViewProps = {
   stageTitle: string;
   stageLead: string;
   centre: string;
+  /** Il titolino sopra i quattro strati. Si vede solo sotto i 1024px: da
+      desktop gli strati arrivano uno alla volta con la camera, e un titolo
+      fisso sopra la scena sarebbe una didascalia che non aspetta nessuno. */
+  composto: string;
   /** Il nome del comando sul post-it bianco. Non e' un'etichetta del tavolo:
    *  e' la ventiquattresima cosa, quella che si preme. */
   blank: string;
@@ -38,6 +42,7 @@ export function ServicesView({
   stageTitle,
   stageLead,
   centre,
+  composto,
   blank,
   note,
   punch,
@@ -56,6 +61,7 @@ export function ServicesView({
         title={stageTitle}
         lead={stageLead}
         centre={centre}
+        composto={composto}
         blank={blank}
         note={note}
         punch={punch}

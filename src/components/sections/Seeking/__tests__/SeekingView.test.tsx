@@ -8,7 +8,6 @@ import { seekingRoutes } from "@/content/seeking";
 const mail = seekingRoutes.map((r, i) => ({
   id: r.id,
   nome: `Nome ${i}`,
-  frequenza: `Frequenza ${i}`,
   oggetto: `Oggetto ${i}`,
   anteprima: `Anteprima ${i}`,
   et: `Et ${i}`,
@@ -100,12 +99,20 @@ describe("l'elenco della posta", () => {
     for (const s of scelte) expect(s).toHaveAttribute("name", "posta");
   });
 
-  it("nessuna parte aperta: la casella si apre chiusa, come una casella vera", () => {
+  it("la prima e' gia' aperta, e solo la prima", () => {
+    // Prima non lo era nessuna, e la nota diceva che le cinque dovevano
+    // restare pari finche' non se ne toccava una. Il costo era che il riquadro
+    // di lettura si apriva su una frase di servizio, e chi non tocca niente non
+    // vedeva mai una risposta: cioe' la cosa che questa sezione esiste per
+    // mostrare. Le cinque anteprime restano tutte leggibili accanto, quindi
+    // quello che quella nota difendeva non si e' perso.
     render(<SeekingView {...props} />);
-    for (const s of screen.getAllByRole("radio")) expect(s).not.toBeChecked();
+    const scelte = screen.getAllByRole("radio");
+    expect(scelte[0]).toBeChecked();
+    for (const altra of scelte.slice(1)) expect(altra).not.toBeChecked();
   });
 
-  it("ogni riga si legge intera prima di scegliere: mittente, frequenza, oggetto, anteprima", () => {
+  it("ogni riga si legge intera prima di scegliere: mittente, oggetto, anteprima", () => {
     // È il motivo per cui questa forma ha vinto sulle altre: chi non apre
     // niente esce comunque avendo letto cinque volte che problemi tratti.
     const { container } = render(<SeekingView {...props} />);
@@ -114,7 +121,6 @@ describe("l'elenco della posta", () => {
     righe.forEach((riga, i) => {
       const dentro = within(riga as HTMLElement);
       expect(dentro.getByText(mail[i].nome)).toBeInTheDocument();
-      expect(dentro.getByText(mail[i].frequenza)).toBeInTheDocument();
       expect(dentro.getByText(mail[i].oggetto)).toBeInTheDocument();
       expect(dentro.getByText(mail[i].anteprima)).toBeInTheDocument();
     });
@@ -195,8 +201,17 @@ describe("il meccanismo senza JavaScript", () => {
     // L'unica cosa da tenere allineata al contenuto: una regola posizionale
     // per mail. Aggiungerne una sesta senza la sua regola vorrebbe dire una
     // risposta che non si apre mai, e nel codice non si vedrebbe.
-    const regole = css.match(/\[data-casella\]:has\(\[data-mail\]:nth-child\(\d+\) input:checked\)/g);
-    expect(regole ?? []).toHaveLength(seekingRoutes.length);
+    // Gli INDICI e non le occorrenze: gli stessi selettori compaiono in piu'
+    // di un blocco (fuori aprono la mail, da 900px in su la fanno anche
+    // distendere fino in fondo al riquadro), e contare le righe direbbe il
+    // doppio senza che niente sia rotto. Cosi' invece si prova la cosa che
+    // conta davvero: che gli indici siano esattamente 1..N, senza buchi.
+    const indici = new Set(
+      [...css.matchAll(/\[data-casella\]:has\(\[data-mail\]:nth-child\((\d+)\) input:checked\)/g)].map(
+        (m) => Number(m[1]),
+      ),
+    );
+    expect([...indici].sort((a, b) => a - b)).toEqual(seekingRoutes.map((_, i) => i + 1));
   });
 
   it("le mail partono chiuse dal CSS, non dal markup", () => {

@@ -44,13 +44,18 @@ export function SeekingView({
   return (
     <section
       id="seeking"
+      data-fondo="accento"
       className="relative overflow-hidden bg-[var(--accent)] px-[var(--gutter)] py-[var(--section-y)]"
     >
       {/* Il filo passa dietro, e per il tratto centrale la casella se lo
           mangia: e' un blocco di carta pieno, non un riquadro arancione come
           quelli di prima. Entra sopra il titolo ed esce sotto il patto, ed e'
           li' che si vede — la continuita' con le sezioni vicine e' salva. */}
-      <ThreadSegment section="seeking" className="pointer-events-none absolute inset-0 opacity-40" />
+      {/* Niente opacity: sbiadire il filo qui lo moltiplicava per 0,4 su un
+          tratto gia' dipinto al 29% dall'antialiasing, e su arancio spariva
+          del tutto (1,09:1 misurato in pagina). Il tono giusto su un fondo
+          pieno lo da' --filo, che qui vale --on-accent. */}
+      <ThreadSegment section="seeking" className="pointer-events-none absolute inset-0" />
       <div className="relative mx-auto max-w-5xl">
         <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
         <h2 className="mt-3 text-4xl text-[var(--paper)] lg:text-6xl">{title}</h2>

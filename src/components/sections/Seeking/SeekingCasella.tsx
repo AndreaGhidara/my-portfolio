@@ -9,11 +9,6 @@ export type SeekingMail = {
    *  «Uno strumento», «Un fulcro». Dare un nome a una cosa che il visitatore ha
    *  in testa senza nome e' gia' consulenza, e succede prima che apra. */
   nome: string;
-  /** Quanto spesso arriva davvero. Qualitativa di proposito: un numero esatto
-   *  accanto a un'email dichiarata riscritta chiederebbe di essere creduto due
-   *  volte. Ha preso il posto del pallino del «non letto», che era una piccola
-   *  bugia — non c'e' niente di non letto. */
-  frequenza: string;
   oggetto: string;
   /** Le due righe che si leggono senza aprire. Erano la `voice`, la frase
    *  parlata della strada: stessa cosa, detta come si scrive una mail. */
@@ -93,12 +88,18 @@ export function SeekingCasella({
       <legend className="sr-only">{titolo}</legend>
 
       <Reveal as="div" data-elenco stagger={0.07}>
-        {mail.map((m) => (
+        {mail.map((m, indice) => (
           <label key={m.id} data-mail>
-            <input type="radio" name="posta" value={m.id} />
+            {/* La prima e' gia' aperta. Prima non lo era, e la nota diceva che
+                le cinque dovevano restare pari finche' non se ne toccava una:
+                il costo era che il riquadro di lettura si apriva su una frase
+                di servizio, e chi non tocca niente non vedeva mai una risposta,
+                cioe' la cosa che questa sezione esiste per mostrare. Le
+                anteprime restano tutte e cinque leggibili accanto, quindi
+                quello che la nota difendeva non si perde. */}
+            <input type="radio" name="posta" value={m.id} defaultChecked={indice === 0} />
             <span data-mail-testa>
               <span data-mail-da>{m.nome}</span>
-              <span data-mail-freq>{m.frequenza}</span>
             </span>
             <span data-mail-ogg>{m.oggetto}</span>
             <span data-mail-ant>{m.anteprima}</span>
@@ -107,8 +108,10 @@ export function SeekingCasella({
       </Reveal>
 
       <div data-lettura>
-        {/* Non si apre con una mail scelta al posto suo: le cinque restano
-            pari finche' non ne tocca una. */}
+        {/* Il riquadro non e' mai vuoto: la prima mail e' aperta di suo. Questa
+            frase resta per il caso in cui non lo sia — JavaScript spento non
+            c'entra (l'attributo `checked` e' nell'HTML servito), ma basta che
+            qualcuno tolga la spunta dal gruppo perche' torni a servire. */}
         <p data-vuoto>{casella.vuoto}</p>
 
         <div data-messaggi>
