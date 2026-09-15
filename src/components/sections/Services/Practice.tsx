@@ -18,8 +18,13 @@ import type { ServiceItem } from "./ServicesView";
 
 /**
  * La seconda scena della sezione del tavolo. Il tavolo e' lo spettacolo, questa
- * e' la sostanza — e conserva la risposta 1:1 alle quattro frasi di «Cosa stai
- * cercando?», nel loro ordine.
+ * e' la sostanza.
+ *
+ * La corrispondenza 1:1 con le frasi della sezione sopra non c'e' piu', e il
+ * testo ha smesso di prometterla: quelle frasi sono diventate cinque mail e
+ * questi sono rimasti quattro, quindi «uno per ogni frase qui sopra» chiedeva
+ * al lettore di fare un conto che non torna. Adesso i quattro si presentano per
+ * quello che sono, pezzi che stanno in piedi da soli e si montano insieme.
  *
  * `data-motion` porta il livello risolto fino al CSS, che e' l'unico posto in
  * cui il movimento esiste: a "full" le voci non attive sbiadiscono e la scena
@@ -150,6 +155,23 @@ export function Practice({
     }
   }, []);
 
+  /**
+   * Il righello della consegna fra la freccia e il filo, dietro `?righelli`.
+   * Stessa guardia del calibratore e per la stessa ragione: dentro un `if`
+   * su NODE_ENV il bundler non attraversa il ramo e non emette il pezzo.
+   * Sono due strumenti separati perche' rispondono a due domande diverse — il
+   * calibratore alla forma della strada, il righello a quando le due
+   * animazioni si passano il testimone — e chi ne apre uno non vuole
+   * l'interfaccia dell'altro davanti.
+   */
+  const [Righelli, setRighelli] = useState<ComponentType | null>(null);
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") {
+      if (!new URLSearchParams(window.location.search).has("righelli")) return;
+      void import("./pratica/Righelli").then((m) => setRighelli(() => m.Righelli));
+    }
+  }, []);
+
   return (
     <div ref={scope} data-pratica data-motion={level}>
       <h3>{practice}</h3>
@@ -207,6 +229,7 @@ export function Practice({
       </div>
 
       {Calibratore ? <Calibratore guida={guidaRef} strada={stradaRef} /> : null}
+      {Righelli ? <Righelli /> : null}
     </div>
   );
 }

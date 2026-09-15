@@ -40,42 +40,10 @@ export function stamp(
  * Lo scrub è consentito solo al livello "full": su touch è la prima
  * causa di scatti.
  */
-/**
- * La finestra in cui il filo si tesse, ed e' la ragione per cui la pagina ha
- * UN filo e non sette.
- *
- * Il fondo di una sezione e' la cima della successiva. Se la corsa di sopra
- * chiude a una quota dello schermo e quella di sotto apre a un'altra, le due
- * si sovrappongono (o lasciano un buco) per tutta la distanza fra le due
- * quote. Aprendo e chiudendo sulla STESSA riga la consegna e' esatta: la corsa
- * di sotto comincia nell'istante in cui quella di sopra ha finito, e quello
- * che si vede e' una testa sola che scende.
- *
- * Il default di prima era `top bottom` -> `bottom top`, cioe' apertura quando
- * la sezione entra dal basso e chiusura quando esce dall'alto: una
- * sovrapposizione di una schermata intera. Misurato nel DOM al caricamento, il
- * filo dell'apertura era disegnato al 59% e quello della sezione dopo gia' al
- * 17%.
- *
- * L'85% e' la riga su cui il filo si tesse: sta in basso, poco sotto quello
- * che si sta leggendo, e tutto quello che e' gia' passato di li' e' cucito.
- */
-export const TESSITURA = { inizio: "top 85%", fine: "bottom 85%" } as const;
-
-/**
- * L'entrata del filo al caricamento, tarata sulla timeline di HeroMotion e non
- * scelta a caso: i timbri delle lettere finiscono verso 1,0s e la copy entra
- * fra 1,15s e 2,1s. Il filo parte con la copy e chiude verso 2,4s, cioe'
- * insieme alle frecce che invitano a scorrere. Ha senso: il filo E' l'invito a
- * scendere, e arriva quando c'e' gia' qualcosa da guardare.
- */
-/**
- * Dove sta la riga di tessitura, come frazione dell'altezza della finestra.
- * Derivata da TESSITURA e non riscritta a mano: se le due divergono l'entrata
- * consegna allo scorrimento in un punto diverso da dove lo scorrimento si
- * aspetta di trovarla, e si vede un salto.
- */
-export const FINESTRA = Number.parseFloat(TESSITURA.inizio.split(" ")[1]) / 100;
+// Le finestre di scorrimento stanno in ./finestre: e' un modulo di soli dati,
+// senza "use client", cosi' lo possono leggere anche i Server Component.
+export { TESSITURA, FINESTRA, CORSA_FRECCIA, TESSITURA_LAVORI, FINESTRE_FILO } from "./finestre";
+import { TESSITURA, FINESTRA } from "./finestre";
 
 /**
  * Quanto e' disegnata UNA corsa quando la testa del filo sta a `testa` pixel

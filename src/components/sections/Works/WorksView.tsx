@@ -14,6 +14,10 @@ export type WorksViewProps = {
 export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewProps) {
   return (
     <section id="works" className="relative px-[var(--gutter)] py-[var(--section-y)]">
+      {/* L'unica sezione che non si tesse sulla riga di tutte, ma la finestra
+          non gliela passa questo file: se la guarda ThreadSegment in
+          FINESTRE_FILO. Questo e' un Server Component, e un valore preso da un
+          modulo client qui arriverebbe `undefined`. Vedi finestre.ts. */}
       <ThreadSegment section="works" className="pointer-events-none absolute inset-0 -z-10" />
 
       <div className="mx-auto max-w-4xl">
