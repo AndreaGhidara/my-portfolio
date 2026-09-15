@@ -16,7 +16,6 @@ const mail = seekingRoutes.map((r, i) => ({
   prima: `Prima ${i}`,
   tipo: `Tipo ${i}`,
   cta: `Cta ${i}`,
-  prova: r.prova ? { testo: `Prova ${i}`, ancora: r.prova.ancora } : null,
 }));
 
 const casella = {
@@ -31,9 +30,8 @@ const casella = {
 
 const props: SeekingViewProps = {
   eyebrow: "Partiamo da qui",
-  title: "Le cinque email che ricevo più spesso",
+  title: "Le cinque richieste che mi fanno più spesso",
   intro: "Riscritte da me, non copiate.",
-  attesa: "Non è un modulo: resta tutto qui.",
   etichettaTipo: "Che tipo di lavoro è",
   casella,
   mail,
@@ -69,15 +67,14 @@ describe("la seconda sezione", () => {
   it("il testo corrente sull'arancio è inchiostro, non carta: la carta su arancio non arriva ad AA", () => {
     const { container } = render(<SeekingView {...props} />);
     expect(container.querySelector("[data-seeking-intro]")?.className).toContain("--on-accent");
-    expect(container.querySelector("[data-seeking-attesa]")?.className).toContain("--on-accent");
   });
 
-  it("dice il patto: la scelta non parte da nessuna parte", () => {
-    // La riga «non è un modulo» è una promessa scritta in pagina. Se un giorno
-    // la scelta comincia a viaggiare verso qualcuno, questa prova va tolta
-    // INSIEME a quella riga, non prima.
+  it("la scelta non parte da nessuna parte: qui dentro non c'è un form", () => {
+    // La riga «non è un modulo» diceva questo a parole ed è stata tolta, ma il
+    // fatto resta ed è quello che conta: aprire una delle cinque mail non manda
+    // niente a nessuno. Il giorno in cui la scelta cominciasse a viaggiare
+    // verso qualcuno, questa prova cadrebbe, ed è esattamente il suo lavoro.
     const { container } = render(<SeekingView {...props} />);
-    expect(screen.getByText(props.attesa)).toBeInTheDocument();
     expect(container.querySelector("form")).toBeNull();
   });
 });
@@ -174,26 +171,21 @@ describe("la lettura", () => {
     }
   });
 
-  it("ognuna porta al contatto, e quelle che ce l'hanno anche alla prova", () => {
+  it("ognuna porta al contatto, e da nessun'altra parte", () => {
+    // Una sola uscita per mail, ed e' quella che serve a te. Il rimando al
+    // lavoro che dimostrava la frase e' stato tolto da tutte e cinque: dava a
+    // chi era appena stato convinto un motivo per andare altrove. Se un giorno
+    // ne ricompare uno, questa prova cade, ed e' il suo lavoro.
     const { container } = render(<SeekingView {...props} />);
     const messaggi = container.querySelectorAll("[data-msg]");
     expect(messaggi).toHaveLength(seekingRoutes.length);
     messaggi.forEach((m, i) => {
+      const azioni = m.querySelectorAll("[data-msg-azioni] a");
+      expect(azioni).toHaveLength(1);
       expect(within(m as HTMLElement).getByText(mail[i].cta)).toHaveAttribute("href", "#contact");
-      const p = mail[i].prova;
-      const rimando = m.querySelector("[data-msg-prova]");
-      if (p) expect(rimando).toHaveAttribute("href", p.ancora);
-      else expect(rimando, "«non ancora» non manda da nessuna parte").toBeNull();
     });
   });
 
-  it("«non ancora» non chiede niente, ed è l'unica", () => {
-    // Chiedere a chi ha appena ammesso di non sapere è il modo più rapido di
-    // perderlo. Se un giorno le si aggiunge un rimando, questa prova cade.
-    const senza = mail.filter((m) => m.prova === null);
-    expect(senza).toHaveLength(1);
-    expect(senza[0].id).toBe("nonancora");
-  });
 });
 
 describe("il meccanismo senza JavaScript", () => {

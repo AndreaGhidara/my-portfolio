@@ -65,14 +65,15 @@ export function HeroView({
           </InkCircle>
         </div>
 
-        {/* Sul telefono il blocco sta a sinistra, da desktop al centro.
-            L'apertura e' l'unico posto del sito con un asse centrale, e da
-            larghi funziona: il nome occupa tutta la riga e l'avatar sta in
-            mezzo, quindi il testo centrato continua quell'asse. Su uno schermo
-            stretto quell'asse non c'e' piu': l'occhiello e' a sinistra, ogni
-            altra sezione comincia a sinistra, e un sottotitolo di due righe
-            centrato fa una sagoma a farfalla che si legge piu' piano. */}
-        <div data-hero-copy className="mt-6 max-w-2xl lg:mx-auto lg:text-center">
+        {/* Il blocco sta al centro a ogni larghezza. L'apertura e' l'unico
+            posto del sito con un asse centrale, e ce l'ha per costruzione: il
+            nome occupa tutta la riga e l'avatar sta esattamente in mezzo.
+            Quell'asse lo segna l'avatar, e l'avatar e' centrato anche su uno
+            schermo stretto: il testo a sinistra sotto un avatar centrato
+            lasciava l'apertura storta proprio nel punto in cui la pagina si
+            presenta. L'occhiello invece resta a sinistra a ogni larghezza,
+            come su desktop: e' un'etichetta, non fa parte del blocco. */}
+        <div data-hero-copy className="mt-6 max-w-2xl mx-auto text-center">
           {/* La scala della pagina, su desktop: il nome disegnato ~110px, i
               due inviti (le cinque email, il tuo turno) 60px, le quattro
               sezioni che spiegano 48px, il corpo 16px.
@@ -102,7 +103,7 @@ export function HeroView({
           {/* Il sottotitolo resta nella colonna stretta anche se il claim si e'
               allargato: e' testo da leggere, e oltre le ~75 battute per riga
               l'occhio fatica a trovare l'inizio della riga dopo. */}
-          <p className="mt-3 max-w-xl text-balance text-[var(--fg-muted)] lg:mx-auto">
+          <p className="mt-3 max-w-xl text-balance text-[var(--fg-muted)] mx-auto">
             {subclaim}
           </p>
 
@@ -110,7 +111,7 @@ export function HeroView({
               suggerita, e passa all'altro bottone quando ci si porta sopra: si
               vede sempre quale dei due si sta per scegliere. Il disegno e' in
               tokens.css, sotto [data-hero-cta]. */}
-          <div data-hero-cta className="mt-7 flex flex-wrap gap-3 lg:justify-center">
+          <div data-hero-cta className="mt-7 flex flex-wrap justify-center gap-3">
             <a
               href="#contact"
               className="rounded-full bg-[var(--fg)] px-6 py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--bg)]"

@@ -19,10 +19,6 @@ export type SeekingMail = {
   prima: string;
   tipo: string;
   cta: string;
-  /** Dove si va a vedere che non e' una promessa. Manca per «non ancora»: a
-   *  chi ha appena ammesso di non sapere non si chiede di andare da nessuna
-   *  parte. */
-  prova: { testo: string; ancora: string } | null;
 };
 
 /** La cornice della casella: le stesse parole in tutte e cinque le mail. */
@@ -161,15 +157,14 @@ export function SeekingCasella({
                 </span>
               </div>
 
+              {/* Una sola uscita. Accanto alla chiamata c'e' stato a lungo un
+                  rimando al lavoro che dimostrava la mail: e' stato tolto
+                  perche' offriva una via di fuga esattamente dove il testo
+                  aveva appena finito di convincere. */}
               <p data-msg-azioni>
                 <a href="#contact" data-msg-cta>
                   {m.cta}
                 </a>
-                {m.prova ? (
-                  <a href={m.prova.ancora} data-msg-prova>
-                    {m.prova.testo}
-                  </a>
-                ) : null}
               </p>
             </article>
           ))}

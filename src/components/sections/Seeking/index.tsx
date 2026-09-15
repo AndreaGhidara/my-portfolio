@@ -4,14 +4,12 @@ import { SeekingView } from "./SeekingView";
 import type { SeekingMail } from "./SeekingCasella";
 
 /**
- * Le cinque strade non ricalcano piu' gli id dei servizi, e il legame con la
- * prova non passa piu' dalla posizione: passa da `prova`, che dice a quale
- * lavoro andare a vedere. Vedi content/seeking.ts per il perche'.
+ * Le cinque strade non ricalcano gli id dei servizi, e non rimandano piu' a
+ * nessun lavoro: la mail si chiude su una sola uscita, i contatti. Vedi
+ * content/seeking.ts per il perche'.
  *
- * `seekingRoutes` non e' cambiato con la casella: sono sempre le stesse cinque
- * forme di intervento, nello stesso ordine e con le stesse prove. E' cambiato
- * come si guardano — da strade a mail — e quello sta tutto nei testi e nel
- * componente.
+ * `seekingRoutes` tiene soltanto l'ordine, che e' la decisione: quanto ogni
+ * intervento tocca di quello che uno ha gia'. Tutto il resto e' nei testi.
  */
 export async function Seeking() {
   const t = await getTranslations("seeking");
@@ -27,9 +25,6 @@ export async function Seeking() {
     prima: t(`list.${r.id}.prima`),
     tipo: t(`list.${r.id}.tipo`),
     cta: t(`list.${r.id}.cta`),
-    // Il buco nelle traduzioni di «non ancora» e' voluto, come per il post-it
-    // bianco del tavolo: non ha una prova, e cercargliela solleverebbe.
-    prova: r.prova ? { testo: t(`list.${r.id}.prova`), ancora: r.prova.ancora } : null,
   }));
 
   return (
@@ -37,7 +32,6 @@ export async function Seeking() {
       eyebrow={t("eyebrow")}
       title={t("title")}
       intro={t("intro")}
-      attesa={t("attesa")}
       etichettaTipo={t("labels.tipo")}
       casella={{
         etichettaDa: t("casella.etichettaDa"),

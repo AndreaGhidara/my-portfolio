@@ -19,12 +19,10 @@
   },
   "seeking": {
     "eyebrow": "Let's start here",
-    "title": "The five emails I get most often",
-    "intro": "Rewritten by me, not copied: none of them is anyone's actual email. Open them and read what I reply. It's what you'd get by writing to me.",
-    "attesa": "This isn't a form: it all stays here, and nobody receives anything until you write to me yourself.",
+    "title": "The five requests I get asked most often",
+    "intro": "They rarely turn up alone: a single project usually holds most of them, and deciding which to answer first is already designing it. I rewrote them, they aren't anyone's mail, but the answers are the real ones.",
     "labels": {
-      "tipo": "What kind of work it is",
-      "prova": "The proof"
+      "tipo": "What kind of work it is"
     },
     "casella": {
       "etichettaDa": "From",
@@ -45,8 +43,7 @@
         "etPrima": "A test you can run today, in ten minutes",
         "prima": "Write down the three questions people ask you on the phone before they buy. Then open your homepage and count how many it answers in the first screenful. If it's none or one, the problem isn't how it's written, it's the order it's in: the site describes how the company is organised instead of answering the person who just arrived.",
         "tipo": "The real work is deciding what comes first, not producing copy. A few weeks, and you don't need to redo the design to find out.",
-        "prova": "Everything behind a website",
-        "cta": "Reply to this email"
+        "cta": "This one's mine, write to me"
       },
       "strumento": {
         "nome": "A tool",
@@ -56,33 +53,30 @@
         "titolo": "It's the only one of the five where you know if it's worth it before you start.",
         "etPrima": "The maths you can do today",
         "prima": "Hours a week, times what an hour of that person costs, times forty-five weeks. If the number that comes out isn't at least double what the tool costs, the step to automate is a different one.",
-        "tipo": "Small and self-contained: it doesn't touch what you have, and if it's wrong you throw it away without having broken anything. It's also the cheapest way to find out whether you need the rest.",
-        "prova": "Aidify, which absorbs the repeated questions",
-        "cta": "Reply to this email"
+        "tipo": "A small, self-standing piece, wired into what you already use. Then it gets calibrated: how you really need it only shows once it's in use, and from there it gets taken in.",
+        "cta": "This one's mine, write to me"
       },
       "aggiunta": {
         "nome": "An addition",
         "oggetto": "The platform is there, but it needs to do more",
         "anteprima": "The platform is already there and it works, but we need a couple of new things. Roughly how long would it take?",
         "et": "What it usually means",
-        "titolo": "The cost isn't the feature. It's whatever was there before.",
-        "etPrima": "The question that moves the quote",
-        "prima": "Ask whoever built it whether there's a way to try a change before publishing it. If the answer is no, that's the first job, and it holds for anything you add afterwards, not just this one.",
-        "tipo": "You start by reading, not writing. An honest estimate comes after half a day inside the code, not before.",
-        "prova": "BDroppy, migrated without ever switching it off",
-        "cta": "Reply to this email"
+        "titolo": "Almost always the platform was built for the company you were, not the one you are.",
+        "etPrima": "The two numbers to compare",
+        "prima": "Count how many people use it today against how many used it in the first month, and how many things it does today against how many it did. If either number has doubled, what you're asking for isn't one more feature: it's the structure underneath that has to grow with you.",
+        "tipo": "It starts with reading, not writing: first you look at what already holds up, then you say whether what you're asking is an addition or the first piece of a new structure.",
+        "cta": "This one's mine, write to me"
       },
       "fulcro": {
         "nome": "A hub",
-        "oggetto": "One place, not five tools",
-        "anteprima": "We work across five different tools and none of them talk to each other. We'd like one single thing, built around us…",
+        "oggetto": "Every morning I log into five different tools",
+        "anteprima": "Five logins, five accounts, and none of them talk to each other. We'd like one single thing, built around us…",
         "et": "What it usually means",
-        "titolo": "It's the largest of the five, and the only one that can fail quietly.",
-        "etPrima": "Where it goes wrong",
-        "prima": "You build everything, you ship it, and people keep using the old spreadsheets. The software isn't the hard part: making it the place where the work actually happens is. List where your data lives today: the management system, spreadsheets, email, somebody's head. The place holding the most of it is usually the person.",
+        "titolo": "The problem isn't the five logins. It's that nobody knows which of the five holds the right number.",
+        "etPrima": "The number to look up twice",
+        "prima": "Take a number you need every day, open orders or active clients, and look it up in every tool where it might live. If you get two different answers, that's the job: not merging the logins, deciding which one is right.",
         "tipo": "In stages, and the first one has to genuinely replace something. One piece that people actually use is worth more than ten that are finished and switched off.",
-        "prova": "CustomerTrack, built to belong to several companies",
-        "cta": "Reply to this email"
+        "cta": "This one's mine, write to me"
       },
       "nonancora": {
         "nome": "Not yet",
@@ -99,7 +93,7 @@
   },
   "services": {
     "eyebrow": "The method",
-    "intro": "Four ways of working, one for each sentence above. If your case sits between two, that's normal: we talk it through on a call.",
+    "intro": "Each one stands on its own: you can ask me for just a site, or just the automation that saves you two hours a week. But they're built to fit, and together they become the place where the work actually happens. You start with the piece that weighs most, the rest gets added when it's needed.",
     "list": {
       "sites": {
         "title": "Sites and landing pages",
@@ -124,7 +118,7 @@
     "composto": "What it's made of",
     "blank": "And yours, what is it? Write to me.",
     "punch": "What you call \"a website\" is the screen in the middle. The rest is the work behind it.",
-    "practice": "And in practice?",
+    "practice": "Four pieces, and they fit together",
     "layers": {
       "site": {
         "title": "The site",
@@ -178,14 +172,15 @@
   "works": {
     "eyebrow": "Work",
     "title": "Four problems, and how I solved them",
-    "intro": "No logos and slogans here. You'll find the problem that existed, the decision I made, and why I rejected the easy alternative.",
+    "intro": "No logos and slogans here. You'll find the problem that existed, the decision I made, and why I rejected the easy alternative. All four come out of fifteen months at D.lab, on the company's products and its clients'.",
     "labels": {
       "symptom": "The symptom",
       "decision": "The decision",
       "outcome": "The outcome",
       "visit": "Visit the site",
       "open": "Open the case",
-      "close": "Close"
+      "close": "Close",
+      "offline": "Never went live"
     },
     "list": {
       "bdroppy": {
@@ -204,13 +199,13 @@
         "name": "CustomerTrack",
         "symptom": "Physical shops that knew nothing about their own customers: how many came in, where they stopped, what they actually looked at.",
         "decision": "Instead of a single product, a white-label solution: each chain uses it as if it were their own. It costs more to build and pays for itself from the second customer onwards.",
-        "outcome": "An in-store behaviour analytics platform, resellable to different brands without rewriting anything."
+        "outcome": "An in-store behaviour analytics platform, built to be resold to several chains on the same foundation. Finished and never put online: it's the only one of the four that never had users."
       },
       "visualboost": {
         "name": "VisualBoost",
         "symptom": "An editorial image library nobody could browse without sitting there waiting.",
         "decision": "The bottleneck was the images, not the code. Before anything else: modern formats, right dimensions and progressive loading.",
-        "outcome": "An image platform for fashion, food and beauty that stays fast even on large catalogues."
+        "outcome": "An image platform for fashion, food and beauty that stays fast even on large catalogues. The public landing page was rebuilt after my work: what remains mine is the engine underneath."
       }
     }
   },
@@ -277,20 +272,25 @@
     "etichettaLezione": "What it taught me",
     "nota": "Nobody hands you a badge when you work for yourself.",
     "list": {
-      "idt": {
-        "role": "React Developer",
-        "body": "Complex features on an application used every day, and a shared component library.",
-        "lezione": "That a component library isn't a developer's indulgence. It's the only thing that keeps a product coherent when several people work on it, and you see it the day someone new joins."
+      "freelanceOggi": {
+        "role": "Freelance web developer",
+        "body": "My own clients' projects, plus backing up other freelancers: from the dashboard that centralises a business to the small tools orbiting it.",
+        "lezione": "How to talk to people who aren't technical. It's the skill I use more than any language, and the only one you can't learn by reading."
+      },
+      "dlab": {
+        "role": "Front-end Developer / UI and UX Designer",
+        "body": "Four products, some the company's and some its clients': a B2B platform to migrate, an AI assistant, an image archive and an analytics platform.",
+        "lezione": "That a component library isn't a developer's indulgence. It's the only thing that keeps a product coherent when many people work on it, and you see it the day someone new joins."
       },
       "eroi": {
-        "role": "Full Stack Developer",
-        "body": "A B2B e-commerce platform end to end: frontend, API, database and dashboard.",
-        "lezione": "That the hard part of an e-commerce isn't the shop. It's the dashboard people work inside every day, and it's also the part nobody expects to pay for."
+        "role": "Web Developer",
+        "body": "E-commerce platforms across Vue and Laravel: interfaces, authentication, APIs and the panels people actually work in.",
+        "lezione": "That the hard part of an e-commerce isn't the shop. It's the dashboard people work inside every day, and it's also the one nobody expects to pay for."
       },
-      "freelance": {
+      "freelanceInizio": {
         "role": "Freelance developer",
-        "body": "Complete projects for small and mid-sized businesses, from gathering requirements to release.",
-        "lezione": "To talk to people who aren't technical. It's the skill I use more than any language, and the only one you can't learn by reading."
+        "body": "First commissioned work: development and interface for a reselling business's dashboard.",
+        "lezione": "That someone else's code gets read before it gets touched. My first real job wasn't writing a new function: it was working out why whoever came before had written it that way."
       }
     }
   },
@@ -368,8 +368,12 @@
     }
   },
   "footer": {
-    "tagline": "I build software for the web. From Bergamo, for whoever turns up.",
-    "emailLabel": "Email",
+    "tagline": "I build software for the web. From Turin, for whoever turns up.",
+    "rispondiA": "Reply to",
+    "ancheQui": "Also here",
+    "citta": "10100 Turin (TO), Italy",
+    "ufficio": "TURIN",
+    "paese": "ITALY",
     "rights": "All rights reserved.",
     "linkedinAria": "Go to Andrea Ghidara's LinkedIn profile",
     "githubAria": "Go to Andrea Ghidara's GitHub profile",

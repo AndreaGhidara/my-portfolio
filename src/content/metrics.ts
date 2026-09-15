@@ -62,9 +62,9 @@ export const metrics: Metric[] = [
   },
   {
     id: "years",
-    value: "6",
-    estimated: true,
-    howToVerify: "Contare gli anni dal primo incarico retribuito. Questo è verificabile subito.",
+    value: "3",
+    estimated: false,
+    howToVerify: "",
   },
   {
     id: "responseTime",

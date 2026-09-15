@@ -98,4 +98,42 @@ describe("tokens.css", () => {
       expect(paletteHexesLower).toContain(hex);
     }
   });
+
+  it("il paese sul francobollo non e' carta su arancio: e' testo piccolo", () => {
+    // carta su arancio fa 3,27:1, sotto AA: ammessa solo per testo grande, ed
+    // e' il test che sta in contrast.test.ts. Sul francobollo della busta la
+    // sigla e' a 1,5rem e puo' restare carta; «ITALIA» e' a 0,5rem e deve
+    // stare in --on-accent, che fa 5,08:1. Il prototipo le aveva tutte e due
+    // in carta, ed e' il difetto che questa prova blocca.
+    const sigla = css.match(/\[data-francobollo-sigla\]\s*\{[^}]*\}/)?.[0];
+    const paese = css.match(/\[data-francobollo-paese\]\s*\{[^}]*\}/)?.[0];
+    expect(sigla, "la sigla del francobollo non c'e' piu'").toBeTruthy();
+    expect(paese, "il paese del francobollo non c'e' piu'").toBeTruthy();
+    expect(sigla).toMatch(/font-size:\s*1\.5rem/);
+    expect(sigla).toMatch(/color:\s*var\(--paper\)/);
+    expect(paese, "«ITALIA» e' tornato carta su arancio, sotto AA").toMatch(
+      /color:\s*var\(--on-accent\)/,
+    );
+  });
+
+  it("la busta riempie il piede: niente cornice e niente larghezza massima", () => {
+    // Il piede non mette padding proprio, o quel padding diventerebbe una
+    // cornice del colore del blocco tutto intorno alla busta: e' esattamente
+    // cio' che la busta doveva smettere di avere.
+    const piede = css.match(/\[data-footer\]\s*\{[^}]*\}/)?.[0];
+    const busta = css.match(/\[data-busta\]\s*\{[^}]*\}/)?.[0];
+    expect(piede, "le regole del piede non ci sono piu'").toBeTruthy();
+    expect(busta, "le regole della busta non ci sono piu'").toBeTruthy();
+    expect(piede, "il piede ha di nuovo un padding: torna la cornice").not.toMatch(/padding/);
+    expect(busta, "la busta ha di nuovo un tetto di larghezza").not.toMatch(/max-inline-size/);
+  });
+
+  it("la pagina ha ancora una fine quando il piede non e' piu' scuro", () => {
+    // Il blocco d'inchiostro era cio' che chiudeva la pagina. Una busta color
+    // carta a filo del fondo la lascerebbe aperta: e' il rischio scritto per
+    // la proposta A nel prototipo, e il rimedio e' lo stesso, il taglio.
+    const taglio = css.match(/\[data-busta\]::after\s*\{[^}]*\}/)?.[0];
+    expect(taglio, "il taglio in fondo alla pagina non c'e' piu'").toBeTruthy();
+    expect(taglio).toMatch(/background-color:\s*var\(--fg\)/);
+  });
 });
