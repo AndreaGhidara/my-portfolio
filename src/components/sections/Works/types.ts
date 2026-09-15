@@ -6,7 +6,8 @@ export type WorkCaseData = {
   symptom: string;
   decision: string;
   outcome: string;
-  url: string;
+  /** Assente se il progetto non è mai andato online. */
+  url?: string;
   screenshot: string;
   year: number;
   tech: string[];
@@ -18,6 +19,8 @@ export type WorkCaseLabels = {
   decision: string;
   outcome: string;
   visit: string;
+  /** Sostituisce `visit` quando non c'è un sito da visitare. */
+  offline: string;
   open: string;
   close: string;
 };

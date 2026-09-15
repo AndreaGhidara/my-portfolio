@@ -81,11 +81,18 @@ describe("lavori", () => {
     }
   });
 
-  it("ogni caso ha uno screenshot e un link", () => {
+  it("ogni caso ha uno screenshot, e un link solo se e' andato online", () => {
+    // CustomerTrack e' finito e mai lanciato: il suo dominio non risolve, e un
+    // "Visita il sito" che porta nel vuoto costa piu' di quanto renda il caso.
+    // Percio' `url` e' facoltativo, ma quando c'e' deve essere un https vero.
     for (const work of works) {
       expect(work.screenshot).toMatch(/^\/works\//);
-      expect(work.url).toMatch(/^https:\/\//);
+      if (work.url !== undefined) expect(work.url).toMatch(/^https:\/\//);
     }
+  });
+
+  it("almeno un caso e' visitabile, altrimenti la sezione non prova niente", () => {
+    expect(works.filter((w) => w.url).length).toBeGreaterThan(0);
   });
 });
 

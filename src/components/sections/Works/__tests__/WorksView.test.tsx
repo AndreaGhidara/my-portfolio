@@ -8,6 +8,7 @@ const labels = {
   decision: "La decisione",
   outcome: "L'esito",
   visit: "Visita il sito",
+  offline: "Mai andata online",
   open: "Apri il caso",
   close: "Chiudi",
 };

@@ -150,14 +150,23 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
             )}
 
             <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-[var(--line)] pt-6">
-              <a
-                href={data.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-full border-2 border-[var(--fg)] px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--fg)]"
-              >
-                {labels.visit}
-              </a>
+              {/* Senza url il progetto non e' mai andato online: al posto del link
+                  resta la stessa forma, tratteggiata e non cliccabile, cosi' la
+                  riga non si sbilancia e l'assenza si legge come un dato. */}
+              {data.url ? (
+                <a
+                  href={data.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full border-2 border-[var(--fg)] px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--fg)]"
+                >
+                  {labels.visit}
+                </a>
+              ) : (
+                <span className="rounded-full border-2 border-dashed border-[var(--fg-muted)] px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--fg-muted)]">
+                  {labels.offline}
+                </span>
+              )}
               <ul className="flex flex-wrap gap-2">
                 {data.tech.map((item) => (
                   <li

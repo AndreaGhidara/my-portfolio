@@ -14,7 +14,8 @@ export type JourneyEntry = {
 
 /** Dal più recente: il test lo verifica. */
 export const journey: JourneyEntry[] = [
-  { id: "idt", company: "IDT spa", year: 2025, tesserino: true },
+  { id: "freelanceOggi", company: "Freelance", year: 2026, tesserino: false },
+  { id: "dlab", company: "D.lab", year: 2025, tesserino: true },
   { id: "eroi", company: "E.Roi srl", year: 2024, tesserino: true },
-  { id: "freelance", company: "Freelance", year: 2023, tesserino: false },
+  { id: "freelanceInizio", company: "Freelance", year: 2023, tesserino: false },
 ];

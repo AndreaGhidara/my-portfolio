@@ -350,7 +350,12 @@ html[data-dialog-open] body { overflow: hidden; }
 [data-desk-punch] {
   max-width: 40rem;
   text-align: center;
-  font-size: clamp(1.25rem, 2.8vw, 1.85rem);
+  /* Il corpo guarda tutte e due le misure e prende la piu' stretta. Con la sola
+     2.8vw su un portatile da 1280x800 la frase restava al massimo, perche' la
+     larghezza c'era: mancava l'altezza, ed e' li' che andava a finire addosso
+     ai disegni del tavolo. Con min() lo schermo basso la rimpicciolisce da se',
+     senza una soglia scritta che poi qualcuno deve ricordarsi di aggiornare. */
+  font-size: clamp(1.05rem, min(2.8vw, 2.4vh), 1.85rem);
   line-height: 1.3;
   text-wrap: balance;
   margin-block-start: 1.5rem;
@@ -1432,12 +1437,36 @@ html[data-dialog-open] body { overflow: hidden; }
      E' anche la stessa risposta che ha gia' la didascalia degli strati, che
      vive nello stesso posto e aveva lo stesso problema: un blocco di carta
      posato sul tavolo. */
+  /* Il fondo non e' piu' una scheda posata sul laptop: riempie tutta la cella
+     del palco, cioe' esattamente il rettangolo dove poi comparira' il tavolo.
+     Una scheda da 34rem su un piano che al primo fotogramma e' quattro volte
+     lo schermo lasciava scoperta tutta la scocca intorno, e l'occhio leggeva
+     due piani sovrapposti invece di una pagina che si apre. Presa la cella
+     intera, la stessa dissolvenza diventa un foglio che si alza e scopre la
+     scena, che e' la cosa che la sezione racconta.
+
+     `place-self: stretch` vince sul `place-items: center` del palco senza
+     toccarlo: le altre celle restano centrate. Il raggio va a zero perche' un
+     angolo arrotondato a filo di schermo non si vede e basta. */
   [data-desk][data-motion="full"] [data-desk-title] {
     z-index: 1;
     opacity: clamp(0, 1 - (var(--p, 1) - 0.02) / 0.08, 1);
     background-color: var(--bg);
-    padding: 1.75rem 1.5rem 1.9rem;
-    border-radius: 4px;
+    place-self: stretch;
+    max-width: none;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    padding: 1.75rem var(--gutter) 1.9rem;
+    border-radius: 0;
+  }
+
+  /* Il fondo si allarga, la riga di testo no: le tre righe restano sulla misura
+     di lettura che avevano quando il riquadro era una scheda. Senza, il
+     sottotitolo si stenderebbe su tutta la larghezza dello schermo e l'occhio
+     perderebbe l'inizio della riga dopo. */
+  [data-desk][data-motion="full"] [data-desk-title] > * {
+    max-width: 34rem;
   }
 
   /* La tesi non sta al centro: al centro c'e' lo schermo che la frase indica,
@@ -1459,6 +1488,7 @@ html[data-dialog-open] body { overflow: hidden; }
     border-block-start: 0;
     opacity: clamp(0, (var(--p, 1) - 0.9) / 0.07, 1);
   }
+
 
   /* Le didascalie escono dal flusso: cosi' il mondo e' alto quanto il piano e
      il tavolo ci sta in uno schermo. In colonna il mondo sarebbe alto 824px.
@@ -1527,8 +1557,46 @@ html[data-dialog-open] body { overflow: hidden; }
   padding-inline: var(--gutter);
   padding-bottom: var(--section-y);
 }
-[data-pratica] > h3 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
-[data-pratica-intro] { max-width: 44ch; margin-block-start: 0.9rem; color: var(--fg-muted); }
+
+/* Lo stacco fra il tavolo e i lavori, quando non c'e' la coda.
+   Tutte le giunture della pagina valgono due --section-y, uno per parte, e
+   dove sopra e sotto c'e' del testo bastano. Qui no: la pratica chiude con
+   un disegno e i lavori aprono con quattro cartelle, e due blocchi di
+   oggetti a quella distanza si leggono come un blocco solo.
+   A "full" il problema non esiste — fra l'ultima voce e la fine della
+   pratica ci sono i 78vh di pista della freccia, e li' di aria ce n'e' anche
+   troppa: e' esattamente la condizione che porta la coda, quindi e' quella
+   che decide. Il mezzo --section-y in piu' sta da questa parte e non sul
+   padding-top dei lavori perche' li' il filo entra dall'alto della sezione:
+   allungare quel padding allungherebbe anche il tratto disegnato. */
+[data-pratica]:not([data-motion="full"]) {
+  padding-bottom: calc(var(--section-y) * 1.75);
+}
+/* Titolo e sottotitolo stanno al centro, le quattro voci sotto no: quelle si
+   alternano a destra e a sinistra, e un'intestazione centrata le apre come un
+   capitolo invece di sembrare la prima della fila. La misura di lettura resta
+   quella di prima — si centra la colonna, non la si allarga. */
+[data-pratica] > h3 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  text-align: center;
+  text-wrap: balance;
+}
+[data-pratica-intro] {
+  max-width: 44ch;
+  /* Lo stacco sotto il titolo cresce insieme al titolo. Era 0,9rem fissi contro
+     un titolo che va da 1,5 a 2,25rem: sullo schermo grande restava lo spazio
+     di un telefono, cioe' 0,4em del titolo, sotto la soglia bassa di 0,5em che
+     vuole un display seguito dal suo occhiello. La stessa 3vw del titolo, ma
+     scalata: cosi' il rapporto fra i due resta lo stesso a ogni larghezza.
+     Il valore sta anche nella parte alta dell'intervallo per un secondo motivo:
+     un blocco centrato legge piu' stretto di uno allineato a sinistra, perche'
+     manca il bordo sinistro che fa da appoggio all'occhio. */
+  margin-block-start: clamp(1.15rem, 1.35vw, 1.45rem);
+  margin-inline: auto;
+  text-align: center;
+  text-wrap: pretty;
+  color: var(--fg-muted);
+}
 
 
 /* Il percorso: dalla prima voce alla fine della coda. E' la scatola in cui la
@@ -1718,7 +1786,7 @@ html[data-dialog-open] body { overflow: hidden; }
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   La casella di posta di «Le cinque email che ricevo piu' spesso».
+   La casella di posta di «Le cinque richieste che mi fanno piu' spesso».
 
    SENZA JAVASCRIPT. La scelta e' un gruppo di radio nascosti alla vista ma non
    all'accesso, e la mail si apre con :has(). Il browser regala quello che
@@ -1950,7 +2018,6 @@ html[data-dialog-open] body { overflow: hidden; }
 [data-msg-cta]:hover { background: var(--accent); color: var(--ink); }
 /* La prova non e' un secondo bottone: e' un rimando. Due bottoni pari
    costringerebbero a scegliere fra due cose che non sono alternative. */
-[data-msg-prova] { font-size: 0.93rem; font-weight: 500; color: var(--fioco); }
 
 @media (max-width: 899.98px) {
   /* I due riquadri si impilano, e cinque anteprime da due righe sarebbero un
@@ -2139,7 +2206,12 @@ html[data-dialog-open] body { overflow: hidden; }
   margin: 6rem 0 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Due colonne e non tre: le tappe sono quattro, e su tre colonne la quarta
+     andava a capo da sola lasciando due terzi di riga vuoti. Due per due e'
+     l'unica griglia che con quattro fogli non apre un buco, e lascia a ogni
+     foglio la larghezza per reggere la lezione senza diventare una colonnina.
+     Se un giorno le tappe tornano tre, qui si torna a repeat(3, ...). */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(1.25rem, 3vw, 2.5rem);
   align-items: start;
 
@@ -2156,13 +2228,15 @@ html[data-dialog-open] body { overflow: hidden; }
    colonna di distanza dalla cosa a cui dovrebbe essere appuntato. */
 [data-journey-item] { position: relative; }
 
-/* Le tre inclinazioni sono diverse una dall'altra, e uno dei fogli è più basso.
+/* Le quattro inclinazioni sono diverse una dall'altra, e i fogli non partono
+   tutti dalla stessa altezza.
    Non è un vezzo: tre fogli con lo stesso angolo sono un errore di stampa e tre
    fogli dritti sono una tabella. Quello che li fa leggere come cose appoggiate
    su un piano è che non combaciano, e una prova verifica che restino diversi. */
 [data-journey-item]:nth-child(1) { transform: rotate(-1.1deg); }
 [data-journey-item]:nth-child(2) { transform: rotate(0.7deg); margin-block-start: 2.75rem; }
 [data-journey-item]:nth-child(3) { transform: rotate(-0.4deg); margin-block-start: 1rem; }
+[data-journey-item]:nth-child(4) { transform: rotate(1.3deg); margin-block-start: 2.25rem; }
 
 /* ── Il tesserino ───────────────────────────────────────────────────────── */
 
@@ -2263,7 +2337,8 @@ html[data-dialog-open] body { overflow: hidden; }
 @media (max-width: 860px) {
   [data-journey-list] { grid-template-columns: 1fr; gap: 3.5rem; }
   [data-journey-item]:nth-child(2),
-  [data-journey-item]:nth-child(3) { margin-block-start: 0; }
+  [data-journey-item]:nth-child(3),
+  [data-journey-item]:nth-child(4) { margin-block-start: 0; }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -2601,4 +2676,218 @@ textarea[data-contact-campo] {
     flex: 1;
   }
   [data-firma] { margin-block-start: auto; }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   IL PIEDE: LA BUSTA DI RISPOSTA
+
+   La busta NON e' un foglio appoggiato su un blocco scuro: e' il piede, e lo
+   occupa tutto. Il piede quindi non mette padding proprio, o quel padding
+   diventerebbe una cornice del colore del blocco tutto intorno alla busta.
+
+   Il colore e' quello che il sito usa gia' per dire «questo e' un foglio»
+   (vedi [data-contact-foglio]): --bg schiarito del 3% verso --fg. Serve perche'
+   una busta esattamente del colore della pagina, a filo con la sezione sopra,
+   non si distinguerebbe da niente. Restano due token, quindi il tema scuro si
+   ribalta da solo.
+   ────────────────────────────────────────────────────────────────────────── */
+
+[data-footer] { background-color: var(--fg); }
+
+[data-busta] {
+  position: relative;
+  background-color: color-mix(in oklab, var(--fg) 3%, var(--bg));
+  color: var(--fg);
+  border-block-start: 1px solid var(--line);
+  padding: clamp(1.75rem, 4vw, 3.5rem) clamp(1.25rem, 5vw, 4.5rem)
+    clamp(2rem, 4vw, 3.5rem);
+  /* Una busta larga quanto lo schermo e alta quanto il testo avrebbe le
+     proporzioni di una fascetta. Il minimo cresce con la larghezza e si ferma,
+     cosi' resta un rettangolo da busta senza diventare una schermata intera. */
+  min-block-size: clamp(17rem, 26vw, 27rem);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* La patta vista in trasparenza: due diagonali appena accennate dagli angoli
+   di sopra. Non e' una busta aperta, e' lo spessore della carta contro luce. */
+[data-busta]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom right, transparent calc(50% - 0.6px),
+      color-mix(in oklab, var(--fg) 12%, transparent) 50%, transparent calc(50% + 0.6px))
+      no-repeat 0 0 / 50% 46%,
+    linear-gradient(to bottom left, transparent calc(50% - 0.6px),
+      color-mix(in oklab, var(--fg) 12%, transparent) 50%, transparent calc(50% + 0.6px))
+      no-repeat 100% 0 / 50% 46%;
+}
+
+/* Il taglio: la pagina finisce qui, e sotto non c'e' un'altra pagina. Finche'
+   il piede era un blocco d'inchiostro la fine la faceva il colore; adesso che
+   e' color carta serve dirla, o il sito resta aperto. E' lo stesso rimedio
+   scritto per la proposta A nel prototipo del 14 settembre. */
+[data-busta]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 3px;
+  background-color: var(--fg);
+}
+
+[data-busta-alto] {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+[data-busta-et] {
+  display: block;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+[data-busta-profili] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  line-height: 1.9;
+}
+[data-busta-profili] > a { display: block; text-decoration: none; border-block-end: 1px solid var(--line); }
+[data-busta-profili] > a:hover { border-color: var(--accent); }
+
+/* ── L'affrancatura ─────────────────────────────────────────────────────── */
+
+[data-busta-affrancatura] { display: flex; gap: 0.65rem; align-items: flex-start; flex: none; }
+
+/* La dentellatura e' una mask di quattro gradienti radiali che si intersecano,
+   uno per lato: un bordo tratteggiato sembrerebbe tratteggio e basta. Dove
+   mask-composite non passa resta un rettangolo pieno, che e' comunque un
+   francobollo: il degrado non ha bisogno di una riserva scritta a parte. */
+[data-francobollo] {
+  inline-size: 3.5rem;
+  block-size: 4.2rem;
+  flex: none;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  background-color: var(--accent);
+  -webkit-mask:
+    radial-gradient(circle 3.2px at 50% 0, transparent 96%, #000) top / 9px 100% repeat-x,
+    radial-gradient(circle 3.2px at 50% 100%, transparent 96%, #000) bottom / 9px 100% repeat-x,
+    radial-gradient(circle 3.2px at 0 50%, transparent 96%, #000) left / 100% 9px repeat-y,
+    radial-gradient(circle 3.2px at 100% 50%, transparent 96%, #000) right / 100% 9px repeat-y;
+  mask:
+    radial-gradient(circle 3.2px at 50% 0, transparent 96%, #000) top / 9px 100% repeat-x,
+    radial-gradient(circle 3.2px at 50% 100%, transparent 96%, #000) bottom / 9px 100% repeat-x,
+    radial-gradient(circle 3.2px at 0 50%, transparent 96%, #000) left / 100% 9px repeat-y,
+    radial-gradient(circle 3.2px at 100% 50%, transparent 96%, #000) right / 100% 9px repeat-y;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+/* Testo grande: carta su arancio fa 3,27:1, ammessa sopra i 24px. */
+[data-francobollo-sigla] {
+  display: block;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--paper);
+}
+/* Testo piccolo: qui carta su arancio sarebbe sotto AA. --on-accent fa 5,08:1. */
+[data-francobollo-paese] {
+  display: block;
+  margin-block-start: 0.2rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  color: var(--on-accent);
+}
+
+[data-busta-annullo] {
+  inline-size: 4.4rem;
+  block-size: 4.4rem;
+  flex: none;
+  color: var(--fg);
+  opacity: 0.66;
+}
+[data-busta-annullo] text {
+  fill: currentColor;
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+/* ── L'indirizzo ────────────────────────────────────────────────────────── */
+
+/* Su una busta l'indirizzo non e' a sinistra: sta staccato verso il centro,
+   perche' li' lo legge la macchina che smista. Con tutta la larghezza a
+   disposizione quel margine si puo' finalmente dare. */
+[data-busta-indirizzo] {
+  align-self: center;
+  padding-inline-start: clamp(0rem, 12vw, 11rem);
+  padding-block: 1.5rem;
+}
+[data-busta-nome] {
+  margin-block-start: 0.35rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+[data-busta-mail] {
+  display: inline-block;
+  margin-block-start: 0.6rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--accent);
+}
+[data-busta-citta] {
+  margin-block-start: 0.4rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+}
+
+/* ── Il fondo della busta ───────────────────────────────────────────────── */
+
+[data-busta-basso] {
+  display: flex;
+  gap: 1rem 2rem;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+/* Dove le buste commerciali stampano la loro riga. */
+[data-busta-tagline] {
+  max-inline-size: 24rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+[data-busta-basso-dx] { display: grid; justify-items: end; gap: 0.7rem; }
+[data-busta-codice] { display: flex; gap: 3px; align-items: flex-end; block-size: 1.1rem; opacity: 0.5; }
+[data-busta-codice] i { inline-size: 2px; block-size: 55%; background-color: var(--fg); }
+[data-busta-codice] i[data-alta] { block-size: 100%; }
+
+[data-footer-diritti] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  color: var(--fg-muted);
+}
+
+@media (max-width: 640px) {
+  [data-busta] { min-block-size: 0; grid-template-rows: auto auto auto; }
+  [data-busta-alto] { flex-direction: column-reverse; align-items: flex-start; }
+  [data-busta-indirizzo] { padding-inline-start: 0; }
+  [data-busta-basso] { margin-block-start: 1.5rem; }
+  [data-busta-basso-dx] { justify-items: start; }
+  /* Le barre sono una per carattere dell'indirizzo: su schermo stretto
+     riempirebbero la riga e sembrerebbero un elemento, non una rifinitura. */
+  [data-busta-codice] { display: none; }
 }

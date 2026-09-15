@@ -34,6 +34,7 @@ export async function Works() {
         decision: t("labels.decision"),
         outcome: t("labels.outcome"),
         visit: t("labels.visit"),
+        offline: t("labels.offline"),
         open: t("labels.open"),
         close: t("labels.close"),
       }}

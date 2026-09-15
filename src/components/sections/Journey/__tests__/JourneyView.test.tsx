@@ -21,7 +21,7 @@ const props: JourneyViewProps = {
     lezione: `Lezione ${e.id}`,
   })),
   stats: [
-    { id: "years", value: "6", label: "anni di sviluppo web" },
+    { id: "years", value: "3", label: "anni di sviluppo web" },
     { id: "responseTime", value: "24h", label: "tempo di risposta" },
   ],
 };
@@ -29,7 +29,10 @@ const props: JourneyViewProps = {
 describe("JourneyView", () => {
   it("presenta il percorso come lista ordinata dal più recente", () => {
     render(<JourneyView {...props} />);
-    expect(screen.getAllByRole("listitem")[0]).toHaveTextContent("IDT spa");
+    // La prima tappa e' quella corrente, ed e' da freelance: al posto del nome
+    // dell'azienda c'e' la riga del tesserino che non esiste, quindi la prova
+    // dell'ordine sta sull'anno.
+    expect(screen.getAllByRole("listitem")[0]).toHaveTextContent("2026");
   });
 
   it("ogni tappa è un tesserino appuntato sul suo foglio", () => {
@@ -38,19 +41,19 @@ describe("JourneyView", () => {
     expect(container.querySelectorAll("[data-journey-sheet]")).toHaveLength(journey.length);
   });
 
-  it("il tesserino che non esiste è dichiarato, e ce n'è uno solo", () => {
+  it("il tesserino che non esiste è dichiarato, e sono i due periodi da freelance", () => {
     // Da freelance il tesserino non te lo dà nessuno: al posto del nome
     // dell'azienda c'è quella riga, e il cartellino si disegna tratteggiato.
     // Il gancio sta sul <li> perché è di lì che pende la regola dello stile.
     const { container } = render(<JourneyView {...props} />);
     const senza = container.querySelectorAll('[data-journey-item][data-tesserino="no"]');
-    expect(senza).toHaveLength(1);
+    expect(senza).toHaveLength(journey.filter((e) => !e.tesserino).length);
     expect(senza[0]).toHaveTextContent(props.senzaTesserino);
     expect(screen.queryByText("Freelance")).toBeNull();
   });
 
   it("ogni tappa dice cosa quel posto ha insegnato", () => {
-    // È la cosa nuova della sezione: senza, tornano tre voci di curriculum.
+    // È la cosa nuova della sezione: senza, tornano voci di curriculum.
     const { container } = render(<JourneyView {...props} />);
     expect(container.querySelectorAll("[data-journey-lesson]")).toHaveLength(journey.length);
   });
@@ -59,12 +62,12 @@ describe("JourneyView", () => {
     const { container } = render(<JourneyView {...props} />);
     const times = container.querySelectorAll("time");
     expect(times).toHaveLength(journey.length);
-    expect(times[0]).toHaveAttribute("dateTime", "2025");
+    expect(times[0]).toHaveAttribute("dateTime", "2026");
   });
 
   it("i numeri restano leggibili anche senza JavaScript: il valore è già nel markup", () => {
     render(<JourneyView {...props} />);
-    expect(screen.getByText("6")).toBeVisible();
+    expect(screen.getByText("3")).toBeVisible();
     expect(screen.getByText("24h")).toBeVisible();
   });
 
@@ -122,10 +125,10 @@ describe("i colori del percorso", () => {
   });
 });
 
-describe("i tre fogli non combaciano", () => {
+describe("i fogli non combaciano", () => {
 
   it("ogni foglio ha la sua inclinazione, e non sono la stessa", () => {
-    // Tre fogli con lo stesso angolo sono un errore di stampa, e tre fogli
+    // Fogli con lo stesso angolo sono un errore di stampa, e fogli
     // dritti sono una tabella. Quello che li fa leggere come cose appoggiate
     // su un piano è che non combaciano: la regola sta qui perché è una
     // decisione di disegno, e una modifica distratta la annullerebbe senza

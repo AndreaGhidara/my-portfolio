@@ -19,12 +19,10 @@
   },
   "seeking": {
     "eyebrow": "Partiamo da qui",
-    "title": "Le cinque email che ricevo più spesso",
-    "intro": "Riscritte da me, non copiate: nessuna è la mail di qualcuno. Aprile e leggi cosa rispondo. È quello che riceveresti scrivendomi.",
-    "attesa": "Non è un modulo: resta tutto qui, nessuno riceve niente finché non sei tu a scrivermi.",
+    "title": "Le cinque richieste che mi fanno più spesso",
+    "intro": "Raramente arrivano da sole: in un progetto solo ci stanno quasi tutte, e decidere a quale rispondere per prima è già progettarlo. Le ho riscritte io, non sono le mail di nessuno, ma le risposte sono quelle vere.",
     "labels": {
-      "tipo": "Che tipo di lavoro è",
-      "prova": "La prova"
+      "tipo": "Che tipo di lavoro è"
     },
     "casella": {
       "etichettaDa": "Da",
@@ -45,8 +43,7 @@
         "etPrima": "La prova che puoi fare oggi, in dieci minuti",
         "prima": "Scrivi le tre domande che ti fanno al telefono prima di comprare. Poi apri la tua home e conta a quante risponde nella prima schermata. Se sono zero o una, il problema non è come è scritto, è l'ordine in cui è messo: il sito racconta com'è fatta l'azienda invece di rispondere a chi arriva.",
         "tipo": "Il lavoro grosso è decidere cosa viene prima, non produrre testo. Poche settimane, e non serve rifare la grafica per scoprirlo.",
-        "prova": "Cosa c'è dietro un sito, per intero",
-        "cta": "Rispondi a questa mail"
+        "cta": "Questa è la mia, scrivimi"
       },
       "strumento": {
         "nome": "Uno strumento",
@@ -56,33 +53,30 @@
         "titolo": "È l'unica delle cinque in cui sai se conviene prima di cominciare.",
         "etPrima": "Il conto che puoi fare oggi",
         "prima": "Ore a settimana, per quanto costa un'ora di quella persona, per quarantacinque settimane. Se il numero che esce non è almeno il doppio di quanto costa lo strumento, il passaggio da automatizzare è un altro.",
-        "tipo": "Piccolo e a sé stante: non tocca quello che hai, e se sbaglia si butta senza aver rotto niente. È anche il modo meno caro di scoprire se ti serve il resto.",
-        "prova": "Aidify, che assorbe le domande ripetute",
-        "cta": "Rispondi a questa mail"
+        "tipo": "Un pezzo piccolo e a sé, collegato a quello che già usi. Poi si calibra: come ti serve davvero si scopre usandolo, e da lì lo si stringe addosso.",
+        "cta": "Questa è la mia, scrivimi"
       },
       "aggiunta": {
         "nome": "Un'aggiunta",
         "oggetto": "La piattaforma c'è, ma deve fare di più",
         "anteprima": "La piattaforma c'è già e funziona, ma servono un paio di cose nuove. Quanto ci vuole più o meno?",
         "et": "Quello che di solito significa",
-        "titolo": "Il costo non è la funzionalità. È quello che c'era prima.",
-        "etPrima": "La domanda che sposta il preventivo",
-        "prima": "Chiedi a chi l'ha costruito se esiste un modo di provare una modifica prima di pubblicarla. Se la risposta è no, quello è il primo lavoro, e vale per qualunque cosa aggiungerai dopo, non solo per questa.",
-        "tipo": "Si comincia leggendo, non scrivendo. Una stima onesta arriva dopo mezza giornata dentro il codice, non prima.",
-        "prova": "BDroppy, migrata senza mai spegnerla",
-        "cta": "Rispondi a questa mail"
+        "titolo": "Quasi sempre la piattaforma è stata costruita per l'azienda che eri, non per quella che sei.",
+        "etPrima": "I due numeri da confrontare",
+        "prima": "Conta quante persone la usano oggi contro quante la usavano il primo mese, e quante cose fa oggi contro quante ne faceva. Se uno dei due numeri è raddoppiato, quello che stai chiedendo non è una funzionalità in più: è la struttura sotto che deve crescere con te.",
+        "tipo": "Si comincia leggendo, non scrivendo: prima si guarda cosa regge già, poi si dice se quello che chiedi è un'aggiunta o il primo pezzo di una struttura nuova.",
+        "cta": "Questa è la mia, scrivimi"
       },
       "fulcro": {
         "nome": "Un fulcro",
-        "oggetto": "Un posto solo, non cinque strumenti",
-        "anteprima": "Lavoriamo su cinque strumenti diversi e nessuno parla con gli altri. Vorremmo una cosa sola, fatta su di noi…",
+        "oggetto": "Ogni mattina entro in cinque strumenti diversi",
+        "anteprima": "Cinque accessi, cinque account, e nessuno parla con gli altri. Vorremmo una cosa sola, fatta su di noi…",
         "et": "Quello che di solito significa",
-        "titolo": "È il progetto più grande dei cinque, e l'unico che può fallire in silenzio.",
-        "etPrima": "Dove va storto",
-        "prima": "Si costruisce tutto, si consegna, e le persone continuano a usare i vecchi fogli. Il software non è la parte difficile: farlo diventare il posto dove si lavora davvero lo è. Elenca dove vivono oggi i dati: gestionale, fogli, email, la testa di qualcuno. Il posto con più cose dentro di solito è la persona.",
+        "titolo": "Il problema non sono i cinque accessi. È che nessuno sa quale dei cinque ha il dato giusto.",
+        "etPrima": "Il numero da cercare due volte",
+        "prima": "Prendi un numero che ti serve tutti i giorni, quanti ordini aperti o quanti clienti attivi, e cercalo in ogni strumento dove potrebbe stare. Se ti escono due numeri diversi, quello è il lavoro: non unire gli accessi, decidere chi ha ragione.",
         "tipo": "A fasi, e la prima deve sostituire qualcosa per davvero. Un pezzo entrato in uso vale più di dieci pronti e spenti.",
-        "prova": "CustomerTrack, costruita per essere di più aziende",
-        "cta": "Rispondi a questa mail"
+        "cta": "Questa è la mia, scrivimi"
       },
       "nonancora": {
         "nome": "Non ancora",
@@ -99,7 +93,7 @@
   },
   "services": {
     "eyebrow": "Il metodo",
-    "intro": "Quattro modi di lavorare, uno per ogni frase qui sopra. Se il tuo caso sta in mezzo a due, è normale: se ne parla in call.",
+    "intro": "Ognuno sta in piedi da solo: puoi chiedermi solo un sito, o solo l'automazione che ti toglie due ore a settimana. Ma sono fatti per combaciare, e messi insieme diventano il posto dove si lavora davvero. Si parte dal pezzo che pesa di più, il resto si aggiunge quando serve.",
     "list": {
       "sites": {
         "title": "Siti e landing",
@@ -123,8 +117,8 @@
     "centre": "il progetto",
     "composto": "Da cosa è composto",
     "blank": "E la tua, qual è? Scrivimi.",
-    "punch": "Quello che chiami «un sito» è lo schermo al centro. Il resto è il lavoro che c'è dietro.",
-    "practice": "E in pratica?",
+    "punch": "Quello che chiami 'un sito' è lo schermo al centro. Il resto è il lavoro che c'è dietro.",
+    "practice": "Quattro pezzi, e si montano insieme",
     "layers": {
       "site": {
         "title": "Il sito",
@@ -178,14 +172,15 @@
   "works": {
     "eyebrow": "Lavori",
     "title": "Quattro problemi, e come li ho risolti",
-    "intro": "Non trovi loghi e slogan. Trovi il problema che c'era, la decisione che ho preso e perché ho scartato l'alternativa comoda.",
+    "intro": "Non trovi loghi e slogan. Trovi il problema che c'era, la decisione che ho preso e perché ho scartato l'alternativa comoda. Tutti e quattro nascono nei quindici mesi in D.lab, su prodotti dell'azienda e dei suoi clienti.",
     "labels": {
       "symptom": "Il sintomo",
       "decision": "La decisione",
       "outcome": "L'esito",
       "visit": "Visita il sito",
       "open": "Apri il caso",
-      "close": "Chiudi"
+      "close": "Chiudi",
+      "offline": "Mai andata online"
     },
     "list": {
       "bdroppy": {
@@ -204,13 +199,13 @@
         "name": "CustomerTrack",
         "symptom": "Negozi fisici che non sapevano nulla dei propri clienti: quanti entravano, dove si fermavano, cosa guardavano davvero.",
         "decision": "Invece di un prodotto unico, una soluzione white-label: ogni catena la usa come fosse sua. Costa di più da costruire e si ripaga dal secondo cliente in poi.",
-        "outcome": "Piattaforma di analisi dei comportamenti in negozio, rivendibile a marchi diversi senza riscrivere nulla."
+        "outcome": "Piattaforma di analisi dei comportamenti in negozio, costruita per essere rivenduta a più catene sullo stesso impianto. Finita e mai messa online: è l'unico dei quattro che non ha mai avuto utenti."
       },
       "visualboost": {
         "name": "VisualBoost",
         "symptom": "Un archivio di immagini editoriali che nessuno riusciva a sfogliare senza restare ad aspettare.",
         "decision": "Il collo di bottiglia erano le immagini, non il codice. Prima di ogni altra cosa: formati moderni, dimensioni giuste e caricamento progressivo.",
-        "outcome": "Piattaforma di immagini per moda, food e beauty che resta veloce anche su cataloghi grandi."
+        "outcome": "Piattaforma di immagini per moda, food e beauty che resta veloce anche su cataloghi grandi. La landing pubblica è stata rifatta dopo di me: quello che resta mio è l'impianto sotto."
       }
     }
   },
@@ -277,20 +272,25 @@
     "etichettaLezione": "Cosa mi ha insegnato",
     "nota": "Da freelance il tesserino non te lo dà nessuno.",
     "list": {
-      "idt": {
-        "role": "React Developer",
-        "body": "Funzionalità complesse su un'applicazione usata ogni giorno, e una libreria di componenti condivisa.",
+      "freelanceOggi": {
+        "role": "Sviluppatore web freelance",
+        "body": "Progetti dei miei clienti e affiancamento ad altri freelance: dalla dashboard che centralizza un'attività ai pezzi che le orbitano attorno.",
+        "lezione": "A parlare con chi non è tecnico. È la competenza che uso più di qualunque linguaggio, ed è l'unica che non si impara leggendo."
+      },
+      "dlab": {
+        "role": "Front-end Developer / UI e UX Designer",
+        "body": "Quattro prodotti fra quelli dell'azienda e quelli dei suoi clienti: una piattaforma B2B da migrare, un assistente AI, un archivio di immagini e una piattaforma di analisi.",
         "lezione": "Che una libreria di componenti non è un vezzo da sviluppatori. È la sola cosa che tiene coerente un prodotto su cui lavorano in tanti, e si vede il giorno in cui entra la persona nuova."
       },
       "eroi": {
-        "role": "Full Stack Developer",
-        "body": "Una piattaforma e-commerce B2B dall'inizio alla fine: frontend, API, database e dashboard.",
+        "role": "Web Developer",
+        "body": "Piattaforme e-commerce fra Vue e Laravel: interfacce, autenticazione, API e i pannelli con cui ci si lavora dentro.",
         "lezione": "Che il pezzo difficile di un e-commerce non è il negozio. È la dashboard con cui ci lavorano dentro tutti i giorni, ed è anche quella che nessuno pensa di dover pagare."
       },
-      "freelance": {
+      "freelanceInizio": {
         "role": "Sviluppatore freelance",
-        "body": "Progetti completi per piccole e medie imprese, dalla raccolta dei requisiti al rilascio.",
-        "lezione": "A parlare con chi non è tecnico. È la competenza che uso più di qualunque linguaggio, ed è l'unica che non si impara leggendo."
+        "body": "Primi lavori su commissione: sviluppo e interfaccia di una dashboard per un'attività di reselling.",
+        "lezione": "Che il codice di qualcun altro si legge prima di toccarlo. Il primo lavoro vero non è stato scrivere una funzione nuova: è stato capire perché chi era passato di lì l'aveva scritta così."
       }
     }
   },
@@ -368,8 +368,12 @@
     }
   },
   "footer": {
-    "tagline": "Costruisco software per il web. Da Bergamo, per chi capita.",
-    "emailLabel": "Email",
+    "tagline": "Costruisco software per il web. Da Torino, per chi capita.",
+    "rispondiA": "Rispondi a",
+    "ancheQui": "Anche qui",
+    "citta": "10100 Torino (TO), Italia",
+    "ufficio": "TORINO",
+    "paese": "ITALIA",
     "rights": "Tutti i diritti riservati.",
     "linkedinAria": "Vai al profilo LinkedIn di Andrea Ghidara",
     "githubAria": "Vai al profilo GitHub di Andrea Ghidara",

@@ -32,7 +32,7 @@ const props: ServicesViewProps = {
   stageLead: "Un sito finito.",
   centre: "il progetto",
   composto: "Da cosa e\' composto",
-  punch: "Quello che chiami «un sito» è lo schermo al centro.",
+  punch: "Quello che chiami 'un sito' è lo schermo al centro.",
   blank: "E la tua, qual è?",
   note: "23.777 caffè",
   practice: "E in pratica?",

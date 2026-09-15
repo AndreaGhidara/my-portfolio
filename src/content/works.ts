@@ -1,7 +1,12 @@
 export type Work = {
   /** È anche la chiave di traduzione: works.list.<id>.symptom */
   id: string;
-  url: string;
+  /**
+   * Assente quando il progetto non è mai stato messo online. CustomerTrack è
+   * finito e mai lanciato: un "Visita il sito" che porta su un dominio che non
+   * risolve costa piu' del progetto stesso, quindi il pulsante non si disegna.
+   */
+  url?: string;
   screenshot: string;
   year: number;
   tech: string[];
@@ -28,7 +33,6 @@ export const works: Work[] = [
   },
   {
     id: "customertrack",
-    url: "https://customertrack.io",
     screenshot: "/works/customertrack.png",
     year: 2025,
     tech: ["Next.js", "TypeScript", "Analytics"],

@@ -10,7 +10,6 @@ export type SeekingViewProps = {
   title: string;
   intro: string;
   /** «Non e' un modulo»: il patto, scritto dove si prende la decisione. */
-  attesa: string;
   etichettaTipo: string;
   casella: SeekingCasellaChrome;
   mail: SeekingMail[];
@@ -23,7 +22,7 @@ export type SeekingViewProps = {
  * sai cosa ti serve» — che era anche falsa. Poi sono diventate cinque strade
  * con la risposta dentro: chiedeva e rispondeva.
  *
- * Adesso non chiede piu' niente. «Queste sono le cinque email che ricevo piu'
+ * Adesso non chiede piu' niente. «Queste sono le cinque richieste che mi fanno piu'
  * spesso, e queste sono le mie risposte»: il visitatore non compila, legge la
  * posta di qualcun altro e ci si riconosce. E' generoso, e' una prova di
  * competenza invece di una promessa, e giustifica da solo la riga sotto — che
@@ -36,7 +35,6 @@ export function SeekingView({
   eyebrow,
   title,
   intro,
-  attesa,
   etichettaTipo,
   casella,
   mail,
@@ -69,10 +67,6 @@ export function SeekingView({
           etichettaTipo={etichettaTipo}
           casella={casella}
         />
-
-        <p data-seeking-attesa className="mt-6 max-w-2xl text-[var(--on-accent)]">
-          {attesa}
-        </p>
       </div>
     </section>
   );
