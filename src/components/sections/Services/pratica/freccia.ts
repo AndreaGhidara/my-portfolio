@@ -1,4 +1,5 @@
 import { gsap, ScrollTrigger } from "@/animations/gsap";
+import { CORSA_FRECCIA } from "@/animations/finestre";
 import { curva, inFuoco, strada, type Coda, type Misura, type Mondo, type Punto } from "./strada";
 import { LARGO, PARAM } from "./param";
 
@@ -339,8 +340,11 @@ export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null
   passo();
   const st = ScrollTrigger.create({
     trigger,
-    start: "top 46%",
-    end: "bottom 46%",
+    // Non due stringhe scritte qui: il filo dei Lavori si apre sulla stessa
+    // riga su cui questa corsa chiude, e due numeri gemelli in due file
+    // divergono al primo che ne tocca uno. Vedi CORSA_FRECCIA in presets.
+    start: CORSA_FRECCIA.inizio,
+    end: CORSA_FRECCIA.fine,
     onUpdate: (self) => {
       p = self.progress;
       sveglia();
