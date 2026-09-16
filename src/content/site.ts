@@ -12,7 +12,7 @@ export const site = {
    * Da qui in poi lo legge chi ne ha bisogno, e il posto e' uno solo.
    */
   url: "https://www.andreaghidara.dev",
-  cvPath: "/cv/Andrea_Ghidara_cv_2026.pdf",
+  cvPath: "/cv/Andrea_Ghidara_CV_2026.pdf",
   socials: [
     { id: "linkedin", url: "https://www.linkedin.com/in/andrea-ghidara" },
     { id: "github", url: "https://github.com/AndreaGhidara" },
