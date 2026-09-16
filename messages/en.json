@@ -15,7 +15,8 @@
     "subclaim": "Measurements first: what you sell, and to whom. Then a site that explains, a store that sells, a platform that gets the work done.",
     "ctaPrimary": "Let's talk",
     "ctaSecondary": "See the work",
-    "scrollHint": "Scroll"
+    "scrollHint": "Scroll",
+    "avatarAlt": "Illustrated portrait of Andrea Ghidara"
   },
   "seeking": {
     "eyebrow": "Let's start here",
@@ -117,7 +118,7 @@
     "centre": "the project",
     "composto": "What it's made of",
     "blank": "And yours, what is it? Write to me.",
-    "punch": "What you call \"a website\" is the screen in the middle. The rest is the work behind it.",
+    "punch": "What you call «a website» is the screen in the middle. The rest is the work behind it.",
     "practice": "Four pieces, and they fit together",
     "layers": {
       "site": {
@@ -171,60 +172,58 @@
   },
   "works": {
     "eyebrow": "Work",
-    "title": "Four problems, and how I solved them",
-    "intro": "No logos and slogans here. You'll find the problem that existed, the decision I made, and why I rejected the easy alternative. All four come out of fifteen months at D.lab, on the company's products and its clients'.",
+    "title": "Three times the easy road was the wrong one",
+    "intro": "Every project has one obvious choice, the one everybody proposes first. These are three times it wasn't the right one, and what happened instead. All three come out of fifteen months at D.lab, on the company's products and its clients'.",
     "labels": {
-      "symptom": "The symptom",
-      "decision": "The decision",
-      "outcome": "The outcome",
+      "alternativa": "The easy alternative",
+      "perche": "Why not",
+      "fatto": "What we did",
       "visit": "Visit the site",
       "open": "Open the case",
       "close": "Close",
-      "offline": "Never went live"
+      "offline": "Never went live",
+      "screenshotAlt": "{name}: screenshot of the project"
     },
     "list": {
       "bdroppy": {
         "name": "BDroppy",
-        "symptom": "The platform was stuck on React 14. Every new feature took weeks and the team was afraid to touch the code.",
-        "decision": "Rewriting from scratch was the comfortable choice, but the platform had to stay online and keep selling. I chose an incremental migration, route by route, with old and new running side by side.",
-        "outcome": "A B2B dropshipping platform now on Next.js and TypeScript, migrated without ever taking the service down."
+        "symptom": "The platform was stuck on Next 14. Every new feature took weeks, and the team was afraid to touch the code.",
+        "alternativa": "Rewrite the platform from scratch.",
+        "perche": "A rewrite ships all at once, and until that day the business stays on what it already has. This one had to keep selling every day of the migration.",
+        "fatto": "One route at a time, old and new living side by side behind the same address. It runs on Next 15 and TypeScript today, and the service never went down."
       },
       "aidify": {
         "name": "Aidify",
         "symptom": "A customer support team buried under the same ten questions, repeated across five different e-commerce platforms.",
-        "decision": "Not a chatbot that guesses, but one wired to the real catalogue and real orders. And above all: when it doesn't know, it hands over to a person instead of inventing an answer.",
-        "outcome": "An AI-based assistant integrated across several stores, absorbing the repetitive requests and leaving the real ones to people."
-      },
-      "customertrack": {
-        "name": "CustomerTrack",
-        "symptom": "Physical shops that knew nothing about their own customers: how many came in, where they stopped, what they actually looked at.",
-        "decision": "Instead of a single product, a white-label solution: each chain uses it as if it were their own. It costs more to build and pays for itself from the second customer onwards.",
-        "outcome": "An in-store behaviour analytics platform, built to be resold to several chains on the same foundation. Finished and never put online: it's the only one of the four that never had users."
+        "alternativa": "A chatbot trained on the most frequent questions.",
+        "perche": "It guesses, and when it guesses wrong it does so with the same confidence as when it gets it right. The customer finds out after buying.",
+        "fatto": "Wired into the real catalogue and real orders, not a model that guesses. And the edge of what it knows is written into the code: past that, the conversation goes to an operator without the customer having to ask."
       },
       "visualboost": {
         "name": "VisualBoost",
         "symptom": "An editorial image library nobody could browse without sitting there waiting.",
-        "decision": "The bottleneck was the images, not the code. Before anything else: modern formats, right dimensions and progressive loading.",
-        "outcome": "An image platform for fashion, food and beauty that stays fast even on large catalogues. The public landing page was rebuilt after my work: what remains mine is the engine underneath."
+        "alternativa": "Optimise the code that laid the images out.",
+        "perche": "It's the first place everyone looks, and it's almost never there. The weight was in the images, not in the code putting them on the page.",
+        "fatto": "Modern formats, right dimensions and progressive loading, before anything else. The public landing page was later rebuilt by others: what remains is the engine underneath."
       }
     }
   },
   "process": {
-    "eyebrow": "How I work",
-    "title": "Four things you get, in this order",
-    "intro": "This isn't a list of what I do: it's what you end up holding, and when. If you don't have these four things by the end, the project isn't finished, even if the site is live.",
+    "eyebrow": "From here on",
+    "title": "How we can carry on",
+    "intro": "It isn't a rulebook, it's a convenience: four moments agreed up front, so neither of us has to ask the other where we are. If your case wants a different order, we change it.",
     "list": {
       "documento": {
-        "quando": "Within three days of the first meeting",
+        "quando": "Within 48 hours of the first meeting",
         "titolo": "A document",
-        "lead": "Two pages, not twenty. What has to happen for the project to have been worth anything, and what we won't do: written down, not implied.",
+        "lead": "Two pages: what the project needs, and how long each piece takes.",
         "dentro": {
-          "uno": "The three things that have to work, in order of importance",
-          "due": "What stays out, and why it stays out",
-          "tre": "The questions we can't answer yet"
+          "uno": "The basics we need before we can start",
+          "due": "What's essential to go live, and what can wait",
+          "tre": "What's worth leaving out, or turning into something else"
         },
-        "nonlo": "It isn't a quote. Numbers come later, when there is something to count.",
-        "perche": "If you don't recognise yourself in it, we misunderstood each other here and not in three months, when fixing it costs ten times as much."
+        "nonlo": "It's the project's instruction booklet: from there on it's only a matter of building it.",
+        "perche": "We can write it together: if something needs changing, this is the moment when changing it is cheap."
       },
       "schermo": {
         "quando": "Before a single line of code exists",
@@ -240,7 +239,7 @@
       },
       "link": {
         "quando": "Every two weeks, until the end",
-        "titolo": "A link that works",
+        "titolo": "A link where you can look and try",
         "lead": "Not a screenshot and not a presentation: an address you open on your phone while the work goes on.",
         "dentro": {
           "uno": "You can click around inside it",
@@ -260,7 +259,7 @@
           "tre": "«Can this be done?», even when the answer is no"
         },
         "nonlo": "It isn't a support contract you have to sign. If you don't need it you don't pay for it, and if you do, you already know who to call.",
-        "perche": "It's why clients come back, and it's the only one of the four with no end date."
+        "perche": "It's a contact that stays with you, both for support and for the ideas that come later."
       }
     }
   },
@@ -269,28 +268,28 @@
     "title": "Where I learned",
     "present": "present",
     "senzaTesserino": "No badge",
-    "etichettaLezione": "What it taught me",
+    "etichettaLezione": "What it left me",
     "nota": "Nobody hands you a badge when you work for yourself.",
     "list": {
       "freelanceOggi": {
         "role": "Freelance web developer",
         "body": "My own clients' projects, plus backing up other freelancers: from the dashboard that centralises a business to the small tools orbiting it.",
-        "lezione": "How to talk to people who aren't technical. It's the skill I use more than any language, and the only one you can't learn by reading."
+        "lezione": "How to talk to people who aren't technical: it's the skill I use more than any language. And the work I do now: moving a business from several tools onto a single platform, running video streaming for clients, holding documents and contracts together, letting many operators work on the same things at the same time."
       },
       "dlab": {
         "role": "Front-end Developer / UI and UX Designer",
         "body": "Four products, some the company's and some its clients': a B2B platform to migrate, an AI assistant, an image archive and an analytics platform.",
-        "lezione": "That a component library isn't a developer's indulgence. It's the only thing that keeps a product coherent when many people work on it, and you see it the day someone new joins."
+        "lezione": "I learned to sort the work and to be on several projects at once, deciding with the team what came first. And to build inside applications already in production, still billing every day: there, every change you make is made while somebody is buying."
       },
       "eroi": {
         "role": "Web Developer",
         "body": "E-commerce platforms across Vue and Laravel: interfaces, authentication, APIs and the panels people actually work in.",
-        "lezione": "That the hard part of an e-commerce isn't the shop. It's the dashboard people work inside every day, and it's also the one nobody expects to pay for."
+        "lezione": "Holding several technologies together instead of using one at a time: Vue and Inertia on top of Laravel, with load times coming down because the two halves stop redoing each other's work. And the first grounding in authentication, which is where a site stops being a shop window."
       },
       "freelanceInizio": {
         "role": "Freelance developer",
         "body": "First commissioned work: development and interface for a reselling business's dashboard.",
-        "lezione": "That someone else's code gets read before it gets touched. My first real job wasn't writing a new function: it was working out why whoever came before had written it that way."
+        "lezione": "I learned to work on a project that was already running, where I had to put the code in context, understand what each piece did and how the whole product logic was built, so I could implement what I was asked for."
       }
     }
   },
@@ -298,7 +297,6 @@
     "bdroppyComponents": "components migrated",
     "bdroppyDowntime": "hours of downtime",
     "aidifyConversations": "conversations handled per month",
-    "customertrackBrands": "chains on the same system",
     "visualboostCatalog": "images in the catalogue",
     "coffees": "coffees",
     "years": "years building for the web",
@@ -327,15 +325,15 @@
         },
         "preventivo": {
           "quando": "Only after that",
-          "titolo": "Two pages, and the numbers",
-          "testo": "What has to happen and what does not, what it costs and how long it takes. Before this there are no numbers, because there would be nothing to count."
+          "titolo": "The same two pages, with the numbers",
+          "testo": "It's the document from the section above, plus what it costs and how long it takes. Before the call those numbers don't exist, because there'd be nothing to count."
         }
       }
     },
     "recruiter": {
       "eyebrow": "The other way out",
       "title": "Are you considering me for a role?",
-      "body": "Then you don't need a form. Here is the up to date CV, and the two places where the code I write can actually be read instead of described.",
+      "body": "Then you don't need a form. Here's the up-to-date CV, and the two places where the code I write can actually be read instead of described.",
       "cv": "Download the CV",
       "linkedin": "LinkedIn",
       "github": "GitHub"
@@ -376,7 +374,6 @@
     "paese": "ITALY",
     "rights": "All rights reserved.",
     "linkedinAria": "Go to Andrea Ghidara's LinkedIn profile",
-    "githubAria": "Go to Andrea Ghidara's GitHub profile",
-    "homeAria": "Back to top of page"
+    "githubAria": "Go to Andrea Ghidara's GitHub profile"
   }
 }

@@ -8,7 +8,7 @@ import { Contact } from "@/components/sections/Contact";
 
 /**
  * L'ordine è quello deciso nella spec e non è arbitrario:
- * al secondo posto sta il riconoscimento — quattro frasi che il visitatore
+ * al secondo posto sta il riconoscimento — cinque richieste che il visitatore
  * si e' gia' detto — e subito dopo la risposta a quelle frasi, nello stesso
  * ordine. Prima si fa dire "questo sono io", poi si spiega come si risolve:
  * invertirli significa descrivere una soluzione a chi non ha ancora ammesso

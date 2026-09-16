@@ -61,13 +61,18 @@ describe("servizi", () => {
 });
 
 describe("lavori", () => {
-  it("sono quattro", () => {
-    expect(works).toHaveLength(4);
+  it("sono tre, e il quarto posto aspetta il lavoro riservato", () => {
+    // CustomerTrack e' uscito: costruita per intero e mai messa online, il suo
+    // dominio non risolve, e un caso senza utenti non prova niente. La mensola
+    // e' disegnata per quattro cartelle e la quarta sara' quella coperta da
+    // accordo di riservatezza, che e' anche l'unico modo di far entrare qui
+    // dentro il lavoro di adesso: gli altri tre vengono tutti da D.lab.
+    expect(works).toHaveLength(3);
   });
 
-  it("ogni caso ha sintomo, decisione ed esito in entrambe le lingue", () => {
+  it("ogni caso ha sintomo, alternativa, perche' ed esito in entrambe le lingue", () => {
     for (const work of works) {
-      for (const field of ["name", "symptom", "decision", "outcome"]) {
+      for (const field of ["name", "symptom", "alternativa", "perche", "fatto"]) {
         expect(itKeys).toContain(`works.list.${work.id}.${field}`);
       }
     }

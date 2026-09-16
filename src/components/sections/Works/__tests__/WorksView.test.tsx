@@ -4,10 +4,11 @@ import userEvent from "@testing-library/user-event";
 import { WorksView } from "../WorksView";
 
 const labels = {
-  symptom: "Il sintomo",
-  decision: "La decisione",
-  outcome: "L'esito",
+  alternativa: "L'alternativa comoda",
+  perche: "Perché no",
+  fatto: "Cosa abbiamo fatto",
   visit: "Visita il sito",
+  screenshotAlt: "{name}: schermata",
   offline: "Mai andata online",
   open: "Apri il caso",
   close: "Chiudi",
@@ -17,11 +18,13 @@ const items = [
   {
     id: "bdroppy",
     name: "BDroppy",
-    symptom: "La piattaforma era ferma su React 14.",
-    decision: "Migrazione incrementale, rotta per rotta.",
-    outcome: "Oggi su Next.js, senza interruzioni.",
+    symptom: "La piattaforma era ferma su Next 14.",
+    alternativa: "Riscriverla da zero.",
+    perche: "Doveva continuare a vendere ogni giorno.",
+    fatto: "Migrazione rotta per rotta, senza interruzioni.",
     url: "https://www.bdroppy.com",
     screenshot: "/works/bdroppy.png",
+    screenshotAlt: "BDroppy: schermata",
     year: 2024,
     tech: ["Next.js", "TypeScript"],
     metrics: [{ id: "bdroppyComponents", value: "120", label: "componenti migrati" }],
@@ -30,10 +33,12 @@ const items = [
     id: "aidify",
     name: "Aidify",
     symptom: "Assistenza sommersa dalle stesse dieci domande.",
-    decision: "Un assistente legato agli ordini reali.",
-    outcome: "Integrato su piu' e-commerce.",
+    alternativa: "Un chatbot che indovina.",
+    perche: "Sbaglia con la stessa sicurezza con cui azzecca.",
+    fatto: "Legato agli ordini reali, e passa a una persona quando non sa.",
     url: "https://aidify.cx",
     screenshot: "/works/aidify.png",
+    screenshotAlt: "Aidify: schermata",
     year: 2024,
     tech: ["Next.js", "Supabase"],
     metrics: [],
@@ -64,17 +69,17 @@ describe("WorksView", () => {
   it("all'inizio nessun dossier è aperto", () => {
     render(<WorksView {...props} />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(screen.queryByText(items[0].decision)).not.toBeInTheDocument();
+    expect(screen.queryByText(items[0].alternativa)).not.toBeInTheDocument();
   });
 
-  it("cliccando una cartella si apre il dossier con decisione ed esito", async () => {
+  it("cliccando una cartella si apre il dossier con l'alternativa scartata", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(screen.getAllByRole("button")[0]);
 
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeVisible();
-    expect(screen.getByText(items[0].decision)).toBeVisible();
-    expect(screen.getByText(items[0].outcome)).toBeVisible();
+    expect(screen.getByText(items[0].alternativa)).toBeVisible();
+    expect(screen.getByText(items[0].fatto)).toBeVisible();
   });
 
   it("il dossier ha un nome accessibile: chi naviga a voce deve sapere di quale caso si tratta", async () => {
@@ -107,7 +112,7 @@ describe("WorksView", () => {
   it("il dossier mostra il caso della cartella cliccata, non sempre il primo", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(screen.getAllByRole("button")[1]);
-    expect(screen.getByText(items[1].decision)).toBeVisible();
-    expect(screen.queryByText(items[0].decision)).not.toBeInTheDocument();
+    expect(screen.getByText(items[1].alternativa)).toBeVisible();
+    expect(screen.queryByText(items[0].alternativa)).not.toBeInTheDocument();
   });
 });

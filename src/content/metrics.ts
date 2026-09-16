@@ -36,12 +36,6 @@ export const metrics: Metric[] = [
     howToVerify: "Esportare il conteggio mensile delle conversazioni dal pannello di Aidify.",
   },
   {
-    id: "customertrackBrands",
-    value: "3",
-    estimated: true,
-    howToVerify: "Contare le istanze white-label attive in produzione.",
-  },
-  {
     id: "visualboostCatalog",
     value: "12.000",
     estimated: true,

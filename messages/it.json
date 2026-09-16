@@ -15,7 +15,8 @@
     "subclaim": "Prima le misure: cosa vendi e a chi. Poi un sito che spiega, un e-commerce che vende, una piattaforma che fa lavorare.",
     "ctaPrimary": "Parliamone",
     "ctaSecondary": "Guarda i lavori",
-    "scrollHint": "Scorri"
+    "scrollHint": "Scorri",
+    "avatarAlt": "Ritratto illustrato di Andrea Ghidara"
   },
   "seeking": {
     "eyebrow": "Partiamo da qui",
@@ -117,7 +118,7 @@
     "centre": "il progetto",
     "composto": "Da cosa è composto",
     "blank": "E la tua, qual è? Scrivimi.",
-    "punch": "Quello che chiami 'un sito' è lo schermo al centro. Il resto è il lavoro che c'è dietro.",
+    "punch": "Quello che chiami «un sito» è lo schermo al centro. Il resto è il lavoro che c'è dietro.",
     "practice": "Quattro pezzi, e si montano insieme",
     "layers": {
       "site": {
@@ -171,60 +172,58 @@
   },
   "works": {
     "eyebrow": "Lavori",
-    "title": "Quattro problemi, e come li ho risolti",
-    "intro": "Non trovi loghi e slogan. Trovi il problema che c'era, la decisione che ho preso e perché ho scartato l'alternativa comoda. Tutti e quattro nascono nei quindici mesi in D.lab, su prodotti dell'azienda e dei suoi clienti.",
+    "title": "Tre volte che la strada comoda era quella sbagliata",
+    "intro": "In ogni progetto c'è una scelta ovvia, quella che tutti propongono per prima. Queste sono tre volte in cui non era quella giusta, e cosa è successo invece. Nascono tutte nei quindici mesi in D.lab, su prodotti dell'azienda e dei suoi clienti.",
     "labels": {
-      "symptom": "Il sintomo",
-      "decision": "La decisione",
-      "outcome": "L'esito",
+      "alternativa": "L'alternativa comoda",
+      "perche": "Perché no",
+      "fatto": "Cosa abbiamo fatto",
       "visit": "Visita il sito",
       "open": "Apri il caso",
       "close": "Chiudi",
-      "offline": "Mai andata online"
+      "offline": "Mai andata online",
+      "screenshotAlt": "{name}: schermata del progetto"
     },
     "list": {
       "bdroppy": {
         "name": "BDroppy",
-        "symptom": "La piattaforma era ferma su React 14. Ogni funzionalità nuova richiedeva settimane e il team aveva paura di toccare il codice.",
-        "decision": "Riscrivere da zero era la scelta comoda, ma la piattaforma doveva restare online e continuare a vendere. Ho scelto una migrazione incrementale, rotta per rotta, con vecchio e nuovo che convivevano.",
-        "outcome": "Piattaforma di dropshipping B2B oggi su Next.js e TypeScript, migrata senza mai interrompere il servizio."
+        "symptom": "La piattaforma era ferma su Next 14. Ogni funzionalità nuova richiedeva settimane e il team aveva paura di toccare il codice.",
+        "alternativa": "Riscrivere la piattaforma da zero.",
+        "perche": "Una riscrittura si consegna tutta insieme, e fino a quel giorno l'azienda resta su quello che ha. Questa doveva continuare a vendere ogni giorno della migrazione.",
+        "fatto": "Una rotta per volta, vecchia e nuova in convivenza dietro lo stesso indirizzo. Oggi è su Next 15 e TypeScript, e il servizio non si è mai fermato."
       },
       "aidify": {
         "name": "Aidify",
         "symptom": "Un'assistenza clienti sommersa dalle stesse dieci domande, ripetute su cinque piattaforme e-commerce diverse.",
-        "decision": "Non un chatbot che indovina, ma uno collegato al catalogo e agli ordini reali. E soprattutto: se non sa, passa a una persona invece di inventare una risposta.",
-        "outcome": "Assistente basato su AI integrato su più e-commerce, che assorbe le richieste ripetitive e lascia agli operatori quelle vere."
-      },
-      "customertrack": {
-        "name": "CustomerTrack",
-        "symptom": "Negozi fisici che non sapevano nulla dei propri clienti: quanti entravano, dove si fermavano, cosa guardavano davvero.",
-        "decision": "Invece di un prodotto unico, una soluzione white-label: ogni catena la usa come fosse sua. Costa di più da costruire e si ripaga dal secondo cliente in poi.",
-        "outcome": "Piattaforma di analisi dei comportamenti in negozio, costruita per essere rivenduta a più catene sullo stesso impianto. Finita e mai messa online: è l'unico dei quattro che non ha mai avuto utenti."
+        "alternativa": "Un chatbot addestrato sulle domande più frequenti.",
+        "perche": "Indovina, e quando indovina male lo fa con la stessa sicurezza di quando indovina bene. Il cliente se ne accorge dopo aver comprato.",
+        "fatto": "Collegato al catalogo e agli ordini veri, non a un modello che indovina. E il confine di quello che sa è scritto nel codice: oltre quello, la conversazione passa a un operatore senza che il cliente debba chiederlo."
       },
       "visualboost": {
         "name": "VisualBoost",
         "symptom": "Un archivio di immagini editoriali che nessuno riusciva a sfogliare senza restare ad aspettare.",
-        "decision": "Il collo di bottiglia erano le immagini, non il codice. Prima di ogni altra cosa: formati moderni, dimensioni giuste e caricamento progressivo.",
-        "outcome": "Piattaforma di immagini per moda, food e beauty che resta veloce anche su cataloghi grandi. La landing pubblica è stata rifatta dopo di me: quello che resta mio è l'impianto sotto."
+        "alternativa": "Ottimizzare il codice che disponeva le immagini.",
+        "perche": "È il primo posto dove si guarda, e quasi mai è lì. A pesare erano le immagini, non il codice che le metteva in pagina.",
+        "fatto": "Formati moderni, dimensioni giuste e caricamento progressivo, prima di ogni altra cosa. La landing pubblica è stata poi rifatta da altri: quello che resta è l'impianto sotto."
       }
     }
   },
   "process": {
-    "eyebrow": "Come lavoro",
-    "title": "Quattro cose che ricevi, in quest'ordine",
-    "intro": "Non è l'elenco di quello che faccio io: è quello che ti resta in mano, e quando. Se a fine progetto non hai queste quattro cose, il progetto non è finito, anche se il sito è online.",
+    "eyebrow": "Da qui in poi",
+    "title": "Come possiamo proseguire",
+    "intro": "Non è un regolamento, è una comodità: quattro momenti decisi prima, così nessuno dei due deve chiedere all'altro a che punto siamo. Se il tuo caso vuole un ordine diverso, si cambia.",
     "list": {
       "documento": {
-        "quando": "Entro tre giorni dal primo incontro",
+        "quando": "Entro 48 ore dal primo incontro",
         "titolo": "Un documento",
-        "lead": "Due pagine, non venti. Cosa deve succedere perché il progetto sia servito a qualcosa, e cosa non faremo: scritto, non sottinteso.",
+        "lead": "Due pagine: cosa serve per il progetto, e quanto tempo ci vuole per ogni pezzo.",
         "dentro": {
-          "uno": "Le tre cose che devono funzionare, in ordine di importanza",
-          "due": "Quello che resta fuori, e perché resta fuori",
-          "tre": "Le domande a cui non sappiamo ancora rispondere"
+          "uno": "Le basi che servono per cominciare a lavorare",
+          "due": "Cosa è indispensabile per andare online, e cosa può aspettare",
+          "tre": "Cosa conviene lasciare fuori, o trasformare in qualcos'altro"
         },
-        "nonlo": "Non è un preventivo. I numeri arrivano dopo, quando c'è qualcosa da contare.",
-        "perche": "Se non ti ci riconosci, ci siamo capiti male qui e non fra tre mesi, quando correggere costa dieci volte tanto."
+        "nonlo": "È il libretto di istruzioni del progetto: da lì in poi resta solo da costruirlo.",
+        "perche": "Possiamo scriverlo insieme: se c'è qualcosa da cambiare, questo è il momento in cui cambiarlo costa poco."
       },
       "schermo": {
         "quando": "Prima che esista una riga di codice",
@@ -240,7 +239,7 @@
       },
       "link": {
         "quando": "Ogni due settimane, fino alla fine",
-        "titolo": "Un link che funziona",
+        "titolo": "Un link dove vedere e provare",
         "lead": "Non uno screenshot e non una presentazione: un indirizzo che apri dal telefono mentre il lavoro va avanti.",
         "dentro": {
           "uno": "Ci puoi cliccare dentro",
@@ -260,7 +259,7 @@
           "tre": "«Si può fare?», anche quando la risposta è no"
         },
         "nonlo": "Non è un contratto di assistenza da firmare per forza. Se non ti serve non lo paghi, e se ti serve sai già chi chiamare.",
-        "perche": "È il motivo per cui i clienti tornano, ed è l'unica delle quattro consegne che non ha una data di fine."
+        "perche": "È un contatto che ti resta, sia per l'assistenza sia per le idee che verranno dopo."
       }
     }
   },
@@ -269,28 +268,28 @@
     "title": "Dove ho imparato",
     "present": "a oggi",
     "senzaTesserino": "Nessun tesserino",
-    "etichettaLezione": "Cosa mi ha insegnato",
+    "etichettaLezione": "Cosa mi ha lasciato",
     "nota": "Da freelance il tesserino non te lo dà nessuno.",
     "list": {
       "freelanceOggi": {
         "role": "Sviluppatore web freelance",
         "body": "Progetti dei miei clienti e affiancamento ad altri freelance: dalla dashboard che centralizza un'attività ai pezzi che le orbitano attorno.",
-        "lezione": "A parlare con chi non è tecnico. È la competenza che uso più di qualunque linguaggio, ed è l'unica che non si impara leggendo."
+        "lezione": "Il modo di parlare con chi non è tecnico: è la competenza che uso più di qualunque linguaggio. E il lavoro che faccio adesso: portare un'attività da più strumenti a una piattaforma sola, gestire lo streaming video per i clienti, tenere insieme documenti e contratti, far lavorare tanti operatori sulle stesse cose nello stesso momento."
       },
       "dlab": {
         "role": "Front-end Developer / UI e UX Designer",
         "body": "Quattro prodotti fra quelli dell'azienda e quelli dei suoi clienti: una piattaforma B2B da migrare, un assistente AI, un archivio di immagini e una piattaforma di analisi.",
-        "lezione": "Che una libreria di componenti non è un vezzo da sviluppatori. È la sola cosa che tiene coerente un prodotto su cui lavorano in tanti, e si vede il giorno in cui entra la persona nuova."
+        "lezione": "Ho imparato a smistare il lavoro e a stare su più progetti insieme, decidendo con il team cosa veniva prima. E a costruire dentro applicazioni già in produzione, che intanto fatturavano: lì ogni modifica la fai mentre qualcuno sta comprando."
       },
       "eroi": {
         "role": "Web Developer",
         "body": "Piattaforme e-commerce fra Vue e Laravel: interfacce, autenticazione, API e i pannelli con cui ci si lavora dentro.",
-        "lezione": "Che il pezzo difficile di un e-commerce non è il negozio. È la dashboard con cui ci lavorano dentro tutti i giorni, ed è anche quella che nessuno pensa di dover pagare."
+        "lezione": "Tenere insieme più tecnologie invece di usarne una per volta: Vue e Inertia sopra Laravel, con i tempi di caricamento che scendono perché le due parti smettono di rifare lo stesso lavoro. E le prime basi dell'autenticazione, che è dove un sito smette di essere una vetrina."
       },
       "freelanceInizio": {
         "role": "Sviluppatore freelance",
         "body": "Primi lavori su commissione: sviluppo e interfaccia di una dashboard per un'attività di reselling.",
-        "lezione": "Che il codice di qualcun altro si legge prima di toccarlo. Il primo lavoro vero non è stato scrivere una funzione nuova: è stato capire perché chi era passato di lì l'aveva scritta così."
+        "lezione": "Ho imparato a lavorare in un progetto già avviato, dove dovevo contestualizzare il codice, capire cosa faceva ogni pezzo e come era strutturata tutta la logica del prodotto, per implementare quello che mi veniva chiesto."
       }
     }
   },
@@ -298,7 +297,6 @@
     "bdroppyComponents": "componenti migrati",
     "bdroppyDowntime": "ore di servizio interrotto",
     "aidifyConversations": "conversazioni gestite al mese",
-    "customertrackBrands": "catene sullo stesso impianto",
     "visualboostCatalog": "immagini a catalogo",
     "coffees": "caffè",
     "years": "anni di sviluppo web",
@@ -327,8 +325,8 @@
         },
         "preventivo": {
           "quando": "Solo dopo",
-          "titolo": "Due pagine, e i numeri",
-          "testo": "Cosa deve succedere e cosa no, quanto costa e quanto dura. Prima di questo non ci sono numeri, perché non ci sarebbe niente da contare."
+          "titolo": "Le stesse due pagine, con i numeri",
+          "testo": "È il documento del percorso qui sopra, con in più quanto costa e quanto dura. Prima della chiamata quei numeri non ci sono, perché non ci sarebbe niente da contare."
         }
       }
     },
@@ -376,7 +374,6 @@
     "paese": "ITALIA",
     "rights": "Tutti i diritti riservati.",
     "linkedinAria": "Vai al profilo LinkedIn di Andrea Ghidara",
-    "githubAria": "Vai al profilo GitHub di Andrea Ghidara",
-    "homeAria": "Torna in cima alla pagina"
+    "githubAria": "Vai al profilo GitHub di Andrea Ghidara"
   }
 }
