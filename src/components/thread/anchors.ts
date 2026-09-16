@@ -42,8 +42,32 @@ export const THREAD_ANCHORS: Record<SectionId, { in: number; out: number }> = {
    * combaciare» costerebbe la corsa di questa sezione o di quella prima, che
    * diventerebbe una riga quasi verticale.
    */
-  works: { in: 88, out: 20 },
-  process: { in: 20, out: 50 },
-  journey: { in: 50, out: 10 },
+  works: { in: 88, out: 50 },
+  /**
+   * Il corridoio, non la diagonale. Da 20 a 50 il filo tagliava in obliquo
+   * tutta la sezione e passava in mezzo al testo della seconda consegna: una
+   * linea che attraversa un paragrafo si legge come una cancellatura.
+   *
+   * Le quattro consegne stanno su due colonne che si alternano, e fra le due
+   * c'e' un corridoio. Misurato sulla pagina resa a 1400px, escludendo i
+   * filetti orizzontali che per forza attraversano ogni colonna, l'unico
+   * corridoio senza UN SOLO pixel di contenuto va dal 50,00% al 52,14%.
+   * Due punti scarsi: non c'e' spazio per curvare, e infatti la corsa e' quasi
+   * verticale. Non e' pigrizia, e' l'unica larghezza disponibile.
+   *
+   * Non i margini esterni, che pure sono vuoti e larghi venti punti: li' il
+   * filo sembrerebbe scansare la sezione invece di attraversarla, e questa e'
+   * la sezione di quello che ricevi, non un'illustrazione di lato.
+   *
+   * Sotto i 900px le voci si impilano su una colonna sola e il testo prende
+   * tutta la larghezza: li' il corridoio non esiste e nessun valore lo salva.
+   * Vale gia' adesso, con qualunque ancoraggio.
+   *
+   * Le due sezioni vicine si adeguano perche' l'uscita di una e' l'entrata
+   * della successiva e una prova lo verifica: i Lavori escono al 50 (sotto la
+   * mensola, dove non c'e' niente) e il percorso entra al 52.
+   */
+  process: { in: 50, out: 52 },
+  journey: { in: 52, out: 10 },
   contact: { in: 10, out: 50 },
 };

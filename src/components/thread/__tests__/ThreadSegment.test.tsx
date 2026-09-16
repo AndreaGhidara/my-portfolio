@@ -46,6 +46,22 @@ describe("ancoraggi del filo", () => {
 });
 
 describe("ThreadSegment", () => {
+  it("si rimisura quando cambia altezza la sezione, non solo la finestra", () => {
+    // La lunghezza del tratteggio e' in pixel di schermo, quindi dipende
+    // dall'altezza della sezione. `weave` la ristende su onRefreshInit, ma
+    // ScrollTrigger si aggiorna al resize della FINESTRA: se e' la sezione a
+    // crescere da sola — un titolo che va a capo, un font che arriva tardi —
+    // il tratteggio resta piu' corto del tracciato e il fondo della sezione
+    // resta scoperto. E' successo davvero, stringendo un titolo.
+    const src = readFileSync("src/components/thread/ThreadSegment.tsx", "utf8");
+    expect(src).toContain("new ResizeObserver");
+    expect(src).toContain("osservatore.disconnect()");
+    // La corsa sua, non tutte: `ScrollTrigger.refresh()` globale rimisurerebbe
+    // sei sezioni ogni volta che una cresce di un pixel.
+    expect(src).toContain("st.refresh()");
+    expect(src).not.toContain("ScrollTrigger.refresh()");
+  });
+
   it("è decorativo e non viene letto dagli screen reader", () => {
     const { container } = render(<ThreadSegment section="hero" />);
     expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");

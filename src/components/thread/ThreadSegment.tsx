@@ -55,7 +55,7 @@ export function ThreadSegment({
 
   useSectionAnimation((level) => {
     const paths = Array.from(scope.current?.querySelectorAll("path") ?? []);
-    weave(paths as SVGPathElement[], {
+    const tl = weave(paths as SVGPathElement[], {
       level,
       trigger: scope.current,
       scrub,
@@ -63,6 +63,37 @@ export function ThreadSegment({
       start: finestra?.inizio,
       end: finestra?.fine,
     });
+
+    /**
+     * Il tratteggio si rimisura anche quando cambia altezza la SEZIONE, non
+     * solo la finestra.
+     *
+     * La lunghezza del tratto si calcola in pixel di schermo, quindi dipende da
+     * quanto e' alta la sezione. `weave` la ristende su `onRefreshInit`, ma
+     * ScrollTrigger si aggiorna al resize della FINESTRA: se e' la sezione a
+     * crescere da sola — un titolo che passa da una riga a due, un font che
+     * arriva tardi, un'immagine che si carica — nessuno lo dice a nessuno. Il
+     * tratteggio resta quello di prima, piu' corto del tracciato, e il fondo
+     * della sezione resta scoperto per sempre. Non e' un caso limite: e'
+     * successo cambiando la larghezza di un titolo.
+     *
+     * Si aggiorna solo la SUA corsa, non tutte quante: la pagina ne ha sei, e
+     * rimisurarle in blocco ogni volta che una cresce di un pixel e' lavoro
+     * che nessuno ha chiesto. La soglia di un pixel evita il ciclo infinito
+     * fra l'osservatore e la ristesa che lui stesso provoca.
+     */
+    const el = scope.current;
+    const st = tl?.scrollTrigger;
+    if (!el || !st) return;
+    let altezza = el.getBoundingClientRect().height;
+    const osservatore = new ResizeObserver(([voce]) => {
+      const nuova = voce.contentRect.height;
+      if (Math.abs(nuova - altezza) < 1) return;
+      altezza = nuova;
+      st.refresh();
+    });
+    osservatore.observe(el);
+    return () => osservatore.disconnect();
   }, scope, [intro, finestra?.inizio, finestra?.fine]);
 
   return (
