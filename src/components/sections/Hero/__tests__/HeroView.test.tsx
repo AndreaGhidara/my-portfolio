@@ -5,6 +5,7 @@ import { HeroView } from "../HeroView";
 const props = {
   eyebrow: "Sviluppatore web · Full stack · Italia",
   wordmarkAlt: "Andrea",
+  avatarAlt: "Ritratto di Andrea",
   heading: "Andrea Ghidara, sviluppatore e programmatore web full stack",
   claim: "Il tuo sito, cucito addosso alla tua azienda.",
   subclaim:

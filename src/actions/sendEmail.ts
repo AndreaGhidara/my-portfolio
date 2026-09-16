@@ -1,5 +1,6 @@
 "use server";
 
+import { site } from "@/content/site";
 import { Resend } from "resend";
 import { z } from "zod";
 
@@ -32,7 +33,8 @@ export async function sendEmail(formData: FormData) {
   try {
     const { error } = await resend.emails.send({
       from: "Portfolio <onboarding@resend.dev>",
-      to: ["andrea.ghidara.dev@gmail.com"],
+      // L'indirizzo sta in site.ts e non qui: e' la stessa regola del dominio.
+      to: [site.email],
       subject: `New message from ${name} via Portfolio`,
       html: `
         <h1>Email from Portfolio</h1>

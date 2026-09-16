@@ -12,10 +12,12 @@ export async function Works() {
     id: work.id,
     name: t(`list.${work.id}.name`),
     symptom: t(`list.${work.id}.symptom`),
-    decision: t(`list.${work.id}.decision`),
-    outcome: t(`list.${work.id}.outcome`),
+    alternativa: t(`list.${work.id}.alternativa`),
+    perche: t(`list.${work.id}.perche`),
+    fatto: t(`list.${work.id}.fatto`),
     url: work.url,
     screenshot: work.screenshot,
+    screenshotAlt: t("labels.screenshotAlt", { name: t(`list.${work.id}.name`) }),
     year: work.year,
     tech: work.tech,
     metrics: work.metricIds.map((id) => {
@@ -30,9 +32,9 @@ export async function Works() {
       title={t("title")}
       intro={t("intro")}
       labels={{
-        symptom: t("labels.symptom"),
-        decision: t("labels.decision"),
-        outcome: t("labels.outcome"),
+        alternativa: t("labels.alternativa"),
+        perche: t("labels.perche"),
+        fatto: t("labels.fatto"),
         visit: t("labels.visit"),
         offline: t("labels.offline"),
         open: t("labels.open"),

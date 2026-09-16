@@ -16,6 +16,6 @@ export type JourneyEntry = {
 export const journey: JourneyEntry[] = [
   { id: "freelanceOggi", company: "Freelance", year: 2026, tesserino: false },
   { id: "dlab", company: "D.lab", year: 2025, tesserino: true },
-  { id: "eroi", company: "E.Roi srl", year: 2024, tesserino: true },
+  { id: "eroi", company: "E.ROI srl", year: 2024, tesserino: true },
   { id: "freelanceInizio", company: "Freelance", year: 2023, tesserino: false },
 ];

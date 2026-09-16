@@ -108,7 +108,7 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
             <div className="mx-auto w-full max-w-5xl">
             <Image
               src={data.screenshot}
-              alt={`${data.name}: schermata del progetto`}
+              alt={data.screenshotAlt}
               width={1200}
               height={750}
               sizes="(min-width: 1024px) 60rem, 100vw"
@@ -119,18 +119,24 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
               className="max-h-[34vh] w-full rounded-[var(--radius)] border border-[var(--line)] object-cover object-top"
             />
 
+            {/* Il caso si apre dall'alternativa scartata e non dal problema:
+                il problema sta gia' sulla cartella chiusa, ed e' lui ad aver
+                fatto aprire il dossier. Ripeterlo qui sarebbe la stessa frase
+                due volte a dieci centimetri di distanza. Quello che il lettore
+                non sa ancora e' cosa NON abbiamo fatto, ed e' la parte che
+                distingue un caso da un elenco di tecnologie. */}
             <div className="mt-7 grid gap-6 lg:grid-cols-3">
               <div>
-                <p className="eyebrow">{labels.symptom}</p>
-                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.symptom}</p>
+                <p className="eyebrow">{labels.alternativa}</p>
+                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.alternativa}</p>
               </div>
               <div>
-                <p className="eyebrow">{labels.decision}</p>
-                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.decision}</p>
+                <p className="eyebrow">{labels.perche}</p>
+                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.perche}</p>
               </div>
               <div>
-                <p className="eyebrow">{labels.outcome}</p>
-                <p className="mt-2 leading-relaxed text-[var(--fg-muted)]">{data.outcome}</p>
+                <p className="eyebrow">{labels.fatto}</p>
+                <p className="mt-2 leading-relaxed text-[var(--fg-muted)]">{data.fatto}</p>
               </div>
             </div>
 

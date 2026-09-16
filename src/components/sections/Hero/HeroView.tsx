@@ -8,6 +8,7 @@ import { CartaStropicciata } from "./CartaStropicciata";
 export type HeroViewProps = {
   eyebrow: string;
   wordmarkAlt: string;
+  avatarAlt: string;
   /**
    * Il titolo della pagina come TESTO. Il nome e' disegnato, cioe' sei
    * immagini: un motore di ricerca legge i nodi di testo e gli `alt`, non
@@ -25,7 +26,7 @@ export type HeroViewProps = {
 };
 
 export function HeroView({
-  eyebrow, wordmarkAlt, heading, claim, subclaim, ctaPrimary, ctaSecondary, scrollHint,
+  eyebrow, wordmarkAlt, avatarAlt, heading, claim, subclaim, ctaPrimary, ctaSecondary, scrollHint,
 }: HeroViewProps) {
   return (
     <section id="hero" className="relative overflow-hidden px-[var(--gutter)] pb-16 pt-6">
@@ -61,7 +62,7 @@ export function HeroView({
 
         <div data-hero-avatar className="relative z-10 -mt-[6%] flex justify-center">
           <InkCircle className="relative grid size-32 place-items-center lg:size-44">
-            <Avatar className="relative z-10 w-[88%]" />
+            <Avatar alt={avatarAlt} className="relative z-10 w-[88%]" />
           </InkCircle>
         </div>
 
