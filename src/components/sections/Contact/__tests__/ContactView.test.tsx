@@ -28,7 +28,7 @@ const props: ContactViewProps = {
     linkedin: "LinkedIn",
     github: "GitHub",
   },
-  cvPath: "/cv/Andrea_Ghidara_cv_2026.pdf",
+  cvPath: "/cv/Andrea_Ghidara_CV_2026.pdf",
   socials: [
     { id: "linkedin", url: "https://www.linkedin.com/in/andrea-ghidara" },
     { id: "github", url: "https://github.com/AndreaGhidara" },
