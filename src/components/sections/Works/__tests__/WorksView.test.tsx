@@ -9,7 +9,7 @@ const labels = {
   fatto: "Cosa abbiamo fatto",
   visit: "Visita il sito",
   screenshotAlt: "{name}: schermata",
-  offline: "Mai andata online",
+  riservato: "Coperto da accordo di riservatezza",
   open: "Apri il caso",
   close: "Chiudi",
 };

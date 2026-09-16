@@ -106,18 +106,29 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
 
           <div className="min-h-0 flex-1 overflow-y-auto px-[var(--gutter)] py-6 lg:py-10">
             <div className="mx-auto w-full max-w-5xl">
-            <Image
-              src={data.screenshot}
-              alt={data.screenshotAlt}
-              width={1200}
-              height={750}
-              sizes="(min-width: 1024px) 60rem, 100vw"
-              // Tetto all'altezza: a piena proporzione lo screenshot si mangia
-              // tutto il dossier e le metriche finiscono sotto la piega. Si
-              // taglia dal basso, perche' la testata del sito e' la parte che
-              // lo fa riconoscere.
-              className="max-h-[34vh] w-full rounded-[var(--radius)] border border-[var(--line)] object-cover object-top"
-            />
+            {/* Senza schermata il posto non resta vuoto: ci va un riquadro
+                tratteggiato che dichiara il perche'. E' lo stesso vocabolario
+                del cartellino mancante in «Dove ho imparato»: il tratteggio e'
+                gia' il modo in cui questo sito dice «questa cosa non c'e', e
+                non per dimenticanza». */}
+            {data.screenshot ? (
+              <Image
+                src={data.screenshot}
+                alt={data.screenshotAlt}
+                width={1200}
+                height={750}
+                sizes="(min-width: 1024px) 60rem, 100vw"
+                // Tetto all'altezza: a piena proporzione lo screenshot si mangia
+                // tutto il dossier e le metriche finiscono sotto la piega. Si
+                // taglia dal basso, perche' la testata del sito e' la parte che
+                // lo fa riconoscere.
+                className="max-h-[34vh] w-full rounded-[var(--radius)] border border-[var(--line)] object-cover object-top"
+              />
+            ) : (
+              <p className="flex min-h-[8rem] items-center justify-center rounded-[var(--radius)] border border-dashed border-[var(--fg-muted)] px-6 py-8 text-center text-sm text-[var(--fg-muted)]">
+                {labels.riservato}
+              </p>
+            )}
 
             {/* Il caso si apre dall'alternativa scartata e non dal problema:
                 il problema sta gia' sulla cartella chiusa, ed e' lui ad aver
@@ -170,7 +181,7 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
                 </a>
               ) : (
                 <span className="rounded-full border-2 border-dashed border-[var(--fg-muted)] px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--fg-muted)]">
-                  {labels.offline}
+                  {labels.riservato}
                 </span>
               )}
               <ul className="flex flex-wrap gap-2">

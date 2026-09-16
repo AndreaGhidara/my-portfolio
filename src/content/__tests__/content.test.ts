@@ -61,13 +61,16 @@ describe("servizi", () => {
 });
 
 describe("lavori", () => {
-  it("sono tre, e il quarto posto aspetta il lavoro riservato", () => {
-    // CustomerTrack e' uscito: costruita per intero e mai messa online, il suo
-    // dominio non risolve, e un caso senza utenti non prova niente. La mensola
-    // e' disegnata per quattro cartelle e la quarta sara' quella coperta da
-    // accordo di riservatezza, che e' anche l'unico modo di far entrare qui
-    // dentro il lavoro di adesso: gli altri tre vengono tutti da D.lab.
-    expect(works).toHaveLength(3);
+  it("sono quattro, e uno solo e' coperto da accordo", () => {
+    // CustomerTrack e' uscito — costruita per intero e mai messa online, il
+    // dominio non risolve, e un caso senza utenti non prova niente — e al suo
+    // posto e' entrato il lavoro di adesso, che non si puo' nominare. E' anche
+    // l'unico modo di far entrare qui dentro qualcosa che non venga da D.lab,
+    // finita ad aprile: senza, la sezione racconterebbe solo un posto lasciato.
+    expect(works).toHaveLength(4);
+    const senzaNome = works.filter((w) => !w.url && !w.screenshot);
+    expect(senzaNome).toHaveLength(1);
+    expect(senzaNome[0].id).toBe("riservato");
   });
 
   it("ogni caso ha sintomo, alternativa, perche' ed esito in entrambe le lingue", () => {
@@ -86,13 +89,18 @@ describe("lavori", () => {
     }
   });
 
-  it("ogni caso ha uno screenshot, e un link solo se e' andato online", () => {
-    // CustomerTrack e' finito e mai lanciato: il suo dominio non risolve, e un
-    // "Visita il sito" che porta nel vuoto costa piu' di quanto renda il caso.
-    // Percio' `url` e' facoltativo, ma quando c'e' deve essere un https vero.
+  it("ogni caso ha schermata e link, tranne quello coperto da accordo", () => {
+    // Il caso riservato non ha ne' indirizzo ne' schermata, e per lo stesso
+    // motivo: non si puo' mostrare. Gli altri devono avere tutti e due, o la
+    // cartella si apre su un dossier a meta'.
     for (const work of works) {
+      if (work.id === "riservato") {
+        expect(work.url).toBeUndefined();
+        expect(work.screenshot).toBeUndefined();
+        continue;
+      }
       expect(work.screenshot).toMatch(/^\/works\//);
-      if (work.url !== undefined) expect(work.url).toMatch(/^https:\/\//);
+      expect(work.url).toMatch(/^https:\/\//);
     }
   });
 

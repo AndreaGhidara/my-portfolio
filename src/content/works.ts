@@ -8,7 +8,11 @@ export type Work = {
    * schermata. Un "Visita il sito" che porta nel vuoto costa piu' del caso.
    */
   url?: string;
-  screenshot: string;
+  /**
+   * Assente quando non c'e' niente da mostrare. Il caso riservato non ha una
+   * schermata per lo stesso motivo per cui non ha un indirizzo.
+   */
+  screenshot?: string;
   year: number;
   tech: string[];
   /** Riferimenti a src/content/metrics.ts */
@@ -16,6 +20,18 @@ export type Work = {
 };
 
 export const works: Work[] = [
+  {
+    /**
+     * Il lavoro di adesso, coperto da un accordo di riservatezza: niente nome,
+     * niente indirizzo, niente schermata. E' l'unico modo di far entrare qui
+     * dentro quello che sto facendo ORA — gli altri tre vengono tutti da
+     * D.lab, finita ad aprile — e sta in cima perche' e' il piu' recente.
+     */
+    id: "riservato",
+    year: 2026,
+    tech: ["Next.js", "TypeScript", "Node.js", "PostgreSQL"],
+    metricIds: [],
+  },
   {
     id: "bdroppy",
     url: "https://www.bdroppy.com",
