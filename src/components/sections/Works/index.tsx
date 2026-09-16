@@ -36,7 +36,7 @@ export async function Works() {
         perche: t("labels.perche"),
         fatto: t("labels.fatto"),
         visit: t("labels.visit"),
-        offline: t("labels.offline"),
+        riservato: t("labels.riservato"),
         open: t("labels.open"),
         close: t("labels.close"),
       }}

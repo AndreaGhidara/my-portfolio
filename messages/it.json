@@ -172,8 +172,8 @@
   },
   "works": {
     "eyebrow": "Lavori",
-    "title": "Tre volte che la strada comoda era quella sbagliata",
-    "intro": "In ogni progetto c'è una scelta ovvia, quella che tutti propongono per prima. Queste sono tre volte in cui non era quella giusta, e cosa è successo invece. Nascono tutte nei quindici mesi in D.lab, su prodotti dell'azienda e dei suoi clienti.",
+    "title": "Quattro volte che la strada comoda era quella sbagliata",
+    "intro": "In ogni progetto c'è una scelta ovvia, quella che tutti propongono per prima. Queste sono quattro volte in cui non era quella giusta, e cosa è successo invece. Tre nascono nei quindici mesi in D.lab; la quarta è di adesso, e su quella ho firmato: posso raccontarti il lavoro, non il nome.",
     "labels": {
       "alternativa": "L'alternativa comoda",
       "perche": "Perché no",
@@ -181,10 +181,17 @@
       "visit": "Visita il sito",
       "open": "Apri il caso",
       "close": "Chiudi",
-      "offline": "Mai andata online",
-      "screenshotAlt": "{name}: schermata del progetto"
+      "screenshotAlt": "{name}: schermata del progetto",
+      "riservato": "Coperto da accordo di riservatezza"
     },
     "list": {
+      "riservato": {
+        "name": "Riservato",
+        "symptom": "Un'attività che lavorava su più strumenti e più piattaforme, con gli stessi dati in posti diversi e nessuno in grado di dire quale versione fosse quella buona.",
+        "alternativa": "Collegare fra loro gli strumenti che c'erano già.",
+        "perche": "Le integrazioni non tolgono le copie, le moltiplicano: ogni strumento resta padrone dei suoi dati, e il giorno che uno dei due cambia il collegamento si rifà da capo.",
+        "fatto": "Una piattaforma sola, costruita a fasi, e la prima doveva sostituire qualcosa per davvero. Dentro ci vivono lo streaming video, i documenti e i contratti dei clienti, e tanti operatori che scrivono sulle stesse cose nello stesso momento."
+      },
       "bdroppy": {
         "name": "BDroppy",
         "symptom": "La piattaforma era ferma su Next 14. Ogni funzionalità nuova richiedeva settimane e il team aveva paura di toccare il codice.",

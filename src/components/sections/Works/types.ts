@@ -13,7 +13,8 @@ export type WorkCaseData = {
   fatto: string;
   /** Assente se il progetto non è mai andato online. */
   url?: string;
-  screenshot: string;
+  /** Assente quando non c'e' niente da mostrare. */
+  screenshot?: string;
   /** Gia' tradotto e gia' col nome dentro: il dialogo non compone testo. */
   screenshotAlt: string;
   year: number;
@@ -30,7 +31,7 @@ export type WorkCaseLabels = {
   fatto: string;
   visit: string;
   /** Sostituisce `visit` quando non c'è un sito da visitare. */
-  offline: string;
+  riservato: string;
   open: string;
   close: string;
 };

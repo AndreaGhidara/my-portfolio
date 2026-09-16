@@ -172,8 +172,8 @@
   },
   "works": {
     "eyebrow": "Work",
-    "title": "Three times the easy road was the wrong one",
-    "intro": "Every project has one obvious choice, the one everybody proposes first. These are three times it wasn't the right one, and what happened instead. All three come out of fifteen months at D.lab, on the company's products and its clients'.",
+    "title": "Four times the easy road was the wrong one",
+    "intro": "Every project has one obvious choice, the one everybody proposes first. These are four times it wasn't the right one, and what happened instead. Three come out of fifteen months at D.lab; the fourth is current, and I signed for it: I can tell you the work, not the name.",
     "labels": {
       "alternativa": "The easy alternative",
       "perche": "Why not",
@@ -181,10 +181,17 @@
       "visit": "Visit the site",
       "open": "Open the case",
       "close": "Close",
-      "offline": "Never went live",
-      "screenshotAlt": "{name}: screenshot of the project"
+      "screenshotAlt": "{name}: screenshot of the project",
+      "riservato": "Covered by a non-disclosure agreement"
     },
     "list": {
+      "riservato": {
+        "name": "Under NDA",
+        "symptom": "A business running on several tools and several platforms, with the same data sitting in different places and nobody able to say which version was the right one.",
+        "alternativa": "Wire the existing tools to each other.",
+        "perche": "Integrations don't remove the copies, they multiply them: each tool stays the owner of its own data, and the day one of the two changes you rebuild the connection from scratch.",
+        "fatto": "One platform, built in phases, and the first one had to actually replace something. Video streaming, documents and client contracts live inside it, along with many operators writing on the same things at the same time."
+      },
       "bdroppy": {
         "name": "BDroppy",
         "symptom": "The platform was stuck on Next 14. Every new feature took weeks, and the team was afraid to touch the code.",
