@@ -159,12 +159,12 @@ export function guidaFreccia(elementi: Elementi, misura: () => Impaginato | null
   let curA: number | null = null;
   let vivo = false;
 
-  // Il corpo e' il porto di `passo()` del prototipo —
-  // docs/prototipi/2026-09-05-pratica-filo.html, righe 803-904 — con quattro
-  // differenze: `p` arriva dal ScrollTrigger invece che da un
-  // getBoundingClientRect a mano, `misura()` sostituisce `misuraImgs()`, i
-  // nomi delle costanti sono quelli di `strada.ts`, e la quarta e' la sola che
-  // tocchi i NUMERI.
+  // Il corpo e' il porto di `passo()` del prototipo
+  // `2026-09-05-pratica-filo.html`, righe 803-904, che sta in locale e fuori
+  // dal repository: con quattro differenze. `p` arriva dal ScrollTrigger
+  // invece che da un getBoundingClientRect a mano, `misura()` sostituisce
+  // `misuraImgs()`, i nomi delle costanti sono quelli di `strada.ts`, e la
+  // quarta e' la sola che tocchi i NUMERI.
   //
   // La quarta: l'origine. Nel prototipo tutto si misurava su `.percorso`, che
   // comincia alla prima voce; qui la scatola e' [data-pratica-percorso], che e'

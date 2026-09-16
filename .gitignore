@@ -42,3 +42,11 @@ next-env.d.ts
 
 # superpowers brainstorm
 .superpowers/
+
+# Documenti di lavoro: restano in locale, non su GitHub.
+# Il repository e' pubblico ed e' fissato sul profilo, quindi e' la prima cosa
+# che un cliente o un selezionatore apre. Dentro docs/ ci sono le specifiche, i
+# piani, i prototipi scartati e i testi del CV con dati personali: servono a
+# lavorare, non a essere letti da fuori. Il codice resta la vetrina, il cantiere
+# resta sulla macchina.
+docs/
