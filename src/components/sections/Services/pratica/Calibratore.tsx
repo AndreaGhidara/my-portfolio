@@ -22,7 +22,8 @@ import type { Guida } from "./freccia";
  * rifa' lei e non deve rifarla nessun altro: una strada disegnata due volte da
  * due posti sarebbe due strade diverse.
  *
- * Porto di `docs/prototipi/2026-09-05-pratica-filo.html`, righe 960-1080.
+ * Porto del prototipo `2026-09-05-pratica-filo.html`, righe 960-1080. I
+ * prototipi restano in locale, fuori dal repository, e non si seguono da qui.
  */
 export type CalibratoreProps = {
   /** Il manico del gesto. E' un ref e non un valore: la guida nasce e muore
