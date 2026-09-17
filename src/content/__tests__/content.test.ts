@@ -3,6 +3,7 @@ import it_ from "../../../messages/it.json";
 import en_ from "../../../messages/en.json";
 import { services } from "../services";
 import { works } from "../works";
+import { shotBySrc } from "../works-shots";
 import { journey } from "../journey";
 import { metrics, metricById } from "../metrics";
 import { site } from "../site";
@@ -73,9 +74,9 @@ describe("lavori", () => {
     expect(senzaNome[0].id).toBe("riservato");
   });
 
-  it("ogni caso ha sintomo, alternativa, perche' ed esito in entrambe le lingue", () => {
+  it("ogni caso dice il lavoro, la scelta e la conduzione in entrambe le lingue", () => {
     for (const work of works) {
-      for (const field of ["name", "symptom", "alternativa", "perche", "fatto"]) {
+      for (const field of ["name", "riga", "lavoro", "scelta", "conduzione"]) {
         expect(itKeys).toContain(`works.list.${work.id}.${field}`);
       }
     }
@@ -101,6 +102,20 @@ describe("lavori", () => {
       }
       expect(work.screenshot).toMatch(/^\/works\//);
       expect(work.url).toMatch(/^https:\/\//);
+    }
+  });
+
+  it("ogni schermata dichiarata esiste davvero fra quelle generate", () => {
+    // works.ts dichiara il percorso, build-works-shots.mjs genera il file e le
+    // sue misure. Se i due divergono, il dossier si apre su un riquadro rotto:
+    // meglio saperlo qui che a sito pubblicato.
+    for (const work of works) {
+      if (!work.screenshot) continue;
+      expect(() => shotBySrc(work.screenshot!)).not.toThrow();
+      const shot = shotBySrc(work.screenshot);
+      expect(shot.width).toBeGreaterThan(0);
+      expect(shot.height).toBeGreaterThan(0);
+      expect(shot.blurDataURL).toMatch(/^data:image\/webp;base64,/);
     }
   });
 

@@ -5,7 +5,8 @@
     "contact": "Contact",
     "themeToggle": "Switch between light and dark theme",
     "languageLabel": "Language",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "sections": "Sections"
   },
   "hero": {
     "eyebrow": "Web developer · Full stack · Italy",
@@ -172,12 +173,12 @@
   },
   "works": {
     "eyebrow": "Work",
-    "title": "Four times the easy road was the wrong one",
-    "intro": "Every project has one obvious choice, the one everybody proposes first. These are four times it wasn't the right one, and what happened instead. Three come out of fifteen months at D.lab; the fourth is current, and I signed for it: I can tell you the work, not the name.",
+    "title": "Four projects, and how they were run",
+    "intro": "Four real projects. For each one: what the job was, the solution I chose and why that one, and how the work was run through to delivery.",
     "labels": {
-      "alternativa": "The easy alternative",
-      "perche": "Why not",
-      "fatto": "What we did",
+      "lavoro": "The job",
+      "scelta": "The solution I chose",
+      "conduzione": "How it was run",
       "visit": "Visit the site",
       "open": "Open the case",
       "close": "Close",
@@ -187,31 +188,31 @@
     "list": {
       "riservato": {
         "name": "Under NDA",
-        "symptom": "A business running on several tools and several platforms, with the same data sitting in different places and nobody able to say which version was the right one.",
-        "alternativa": "Wire the existing tools to each other.",
-        "perche": "Integrations don't remove the copies, they multiply them: each tool stays the owner of its own data, and the day one of the two changes you rebuild the connection from scratch.",
-        "fatto": "One platform, built in phases, and the first one had to actually replace something. Video streaming, documents and client contracts live inside it, along with many operators writing on the same things at the same time."
+        "riga": "A business running on several tools and several platforms, with the same data sitting in different places and nobody able to say which version was the right one.",
+        "lavoro": "One platform in place of the scattered tools. Video streaming, documents and client contracts live inside it, along with many operators writing on the same things at the same time.",
+        "scelta": "Replace the tools rather than wire them to each other. Integrations don't remove the copies, they multiply them: each tool stays the owner of its own data, and the day one of the two changes you rebuild the connection from scratch.",
+        "conduzione": "In phases, and the first one had to actually replace something instead of being added to what was already there: as long as the old tool stays on next to the new one, the data keeps living in two places."
       },
       "bdroppy": {
         "name": "BDroppy",
-        "symptom": "The platform was stuck on Next 14. Every new feature took weeks, and the team was afraid to touch the code.",
-        "alternativa": "Rewrite the platform from scratch.",
-        "perche": "A rewrite ships all at once, and until that day the business stays on what it already has. This one had to keep selling every day of the migration.",
-        "fatto": "One route at a time, old and new living side by side behind the same address. It runs on Next 15 and TypeScript today, and the service never went down."
+        "riga": "The platform was stuck on Next 14. Every new feature took weeks, and the team was afraid to touch the code.",
+        "lavoro": "A platform that sells every day, and so could not afford a window of downtime: whatever we did had to happen with the shop open.",
+        "scelta": "Migrate one route at a time instead of rewriting from scratch. A rewrite ships all at once, and until that day the business stays on what it already has.",
+        "conduzione": "Old and new living side by side behind the same address: every migrated route went to production on its own, without waiting for the others. It runs on Next 15 and TypeScript today, and the service never went down."
       },
       "aidify": {
         "name": "Aidify",
-        "symptom": "A customer support team buried under the same ten questions, repeated across five different e-commerce platforms.",
-        "alternativa": "A chatbot trained on the most frequent questions.",
-        "perche": "It guesses, and when it guesses wrong it does so with the same confidence as when it gets it right. The customer finds out after buying.",
-        "fatto": "Wired into the real catalogue and real orders, not a model that guesses. And the edge of what it knows is written into the code: past that, the conversation goes to an operator without the customer having to ask."
+        "riga": "A customer support team buried under the same ten questions, repeated across five different e-commerce platforms.",
+        "lavoro": "An assistant that answers in place of people on the questions that keep coming back, across the five e-commerce platforms they come from.",
+        "scelta": "Wire it into the real catalogue and real orders, instead of training a model on the most frequent questions. A model guesses, and when it guesses wrong it does so with the same confidence as when it gets it right: the customer finds out after buying.",
+        "conduzione": "The edge of what the assistant knows is not left to the model, it is written into the code: past that edge the conversation goes to an operator without the customer having to ask."
       },
       "visualboost": {
         "name": "VisualBoost",
-        "symptom": "An editorial image library nobody could browse without sitting there waiting.",
-        "alternativa": "Optimise the code that laid the images out.",
-        "perche": "It's the first place everyone looks, and it's almost never there. The weight was in the images, not in the code putting them on the page.",
-        "fatto": "Modern formats, right dimensions and progressive loading, before anything else. The public landing page was later rebuilt by others: what remains is the engine underneath."
+        "riga": "An editorial image library nobody could browse without sitting there waiting.",
+        "lavoro": "An editorial library to browse, where the content is made almost entirely of heavy images.",
+        "scelta": "Work on the images, not on the code laying them out. The code is the first place everyone looks, and it's almost never there: the weight was in the files.",
+        "conduzione": "Modern formats, right dimensions and progressive loading, before anything else. The public landing page was later rebuilt by others: what remains is the engine underneath."
       }
     }
   },
@@ -373,7 +374,7 @@
     }
   },
   "footer": {
-    "tagline": "I build software for the web. From Turin, for whoever turns up.",
+    "tagline": "I build software for the web. From Turin, for people with a business to grow.",
     "rispondiA": "Reply to",
     "ancheQui": "Also here",
     "citta": "10100 Turin (TO), Italy",
