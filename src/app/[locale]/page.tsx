@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/sections/Hero";
 import { Seeking } from "@/components/sections/Seeking";
 import { Services } from "@/components/sections/Services";
@@ -19,7 +20,16 @@ import { Contact } from "@/components/sections/Contact";
  * di sito (come la Navbar) e un <footer> dentro <main> perde il ruolo
  * implicito contentinfo per HTML-AAM.
  */
-export default function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  // Come nel layout: senza, la pagina torna dinamica e si ricostruisce a ogni
+  // richiesta. Va chiamata in ogni file che sta sotto [locale].
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <>
       <Hero />
