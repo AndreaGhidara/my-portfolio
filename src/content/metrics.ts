@@ -18,6 +18,19 @@ export type Metric = {
  */
 export const metrics: Metric[] = [
   {
+    /**
+     * Il caso riservato non aveva numeri, ed era l'unico: senza, il dossier
+     * del lavoro di adesso raccontava una scelta senza dire cosa ha prodotto.
+     * Il numero arriva dal CV, dov'era scritto e basta: qui dentro almeno
+     * porta con se' come si verifica.
+     */
+    id: "riservatoCycleTime",
+    value: "15 min",
+    estimated: true,
+    howToVerify:
+      "Cronometrare il passaggio dentro la piattaforma con chi lo esegue davvero, e confrontarlo con quanto durava sui vecchi strumenti. Finche' non e' misurato, in call si dice \"si e' passati da ore a minuti\" senza dare il numero.",
+  },
+  {
     id: "bdroppyComponents",
     value: "120",
     estimated: true,
@@ -40,6 +53,19 @@ export const metrics: Metric[] = [
     value: "12.000",
     estimated: true,
     howToVerify: "Contare le righe della tabella immagini nel database di VisualBoost.",
+  },
+  {
+    /**
+     * Il numero si misura da solo, ma non piu' su visual-boost.com: la landing
+     * pubblica e' stata rifatta da altri dopo, quindi Lighthouse oggi da' il
+     * voto al lavoro di qualcun altro. Per questo resta stimato: il 90+ e' un
+     * ricordo di una misura vera, e un ricordo non e' una misura.
+     */
+    id: "visualboostLighthouse",
+    value: "90+",
+    estimated: true,
+    howToVerify:
+      "Recuperare il report Lighthouse salvato all'epoca, o rilanciarlo su una copia del progetto di allora. La pagina online oggi non vale: l'ha rifatta qualcun altro.",
   },
   {
     // Il post-it grigio del tavolo. E' l'unico numero del sito che non e' una

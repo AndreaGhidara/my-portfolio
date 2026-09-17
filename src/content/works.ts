@@ -30,7 +30,7 @@ export const works: Work[] = [
     id: "riservato",
     year: 2026,
     tech: ["Next.js", "TypeScript", "Node.js", "PostgreSQL"],
-    metricIds: [],
+    metricIds: ["riservatoCycleTime"],
   },
   {
     id: "bdroppy",
@@ -54,6 +54,6 @@ export const works: Work[] = [
     screenshot: "/works/visualboost.webp",
     year: 2025,
     tech: ["Next.js", "TypeScript", "SEO"],
-    metricIds: ["visualboostCatalog"],
+    metricIds: ["visualboostCatalog", "visualboostLighthouse"],
   },
 ];
