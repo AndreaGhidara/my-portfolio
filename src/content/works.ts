@@ -1,5 +1,5 @@
 export type Work = {
-  /** È anche la chiave di traduzione: works.list.<id>.symptom */
+  /** È anche la chiave di traduzione: works.list.<id>.riga */
   id: string;
   /**
    * Assente quando non c'e' un sito da visitare. Oggi ce l'hanno tutti e tre,
@@ -35,7 +35,7 @@ export const works: Work[] = [
   {
     id: "bdroppy",
     url: "https://www.bdroppy.com",
-    screenshot: "/works/bdroppy.png",
+    screenshot: "/works/bdroppy.webp",
     year: 2025,
     tech: ["Next.js", "TypeScript", "SEO"],
     metricIds: ["bdroppyComponents", "bdroppyDowntime"],
@@ -43,7 +43,7 @@ export const works: Work[] = [
   {
     id: "aidify",
     url: "https://aidify.cx",
-    screenshot: "/works/aidify.png",
+    screenshot: "/works/aidify.webp",
     year: 2025,
     tech: ["Next.js", "TypeScript", "GraphQL", "Supabase"],
     metricIds: ["aidifyConversations"],
@@ -51,7 +51,7 @@ export const works: Work[] = [
   {
     id: "visualboost",
     url: "https://visual-boost.com",
-    screenshot: "/works/visualboost.png",
+    screenshot: "/works/visualboost.webp",
     year: 2025,
     tech: ["Next.js", "TypeScript", "SEO"],
     metricIds: ["visualboostCatalog"],

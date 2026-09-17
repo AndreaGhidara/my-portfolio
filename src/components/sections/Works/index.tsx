@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { works } from "@/content/works";
 import { metricById } from "@/content/metrics";
+import { shotBySrc } from "@/content/works-shots";
 import { WorksView } from "./WorksView";
 import type { WorkCaseData } from "./types";
 
@@ -11,12 +12,12 @@ export async function Works() {
   const items: WorkCaseData[] = works.map((work) => ({
     id: work.id,
     name: t(`list.${work.id}.name`),
-    symptom: t(`list.${work.id}.symptom`),
-    alternativa: t(`list.${work.id}.alternativa`),
-    perche: t(`list.${work.id}.perche`),
-    fatto: t(`list.${work.id}.fatto`),
+    riga: t(`list.${work.id}.riga`),
+    lavoro: t(`list.${work.id}.lavoro`),
+    scelta: t(`list.${work.id}.scelta`),
+    conduzione: t(`list.${work.id}.conduzione`),
     url: work.url,
-    screenshot: work.screenshot,
+    screenshot: work.screenshot ? shotBySrc(work.screenshot) : undefined,
     screenshotAlt: t("labels.screenshotAlt", { name: t(`list.${work.id}.name`) }),
     year: work.year,
     tech: work.tech,
@@ -32,9 +33,9 @@ export async function Works() {
       title={t("title")}
       intro={t("intro")}
       labels={{
-        alternativa: t("labels.alternativa"),
-        perche: t("labels.perche"),
-        fatto: t("labels.fatto"),
+        lavoro: t("labels.lavoro"),
+        scelta: t("labels.scelta"),
+        conduzione: t("labels.conduzione"),
         visit: t("labels.visit"),
         riservato: t("labels.riservato"),
         open: t("labels.open"),

@@ -5,7 +5,8 @@
     "contact": "Contatti",
     "themeToggle": "Cambia tema chiaro o scuro",
     "languageLabel": "Lingua",
-    "skipToContent": "Vai al contenuto"
+    "skipToContent": "Vai al contenuto",
+    "sections": "Sezioni"
   },
   "hero": {
     "eyebrow": "Sviluppatore web · Full stack · Italia",
@@ -172,12 +173,12 @@
   },
   "works": {
     "eyebrow": "Lavori",
-    "title": "Quattro volte che la strada comoda era quella sbagliata",
-    "intro": "In ogni progetto c'è una scelta ovvia, quella che tutti propongono per prima. Queste sono quattro volte in cui non era quella giusta, e cosa è successo invece. Tre nascono nei quindici mesi in D.lab; la quarta è di adesso, e su quella ho firmato: posso raccontarti il lavoro, non il nome.",
+    "title": "Quattro lavori, e come sono stati condotti",
+    "intro": "Quattro progetti veri. Per ognuno: cos'era il lavoro, la soluzione che ho scelto e perché quella, e come è stato condotto fino alla consegna.",
     "labels": {
-      "alternativa": "L'alternativa comoda",
-      "perche": "Perché no",
-      "fatto": "Cosa abbiamo fatto",
+      "lavoro": "Il lavoro",
+      "scelta": "La soluzione scelta",
+      "conduzione": "Come è stata condotta",
       "visit": "Visita il sito",
       "open": "Apri il caso",
       "close": "Chiudi",
@@ -187,31 +188,31 @@
     "list": {
       "riservato": {
         "name": "Riservato",
-        "symptom": "Un'attività che lavorava su più strumenti e più piattaforme, con gli stessi dati in posti diversi e nessuno in grado di dire quale versione fosse quella buona.",
-        "alternativa": "Collegare fra loro gli strumenti che c'erano già.",
-        "perche": "Le integrazioni non tolgono le copie, le moltiplicano: ogni strumento resta padrone dei suoi dati, e il giorno che uno dei due cambia il collegamento si rifà da capo.",
-        "fatto": "Una piattaforma sola, costruita a fasi, e la prima doveva sostituire qualcosa per davvero. Dentro ci vivono lo streaming video, i documenti e i contratti dei clienti, e tanti operatori che scrivono sulle stesse cose nello stesso momento."
+        "riga": "Un'attività che lavorava su più strumenti e più piattaforme, con gli stessi dati in posti diversi e nessuno in grado di dire quale versione fosse quella buona.",
+        "lavoro": "Una piattaforma sola al posto degli strumenti sparsi. Dentro ci vivono lo streaming video, i documenti e i contratti dei clienti, e tanti operatori che scrivono sulle stesse cose nello stesso momento.",
+        "scelta": "Sostituire gli strumenti, non collegarli fra loro. Le integrazioni non tolgono le copie, le moltiplicano: ogni strumento resta padrone dei suoi dati, e il giorno che uno dei due cambia il collegamento si rifà da capo.",
+        "conduzione": "A fasi, e la prima doveva sostituire qualcosa per davvero invece di aggiungersi a quello che c'era già: finché il vecchio strumento resta acceso accanto al nuovo, i dati continuano a stare in due posti."
       },
       "bdroppy": {
         "name": "BDroppy",
-        "symptom": "La piattaforma era ferma su Next 14. Ogni funzionalità nuova richiedeva settimane e il team aveva paura di toccare il codice.",
-        "alternativa": "Riscrivere la piattaforma da zero.",
-        "perche": "Una riscrittura si consegna tutta insieme, e fino a quel giorno l'azienda resta su quello che ha. Questa doveva continuare a vendere ogni giorno della migrazione.",
-        "fatto": "Una rotta per volta, vecchia e nuova in convivenza dietro lo stesso indirizzo. Oggi è su Next 15 e TypeScript, e il servizio non si è mai fermato."
+        "riga": "La piattaforma era ferma su Next 14. Ogni funzionalità nuova richiedeva settimane e il team aveva paura di toccare il codice.",
+        "lavoro": "Una piattaforma che vende ogni giorno, e che quindi non poteva avere una finestra di fermo: qualunque cosa si facesse, doveva succedere mentre il negozio era aperto.",
+        "scelta": "Migrare una rotta alla volta, invece di riscrivere da zero. Una riscrittura si consegna tutta insieme, e fino a quel giorno l'azienda resta su quello che ha.",
+        "conduzione": "Vecchia e nuova in convivenza dietro lo stesso indirizzo: ogni rotta migrata andava in produzione per conto suo, senza aspettare le altre. Oggi è su Next 15 e TypeScript, e il servizio non si è mai fermato."
       },
       "aidify": {
         "name": "Aidify",
-        "symptom": "Un'assistenza clienti sommersa dalle stesse dieci domande, ripetute su cinque piattaforme e-commerce diverse.",
-        "alternativa": "Un chatbot addestrato sulle domande più frequenti.",
-        "perche": "Indovina, e quando indovina male lo fa con la stessa sicurezza di quando indovina bene. Il cliente se ne accorge dopo aver comprato.",
-        "fatto": "Collegato al catalogo e agli ordini veri, non a un modello che indovina. E il confine di quello che sa è scritto nel codice: oltre quello, la conversazione passa a un operatore senza che il cliente debba chiederlo."
+        "riga": "Un'assistenza clienti sommersa dalle stesse dieci domande, ripetute su cinque piattaforme e-commerce diverse.",
+        "lavoro": "Un assistente che risponde al posto delle persone sulle domande che tornano sempre, sulle cinque piattaforme e-commerce da cui arrivano.",
+        "scelta": "Legarlo al catalogo e agli ordini veri, invece di addestrare un modello sulle domande più frequenti. Un modello indovina, e quando indovina male lo fa con la stessa sicurezza di quando indovina bene: il cliente se ne accorge dopo aver comprato.",
+        "conduzione": "Il confine di quello che l'assistente sa non è affidato al modello, è scritto nel codice: oltre quel confine la conversazione passa a un operatore senza che il cliente debba chiederlo."
       },
       "visualboost": {
         "name": "VisualBoost",
-        "symptom": "Un archivio di immagini editoriali che nessuno riusciva a sfogliare senza restare ad aspettare.",
-        "alternativa": "Ottimizzare il codice che disponeva le immagini.",
-        "perche": "È il primo posto dove si guarda, e quasi mai è lì. A pesare erano le immagini, non il codice che le metteva in pagina.",
-        "fatto": "Formati moderni, dimensioni giuste e caricamento progressivo, prima di ogni altra cosa. La landing pubblica è stata poi rifatta da altri: quello che resta è l'impianto sotto."
+        "riga": "Un archivio di immagini editoriali che nessuno riusciva a sfogliare senza restare ad aspettare.",
+        "lavoro": "Un archivio editoriale da sfogliare, dove il contenuto è fatto quasi solo di immagini pesanti.",
+        "scelta": "Lavorare sulle immagini, non sul codice che le impagina. Il codice è il primo posto dove si guarda, e quasi mai è lì: a pesare erano i file.",
+        "conduzione": "Formati moderni, dimensioni giuste e caricamento progressivo, prima di ogni altra cosa. La landing pubblica è stata poi rifatta da altri: quello che resta è l'impianto sotto."
       }
     }
   },
@@ -373,7 +374,7 @@
     }
   },
   "footer": {
-    "tagline": "Costruisco software per il web. Da Torino, per chi capita.",
+    "tagline": "Costruisco software per il web. Da Torino, per chi ha un'attività da far crescere.",
     "rispondiA": "Rispondi a",
     "ancheQui": "Anche qui",
     "citta": "10100 Torino (TO), Italia",

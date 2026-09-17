@@ -1,3 +1,4 @@
+import { Reveal } from "@/animations/components/Reveal";
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { QuoteFrame } from "@/components/brand/QuoteFrame";
 import { WorksShelf } from "./WorksShelf";
@@ -20,17 +21,17 @@ export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewPro
           modulo client qui arriverebbe `undefined`. Vedi finestre.ts. */}
       <ThreadSegment section="works" className="pointer-events-none absolute inset-0 -z-10" />
 
-      <div className="mx-auto max-w-4xl">
+      <Reveal className="mx-auto max-w-4xl" moto="dietro" stagger={0.08}>
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="eyebrow">{eyebrow}</p>
             <h2 className="mt-3 text-3xl lg:text-5xl">{title}</h2>
           </div>
-          <QuoteFrame variant="close" className="block w-10 shrink-0 lg:w-14 [&_img]:h-auto [&_img]:w-full" />
+          <QuoteFrame variant="close" className="block w-10 shrink-0 lg:w-14" />
         </div>
 
         <p className="mt-5 max-w-2xl text-[var(--fg-muted)]">{intro}</p>
-      </div>
+      </Reveal>
 
       {/* Lo schedario esce dalla colonna del testo: quattro cartelle accostate
           dentro 896px lascerebbero al sintomo una colonna da poche parole per
