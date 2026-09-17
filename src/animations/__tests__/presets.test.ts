@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { lunghezzaDelTratteggio, TESSITURA, INTRO_FILO } from "../presets";
+import { lunghezzaDelTratteggio, pulizia, TESSITURA, INTRO_FILO } from "../presets";
 
 /**
  * Un finto <path>: jsdom non ha ne' getTotalLength ne' getScreenCTM, e qui
@@ -157,5 +157,51 @@ describe("l'entrata e' una testa sola che scende", () => {
   it("la riga dell'entrata e quella dello scorrimento sono la stessa", async () => {
     const { FINESTRA, TESSITURA } = await import("../presets");
     expect(FINESTRA).toBeCloseTo(Number.parseFloat(TESSITURA.fine.split(" ")[1]) / 100, 5);
+  });
+});
+
+describe("la pulizia di fine entrata", () => {
+  function conStili(transform: string, opacity: string) {
+    const el = document.createElement("div");
+    el.style.transform = transform;
+    el.style.opacity = opacity;
+    return el;
+  }
+
+  it("senza richiesta non aggiunge niente alle vars", () => {
+    // Nemmeno una chiave a undefined: `clearProps: undefined` bastava a far
+    // registrare il plugin di GSAP, che poi faceva split su undefined e
+    // lanciava a ogni fotogramma di ogni entrata.
+    expect(pulizia(document.createElement("div"))).toEqual({});
+    expect(pulizia(document.createElement("div"), false)).toEqual({});
+  });
+
+  it("a movimento finito toglie transform e opacita', e lascia il resto", () => {
+    const el = conStili("translate(0px, 0px)", "1");
+    el.style.zIndex = "3";
+    const vars = pulizia(el, true);
+    (vars.onComplete as () => void)();
+    expect(el.style.transform).toBe("");
+    expect(el.style.opacity).toBe("");
+    expect(el.style.zIndex, "ha ripulito anche cose che non erano sue").toBe("3");
+  });
+
+  it("con una stringa tocca solo quelle proprieta'", () => {
+    // I pezzi del tavolo hanno un'opacita' scritta da React come funzione CSS:
+    // toglierla vorrebbe dire buttare via la regola della camera.
+    const el = conStili("rotate(3deg)", "0.5");
+    const vars = pulizia(el, "transform");
+    (vars.onComplete as () => void)();
+    expect(el.style.transform).toBe("");
+    expect(el.style.opacity).toBe("0.5");
+  });
+
+  it("ripulisce tutti i bersagli, non solo il primo", () => {
+    const uno = conStili("translate(1px, 0px)", "1");
+    const due = conStili("translate(2px, 0px)", "1");
+    const vars = pulizia([uno, due], true);
+    (vars.onComplete as () => void)();
+    expect(uno.style.transform).toBe("");
+    expect(due.style.transform).toBe("");
   });
 });

@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import { weave } from "@/animations/presets";
 import { FINESTRE_FILO } from "@/animations/finestre";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import { THREAD_ANCHORS, type SectionId } from "./anchors";
@@ -53,7 +52,8 @@ export function ThreadSegment({
   // qualunque sia il rapporto fra larghezza e altezza della sezione.
   const d = `M${entry} 0 C${entry} 45, ${exit} 55, ${exit} 100`;
 
-  useSectionAnimation((level) => {
+  useSectionAnimation(({ level, presets }) => {
+    const { weave } = presets;
     const paths = Array.from(scope.current?.querySelectorAll("path") ?? []);
     const tl = weave(paths as SVGPathElement[], {
       level,

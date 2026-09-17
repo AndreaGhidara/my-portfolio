@@ -1,8 +1,6 @@
 "use client";
 
 import { useRef, type ReactNode } from "react";
-import { gsap } from "@/animations/gsap";
-import { paint, reveal, stamp } from "@/animations/presets";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 
 /**
@@ -13,7 +11,8 @@ import { useSectionAnimation } from "@/animations/useSectionAnimation";
 export function HeroMotion({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement | null>(null);
 
-  useSectionAnimation((level) => {
+  useSectionAnimation(({ level, gsap, presets }) => {
+    const { paint, reveal, stamp } = presets;
     const root = scope.current;
     if (!root) return;
 
@@ -23,10 +22,37 @@ export function HeroMotion({ children }: { children: ReactNode }) {
     const intro = gsap.timeline();
     intro.add(stamp(letters, { level, stagger: 0.09 }) ?? gsap.timeline());
     intro.add(paint(circle, { level }) ?? gsap.timeline(), "-=0.35");
-    intro.add(
-      reveal(root.querySelectorAll("[data-hero-copy] > *"), { level, stagger: 0.08 }) ?? gsap.timeline(),
-      "-=0.4",
+    /* Il claim e il resto della copia entrano insieme, ma in due modi diversi,
+       e la ragione e' una metrica.
+       Il claim e' l'elemento piu' grande della prima schermata: e' lui che il
+       browser cronometra come Largest Contentful Paint. Portandolo a opacita'
+       zero — come fa `reveal` — se l'animazione parte PRIMA che il browser
+       l'abbia dipinto, quel cronometro non parte al primo disegno ma quando la
+       frase ricompare. Misurato con Lighthouse mobile: LCP a 3,0s con 2,5s di
+       sola attesa, su una frase che nel documento c'e' dall'inizio.
+       Quindi il claim si muove e basta, senza dissolvenza: sale di qualche
+       pixel, resta sempre visibile, e l'LCP e' il primo disegno. Il resto della
+       copia — sottotitolo e bottoni — non e' l'elemento piu' grande e puo'
+       continuare a comparire. */
+    const claim = root.querySelector<HTMLElement>("[data-hero-claim]");
+    const resto = [...root.querySelectorAll<HTMLElement>("[data-hero-copy] > *")].filter(
+      (el) => el !== claim,
     );
+
+    if (claim) {
+      intro.add(
+        gsap.from(claim, {
+          y: level === "full" ? 20 : 14,
+          duration: level === "full" ? 0.7 : 0.55,
+          ease: "power3.out",
+          onComplete: () => claim.style.removeProperty("transform"),
+        }),
+        "-=0.4",
+      );
+    }
+    if (resto.length) {
+      intro.add(reveal(resto, { level, stagger: 0.08 }) ?? gsap.timeline(), "-=0.5");
+    }
     // Le frecce per ultime, e senza sovrapposizione: invitano a scorrere, e
     // ha senso invitare solo quando c'e' gia' qualcosa da guardare.
     intro.add(reveal(root.querySelectorAll("[data-hero-outro]"), { level }) ?? gsap.timeline());
