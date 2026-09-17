@@ -12,16 +12,32 @@ export function HeroMotion({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement | null>(null);
 
   useSectionAnimation(({ level, gsap, presets }) => {
-    const { paint, reveal, stamp } = presets;
+    const { cresce, paint, reveal, stamp } = presets;
     const root = scope.current;
     if (!root) return;
 
     const letters = root.querySelectorAll(".wordmark-letter");
     const circle = root.querySelector("[data-ink-circle-fill]");
+    const ritratto = root.querySelector("[data-hero-avatar] img");
 
     const intro = gsap.timeline();
     intro.add(stamp(letters, { level, stagger: 0.09 }) ?? gsap.timeline());
     intro.add(paint(circle, { level }) ?? gsap.timeline(), "-=0.35");
+    /* La testa cresce DENTRO il cerchio che si sta ancora dipingendo: entra a
+       un terzo di quella pennellata, cosi' le due cose si leggono come un
+       gesto solo invece che come due animazioni in fila.
+
+       L'origine e' il centro del cerchio, non quello dell'immagine: il
+       ritratto e' alzato del 16% della propria altezza per far uscire la testa
+       dal bordo, e quell'alzata sposta il suo centro sopra il centro del
+       cerchio. I conti: l'immagine e' l'88% del cerchio e sta alzata di
+       0,16 x 0,88 = 14,08% del cerchio, quindi il centro del cerchio cade al
+       66% dell'altezza dell'immagine. Crescendo dal 50% la testa si aprirebbe
+       a cavallo del bordo. */
+    intro.add(
+      cresce(ritratto, { level, origine: "50% 66%" }) ?? gsap.timeline(),
+      "-=0.55",
+    );
     /* Il claim e il resto della copia entrano insieme, ma in due modi diversi,
        e la ragione e' una metrica.
        Il claim e' l'elemento piu' grande della prima schermata: e' lui che il
