@@ -3,6 +3,7 @@ import { Archivo, Archivo_Black, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "@/app/globals.css";
 import { Navbar } from "@/components/shell/Navbar";
+import { BottomNav } from "@/components/shell/BottomNav";
 import { TopStateScript } from "@/components/shell/TopStateScript";
 import { HeaderScrollState } from "@/components/shell/HeaderScrollState";
 import { WebCorner } from "@/components/brand/WebCorner";
@@ -10,6 +11,7 @@ import { Footer } from "@/components/sections/Footer";
 import { ThemeScript } from "@/components/shell/ThemeScript";
 import { SmoothScroll } from "@/components/shell/SmoothScroll";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import Script from "next/script";
@@ -115,6 +117,16 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * Le due lingue sono due, e si sanno prima: senza questo Next tratta la pagina
+ * come dinamica e la ricostruisce a ogni richiesta. Misurato con Lighthouse
+ * mobile: 453ms di attesa per il primo byte, cioe' il 15% dell'LCP speso a
+ * rifare un lavoro il cui risultato non cambia mai.
+ */
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export default async function RootLayout({
   children,
   params,
@@ -126,6 +138,11 @@ export default async function RootLayout({
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+
+  /* Dice a next-intl quale lingua sta costruendo. Senza, ogni `getTranslations`
+     piu' in basso chiede la lingua alla richiesta in corso, e una richiesta in
+     corso durante il build non c'e': la pagina ricade su dinamica. */
+  setRequestLocale(locale);
 
   /* I dati strutturati sono il posto legittimo dei metadati: nessuno li vede,
      e non sono testo nascosto per posizionarsi. Sono anche la fonte che gli
@@ -207,6 +224,9 @@ export default async function RootLayout({
         {/* Fuori da <main>: e' chrome di sito come la Navbar, e un <footer>
             dentro <main> perde il ruolo implicito contentinfo (HTML-AAM). */}
         <Footer />
+        {/* Ultima nel DOM come si conviene a una barra fissa: chi naviga da
+            tastiera la trova dopo il contenuto, non prima. */}
+        <BottomNav />
       </body>
     </html>
   );
