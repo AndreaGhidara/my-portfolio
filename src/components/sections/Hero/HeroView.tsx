@@ -62,7 +62,18 @@ export function HeroView({
 
         <div data-hero-avatar className="relative z-10 -mt-[6%] flex justify-center">
           <InkCircle className="relative grid size-32 place-items-center lg:size-44">
-            <Avatar alt={avatarAlt} className="relative z-10 w-[88%]" />
+            {/* Alzato di un dodicesimo della propria altezza: la testa esce dal
+                cerchio invece di starci dentro come in un francobollo. Il
+                ritratto e il cerchio sono due disegni diversi, e finche' il
+                secondo conteneva il primo si leggevano come un'immagine sola
+                incollata sopra un'altra. In percentuale e non in pixel perche'
+                il cerchio cambia misura fra telefono (128px) e desktop
+                (176px): la testa deve uscire della stessa quantita' relativa,
+                non degli stessi pixel.
+                Transform e non margine: il cerchio resta dov'e', e a muoversi
+                e' solo il ritratto. La parallasse del puntatore lavora sul
+                genitore [data-hero-avatar], quindi non si pestano i piedi. */}
+            <Avatar alt={avatarAlt} className="relative z-10 w-[88%] -translate-y-[12%]" />
           </InkCircle>
         </div>
 
