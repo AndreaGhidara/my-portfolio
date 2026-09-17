@@ -1,3 +1,4 @@
+import { Reveal } from "@/animations/components/Reveal";
 export type FooterViewProps = {
   tagline: string;
   /** L'etichetta sopra l'indirizzo: «Rispondi a». */
@@ -81,7 +82,10 @@ export function FooterView({
 
   return (
     <footer data-footer>
-      <div data-busta data-testid="busta">
+      {/* I tre blocchi della busta entrano uno dopo l'altro. L'attributo resta
+          qui: [data-busta] porta il fondo, la patta e il taglio in fondo alla
+          pagina, e un involucro in mezzo li staccherebbe dal contenuto. */}
+      <Reveal data-busta data-testid="busta" moto="dietro" stagger={0.12}>
         <div data-busta-alto>
           <p data-busta-profili data-testid="busta-profili">
             <span data-busta-et>{ancheQui}</span>
@@ -107,7 +111,13 @@ export function FooterView({
               pagina: la citta' sta gia' nella riga dell'indirizzo, e il resto
               e' disegno. Un nome accessibile qui sarebbe la stessa cosa letta
               due volte. */}
-          <span
+          {/* Il francobollo e l'annullo cadono sulla busta dopo che la busta
+              c'e': e' il gesto di affrancare, e succede per ultimo anche nella
+              vita. `as="span"` perche' qui dentro sta in una riga di testo. */}
+          <Reveal
+            as="span"
+            moto="alto"
+            delay={0.25}
             data-busta-affrancatura
             data-testid="busta-affrancatura"
             aria-hidden="true"
@@ -159,7 +169,7 @@ export function FooterView({
                 {data}
               </text>
             </svg>
-          </span>
+          </Reveal>
         </div>
 
         <div data-busta-indirizzo data-testid="busta-indirizzo">
@@ -188,7 +198,7 @@ export function FooterView({
             </p>
           </div>
         </div>
-      </div>
+      </Reveal>
     </footer>
   );
 }

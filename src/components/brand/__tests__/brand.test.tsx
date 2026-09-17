@@ -46,6 +46,20 @@ describe("elementi decorativi", () => {
     expect(container.firstElementChild).toHaveAttribute("aria-hidden", "true");
   });
 
+  it("il segno e' una maschera e non un'immagine: cosi' esiste anche sul tema scuro", () => {
+    // Il file e' inchiostro su trasparente. Messo come <img> resta inchiostro
+    // anche quando la pagina diventa inchiostro, e le virgolette spariscono.
+    // Da maschera prende --fg, che e' carta sul tema scuro e inchiostro sul
+    // chiaro: un file solo, giusto in tutti e due. E' la stessa strada del
+    // cerchio d'inchiostro.
+    const { container } = render(<QuoteFrame variant="open" />);
+    const segno = container.querySelector("[data-quote-fill]") as HTMLElement | null;
+    expect(segno, "manca il segno mascherato").not.toBeNull();
+    expect(segno!.style.backgroundColor).toBe("var(--fg)");
+    expect(segno!.style.mask || segno!.style.webkitMask).toContain("quote-open");
+    expect(container.querySelector("img"), "e' ancora un'immagine").toBeNull();
+  });
+
   it("la ragnatela è nascosta alla tecnologia assistiva", () => {
     const { container } = render(<WebCorner />);
     expect(container.firstElementChild).toHaveAttribute("aria-hidden", "true");

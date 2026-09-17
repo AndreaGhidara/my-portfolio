@@ -32,7 +32,10 @@ export async function Navbar() {
         {t("skipToContent")}
       </a>
 
-      <a href="#top" className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-[var(--fg)]">
+      {/* py: il nome e' alto 17px, e un bersaglio da 17px sta sotto i 24 di
+          WCAG 2.2. La barra non si alza: la sua altezza la detta il bottone
+          del tema, che resta il pezzo piu' alto. */}
+      <a href="#top" className="py-2 text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-[var(--fg)]">
         {site.name}
       </a>
 

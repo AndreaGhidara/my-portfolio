@@ -21,10 +21,14 @@ export function LanguageSwitcher({ label }: { label: string }) {
           type="button"
           onClick={() => router.replace(pathname, { locale: code })}
           aria-current={code === locale ? "true" : undefined}
+          // px/py sono bersaglio e non decorazione: due lettere da 12px
+          // facevano un'area da 26x16, sotto i 24x24 che WCAG 2.2 chiede.
+          // L'altezza della barra non cambia: la detta il bottone del tema,
+          // che e' piu' alto di cosi'.
           className={
             code === locale
-              ? "px-1.5 text-[var(--fg)]"
-              : "px-1.5 text-[var(--fg-muted)] hover:text-[var(--fg)]"
+              ? "px-2 py-2.5 text-[var(--fg)]"
+              : "px-2 py-2.5 text-[var(--fg-muted)] hover:text-[var(--fg)]"
           }
         >
           {code.toUpperCase()}

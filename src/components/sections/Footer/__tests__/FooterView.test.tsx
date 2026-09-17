@@ -3,7 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import { FooterView } from "../FooterView";
 
 const props = {
-  tagline: "Costruisco software per il web. Da Torino, per chi capita.",
+  tagline: "Costruisco software per il web. Da Torino, per chi ha un'attività da far crescere.",
   rispondiA: "Rispondi a",
   ancheQui: "Anche qui",
   citta: "10100 Torino (TO), Italia",
