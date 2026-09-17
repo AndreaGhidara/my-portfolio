@@ -21,6 +21,19 @@
      ribaltarsi. Non entra nessun colore nuovo in tavolozza. */
   --filo: var(--muted);
 
+  /* Il fondo delle cose appoggiate sulla pagina: le cartelle dello schedario.
+     Sul chiaro e' il fondo di pagina e non cambia niente, perche' li' il bordo
+     basta a staccarle. Vedi la variante scura sotto. */
+  --superficie: var(--bg);
+
+  /* L'arancio quando fa da TESTO sul fondo di pagina, e non da fondo lui.
+     Pieno su carta fa 3,27:1, e quasi tutte le etichette che lo usano stanno
+     sotto i 12px: sotto il 4,5:1 che WCAG chiede al testo piccolo. Scurito
+     con l'inchiostro fa 5,42:1 e resta arancio. Non e' --accento-su-carta,
+     che vive dentro i fogli chiari appoggiati sull'arancio e resta carta in
+     tutti e due i temi: questo invece segue il fondo della pagina. */
+  --accento-testo: color-mix(in oklab, var(--accent) 72%, var(--ink));
+
   --radius: 10px;
   --section-y: 4.5rem;
   --gutter: 1.25rem;
@@ -42,6 +55,15 @@
 [data-theme="dark"] {
   --bg: var(--ink);
   --fg: var(--paper);
+  /* Su inchiostro l'arancio pieno fa gia' 5,08:1: scurirlo qui lo
+     spegnerebbe e basta. */
+  --accento-testo: var(--accent);
+  /* Su inchiostro una cartella col fondo della pagina non ha corpo: restano
+     quattro rettangoli di bordo, e l'accostamento che fa lo schedario non si
+     legge piu'. Un gradino di carta dentro l'inchiostro basta a rimetterle
+     sopra il piano. Non entra un colore nuovo in tavolozza: e' una miscela
+     dei due che ci sono gia'. */
+  --superficie: color-mix(in oklab, var(--paper) 7%, var(--ink));
   --fg-muted: #A79E8C; /* from palette.mutedDark */
   --line: var(--muted); /* il vecchio lineDark era a 1.52:1 su --ink, sotto la soglia 3:1 WCAG per elementi non testuali */
 }
@@ -198,7 +220,11 @@ h1, h2, h3, h4, .display {
   transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-[data-work-shelf] > * + * { margin-top: -0.4rem; }
+/* Staccate, sul telefono. Si sovrapponevano di 0,4rem per leggersi come una
+   pila: in colonna pero' la sovrapposizione non e' una pila, e' una cartella
+   che tocca quella sotto. Da 1024px in su tornano accostate, e li' ha senso:
+   e' l'occlusione di fianco a fare lo schedario. */
+[data-work-shelf] > * + * { margin-top: 0.9rem; }
 
 [data-work-shelf] > *:hover,
 [data-work-shelf] > *:focus-visible {
@@ -271,6 +297,66 @@ h1, h2, h3, h4, .display {
 
 html[data-dialog-open],
 html[data-dialog-open] body { overflow: hidden; }
+
+/* Le due sezioni in cui un blocco entra di lato. Per mezzo secondo la voce sta
+   fuori dal bordo destro, e senza ritaglio quel mezzo secondo la pagina si puo'
+   trascinare in orizzontale: misurato, 429px di documento su una finestra da
+   390.
+   `clip` e non `hidden`: hidden fa di questi due un contenitore di scorrimento,
+   e un contenitore di scorrimento in mezzo rompe l'intestazione appiccicata in
+   cima alla pagina. clip taglia e basta. Dove non e' supportato (Safari sotto
+   la 16) si torna al comportamento di prima, che e' brutto ma non rotto. */
+#services,
+#process {
+  overflow-x: clip;
+}
+
+/* ── La barra in basso ─────────────────────────────────────────────────────
+   Sotto i 768px la barra in alto perde le tre voci (accanto a nome, lingua e
+   tema non ci stanno) e la pagina e' alta una ventina di schermate: da meta'
+   sito, per tornare ai Contatti, si scorreva a mano fino in fondo. Qui le tre
+   voci restano ferme dove il pollice arriva senza spostare la mano.
+   Sopra i 768px non esiste: li' stanno in alto, che e' dove uno le cerca. */
+[data-nav-basso] {
+  display: none;
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 40;
+  /* Semitrasparente come la barra in alto, e per la stessa ragione: sotto ci
+     scorre il sito, e un fondo pieno la farebbe leggere come il bordo dello
+     schermo invece che come una cosa appoggiata sopra la pagina. */
+  background-color: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-block-start: 1px solid var(--line);
+  /* La tacca dei telefoni senza tasto: senza questo, l'ultima riga di voci
+     finisce sotto la barra di sistema. */
+  padding-block-end: env(safe-area-inset-bottom, 0px);
+}
+
+/* 3,25rem = 52px: sopra i 24 di WCAG 2.2 e sopra i 44 consigliati per il
+   pollice. La larghezza se la dividono in tre parti uguali, cosi' nessuna
+   delle tre e' piu' facile da prendere delle altre. */
+[data-nav-basso] a {
+  flex: 1 1 0;
+  min-block-size: 3.25rem;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* Il dossier sta a tutto schermo e ha gia' la sua uscita: una seconda
+   navigazione appiccicata sopra coprirebbe la cosa che sei appena andato ad
+   aprire. */
+html[data-dialog-open] [data-nav-basso] { display: none; }
+
+@media (max-width: 767px) {
+  [data-nav-basso] { display: flex; }
+}
 
 /* Le quattro voci. La riga che attraversa la fascia centrale dello schermo si
    accende e si fa avanti di qualche pixel: scorrendo, l'attenzione passa da una
@@ -560,7 +646,9 @@ html[data-dialog-open] body { overflow: hidden; }
     font-family: var(--font-mono), ui-monospace, monospace;
     font-size: 0.62rem;
     letter-spacing: 0.18em;
-    color: var(--accent);
+    /* L'arancio da testo: questi numeri sono a 0,62rem su carta, e pieno
+       farebbe 3,27:1. */
+    color: var(--accento-testo);
   }
   [data-desk-caption] h3 { margin-block-start: 0.15rem; }
 
@@ -609,13 +697,13 @@ html[data-dialog-open] body { overflow: hidden; }
   [data-desk-object] [data-desk-sample] [data-m="mono"] { font-size: 7.8cqw; }
   [data-desk-object] [data-desk-sample] [data-m="mono"][data-piccolo] { font-size: 6.2cqw; }
 
-  [data-desk-world][data-layout="wide"] {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
+  /* Fuori dall'impaginato per davvero, non ridotto a un pixel ritagliato.
+     Era nascosto ma restava nel flusso: 305 elementi su 1.335 che sotto i
+     1024px nessuno vedra' mai, e che il browser continuava a impaginare e a
+     ricalcolare a ogni scorsa. Misurato: -28% di CPU durante lo scorrimento.
+     Nessuno lo misura da qui: la camera legge questo mondo solo a livello
+     pieno, che vuole gia' i 1024px e il puntatore fine. */
+  [data-desk-world][data-layout="wide"] { display: none; }
   [data-desk-world][data-layout="tall"] {
     display: block;
     width: min(92vw, 26rem);
@@ -938,9 +1026,21 @@ html[data-dialog-open] body { overflow: hidden; }
   opacity: 1;
 }
 
-/* ...e la nota si toglie di mezzo, o le due scritte si sovrappongono. */
+/* ...e la nota si toglie di mezzo, o le due scritte si sovrappongono.
+   Il secondo selettore e' lo stesso caso visto dall'altra parte: a tavolo
+   fermo la domanda sta scritta sempre (riga sopra) e l'hover non succede mai,
+   perche' chi ha chiesto niente movimento o arriva con un puntatore grosso non
+   ha un modo di passarci sopra. Senza, quei due si leggono uno dentro
+   l'altro. */
 [data-desk-blank]:hover [data-desk-note],
-[data-desk-blank]:focus-visible [data-desk-note] {
+[data-desk-blank]:focus-visible [data-desk-note],
+/* ...e a tavolo fermo, ma SOLO nel mondo dove la domanda esiste. Nel gemello
+   (quello che si vede sotto i 1024px, aria-hidden per intero) la domanda non
+   viene disegnata: spegnere anche li' la nota lasciava un post-it grigio e
+   muto, che e' il difetto da cui era partita tutta questa storia. */
+[data-desk]:not([data-motion="full"])
+  [data-desk-world]:not([aria-hidden="true"])
+  [data-desk-note] {
   opacity: 0;
 }
 
@@ -1621,6 +1721,25 @@ html[data-dialog-open] body { overflow: hidden; }
   padding-block: 3.5rem;
 }
 [data-practice-text] { max-width: 36ch; }
+
+/* Sotto i 900px la voce e' una colonna sola larga quanto la pagina, e il testo
+   e' un blocco da 36ch: appoggiato a sinistra lasciava il resto vuoto. Misurato
+   su un tablet da 834px: 464px di niente a destra, con le quattro voci tutte
+   schiacciate su un lato. Centrato, il blocco sta dove si guarda.
+   Centrato il BLOCCO, non le righe: il testo resta allineato a sinistra, come
+   ovunque nel sito. Sopra i 900px non serve e non va fatto, perche' li' ci
+   pensa l'alternanza a due colonne. */
+@media (max-width: 899px) {
+  [data-practice-text] { margin-inline: auto; }
+  /* E anche i disegni. La scatola e' una casella di griglia che contiene solo
+     figli assoluti: con `margin-inline: auto` collassa a larghezza zero e i
+     disegni spariscono (successo, misurato: scatola larga 0 al centro). Serve
+     una larghezza vera e `justify-self`. */
+  [data-practice-art] {
+    width: min(100%, 34rem);
+    justify-self: center;
+  }
+}
 [data-practice-text] h4 {
   margin-block-start: 0.25rem;
   font-size: clamp(1.25rem, 2.2vw, 1.75rem);
@@ -2065,6 +2184,30 @@ html[data-dialog-open] body { overflow: hidden; }
 [data-process-item]:first-child { border-block-start: 0; padding-block-start: 1rem; }
 
 [data-process-text] { max-width: 34rem; }
+
+/* Sotto i 900px le consegne sono una colonna sola, larga quanto la pagina, ma
+   il testo si ferma a 34rem e il titolo della sezione a 30rem: appoggiati a
+   sinistra lasciavano un terzo di riga vuoto a destra, con il disegno che sotto
+   sta centrato. Misurato a 768px: 248px di vuoto sotto il titolo e 184 accanto
+   a ogni consegna, tutto spinto da una parte.
+   Si centra il BLOCCO, non le righe: dentro, il testo resta allineato a
+   sinistra. Da 900px in su non si tocca, perche' li' le due colonne si
+   dividono la riga e il tetto stretto serve a lasciare passare il filo. */
+@media (max-width: 899px) {
+  [data-process-text] { margin-inline: auto; }
+}
+
+/* La testata si centra fino a 1023px e non fino a 899: il suo tetto stretto
+   esiste per lasciar passare il filo nel corridoio fra le due colonne, e il
+   filo sotto i 1024px non c'e' proprio (vedi la regola che lo spegne). Fra i
+   900 e i 1023 le consegne sono gia' a due colonne ma la testata resterebbe
+   comunque un blocco stretto appoggiato a sinistra. */
+@media (max-width: 1023px) {
+  [data-process-testata] h2,
+  [data-process-testata] p {
+    margin-inline: auto;
+  }
+}
 [data-process-text] h3 {
   margin-block-start: 0.35rem;
   font-size: clamp(1.35rem, 2.4vw, 1.75rem);
@@ -2094,7 +2237,7 @@ html[data-dialog-open] body { overflow: hidden; }
   content: "\0000B7";
   position: absolute;
   inset-inline-start: 0;
-  color: var(--accent);
+  color: var(--accento-testo);
 }
 
 /* Cosa NON e'. In monospaziato e staccata dal filetto: e' una nota a margine
@@ -2376,7 +2519,7 @@ html[data-dialog-open] body { overflow: hidden; }
   font-size: 0.62rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accento-testo);
 }
 [data-contact-foglio] h3 { margin-block-start: 0.5rem; font-size: 1.6rem; }
 [data-contact-foglio-testo] {
@@ -2493,7 +2636,7 @@ textarea[data-contact-campo] {
   font-size: 0.62rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accento-testo);
   white-space: nowrap;
   padding-block-start: 0.15rem;
 }
@@ -2545,12 +2688,14 @@ textarea[data-contact-campo] {
   font-size: 0.6rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accento-testo);
 }
 [data-contact-badge] h3 { margin-block-start: 0.45rem; font-size: 1.35rem; }
 [data-contact-badge-testo] {
   margin-block-start: 0.5rem;
-  color: var(--fg-muted);
+  /* Non --fg-muted: il cartellino ha un fondo suo, piu' scuro della carta, e
+     li' il grigio spento scendeva a 4,22:1, sotto il 4,5:1 del testo piccolo. */
+  color: var(--fg);
   line-height: 1.6;
   font-size: 0.92rem;
   max-width: 30rem;
@@ -2709,6 +2854,16 @@ textarea[data-contact-campo] {
   grid-template-rows: auto 1fr auto;
 }
 
+/* La busta si fa da parte per la barra delle sezioni, che sotto i 768px sta
+   fissa in fondo allo schermo: senza questo spazio starebbe sopra l'ultima
+   riga della busta per sempre. Lo spazio va DENTRO la busta e non sotto il
+   piede, dove sarebbe una cornice del colore del blocco tutto intorno.
+   E va DOPO la regola qui sopra: quella dichiara `padding` per intero, e una
+   scorciatoia che arriva dopo azzererebbe questo lato. */
+@media (max-width: 767px) {
+  [data-busta] { padding-block-end: calc(2rem + 3.25rem + env(safe-area-inset-bottom, 0px)); }
+}
+
 /* La patta vista in trasparenza: due diagonali appena accennate dagli angoli
    di sopra. Non e' una busta aperta, e' lo spessore della carta contro luce. */
 [data-busta]::before {
@@ -2759,7 +2914,16 @@ textarea[data-contact-campo] {
   font-size: 0.72rem;
   line-height: 1.9;
 }
-[data-busta-profili] > a { display: block; text-decoration: none; border-block-end: 1px solid var(--line); }
+/* Il padding in cima e' bersaglio, non aria: il testo e' alto 12px e il
+   filetto gli sta attaccato sotto, quindi il link era alto 23px, sotto i 24
+   che WCAG 2.2 chiede a un bersaglio. Cresce solo verso l'alto, cosi' il
+   filetto resta dov'e'. */
+[data-busta-profili] > a {
+  display: block;
+  padding-block-start: 0.55rem;
+  text-decoration: none;
+  border-block-end: 1px solid var(--line);
+}
 [data-busta-profili] > a:hover { border-color: var(--accent); }
 
 /* ── L'affrancatura ─────────────────────────────────────────────────────── */
@@ -2841,6 +3005,10 @@ textarea[data-contact-campo] {
 [data-busta-mail] {
   display: inline-block;
   margin-block-start: 0.6rem;
+  /* Stessa ragione dei profili qui sopra: una riga di testo e' alta 20px. Qui
+     il padding non sposta niente, perche' la sottolineatura e' una
+     text-decoration e resta attaccata alle lettere. */
+  padding-block: 0.35rem;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: clamp(0.85rem, 1.4vw, 1.05rem);
   text-decoration: underline;

@@ -135,7 +135,12 @@ describe("il tavolo è la lista", () => {
     const comando = muti[0].querySelector("[data-desk-blank]") as HTMLElement;
     expect(comando).toHaveAttribute("href", "#contact");
     expect(comando).toHaveAttribute("tabindex", "-1");
-    expect(comando).toHaveTextContent("");
+    // Dentro ci sta la nota (il conto dei caffe'), che qui e' il disegno stesso
+    // del post-it: sotto i 1024px il mondo che si vede e' questo. Quello che il
+    // gemello NON porta e' la domanda, che e' il nome del comando: quella sta
+    // nell'altro mondo, l'unico che uno screen reader legge.
+    expect(comando.querySelector("[data-desk-note]")).not.toBeNull();
+    expect(comando.querySelector("[data-desk-ask]")).toBeNull();
   });
 
   it("le sagome sono decorative: il significato sta nell'etichetta, non nel disegno", () => {

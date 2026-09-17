@@ -167,7 +167,12 @@ export function DeskObject({
               e due testi dentro un <a> sono un comando che si annuncia due
               volte. Si scansa quando la domanda entra — non stanno nello stesso
               posto per caso, ci stanno tutte e due al centro del foglio. */}
-          {note && !ghost ? (
+          {/* Anche nel gemello, ed e' il mondo che si vede sotto i 1024px: senza,
+              da telefono il post-it era un quadrato grigio e basta. Non e' un
+              problema di lettura a voce — il gemello e' aria-hidden per intero —
+              ma di disegno: e' l'unico oggetto del tavolo che porta scritto
+              qualcosa, e vuoto non si capisce cosa sia. */}
+          {note ? (
             <span data-desk-note aria-hidden="true">
               {note}
             </span>

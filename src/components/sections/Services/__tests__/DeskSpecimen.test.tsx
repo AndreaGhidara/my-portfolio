@@ -99,11 +99,20 @@ describe("il post-it grigio", () => {
     expect(dentro, "la nota sta fuori dal comando").not.toBeNull();
   });
 
-  it("il gemello nascosto non la ripete", () => {
+  it("il gemello la porta: sotto i 1024px e' lui il disegno che si vede", () => {
+    // Prima qui ci si aspettava zero, e per una ragione che sembrava giusta:
+    // la stessa scritta in due mondi e' una ripetizione. Non lo e': il gemello
+    // e' aria-hidden per intero, quindi nessuno la legge due volte, e sotto i
+    // 1024px l'altro mondo il CSS lo riduce a un pixel. Senza la nota qui, da
+    // telefono il post-it era un quadrato grigio senza niente sopra, e nessuno
+    // capiva cosa fosse.
     const { container } = render(
       <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note={NOTA} layout="tall" ghost />,
     );
-    expect(container.querySelectorAll("[data-desk-note]")).toHaveLength(0);
+    const nota = container.querySelector("[data-desk-note]");
+    expect(nota).not.toBeNull();
+    expect(nota).toHaveTextContent(NOTA);
+    expect(nota).toHaveAttribute("aria-hidden", "true");
   });
 
   it("il numero sta dove stanno gli altri numeri inventati, e si dichiara tale", () => {
