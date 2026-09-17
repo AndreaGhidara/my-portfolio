@@ -1,4 +1,5 @@
 import { Reveal } from "@/animations/components/Reveal";
+import { JourneyList } from "./JourneyList";
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { Counter } from "./Counter";
 import { JourneyCard } from "./JourneyCard";
@@ -57,14 +58,18 @@ export function JourneyView({
         {/* Titolo in carta e occhiello in inchiostro, come nella seconda
             sezione: sull'arancio la scala dei toni e' quella, e --on-accent non
             si ribalta col tema mentre --fg-muted si'. */}
-        <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
-        <h2 className="mt-3 text-3xl text-[var(--paper)] lg:text-5xl">{title}</h2>
+        <Reveal moto="dietro" stagger={0.08}>
+          <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
+          <h2 className="mt-3 text-3xl text-[var(--paper)] lg:text-5xl">{title}</h2>
+        </Reveal>
 
         {/* In fila e non in colonna: l'alternanza destra/sinistra scendendo la
             usano gia' «E in pratica?» e le quattro consegne, e questa sarebbe
             stata la terza volta. Resta una lista ordinata perche' l'ordine e'
             un dato: dal piu' recente, e una prova lo verifica. */}
-        <Reveal as="ol" data-journey-list stagger={0.1}>
+        {/* Non un Reveal: qui le due meta' di ogni tappa entrano in ordine,
+            il foglio e poi il tesserino che ci si appunta sopra. */}
+        <JourneyList data-journey-list>
           {entries.map((entry) => (
             <JourneyCard
               key={entry.id}
@@ -74,7 +79,7 @@ export function JourneyView({
               etichettaLezione={etichettaLezione}
             />
           ))}
-        </Reveal>
+        </JourneyList>
 
         <p data-journey-note>{nota}</p>
 

@@ -11,7 +11,7 @@ import { practiceScenes } from "@/content/practice";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import type { Coda, Misura, Mondo } from "./pratica/strada";
-import { guidaFreccia, type Guida, type Impaginato } from "./pratica/freccia";
+import type { Guida, Impaginato } from "./pratica/freccia";
 import type { CalibratoreProps } from "./pratica/Calibratore";
 import { PracticeBlock } from "./PracticeBlock";
 import type { ServiceItem } from "./ServicesView";
@@ -113,14 +113,40 @@ export function Practice({
 
   // A ogni cambio di livello, non solo all'uscita da "full": useGSAP con delle
   // dipendenze rimanda il revert allo smontaggio, non al cambio di livello.
-  useSectionAnimation((livello) => {
+  useSectionAnimation(({ level: livello, presets }) => {
+    const { daDietro, daLato } = presets;
     // Qui dentro resta solo la freccia, che esiste solo a "full". Il filo di
     // pagina non passa piu' da questa sezione (vedi anchors.ts), quindi la
     // tessitura e il suo spegnimento se ne sono andati con lui.
     const stradaEl = stradaRef.current;
     const gpath = stradaEl?.querySelector("path");
     const fre = frecciaRef.current;
-    if (livello !== "full" || !stradaEl || !gpath || !fre) return;
+
+    /* Sotto il livello pieno la freccia non esiste, ed e' lei la coreografia
+       del desktop: senza, le quattro voci comparivano e basta. Al suo posto
+       entrano una alla volta dal lato in cui sono gia' impaginate.
+       Sta in questo ramo e non in tutti e due apposta: a livello pieno la
+       guida MISURA la posizione delle voci per posare la strada, e una voce
+       spostata di 90px mentre lei misura le farebbe posare la strada storta. */
+    if (livello !== "full") {
+      const radice = scope.current;
+      if (!radice) return;
+
+      const testata = radice.querySelectorAll<HTMLElement>("h3, [data-pratica-intro]");
+      daDietro(Array.from(testata), { level: livello, trigger: radice, stagger: 0.08 });
+
+      for (const voce of radice.querySelectorAll<HTMLElement>("[data-practice-item]")) {
+        daLato(voce, {
+          level: livello,
+          trigger: voce,
+          verso: voce.getAttribute("data-lato") === "sx" ? "sx" : "dx",
+          clearProps: true,
+        });
+      }
+      return;
+    }
+
+    if (!stradaEl || !gpath || !fre) return;
 
     const voci = [...(scope.current?.querySelectorAll<HTMLElement>("[data-practice-item]") ?? [])];
     // Il trigger e' il percorso e non la scena: la finestra dello scorrimento
@@ -128,13 +154,22 @@ export function Practice({
     // il fondo della coda. Con la scena intera quella finestra era piu' lunga
     // di tutta l'intestazione, e `PARAM.ritardo` — che e' una frazione della
     // finestra — segnava un altro momento.
-    const guida = guidaFreccia(
-      { stradaEl, gpath, fre, voci, trigger: percorso.current },
-      misuraPercorso,
-    );
-    guidaRef.current = guida;
+    /* Anche la guida della freccia si carica al volo: dentro ha GSAP, e a
+       livello pieno serve comunque solo quando la sezione arriva a tiro. */
+    let guida: Guida | null = null;
+    let annullata = false;
+    void import("./pratica/freccia").then(({ guidaFreccia }) => {
+      if (annullata) return;
+      guida = guidaFreccia(
+        { stradaEl, gpath, fre, voci, trigger: percorso.current },
+        misuraPercorso,
+      );
+      guidaRef.current = guida;
+    });
+
     return () => {
-      guida.molla();
+      annullata = true;
+      guida?.molla();
       guidaRef.current = null;
     };
   }, scope);

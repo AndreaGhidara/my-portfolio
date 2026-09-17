@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import { weave } from "@/animations/presets";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 
 /**
@@ -15,7 +14,8 @@ import { useSectionAnimation } from "@/animations/useSectionAnimation";
 export function WebCorner({ className }: { className?: string }) {
   const scope = useRef<HTMLElement | null>(null);
 
-  useSectionAnimation((level) => {
+  useSectionAnimation(({ level, presets }) => {
+    const { weave } = presets;
     const paths = Array.from(scope.current?.querySelectorAll("path") ?? []);
     weave(paths as SVGPathElement[], { level, stagger: 0.06 });
   }, scope);

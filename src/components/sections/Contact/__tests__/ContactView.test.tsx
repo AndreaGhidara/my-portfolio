@@ -104,6 +104,17 @@ describe("ContactView", () => {
     expect(nome).toHaveAccessibleDescription(props.form.errors.nameRequired);
   });
 
+  it("la griglia a due colonne resta l'elemento che contiene foglio e momenti", () => {
+    // `[data-contact-due]` e' la griglia: l'entrata avvolge quell'elemento
+    // stesso, non ci si infila dentro, o le due colonne tornano una sotto
+    // l'altra su ogni schermo.
+    const { container } = render(<ContactView {...props} />);
+    const griglia = container.querySelector("[data-contact-due]");
+    expect(griglia).not.toBeNull();
+    expect(griglia!.querySelector("[data-contact-foglio]")).not.toBeNull();
+    expect(griglia!.querySelector("[data-contact-tempi]")).not.toBeNull();
+  });
+
   it("il filo attraversa la sezione", () => {
     const { container } = render(<ContactView {...props} />);
     expect(container.querySelector('[data-thread="contact"]')).not.toBeNull();
@@ -132,5 +143,45 @@ describe("i campi sono righe, non riquadri", () => {
     const base = regole.find((r) => r.selettore === "[data-contact-campo]");
     expect(base, "manca la regola base dei campi").toBeDefined();
     expect(base!.corpo).toMatch(/min-height:\s*2\.75rem/);
+  });
+});
+
+describe("le etichette arancioni si leggono", () => {
+  const css = readFileSync("src/styles/tokens.css", "utf8");
+  const regole = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }));
+
+  // Sono le micro etichette in monospaziato sopra ogni blocco: "Ho un
+  // progetto", "Entro 24 ore", "L'altra uscita". Stanno tutte sotto i 12px, e
+  // l'arancio pieno su carta fa 3,27:1 — sotto il 4,5:1 che WCAG chiede al
+  // testo piccolo. --accento-testo e' lo stesso arancio scurito quel tanto che
+  // basta (5,42:1), e sul tema scuro torna pieno perche' li' il problema non
+  // c'e'.
+  const etichette = [
+    "[data-contact-foglio-et]",
+    "[data-contact-quando]",
+    "[data-contact-badge-et]",
+  ];
+
+  it.each(etichette)("%s non usa l'arancio pieno come testo", (selettore) => {
+    const regola = regole.find((r) => r.selettore === selettore);
+    expect(regola, `manca la regola ${selettore}`).toBeDefined();
+    expect(regola!.corpo).toMatch(/color:\s*var\(--accento-testo\)/);
+  });
+
+  it("il testo del cartellino non e' spento: su quel fondo il grigio faceva 4,22:1", () => {
+    // Il cartellino ha un fondo suo, piu' scuro della carta di pagina
+    // (color-mix con --fg al 7%): li' --fg-muted scendeva sotto il 4,5:1
+    // richiesto al testo piccolo. Il paragrafo passa a --fg.
+    const regola = regole.find((r) => r.selettore === "[data-contact-badge-testo]");
+    expect(regola, "manca la regola del testo del cartellino").toBeDefined();
+    expect(regola!.corpo).toMatch(/color:\s*var\(--fg\)/);
+  });
+
+  it("l'arancio da testo esiste in tutti e due i temi", () => {
+    const radice = regole.find((r) => r.selettore === ":root");
+    const scuro = regole.find((r) => r.selettore === '[data-theme="dark"]');
+    expect(radice!.corpo).toMatch(/--accento-testo:/);
+    expect(scuro!.corpo).toMatch(/--accento-testo:/);
   });
 });

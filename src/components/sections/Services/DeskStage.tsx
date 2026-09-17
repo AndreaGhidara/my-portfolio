@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
-import { ScrollTrigger } from "@/animations/gsap";
+import type { ScrollTrigger as TipoScrollTrigger } from "gsap/ScrollTrigger";
+import { INIZIO_ENTRATA } from "@/animations/finestre";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import { DeskTable, type DeskLayerData } from "./DeskTable";
@@ -111,7 +112,7 @@ export function DeskStage({
   const scope = useRef<HTMLDivElement | null>(null);
   const track = useRef<HTMLDivElement | null>(null);
   const stage = useRef<HTMLDivElement | null>(null);
-  const camera = useRef<ScrollTrigger | null>(null);
+  const camera = useRef<TipoScrollTrigger | null>(null);
   const level = useMotionLevel();
 
   /**
@@ -146,10 +147,147 @@ export function DeskStage({
     if (level !== "full") spegni();
   }, [level, spegni]);
 
-  useSectionAnimation((resolved) => {
+  useSectionAnimation(({ level: resolved, gsap, ScrollTrigger, presets }) => {
+    const { daDietro, reveal } = presets;
     const stageEl = stage.current;
     const trackEl = track.current;
-    if (resolved !== "full" || !stageEl || !trackEl) return;
+
+    /* Sotto il livello pieno la camera non scende: il tavolo sta fermo e la
+       testata comparirebbe e basta. Le si da' l'entrata che hanno tutte le
+       altre sezioni, e la sezione smette di essere l'unica che appare secca. */
+    if (resolved !== "full") {
+      /* Senza impaginazione non c'e' niente da animare, e ScrollTrigger non ha
+         metriche da cui partire: in jsdom ogni rettangolo e' alto zero e la
+         creazione del trigger scoppia. E' anche la risposta giusta nel browser:
+         un palco alto zero non e' sullo schermo di nessuno. */
+      if (!scope.current || scope.current.offsetHeight === 0) return;
+
+      const testata = scope.current?.querySelector<HTMLElement>("[data-desk-title]");
+      if (testata) {
+        daDietro(Array.from(testata.children), {
+          level: resolved,
+          trigger: testata,
+          stagger: 0.08,
+        });
+      }
+
+      /* I quattro strati, uno alla volta mentre scendi.
+         Dentro ogni strato l'ordine e' quello con cui si leggono: prima il
+         nome («Il sito»), poi la riga che lo spiega, poi i quattro disegni che
+         si compongono dentro. Non insieme: il nome deve arrivare prima, o i
+         disegni si guardano senza sapere di cosa sono.
+
+         Il mondo e' quello "tall": sotto i 1024px e' l'unico che si vede
+         (l'altro il CSS lo riduce a un pixel), ed e' il gemello, quindi tutto
+         quello che c'e' dentro e' gia' aria-hidden. */
+      const mondo = scope.current?.querySelector<HTMLElement>(
+        '[data-desk-world][data-layout="tall"]',
+      );
+
+      /* Il progetto: il laptop al centro del tavolo, con dentro il sito finito.
+         Da telefono e da tablet non aveva entrata ed era l'unica cosa della
+         sezione che compariva secca.
+         Arriva da dietro, poi il sito dentro lo schermo si compone riga per
+         riga — la barra, il titolo, le tre righe, il bottone arancione — e per
+         ultima cade la didascalia. E' la stessa cosa che dice la sezione: un
+         sito finito e' l'ultima cosa che si vede, non la prima che si fa.
+         clearProps su transform perche' il CSS tiene laptop ed etichetta
+         centrati con un translate in percentuale: uno in pixel scritto in
+         linea smetterebbe di seguire la scatola quando cambia misura. */
+      const centro = mondo?.querySelector<HTMLElement>("[data-desk-centre]");
+      if (centro && mondo && mondo.offsetHeight > 1) {
+        const schermo = [...centro.querySelectorAll<HTMLElement>("[data-desk-screen] > *")];
+        const etichetta = centro.querySelector<HTMLElement>("[data-desk-centre-label]");
+
+        const linea = gsap.timeline({
+          scrollTrigger: { trigger: centro, start: INIZIO_ENTRATA.ridotto, once: true },
+        });
+        linea.add(
+          daDietro(centro, { level: resolved, clearProps: "transform" }) ?? gsap.timeline(),
+        );
+        if (schermo.length) {
+          linea.add(
+            daDietro(schermo, { level: resolved, stagger: 0.07, clearProps: "transform" }) ??
+              gsap.timeline(),
+            "-=0.32",
+          );
+        }
+        if (etichetta) {
+          linea.add(
+            reveal(etichetta, { level: resolved, clearProps: "transform" }) ?? gsap.timeline(),
+            "-=0.25",
+          );
+        }
+      }
+
+      // `offsetHeight` a zero vuol dire che questo mondo non e' quello mostrato
+      // (sopra i 1024px il CSS lo riduce a un pixel): li' non c'e' niente da far
+      // entrare.
+      const strati = mondo && mondo.offsetHeight > 1
+        ? mondo.querySelectorAll<HTMLElement>("[data-desk-layer]")
+        : [];
+
+      for (const strato of strati) {
+        const didascalia = strato.querySelector<HTMLElement>("[data-desk-caption]");
+        const nome = didascalia?.querySelectorAll<HTMLElement>("[data-desk-num], h3");
+        const riga = didascalia?.querySelector<HTMLElement>("p");
+        // Sul telefono ne entrano quattro per strato: gli altri sono
+        // display:none, e offsetParent e' il modo di chiederlo al browser
+        // invece di ricontare qui una regola che vive nel CSS.
+        const disegni = [
+          ...strato.querySelectorAll<HTMLElement>("[data-desk-object]"),
+        ].filter((el) => el.offsetParent !== null);
+
+        /* Due inneschi e non uno, ed e' la stessa lezione dello schedario: il
+           blocco di uno strato e' alto mezzo schermo abbondante, e agganciando
+           tutto alla sua cima i quattro disegni si componevano mentre erano
+           ancora sotto la piega. La didascalia scatta sulla didascalia, i
+           disegni sulla griglia dei disegni: ognuno entra quando e' lui a
+           entrare nello schermo. */
+        if (didascalia && (nome?.length || riga)) {
+          const linea = gsap.timeline({
+            // Qui siamo per forza sotto il livello pieno: la riga e' quella.
+            scrollTrigger: { trigger: didascalia, start: INIZIO_ENTRATA.ridotto, once: true },
+          });
+          if (nome?.length) {
+            linea.add(daDietro([...nome], { level: resolved, stagger: 0.06 }) ?? gsap.timeline());
+          }
+          if (riga) {
+            linea.add(reveal(riga, { level: resolved }) ?? gsap.timeline(), "-=0.28");
+          }
+        }
+
+        const griglia = strato.querySelector<HTMLElement>("ul");
+        if (griglia && disegni.length) {
+          /* L'opacita' di questi pezzi la scrive React in linea, e non e' un
+             numero: e' `clamp(0, (var(--p) - var(--from)) / var(--span), 1)`,
+             cioe' la camera che li accende uno strato alla volta. GSAP non sa
+             interpolare verso una funzione CSS: arrivato al suo turno metteva
+             direttamente il valore finale, e il disegno compariva di scatto
+             invece di dissolversi. Si vedeva, ed e' il difetto per cui questa
+             riga esiste.
+             A livello ridotto quella clamp vale comunque 1 (--p non lo scrive
+             nessuno, e senza vale 1): fissarla a 1 non cambia cosa si vede, e
+             da' a GSAP un numero su cui lavorare. Al cambio di livello il
+             contesto di useGSAP rimette l'originale, camera compresa. */
+          gsap.set(disegni, { opacity: 1 });
+
+          /* clearProps solo su `transform`: l'opacita' deve restare quella che
+             l'entrata lascia, o al prossimo giro si torna alla funzione che
+             GSAP non sa animare. */
+          daDietro(disegni, {
+            level: resolved,
+            trigger: griglia,
+            stagger: 0.09,
+            clearProps: "transform",
+          });
+        }
+      }
+
+      return;
+    }
+
+    if (!stageEl || !trackEl) return;
 
     // Il piano, non il mondo: le percentuali di layers.ts misurano il piano, e
     // il mondo e' il piano PIU' le didascalie. Misurando il mondo, l'apertura

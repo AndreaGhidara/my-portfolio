@@ -93,7 +93,15 @@ export function HeroView({
               carattere dei titoli di sezione. Niente `font-bold` accanto:
               Archivo Black esiste in un peso solo, e chiedergliene un altro
               fa ingrassare le lettere al browser invece che al disegnatore. */}
-          <p className="display text-balance text-[2rem] leading-[1.1] text-[var(--fg)] lg:text-[3rem]">
+          {/* data-hero-claim: e' l'elemento piu' grande della prima schermata,
+              quindi e' LUI che il browser cronometra come Largest Contentful
+              Paint. L'entrata dell'hero non deve portarlo a opacita' zero, o
+              l'LCP viene registrato quando ricompare invece che quando viene
+              dipinto. Vedi HeroMotion. */}
+          <p
+            data-hero-claim
+            className="display text-balance text-[2rem] leading-[1.1] text-[var(--fg)] lg:text-[3rem]"
+          >
             {claim}
           </p>
           {/* text-balance distribuisce le righe invece di riempirle: senza,

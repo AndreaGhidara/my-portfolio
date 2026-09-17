@@ -3,6 +3,50 @@
 import { gsap, ScrollTrigger } from "./gsap";
 import type { MotionLevel } from "./motionPolicy";
 
+/**
+ * La pulizia di fine entrata, fatta a mano.
+ *
+ * Serve dove il foglio di stile usa `transform` anche per altro: le cartelle
+ * dei Lavori si alzano di 6px al passaggio del mouse, e un `transform` scritto
+ * in linea dall'entrata batte il CSS per sempre.
+ *
+ * Perche' non `clearProps`, che GSAP ha apposta: con quello attivo ogni
+ * fotogramma di ogni entrata lanciava «Cannot read properties of undefined
+ * (reading 'split')» da dentro il plugin, e scorrendo la pagina la console si
+ * riempiva di eccezioni. Le animazioni giravano lo stesso, ma una console che
+ * urla e' una console che nessuno legge piu'. Verificato bisezionando: spento
+ * clearProps, zero errori; riacceso, tornano.
+ *
+ * Qui si toglie la proprieta' e basta, a mano, quando il movimento e' finito.
+ * Restituisce un oggetto VUOTO se non c'e' niente da pulire: nessuna chiave
+ * fantasma nelle vars.
+ */
+export function pulizia(
+  targets: gsap.TweenTarget,
+  clearProps?: boolean | string,
+): gsap.TweenVars {
+  if (!clearProps) return {};
+
+  const quali = (typeof clearProps === "string" ? clearProps : "transform,opacity")
+    .split(",")
+    .map((nome) => nome.trim())
+    .filter(Boolean);
+
+  return {
+    onComplete: () => {
+      for (const bersaglio of gsap.utils.toArray<Element>(targets)) {
+        if (!(bersaglio instanceof HTMLElement)) continue;
+        for (const prop of quali) bersaglio.style.removeProperty(prop);
+      }
+    },
+  };
+}
+
+/** La riga d'innesco che tocca a questo livello. Vedi INIZIO_ENTRATA. */
+function inizio(level: MotionLevel): string {
+  return level === "full" ? INIZIO_ENTRATA.pieno : INIZIO_ENTRATA.ridotto;
+}
+
 type Common = {
   level: MotionLevel;
   /** Elemento che fa scattare l'animazione entrando nel viewport. */
@@ -42,8 +86,8 @@ export function stamp(
  */
 // Le finestre di scorrimento stanno in ./finestre: e' un modulo di soli dati,
 // senza "use client", cosi' lo possono leggere anche i Server Component.
-export { TESSITURA, FINESTRA, CORSA_FRECCIA, TESSITURA_LAVORI, FINESTRE_FILO } from "./finestre";
-import { TESSITURA, FINESTRA } from "./finestre";
+export { TESSITURA, FINESTRA, CORSA_FRECCIA, TESSITURA_LAVORI, FINESTRE_FILO, INIZIO_ENTRATA } from "./finestre";
+import { TESSITURA, FINESTRA, INIZIO_ENTRATA } from "./finestre";
 
 /**
  * Quanto e' disegnata UNA corsa quando la testa del filo sta a `testa` pixel
@@ -260,17 +304,138 @@ export function paint(
 /** Ingresso sobrio per tutto il resto: sale e compare. Mai una dissolvenza sola. */
 export function reveal(
   targets: gsap.TweenTarget,
-  { level, trigger, stagger = 0.07, delay = 0 }: Common & { stagger?: number; delay?: number },
+  {
+    level,
+    trigger,
+    stagger = 0.07,
+    delay = 0,
+    clearProps = false,
+  }: Common & { stagger?: number; delay?: number; clearProps?: boolean | string },
 ): gsap.core.Tween | null {
   if (level === "none") return null;
 
   return gsap.from(targets, {
     opacity: 0,
     y: level === "full" ? 28 : 16,
-    duration: level === "full" ? 0.7 : 0.45,
+    /* Un filo piu' lunghe di prima, e con un'uscita piu' morbida: a 0,45s il
+       movimento finiva mentre l'occhio ci arrivava sopra, e si leggeva come uno
+       scatto invece che come una cosa che si posa. */
+    duration: level === "full" ? 0.75 : 0.58,
+    ease: "power3.out",
     delay,
     stagger,
-    scrollTrigger: trigger ? { trigger, start: "top 85%", once: true } : undefined,
+    /* Un `from` finisce lasciando scritto nello stile in linea lo stato
+       d'arrivo, e uno stile in linea batte il foglio di stile per sempre. Dove
+       il CSS usa `transform` per qualcos'altro — le cartelle dei Lavori si
+       alzano di 6px al passaggio del mouse — l'entrata gli lascia addosso un
+       translate(0,0) e quel sollevamento non succede piu'. Qui si ripulisce
+       quello che l'entrata ha scritto, e il CSS torna padrone. */
+    ...pulizia(targets, clearProps),
+    scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
+  });
+}
+
+/**
+ * ARRIVA DI LATO — entra scorrendo dal bordo che gli e' stato assegnato.
+ *
+ * Il verso non se lo inventa l'animazione: i blocchi di «E in pratica?» e le
+ * quattro consegne portano gia' un `data-lato`, che e' il lato da cui il
+ * disegno sta gia' impaginato. Facendoli entrare da li', il movimento e'
+ * l'impaginato che si compone, non un effetto appiccicato sopra.
+ *
+ * Le distanze sono corte apposta: un blocco che attraversa mezzo schermo su un
+ * telefono e' una pagina che balla, e chi scorre veloce lo prende in faccia a
+ * meta' strada.
+ */
+export function daLato(
+  targets: gsap.TweenTarget,
+  {
+    level,
+    trigger,
+    verso,
+    stagger = 0,
+    delay = 0,
+    clearProps = false,
+  }: Common & { verso: "sx" | "dx"; stagger?: number; delay?: number; clearProps?: boolean | string },
+): gsap.core.Tween | null {
+  if (level === "none") return null;
+
+  const distanza = (level === "full" ? 90 : 56) * (verso === "sx" ? -1 : 1);
+
+  return gsap.from(targets, {
+    opacity: 0,
+    x: distanza,
+    duration: level === "full" ? 0.85 : 0.68,
+    ease: "power3.out",
+    delay,
+    stagger,
+    ...pulizia(targets, clearProps),
+    scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
+  });
+}
+
+/**
+ * ARRIVA DA DIETRO — cresce dal fondo e si mette a fuoco.
+ *
+ * Non e' uno zoom: la scala parte vicina a 1 e il movimento vero e' il fatto
+ * che la cosa era piu' lontana un attimo prima. Sopra il 10% di scala si legge
+ * come un ingrandimento, e un ingrandimento su un titolo grande e' un effetto.
+ */
+export function daDietro(
+  targets: gsap.TweenTarget,
+  {
+    level,
+    trigger,
+    stagger = 0.06,
+    delay = 0,
+    clearProps = false,
+  }: Common & { stagger?: number; delay?: number; clearProps?: boolean | string },
+): gsap.core.Tween | null {
+  if (level === "none") return null;
+
+  return gsap.from(targets, {
+    opacity: 0,
+    scale: level === "full" ? 0.9 : 0.94,
+    y: level === "full" ? 18 : 12,
+    duration: level === "full" ? 0.8 : 0.64,
+    ease: "power3.out",
+    delay,
+    stagger,
+    ...pulizia(targets, clearProps),
+    scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
+  });
+}
+
+/**
+ * CADE E SI ATTACCA — scende da sopra e si ferma con un rimbalzo corto.
+ *
+ * E' il gesto di appuntare: un tesserino sul foglio, un francobollo sulla
+ * busta. Il rimbalzo (`back.out`) e' quello che lo fa leggere come una cosa
+ * appoggiata da una mano invece che come un blocco che scivola.
+ */
+export function dallAlto(
+  targets: gsap.TweenTarget,
+  {
+    level,
+    trigger,
+    stagger = 0.08,
+    delay = 0,
+    clearProps = false,
+  }: Common & { stagger?: number; delay?: number; clearProps?: boolean | string },
+): gsap.core.Tween | null {
+  if (level === "none") return null;
+
+  return gsap.from(targets, {
+    opacity: 0,
+    y: level === "full" ? -56 : -40,
+    duration: level === "full" ? 0.72 : 0.6,
+    /* Rimbalzo appena piu' corto di prima: con 1.6 e una durata piu' lunga il
+       tesserino ballava. */
+    ease: "back.out(1.4)",
+    delay,
+    stagger,
+    ...pulizia(targets, clearProps),
+    scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
   });
 }
 

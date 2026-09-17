@@ -20,6 +20,29 @@
  */
 
 /**
+ * La riga dello schermo su cui scatta un'entrata.
+ *
+ * Era "top 85%" per tutti, cioe' l'elemento parte quando la sua cima e' a un
+ * settimo dal fondo dello schermo. Sul telefono quel settimo e' occupato dalla
+ * barra delle sezioni, che sta fissa in fondo e copre gli ultimi 52px: il
+ * movimento succedeva DIETRO la barra e si concludeva prima che l'elemento
+ * arrivasse dove lo stai guardando. Il risultato e' che le entrate non le
+ * vedevi mai, e trovavi la roba gia' a posto.
+ *
+ * Al 72% la cima dell'elemento e' a un quarto dal fondo: su uno schermo da
+ * 844px sono 590px, cioe' duecento pixel sopra la barra. Il movimento parte
+ * dove l'occhio sta gia' guardando.
+ *
+ * Il desktop non ha la barra in fondo e ha piu' schermo: li' 82% e' gia'
+ * dentro la zona che si guarda, e anticipare un po' evita che il contenuto si
+ * faccia aspettare su un monitor alto.
+ */
+export const INIZIO_ENTRATA = {
+  pieno: "top 82%",
+  ridotto: "top 72%",
+} as const;
+
+/**
  * La finestra in cui il filo si tesse, ed e' la ragione per cui la pagina ha
  * UN filo e non sette.
  *

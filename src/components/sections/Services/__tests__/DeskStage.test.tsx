@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { act, cleanup, render } from "@testing-library/react";
+import { readFileSync } from "node:fs";
+import { act, cleanup, render, waitFor } from "@testing-library/react";
 import { DeskStage } from "../DeskStage";
 import { cameraScale } from "../layers";
 
@@ -130,22 +131,28 @@ describe("il patto del fallback regge anche sul palco", () => {
 });
 
 describe("la camera", () => {
-  it("al fotogramma zero il piano e' ingrandito e il tavolo e' ancora vuoto", () => {
+  it("al fotogramma zero il piano e' ingrandito e il tavolo e' ancora vuoto", async () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = render(<DeskStage {...props} />);
     const stage = palco(container);
-    expect(stage.style.getPropertyValue("--p")).toBe("0.0000");
+    // La camera non parte piu' durante il render: GSAP si carica al volo dopo
+    // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
+    await waitFor(() => expect(stage.style.getPropertyValue("--p")).toBe("0.0000"));
     // La camera parte arretrata: --s e' la scala d'apertura, non 1.
     expect(Number(stage.style.getPropertyValue("--s"))).toBeGreaterThan(1);
   });
 
-  it("scrive due property e non tocca un elemento: le opacita' le fa il CSS", () => {
+  it("scrive due property e non tocca un elemento: le opacita' le fa il CSS", async () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = render(<DeskStage {...props} />);
     // Il palco porta solo --p e --s. Se un giorno la camera cominciasse a
     // scrivere opacita' o transform, questo conto cambia, ed e' il punto.
-    const scritte = [...palco(container).style].filter((p) => p.startsWith("--"));
-    expect(scritte.sort()).toEqual(["--p", "--s"]);
+    // La camera non parte piu' durante il render: GSAP si carica al volo dopo
+    // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
+    await waitFor(() => {
+      const scritte = [...palco(container).style].filter((p) => p.startsWith("--"));
+      expect(scritte.sort()).toEqual(["--p", "--s"]);
+    });
 
     // Gli oggetti restano quelli che React ha reso: l'opacita' e' ancora la
     // formula col default 1, non un numero calcolato per fotogramma.
@@ -154,10 +161,12 @@ describe("la camera", () => {
     }
   });
 
-  it("chi accende la riduzione del movimento a meta' strada ritrova il tavolo intero", () => {
+  it("chi accende la riduzione del movimento a meta' strada ritrova il tavolo intero", async () => {
     const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = render(<DeskStage {...props} />);
-    expect(palco(container).style.getPropertyValue("--p")).not.toBe("");
+    // La camera non parte piu' durante il render: GSAP si carica al volo dopo
+    // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
+    await waitFor(() => expect(palco(container).style.getPropertyValue("--p")).not.toBe(""));
 
     cambiaIdea((q) => q.includes("prefers-reduced-motion"));
 
@@ -242,11 +251,13 @@ describe("la camera", () => {
     expect(vivi.size).toBe(0);
   });
 
-  it("smontando il palco le due property se ne vanno con lui", () => {
+  it("smontando il palco le due property se ne vanno con lui", async () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container, unmount } = render(<DeskStage {...props} />);
     const stage = palco(container);
-    expect(stage.style.getPropertyValue("--p")).not.toBe("");
+    // La camera non parte piu' durante il render: GSAP si carica al volo dopo
+    // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
+    await waitFor(() => expect(stage.style.getPropertyValue("--p")).not.toBe(""));
     unmount();
     // Restassero appiccicate a --p = 0, il tavolo resterebbe vuoto per sempre.
     expect(stage.style.getPropertyValue("--p")).toBe("");
@@ -267,5 +278,27 @@ describe("cameraScale e' una camera, non una curva qualsiasi", () => {
       expect(ora).toBeLessThan(prima);
       prima = ora;
     }
+  });
+});
+
+describe("il post-it dice una cosa sola per volta", () => {
+  const css = readFileSync("src/styles/tokens.css", "utf8");
+  const regole = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }));
+
+  it("a tavolo fermo la nota si toglie, come si toglie al passaggio del mouse", () => {
+    // Sul post-it ci stanno due scritte nello stesso punto: il conto dei caffe'
+    // e la domanda che e' il nome del comando. Si danno il cambio. La domanda
+    // pero' resta scritta ANCHE a tavolo fermo (chi ha chiesto niente
+    // movimento, chi arriva con un puntatore grosso), e li' l'hover non
+    // succede mai: senza una regola che spenga la nota nello stesso caso, le
+    // due scritte si leggono una sopra l'altra.
+    const ferma = regole.find(
+      (r) =>
+        /\[data-desk\]:not\(\[data-motion="full"\]\)/.test(r.selettore) &&
+        /\[data-desk-note\]/.test(r.selettore),
+    );
+    expect(ferma, "manca la regola che spegne la nota a tavolo fermo").toBeDefined();
+    expect(ferma!.corpo).toMatch(/opacity:\s*0/);
   });
 });

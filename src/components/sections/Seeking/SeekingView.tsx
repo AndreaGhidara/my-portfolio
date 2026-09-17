@@ -1,3 +1,4 @@
+import { Reveal } from "@/animations/components/Reveal";
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import {
   SeekingCasella,
@@ -55,11 +56,13 @@ export function SeekingView({
           pieno lo da' --filo, che qui vale --on-accent. */}
       <ThreadSegment section="seeking" className="pointer-events-none absolute inset-0" />
       <div className="relative mx-auto max-w-5xl">
-        <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
-        <h2 className="mt-3 text-4xl text-[var(--paper)] lg:text-6xl">{title}</h2>
-        <p data-seeking-intro className="mt-4 max-w-2xl text-[var(--on-accent)]">
-          {intro}
-        </p>
+        <Reveal moto="dietro" stagger={0.08}>
+          <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
+          <h2 className="mt-3 text-4xl text-[var(--paper)] lg:text-6xl">{title}</h2>
+          <p data-seeking-intro className="mt-4 max-w-2xl text-[var(--on-accent)]">
+            {intro}
+          </p>
+        </Reveal>
 
         <SeekingCasella
           mail={mail}

@@ -31,6 +31,7 @@ export function ProcessView({ eyebrow, title, intro, deliveries }: ProcessViewPr
       <ThreadSegment section="process" scrub className="pointer-events-none absolute inset-0 -z-10" />
 
       <div className="mx-auto max-w-[64rem]">
+        <Reveal data-process-testata moto="dietro" stagger={0.08}>
         <p className="eyebrow">{eyebrow}</p>
         {/* L'intestazione si ferma prima di meta' pagina, e non e' una scelta
             di misura di lettura: e' che il filo scende nel corridoio fra le
@@ -40,12 +41,16 @@ export function ProcessView({ eyebrow, title, intro, deliveries }: ProcessViewPr
             come una cancellatura. Stretto qui, il filo gli passa accanto. */}
         <h2 className="mt-3 max-w-[30rem] text-3xl lg:text-5xl">{title}</h2>
         <p className="mt-5 max-w-[30rem] leading-relaxed text-[var(--fg-muted)]">{intro}</p>
+        </Reveal>
 
         {/* Ordinata, e non e' un dettaglio: «in quest'ordine» e' meta' del
             titolo, e una <ol> e' il modo in cui quell'ordine arriva anche a chi
             la pagina non la vede. Le voci si accoppiano al contenuto per
             posizione, come fa Practice con le sue scene. */}
-        <Reveal as="ol" data-process-list stagger={0.1}>
+        {/* Ogni consegna entra dal lato in cui e' gia' impaginata: `data-lato`
+            alterna destra e sinistra scendendo, e l'entrata non fa che
+            rendere visibile quell'alternanza. */}
+        <Reveal as="ol" data-process-list moto="lati">
           {deliveries.map((delivery, index) => (
             <ProcessBlock
               key={delivery.id}

@@ -1,3 +1,4 @@
+import { Reveal } from "@/animations/components/Reveal";
 import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { ContactForm, type ContactFormCopy } from "./ContactForm";
 
@@ -56,10 +57,14 @@ export function ContactView({
       <ThreadSegment section="contact" className="pointer-events-none absolute inset-0 -z-10" />
 
       <div className="mx-auto max-w-[56rem]">
-        <p className="eyebrow">{eyebrow}</p>
-        <h2 className="mt-3 text-4xl lg:text-6xl">{title}</h2>
+        <Reveal moto="dietro" stagger={0.08}>
+          <p className="eyebrow">{eyebrow}</p>
+          <h2 className="mt-3 text-4xl lg:text-6xl">{title}</h2>
+        </Reveal>
 
-        <div data-contact-due>
+        {/* Il foglio e il cartellino entrano uno dopo l'altro, e l'attributo
+            resta qui: `[data-contact-due]` e' la griglia a due colonne. */}
+        <Reveal data-contact-due moto="dietro" stagger={0.12}>
           {/* Il foglio: quello che scrivi finisce su una cosa che qualcuno
               legge, non dentro un sistema. Le righe al posto dei riquadri sono
               tutto quello che serve a dirlo. */}
@@ -86,9 +91,11 @@ export function ContactView({
               ))}
             </ol>
           </div>
-        </div>
+        </Reveal>
 
-        <div data-contact-badge>
+        {/* Il cartellino entra dopo il foglio: e' la seconda uscita, e la
+            sequenza dice quale delle due e' la principale. */}
+        <Reveal data-contact-badge moto="alto" delay={0.05}>
           <span data-contact-clip aria-hidden="true" />
           <div data-contact-badge-body>
             <div>
@@ -119,7 +126,7 @@ export function ContactView({
               </a>
             </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

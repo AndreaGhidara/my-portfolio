@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap } from "@/animations/gsap";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 
 /**
@@ -13,7 +12,7 @@ import { useSectionAnimation } from "@/animations/useSectionAnimation";
 export function Counter({ value, label }: { value: string; label: string }) {
   const scope = useRef<HTMLDivElement | null>(null);
 
-  useSectionAnimation((level) => {
+  useSectionAnimation(({ level, gsap }) => {
     const target = scope.current?.querySelector("[data-counter-value]");
     if (!target) return;
 
