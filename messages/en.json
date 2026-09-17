@@ -302,10 +302,12 @@
     }
   },
   "metrics": {
+    "riservatoCycleTime": "for a step that used to take hours",
     "bdroppyComponents": "components migrated",
     "bdroppyDowntime": "hours of downtime",
     "aidifyConversations": "conversations handled per month",
     "visualboostCatalog": "images in the catalogue",
+    "visualboostLighthouse": "Lighthouse score, up from 50-60",
     "coffees": "coffees",
     "years": "years building for the web",
     "responseTime": "response time"

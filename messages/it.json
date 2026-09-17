@@ -302,10 +302,12 @@
     }
   },
   "metrics": {
+    "riservatoCycleTime": "per un passaggio che prima chiedeva ore",
     "bdroppyComponents": "componenti migrati",
     "bdroppyDowntime": "ore di servizio interrotto",
     "aidifyConversations": "conversazioni gestite al mese",
     "visualboostCatalog": "immagini a catalogo",
+    "visualboostLighthouse": "punteggio Lighthouse, da 50-60",
     "coffees": "caffè",
     "years": "anni di sviluppo web",
     "responseTime": "tempo di risposta"
