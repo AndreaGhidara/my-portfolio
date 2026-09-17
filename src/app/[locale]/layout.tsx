@@ -15,6 +15,8 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { site } from "@/content/site";
 
 const SITE_URL = site.url;
@@ -227,6 +229,24 @@ export default async function RootLayout({
         {/* Ultima nel DOM come si conviene a una barra fissa: chi naviga da
             tastiera la trova dopo il contenuto, non prima. */}
         <BottomNav />
+        {/* Le due misure di Vercel, in fondo a tutto perche' non disegnano
+            niente: sono due script differiti serviti dal nostro stesso
+            dominio (/_vercel/insights/*), quindi niente terza connessione da
+            aprire mentre il browser dovrebbe dipingere.
+
+            Nessun cookie e nessun identificatore che segue la persona da un
+            sito all'altro: e' la ragione per cui questo sito puo' misurarsi
+            senza chiedere un consenso che nessuno legge.
+
+            SpeedInsights e' quella che conta qui: dice se i numeri che ci
+            siamo misurati con la rete finta tengono sui telefoni veri di chi
+            apre la pagina. Analytics conta le visite.
+
+            Funzionano solo in produzione e solo se le due levette sono accese
+            nel pannello del progetto: in locale lo script non esiste e la
+            richiesta muore, ed e' normale. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
