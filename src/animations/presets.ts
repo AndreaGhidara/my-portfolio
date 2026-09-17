@@ -21,13 +21,28 @@ import type { MotionLevel } from "./motionPolicy";
  * Restituisce un oggetto VUOTO se non c'e' niente da pulire: nessuna chiave
  * fantasma nelle vars.
  */
+/**
+ * Quello che GSAP scrive in linea quando muove qualcosa, e che va tolto per
+ * restituire il comando al foglio di stile.
+ *
+ * `translate`, `rotate` e `scale` non sono di troppo: Tailwind v4 NON compila
+ * piu' le utility di trasformazione dentro `transform`, le scrive nelle
+ * proprieta' indipendenti — `-translate-y-[16%]` diventa `translate: 0 -16%`.
+ * GSAP, per non litigare con loro, le azzera in linea (`translate: none`).
+ * Togliendo solo `transform` si lascia addosso quell'azzeramento, e l'elemento
+ * resta senza la trasformazione che il CSS gli dava: il ritratto
+ * dell'apertura, finita l'entrata, tornava dentro il cerchio da cui doveva
+ * sporgere. Verificato leggendo lo stile in linea a fine tween.
+ */
+const PROPRIETA_DEL_MOTO = "transform,opacity,translate,rotate,scale,transform-origin";
+
 export function pulizia(
   targets: gsap.TweenTarget,
   clearProps?: boolean | string,
 ): gsap.TweenVars {
   if (!clearProps) return {};
 
-  const quali = (typeof clearProps === "string" ? clearProps : "transform,opacity")
+  const quali = (typeof clearProps === "string" ? clearProps : PROPRIETA_DEL_MOTO)
     .split(",")
     .map((nome) => nome.trim())
     .filter(Boolean);
@@ -298,6 +313,54 @@ export function paint(
     duration: level === "full" ? 0.9 : 0.5,
     ease: "power2.inOut",
     scrollTrigger: trigger ? { trigger, start: "top 80%", once: true } : undefined,
+  });
+}
+
+/**
+ * CRESCE — arriva grande come un punto e si apre fino alla sua misura.
+ *
+ * Nato per il ritratto dell'apertura, che e' l'unica immagine del sito a stare
+ * dentro un altro disegno: il cerchio si dipinge, e mentre si dipinge la testa
+ * ci cresce dentro. Senza, il ritratto era li' dal primo fotogramma e il
+ * cerchio sembrava arrivare sotto una cosa gia' successa.
+ *
+ * `origine` esiste per questo: il punto da cui si cresce non e' il centro
+ * dell'immagine ma il centro del CERCHIO, che sta piu' in basso perche' il
+ * ritratto e' alzato per fargli uscire la testa. Crescendo dal proprio centro,
+ * la testa si aprirebbe a cavallo del bordo invece che da dentro.
+ *
+ * `back.out` e non un'uscita liscia: una cosa che si apre e si ferma netta
+ * sembra uno zoom, una che sfora di un soffio e torna sembra una cosa che si
+ * posa.
+ */
+export function cresce(
+  target: Element | null,
+  {
+    level,
+    trigger,
+    origine = "50% 50%",
+    delay = 0,
+  }: Common & { origine?: string; delay?: number },
+): gsap.core.Tween | null {
+  if (level === "none" || !target) return null;
+
+  return gsap.from(target, {
+    /* Minuscolo davvero: a 0.3 non si legge come "cresce", si legge come
+       "era gia' li' e si e' assestato". */
+    scale: level === "full" ? 0.05 : 0.08,
+    opacity: 0,
+    transformOrigin: origine,
+    duration: level === "full" ? 0.8 : 0.6,
+    ease: "back.out(1.4)",
+    delay,
+    /* Il ritratto porta un translate scritto nel CSS — e' alzato del 16% per
+       far uscire la testa dal cerchio. Un `from` lascerebbe in linea la
+       matrice d'arrivo, che quel translate lo contiene ma congelato in pixel:
+       cambiando larghezza dello schermo il cerchio cambia misura e la testa
+       resterebbe alzata dei pixel di prima. Si toglie, e il CSS torna
+       padrone. */
+    ...pulizia(target, true),
+    scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
   });
 }
 
