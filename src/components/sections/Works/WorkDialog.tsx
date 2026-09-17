@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useId, useRef } from "react";
+import { WorkShot } from "./WorkShot";
 import type { WorkCaseData, WorkCaseLabels } from "./types";
 
 export type WorkDialogProps = {
@@ -96,7 +96,7 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
             <button
               type="button"
               onClick={() => dialogRef.current?.close()}
-              className="-mt-1 grid size-8 shrink-0 place-items-center rounded-full border border-[var(--line)] text-[var(--fg)]"
+              className="-mt-1 grid size-10 shrink-0 place-items-center rounded-full border border-[var(--line)] text-[var(--fg)]"
             >
               <span aria-hidden="true" className="text-lg leading-none">×</span>
               <span className="sr-only">{labels.close}</span>
@@ -112,42 +112,32 @@ export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
                 gia' il modo in cui questo sito dice «questa cosa non c'e', e
                 non per dimenticanza». */}
             {data.screenshot ? (
-              <Image
-                src={data.screenshot}
-                alt={data.screenshotAlt}
-                width={1200}
-                height={750}
-                sizes="(min-width: 1024px) 60rem, 100vw"
-                // Tetto all'altezza: a piena proporzione lo screenshot si mangia
-                // tutto il dossier e le metriche finiscono sotto la piega. Si
-                // taglia dal basso, perche' la testata del sito e' la parte che
-                // lo fa riconoscere.
-                className="max-h-[34vh] w-full rounded-[var(--radius)] border border-[var(--line)] object-cover object-top"
-              />
+              <WorkShot shot={data.screenshot} alt={data.screenshotAlt} />
             ) : (
               <p className="flex min-h-[8rem] items-center justify-center rounded-[var(--radius)] border border-dashed border-[var(--fg-muted)] px-6 py-8 text-center text-sm text-[var(--fg-muted)]">
                 {labels.riservato}
               </p>
             )}
 
-            {/* Il caso si apre dall'alternativa scartata e non dal problema:
-                il problema sta gia' sulla cartella chiusa, ed e' lui ad aver
-                fatto aprire il dossier. Ripeterlo qui sarebbe la stessa frase
-                due volte a dieci centimetri di distanza. Quello che il lettore
-                non sa ancora e' cosa NON abbiamo fatto, ed e' la parte che
-                distingue un caso da un elenco di tecnologie. */}
+            {/* Il lavoro, la scelta, la conduzione. La riga sulla cartella
+                chiusa non si ripete: quella dice in che situazione eravamo, ed
+                e' lei ad aver fatto aprire il dossier.
+                I tre pesi sono uguali apposta. Prima il terzo campo era il piu'
+                spento della fila, e il terzo campo e' la conduzione: cioe' la
+                cosa che un elenco di tecnologie non ha. Chi legge in diagonale
+                leggeva i due meno utili. */}
             <div className="mt-7 grid gap-6 lg:grid-cols-3">
               <div>
-                <p className="eyebrow">{labels.alternativa}</p>
-                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.alternativa}</p>
+                <p className="eyebrow">{labels.lavoro}</p>
+                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.lavoro}</p>
               </div>
               <div>
-                <p className="eyebrow">{labels.perche}</p>
-                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.perche}</p>
+                <p className="eyebrow">{labels.scelta}</p>
+                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.scelta}</p>
               </div>
               <div>
-                <p className="eyebrow">{labels.fatto}</p>
-                <p className="mt-2 leading-relaxed text-[var(--fg-muted)]">{data.fatto}</p>
+                <p className="eyebrow">{labels.conduzione}</p>
+                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.conduzione}</p>
               </div>
             </div>
 
