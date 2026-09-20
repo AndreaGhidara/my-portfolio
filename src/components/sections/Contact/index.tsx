@@ -37,6 +37,7 @@ export async function Contact() {
         github: t("recruiter.github"),
       }}
       cvPath={site.cvPath}
+      email={site.email}
       socials={[...site.socials]}
       form={{
         labels: { name: t("labels.name"), email: t("labels.email"), message: t("labels.message") },

@@ -1,8 +1,27 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactView, type ContactViewProps } from "../ContactView";
+import { sendEmail } from "@/actions/sendEmail";
+
+/* La server action non parte davvero in una prova: qui si sta verificando
+   cosa VEDE chi ha premuto invia, non se Resend consegna. */
+vi.mock("@/actions/sendEmail", () => ({ sendEmail: vi.fn() }));
+const invio = vi.mocked(sendEmail);
+
+/** Compila i tre campi e preme invia. */
+async function scriviEInvia(esito: { success: boolean }) {
+  invio.mockResolvedValue(esito);
+  render(<ContactView {...props} />);
+  await userEvent.type(screen.getByLabelText(props.form.labels.name), "Mario Rossi");
+  await userEvent.type(screen.getByLabelText(props.form.labels.email), "mario@esempio.it");
+  await userEvent.type(
+    screen.getByLabelText(props.form.labels.message),
+    "Ciao Andrea, ho un'attivita' e mi servirebbe un sito.",
+  );
+  await userEvent.click(screen.getByRole("button", { name: props.form.button.default }));
+}
 
 const props: ContactViewProps = {
   eyebrow: "Contatti",
@@ -29,6 +48,7 @@ const props: ContactViewProps = {
     github: "GitHub",
   },
   cvPath: "/cv/Andrea_Ghidara_CV_2026.pdf",
+  email: "andrea.ghidara.dev@gmail.com",
   socials: [
     { id: "linkedin", url: "https://www.linkedin.com/in/andrea-ghidara" },
     { id: "github", url: "https://github.com/AndreaGhidara" },
@@ -183,5 +203,43 @@ describe("le etichette arancioni si leggono", () => {
     const scuro = regole.find((r) => r.selettore === '[data-theme="dark"]');
     expect(radice!.corpo).toMatch(/--accento-testo:/);
     expect(scuro!.corpo).toMatch(/--accento-testo:/);
+  });
+});
+
+describe("l'esito dell'invio", () => {
+  beforeEach(() => invio.mockReset());
+
+  it("si vede, e non e' piu' una riga grigia sotto il bottone", async () => {
+    // Era `color: var(--fg-muted)` a 0.85rem: il messaggio partiva davvero, ma
+    // chi premeva non vedeva cambiare niente e restava a chiedersi se il
+    // modulo fosse rotto. Lo stato sta nell'attributo perche' e' da li' che il
+    // foglio di stile costruisce il riquadro.
+    await scriviEInvia({ success: true });
+    const esito = await screen.findByRole("status");
+    expect(esito).toHaveAttribute("data-esito", "success");
+    expect(esito).toHaveTextContent(props.form.status.success);
+    // Il segno accanto al testo: chi non distingue l'arancio dall'inchiostro
+    // deve capirlo lo stesso, e il colore da solo non glielo dice.
+    expect(esito.querySelector("svg")).not.toBeNull();
+    expect(esito.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("quando qualcosa non parte, l'indirizzo e' li' e si puo' cliccare", async () => {
+    // Un errore che dice "scrivimi via email" senza dare l'email lascia la
+    // persona a cercarsela: e' esattamente il momento in cui se ne va.
+    await scriviEInvia({ success: false });
+    const esito = await screen.findByRole("status");
+    expect(esito).toHaveAttribute("data-esito", "error");
+    expect(esito).toHaveTextContent(props.form.status.error);
+    expect(esito.querySelector("a")).toHaveAttribute("href", `mailto:${props.email}`);
+  });
+
+  it("la regione viva c'e' anche da ferma, o certi screen reader non la leggono", () => {
+    // Una regione che NASCE nel momento in cui ha qualcosa da dire, per certi
+    // lettori di schermo non esiste: va gia' trovata nel documento, vuota.
+    render(<ContactView {...props} />);
+    const esito = screen.getByRole("status");
+    expect(esito).toHaveAttribute("data-esito", "idle");
+    expect(esito).toHaveTextContent("");
   });
 });

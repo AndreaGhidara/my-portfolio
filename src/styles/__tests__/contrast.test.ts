@@ -42,6 +42,26 @@ describe("vincoli di accessibilità della spec", () => {
   it("testo secondario su carta supera AA", () => {
     expect(contrastRatio(palette.muted, palette.paper)).toBeGreaterThanOrEqual(4.5);
   });
+
+  it("il verde dell'esito supera AA sulla carta: e' segno e bordo, e un giorno puo' essere testo", () => {
+    expect(contrastRatio(palette.green, palette.paper)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("il verde si legge sul fondo VERO del riquadro, nei due temi", () => {
+    // Il fondo del riquadro non e' un token: e' il verde tinto al 9% dentro la
+    // superficie, cioe' una color-mix che sa risolvere solo il browser. I due
+    // valori qui sotto sono quelli letti da li', disegnando il colore su una
+    // tela e leggendo il pixel: a mente non si ricavano.
+    const fondoChiaro = "#E3E5D9";
+    const fondoScuro = "#292B24";
+    // 3:1 e' la soglia WCAG per gli elementi non testuali, e la spunta con la
+    // barra di bordo stanno li' dentro.
+    expect(contrastRatio(palette.green, fondoChiaro)).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(palette.greenDark, fondoScuro)).toBeGreaterThanOrEqual(3);
+    // Ed ecco perche' i verdi sono due: quello di carta, sul fondo scuro, fa
+    // 2,39:1. Un "e' andata bene" che in tema scuro non si vede.
+    expect(contrastRatio(palette.green, fondoScuro)).toBeLessThan(3);
+  });
 });
 
 describe("tema scuro", () => {
