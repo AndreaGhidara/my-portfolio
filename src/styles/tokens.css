@@ -5,6 +5,15 @@
   --graph: #D9D3C4;
   --muted: #6E6759;
   --bulb: #FDEA7B;
+  /* Il settimo colore, ed e' entrato per una ragione sola: l'esito positivo
+     del modulo era arancione — il colore del sito — e a colpo d'occhio si
+     leggeva come un errore. Lo ha detto chi il sito ce l'ha, guardandolo, e
+     davanti a una convenzione che il mondo intero ha imparato (verde = e'
+     andata) tenere la tavolozza chiusa costava piu' di quanto valesse.
+     Smorzato verso l'oliva per stare sulla carta senza sembrare un semaforo:
+     5,32:1 sulla carta e 4,70:1 sul fondo tinto del riquadro, cioe' buono
+     anche se un giorno porta del testo. */
+  --verde: #2F6F4E;
 
   --bg: var(--paper);
   --fg: var(--ink);
@@ -65,6 +74,10 @@
      dei due che ci sono gia'. */
   --superficie: color-mix(in oklab, var(--paper) 7%, var(--ink));
   --fg-muted: #A79E8C; /* from palette.mutedDark */
+  /* Sul fondo scuro del riquadro il verde di carta sprofonda (2,39:1, sotto
+     la soglia 3:1 che WCAG chiede a un elemento non testuale): qui serve la
+     versione schiarita, che li' fa 6,68:1. */
+  --verde: #7FBF95;
   --line: var(--muted); /* il vecchio lineDark era a 1.52:1 su --ink, sotto la soglia 3:1 WCAG per elementi non testuali */
 }
 
@@ -2605,10 +2618,75 @@ textarea[data-contact-campo] {
 }
 [data-contact-invia]:disabled { opacity: 0.6; }
 
+/* L'esito dell'invio.
+
+   Era una riga grigia di 13,6px sotto il bottone, e chi premeva "invia" non
+   vedeva succedere niente: il messaggio partiva davvero, ma la persona restava
+   a chiedersi se il modulo fosse rotto. Adesso e' un riquadro, e si distingue
+   in tre modi diversi — colore, segno e testo — perche' chi non distingue
+   l'arancio dall'inchiostro deve capirlo lo stesso.
+
+   Il si' e' verde e il no e' inchiostro. Il verde e' l'unico colore entrato
+   in tavolozza per questo riquadro, ed e' costato una discussione: prima il
+   si' era l'arancio del sito, che e' coerente col resto ma a colpo d'occhio
+   si legge come un allarme — provato da chi il sito ce l'ha, che davanti al
+   riquadro arancione ha creduto che l'invio fosse fallito. Il rosso invece
+   non e' entrato: il no e' l'inchiostro, e il punto esclamativo dice il resto.
+
+   Da fermo l'elemento resta e non si vede: tiene il posto — 1,5rem — cosi'
+   l'arrivo del riquadro non fa saltare quello che sta sotto. */
 [data-contact-esito] {
   min-height: 1.5rem;
+  margin: 0;
   font-size: 0.85rem;
   color: var(--fg-muted);
+}
+
+[data-contact-esito][data-esito="success"],
+[data-contact-esito][data-esito="error"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-block-start: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius);
+  border-inline-start: 3px solid var(--esito-segno);
+  background-color: color-mix(in oklab, var(--esito-segno) 9%, var(--superficie));
+  color: var(--fg);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+[data-contact-esito][data-esito="success"] { --esito-segno: var(--verde); }
+[data-contact-esito][data-esito="error"] { --esito-segno: var(--fg); }
+
+[data-contact-esito] svg {
+  flex: none;
+  /* Allineato alla prima riga di testo, non al centro del riquadro: con due
+     righe il segno finirebbe a meta' frase. */
+  margin-block-start: 0.12rem;
+  color: var(--esito-segno);
+}
+
+/* L'indirizzo dentro il messaggio d'errore: e' l'unica via d'uscita che resta
+   a chi non e' riuscito a mandare, quindi si vede che e' un link e si puo'
+   toccare. */
+[data-contact-esito-via] {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-contact-esito][data-esito="success"],
+  [data-contact-esito][data-esito="error"] {
+    animation: esito-arriva 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+@keyframes esito-arriva {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
 }
 
 /* ── Cosa succede dopo ──────────────────────────────────────────────────── */

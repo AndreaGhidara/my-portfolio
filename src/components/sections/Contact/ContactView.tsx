@@ -19,6 +19,8 @@ export type ContactViewProps = {
     github: string;
   };
   cvPath: string;
+  /** L'indirizzo vero: il modulo lo mostra quando l'invio fallisce. */
+  email: string;
   socials: { id: string; url: string }[];
   form: ContactFormCopy;
 };
@@ -47,6 +49,7 @@ export function ContactView({
   dopo,
   recruiter,
   cvPath,
+  email,
   socials,
   form,
 }: ContactViewProps) {
@@ -72,7 +75,7 @@ export function ContactView({
             <p data-contact-foglio-et>{client.eyebrow}</p>
             <h3>{client.title}</h3>
             <p data-contact-foglio-testo>{client.body}</p>
-            <ContactForm copy={form} />
+            <ContactForm copy={form} email={email} />
           </div>
 
           <div>
