@@ -670,10 +670,12 @@ h1, h2, h3, h4, .display {
 html[data-dialog-open],
 html[data-dialog-open] body { overflow: hidden; }
 
-/* Le due sezioni in cui un blocco entra di lato. Per mezzo secondo la voce sta
-   fuori dal bordo destro, e senza ritaglio quel mezzo secondo la pagina si puo'
-   trascinare in orizzontale: misurato, 429px di documento su una finestra da
-   390.
+/* Le due sezioni in cui un blocco entrava di lato: le voci di «E in pratica?»
+   sotto il tavolo (tolte) e le consegne di «Come lavoro» (nascosta per scelta).
+   Per mezzo secondo la voce stava fuori dal bordo destro, e senza ritaglio quel
+   mezzo secondo la pagina si poteva trascinare in orizzontale: misurato, 429px
+   di documento su una finestra da 390. La regola resta: su #services non costa
+   niente, e #process torna in pagina con una riga.
    `clip` e non `hidden`: hidden fa di questi due un contenitore di scorrimento,
    e un contenitore di scorrimento in mezzo rompe l'intestazione appiccicata in
    cima alla pagina. clip taglia e basta. Dove non e' supportato (Safari sotto
@@ -1165,9 +1167,9 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
 [data-desk-line] { background-color: var(--desk-tratto, currentColor); }
 
 /* Le maschere pendono dalla SAGOMA e non dall'oggetto: cosi' chiunque disegni
-   una DeskShapeArt se le porta dietro, tavolo o no. «E in pratica?» usa le
-   stesse sagome molto piu' grandi, fuori dal tavolo, e senza questo non
-   avrebbe niente da mostrare. */
+   una DeskShapeArt se le porta dietro, tavolo o no. Le consegne di «Come
+   lavoro» usano le stesse sagome fuori dal tavolo, e senza questo non
+   avrebbero niente da mostrare. */
 [data-desk-shape][data-shape="sheet"]  [data-desk-fill] { mask-image: url("/brand/desk/sheet-fill.svg"); }
 [data-desk-shape][data-shape="sheet"]  [data-desk-line] { mask-image: url("/brand/desk/sheet.svg"); }
 [data-desk-shape][data-shape="card"]   [data-desk-fill] { mask-image: url("/brand/desk/card-fill.svg"); }
@@ -1188,12 +1190,12 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
    sparpagliata fra quattordici regole non si riconoscerebbe piu'.
 
    Pende da [data-desk-piece] e non da [data-desk-object]: «un pezzo disegnato»
-   e non «una delle ventiquattro cose sul tavolo». I nove disegni di «E in
-   pratica?» sono la prima cosa e non la seconda — dargli data-desk-object
-   romperebbe la prova che conta i ventiquattro (spec §4.4) — e con la tavola
-   agganciata all'oggetto restavano contorni nudi in colore di testo: le stesse
-   sagome senza i loro materiali, cioe' esattamente quello che quella scena
-   esiste per mostrare da vicino.
+   e non «una delle ventiquattro cose sul tavolo». I disegni fuori dal tavolo
+   (le consegne di «Come lavoro», e prima quelli di «E in pratica?») sono la
+   prima cosa e non la seconda: dargli data-desk-object romperebbe la prova che
+   conta i ventiquattro (spec §4.4), e con la tavola agganciata all'oggetto
+   restavano contorni nudi in colore di testo, le stesse sagome senza i loro
+   materiali.
 
    E si dichiara DUE VOLTE, una per tema. La prima stesura ne aveva una sola, e
    in tema scuro la scheda (--fg 15% su --bg) e la scocca (--ink 78% con
@@ -1498,8 +1500,8 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
 
 /* La scatola del campione pende da [data-desk-piece], come i materiali: e' il
    pezzo disegnato a dire dove sta il suo frammento, non il posto in cui il
-   pezzo si trova. Sul tavolo il pezzo e' il <li>; in «E in pratica?» e' lo
-   <span> del disegno, e la struttura dentro e' la stessa — la sagoma, e il
+   pezzo si trova. Sul tavolo il pezzo e' il <li>; nelle consegne di «Come
+   lavoro» e' il disegno, e la struttura dentro e' la stessa: la sagoma, e il
    campione suo fratello. Senza questo il campione si impaginava DOPO la
    sagoma invece che dentro: le marche in percentuale collassavano e quelle
    assolute coprivano tutto il disegno. */
@@ -2017,225 +2019,6 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   E in pratica? — la seconda scena della sezione del tavolo.
-   Le regole del movimento (il filo, la freccia) arrivano dopo: qui c'e' solo
-   l'impaginato, ed e' quello che si vede a "reduced", a "none" e senza
-   JavaScript. Deve reggere da solo.
-   ────────────────────────────────────────────────────────────────────────── */
-[data-pratica] {
-  position: relative;
-  max-width: 74rem;
-  margin-inline: auto;
-  padding-inline: var(--gutter);
-  padding-bottom: var(--section-y);
-}
-
-/* Lo stacco fra il tavolo e i lavori, quando non c'e' la coda.
-   Tutte le giunture della pagina valgono due --section-y, uno per parte, e
-   dove sopra e sotto c'e' del testo bastano. Qui no: la pratica chiude con
-   un disegno e i lavori aprono con quattro cartelle, e due blocchi di
-   oggetti a quella distanza si leggono come un blocco solo.
-   A "full" il problema non esiste — fra l'ultima voce e la fine della
-   pratica ci sono i 78vh di pista della freccia, e li' di aria ce n'e' anche
-   troppa: e' esattamente la condizione che porta la coda, quindi e' quella
-   che decide. Il mezzo --section-y in piu' sta da questa parte e non sul
-   padding-top dei lavori perche' li' il filo entra dall'alto della sezione:
-   allungare quel padding allungherebbe anche il tratto disegnato. */
-[data-pratica]:not([data-motion="full"]) {
-  padding-bottom: calc(var(--section-y) * 1.75);
-}
-/* Titolo e sottotitolo stanno al centro, le quattro voci sotto no: quelle si
-   alternano a destra e a sinistra, e un'intestazione centrata le apre come un
-   capitolo invece di sembrare la prima della fila. La misura di lettura resta
-   quella di prima — si centra la colonna, non la si allarga. */
-[data-pratica] > h3 {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
-  text-align: center;
-  text-wrap: balance;
-}
-[data-pratica-intro] {
-  max-width: 44ch;
-  /* Lo stacco sotto il titolo cresce insieme al titolo. Era 0,9rem fissi contro
-     un titolo che va da 1,5 a 2,25rem: sullo schermo grande restava lo spazio
-     di un telefono, cioe' 0,4em del titolo, sotto la soglia bassa di 0,5em che
-     vuole un display seguito dal suo occhiello. La stessa 3vw del titolo, ma
-     scalata: cosi' il rapporto fra i due resta lo stesso a ogni larghezza.
-     Il valore sta anche nella parte alta dell'intervallo per un secondo motivo:
-     un blocco centrato legge piu' stretto di uno allineato a sinistra, perche'
-     manca il bordo sinistro che fa da appoggio all'occhio. */
-  margin-block-start: clamp(1.15rem, 1.35vw, 1.45rem);
-  margin-inline: auto;
-  text-align: center;
-  text-wrap: pretty;
-  color: var(--fg-muted);
-}
-
-
-/* Il percorso: dalla prima voce alla fine della coda. E' la scatola in cui la
-   freccia sta E quella che misura, e devono essere la stessa — il ciclo le
-   scrive `left` e `top` in pixel, e sono pixel dell'antenato posizionato.
-   Nessuno z-index: con `z-index: auto` non apre un contesto di impilamento, e
-   la strada, la freccia e le voci restano impilate contro il filo che sta
-   fuori, esattamente come prima. */
-[data-pratica-percorso] { position: relative; margin-block-start: 3rem; }
-
-[data-practice] { position: relative; z-index: 2; }
-
-[data-practice-item] {
-  position: relative;
-  display: grid;
-  gap: 1.5rem;
-  align-items: center;
-  /* Le voci respirano, e non e' gusto: il fuoco si accende sulla voce piu'
-     vicina al centro dello schermo, quindi due voci troppo vicine se lo
-     passano prima che si sia finito di leggere la prima. Lo spazio e' quello
-     che rende la scena una voce alla volta invece di un elenco fitto. */
-  padding-block: 3.5rem;
-}
-[data-practice-text] { max-width: 36ch; }
-
-/* Sotto i 900px la voce e' una colonna sola larga quanto la pagina, e il testo
-   e' un blocco da 36ch: appoggiato a sinistra lasciava il resto vuoto. Misurato
-   su un tablet da 834px: 464px di niente a destra, con le quattro voci tutte
-   schiacciate su un lato. Centrato, il blocco sta dove si guarda.
-   Centrato il BLOCCO, non le righe: il testo resta allineato a sinistra, come
-   ovunque nel sito. Sopra i 900px non serve e non va fatto, perche' li' ci
-   pensa l'alternanza a due colonne. */
-@media (max-width: 899px) {
-  [data-practice-text] { margin-inline: auto; }
-  /* E anche i disegni. La scatola e' una casella di griglia che contiene solo
-     figli assoluti: con `margin-inline: auto` collassa a larghezza zero e i
-     disegni spariscono (successo, misurato: scatola larga 0 al centro). Serve
-     una larghezza vera e `justify-self`. */
-  [data-practice-art] {
-    width: min(100%, 34rem);
-    justify-self: center;
-  }
-}
-[data-practice-text] h4 {
-  margin-block-start: 0.25rem;
-  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
-  line-height: 1.15;
-}
-[data-practice-text] p { margin-block-start: 0.8rem; color: var(--fg-muted); line-height: 1.7; }
-
-/* La scatola dei disegni. L'altezza e' fissa apposta: e' su di lei che la
-   strada della freccia si misura, e un'altezza che dipende dal contenuto
-   farebbe ballare il tracciato a ogni riflow. */
-[data-practice-art] { position: relative; height: clamp(230px, 32vw, 330px); }
-/* Il disegno e' anche il CONTENITORE DI INTERROGAZIONE del suo campione. Sul
-   tavolo quel mestiere lo fa [data-desk-world]: le marche che sono testo — il
-   mono dei tre campioni scritti, la A del campione dei caratteri — si misurano
-   in cqw, cioe' sulla larghezza del mondo e non su quella della finestra,
-   perche' lo stesso disegno stretto o largo deve restare lo stesso disegno.
-   Fuori dal tavolo quel contenitore non c'e', e senza questa riga quei due cqw
-   si risolverebbero sul viewport: una misura che non ha niente a che vedere col
-   disegno che la ospita. Nessuno dei nove oggetti che «E in pratica?» usa porta
-   oggi un campione di testo, quindi non si vede niente di sbagliato — ed e'
-   appunto il momento giusto per dichiararlo. */
-[data-practice-drawing] {
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: var(--w);
-  max-width: 76%;
-  transform: rotate(var(--rot));
-  container-type: inline-size;
-}
-
-/* Il blocco vuoto della coda: lo spazio in cui la freccia fa il suo 180 prima
-   di consegnare il filo ai Lavori. Esiste esattamente quando esiste la freccia,
-   e la freccia esiste solo a "full" — che vuole gia' il puntatore fine e i
-   1024px. Era invece appeso a una @media da 900px: chi ha la riduzione del
-   movimento accesa, chi non ha JavaScript e chiunque stia fra i 900 e i 1023
-   si trovava mezzo schermo di pagina bianca a chiudere la sezione, senza
-   niente dentro. Il vuoto e' respiro per un gesto, non un margine. */
-[data-pratica-coda] { position: relative; z-index: 1; height: 0; }
-[data-pratica][data-motion="full"] [data-pratica-coda] { height: 78vh; }
-
-/* Testo|disegno, disegno|testo, e cosi' via: e' quello che permette alla
-   freccia di passare solo sopra i disegni. Sotto i 900px si impila e
-   l'alternanza non ha piu' senso — ne' ce n'e' bisogno. */
-@media (min-width: 900px) {
-  [data-practice-item] {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    gap: 3.5rem;
-    padding-block: 7rem;
-  }
-  [data-practice-item][data-lato="sx"] [data-practice-text] { order: 2; margin-inline-start: auto; }
-  [data-practice-item][data-lato="sx"] [data-practice-art] { order: 1; }
-}
-
-/* La freccia esiste solo a "full". E' un gesto disegnato, e' solo movimento:
-   ferma non vuol dire niente, sarebbe una freccia appoggiata a caso in mezzo
-   alla pagina. Sotto, la scena e' quattro voci e un filo. */
-[data-pratica-freccia] { display: none; }
-[data-pratica][data-motion="full"] [data-pratica-freccia] {
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1;
-  width: clamp(84px, 12vw, 150px);
-  height: 40px;
-  pointer-events: none;
-  transform: translate(-50%, -50%) rotate(var(--a, 0deg));
-  transform-origin: 50% 50%;
-}
-[data-pratica-freccia] svg { display: block; width: 100%; height: 100%; overflow: visible; }
-[data-pratica-freccia] path {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-/* L'asta si allunga, la punta no. */
-[data-pratica-freccia] [data-asta] { transform: scaleX(var(--s, 1)); transform-origin: 40px 20px; }
-
-/* Il tracciato, non il disegno: sta nel DOM perche' getPointAtLength ha bisogno
-   di un path vero, e non si vede. Niente display:none — li' getPointAtLength
-   smetterebbe di rispondere, cioe' la sola ragione per cui questo path esiste. */
-[data-pratica-strada] {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0;
-  overflow: visible;
-  pointer-events: none;
-}
-
-/* Le voci non attive sbiadiscono SOLO a "full". Fuori di li' tre quarti della
-   sezione resterebbero al 40% per sempre, cioe' illeggibili — ed e' il modo
-   classico in cui una scena scrollytelling si rompe sul fallback. */
-[data-pratica][data-motion="full"] [data-practice-text],
-[data-pratica][data-motion="full"] [data-practice-art],
-[data-pratica][data-motion="full"] [data-practice-drawing] {
-  transition: opacity 0.45s ease, filter 0.45s ease, transform 0.45s ease;
-}
-[data-pratica][data-motion="full"] [data-practice-item]:not([data-attiva]) [data-practice-text] {
-  opacity: 0.4;
-}
-[data-pratica][data-motion="full"] [data-practice-item]:not([data-attiva]) [data-practice-art] {
-  filter: grayscale(0.4) opacity(0.5);
-  transform: scale(0.96);
-}
-/* Arrivando la voce, la pila si scompone appena: e' una mano che sposta i
-   fogli, non una card che si solleva. */
-[data-pratica][data-motion="full"] [data-practice-item][data-attiva] [data-practice-drawing]:nth-child(2) {
-  transform: rotate(var(--rot)) translate(3%, -4%);
-}
-[data-pratica][data-motion="full"] [data-practice-item][data-attiva] [data-practice-drawing]:nth-child(3) {
-  transform: rotate(var(--rot)) translate(5%, -6%);
-}
-
-/* Niente blocco per prefers-reduced-motion: le uniche transizioni della scena
-   sono dichiarate qui sopra sotto [data-motion="full"], e "full" e' un livello
-   che chi ha chiesto la riduzione del movimento non ha mai. Spegnerle di nuovo
-   spegnerebbe qualcosa che non e' acceso. */
-
-/* ──────────────────────────────────────────────────────────────────────────
    La carta del nome. Le lettere dell'hero sono fogli: si sgualciscono al
    passaggio, si prendono e si lanciano, e le palline cadono in fondo alla
    finestra e ci restano mentre si scorre.
@@ -2276,264 +2059,391 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
   cursor: grab;
 }
 
-/* ──────────────────────────────────────────────────────────────────────────
-   La casella di posta di «Le cinque richieste che mi fanno piu' spesso».
+/* ══════════════════════════════════════════════════════════════════════════
+   LA STAMPANTE DEI SERVIZI: la seconda sezione, su fondo arancio
 
-   SENZA JAVASCRIPT. La scelta e' un gruppo di radio nascosti alla vista ma non
-   all'accesso, e la mail si apre con :has(). Il browser regala quello che
-   altrimenti andrebbe imitato: un solo stop nel giro dei Tab, le frecce per
-   cambiare opzione, e lo stato annunciato senza doverlo dichiarare.
+   A destra quattro tasti e una stampante: lo scontrino esce stampando riga per
+   riga. A sinistra la tavola da progetto che disegna lo stesso servizio, con
+   gli stessi pezzi annotati attorno. A tutto schermo in flusso normale, senza
+   aggancio. Sotto gli 860px tutto in colonna, e la sezione cresce quanto serve.
 
-   Le cinque regole posizionali qui sotto sono l'unica cosa da tenere allineata
-   al contenuto: una per mail, nell'ordine di `seekingRoutes`. Una prova conta
-   che siano tante quante le strade — se un giorno se ne aggiunge una sesta e
-   la regola manca, la sua mail non si aprirebbe e nessuno se ne accorgerebbe
-   guardando il codice.
+   LO SCONTRINO NON ENTRA MAI NEL FLUSSO. E' assoluto dentro l'uscita, che e'
+   alta quanto il piu' lungo dei quattro: li tiene in piedi i quattro fantasmi,
+   interi e invisibili, impilati nella stessa cella della griglia. Stampare o
+   strappare non cambia l'altezza della pagina, e le scene agganciate piu'
+   sotto (tavolo, archivio, percorso) non si sfasano.
 
-   I COLORI QUI DENTRO NON GIRANO COL TEMA, e non e' una dimenticanza. La
-   casella e' carta e inchiostro sempre, perche' sta dentro una sezione arancio
-   che di notte resta arancio: chiedendo --fg, --line o --fg-muted si sarebbe
-   ribaltata da sola e sarebbe diventata testo carta su fondo carta — sparita.
-   Le due sfumature che le servono nascono qui da --ink e --paper, e la riga
-   aperta se le ribalta addosso, cosi' quello che ci sta dentro non deve sapere
-   su che fondo si trova. Una prova legge questo foglio come testo e non lascia
-   piu' rientrare i token del tema: nel DOM non si vedrebbe.
+   I LIVELLI. Lo scontrino esce da SOTTO la stampante: la stampante sta a 1 e
+   lo scontrino a 0. Non a -1 come nel prototipo: li' finiva sotto l'uscita e
+   il banco, che per il browser gli stanno sopra anche se trasparenti, e
+   «Parliamone» e «strappa» non si potevano premere. La sezione ha il suo
+   contesto di impilamento (isolation), che convive con lo z-index 2 che le
+   da' l'effetto sopra l'apertura.
 
-   Fuori dalla casella il testo corrente e' in INCHIOSTRO e non in carta: carta
-   su arancio fa 3,27:1, che regge solo per il titolo. Inchiostro fa 5,08:1.
-   ────────────────────────────────────────────────────────────────────────── */
-[data-casella] {
-  /* <fieldset>: azzerare i suoi difetti prima di poterla usare come griglia.
-     min-inline-size perche' altrimenti e' il contenuto a dettare la larghezza
-     e la colonna di lettura non si stringe mai. */
-  margin: 2.5rem 0 0;
-  padding: 0;
-  min-inline-size: 0;
-  border: 1.5px solid color-mix(in oklab, var(--ink) 35%, transparent);
+   LA REGOLA DEI COLORI e' quella del percorso: la sezione e' arancione e di
+   notte resta arancione, quindi qui dentro niente --fg, --bg, --line,
+   --fg-muted, e nemmeno --accento-testo, che nel tema scuro diventa l'arancio
+   pieno. Solo carta, inchiostro e le loro miscele: la stampante e' inchiostro,
+   tasti e scontrino carta, la tavola inchiostro con i richiami in carta
+   (l'arancio su arancio non si vede). Una prova lo verifica.
 
-  /* Il tratto fra i due riquadri e' il fondo che si vede nel gap da 1px. */
+   I numeri e i tempi sono quelli del prototipo
+   (docs/prototipi/2026-09-27-scontrino-tre-proposte.html, proposta G1).
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-scontrino] {
+  min-height: 100vh;
+  min-height: 100svh;
+  isolation: isolate;
+  /* La caduta dello scontrino strappato esce dall'uscita: si ferma qui. */
+  overflow: hidden;
   display: grid;
-  gap: 1px;
-  background: color-mix(in oklab, var(--ink) 30%, transparent);
-
+  grid-template-columns: 1.15fr 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: 2rem;
+  /* 3,75rem e' la testata, che scorre sopra la sezione quando la sezione
+     riempie lo schermo. */
+  padding: 3.75rem var(--gutter) 2rem;
   color: var(--ink);
-  --riga: color-mix(in oklab, var(--ink) 16%, var(--paper));
-  --fioco: color-mix(in oklab, var(--ink) 62%, var(--paper));
-  /* L'arancio pieno su carta fa 3,27:1 e l'etichetta e' 0,6rem: non basta.
-     Scurito con l'inchiostro fa 5,42:1 e resta arancio. */
+  /* Il foglio millimetrato della tavola, appena accennato. */
+  background-image:
+    repeating-linear-gradient(0deg, color-mix(in oklab, var(--ink) 7%, transparent) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(90deg, color-mix(in oklab, var(--ink) 7%, transparent) 0 1px, transparent 1px 32px);
+  /* L'arancio pieno su carta fa 3,27:1 e il numero del tasto e' 0,6rem: non
+     basta. Scurito con l'inchiostro fa 5,42:1 e resta arancio. Locale, e non
+     --accento-testo, per la ragione scritta sopra. */
   --accento-su-carta: color-mix(in oklab, var(--accent) 72%, var(--ink));
+  --tratto-fioco: color-mix(in oklab, var(--ink) 50%, transparent);
+  --macchina-alta: color-mix(in oklab, var(--paper) 14%, var(--ink));
+  --macchina-bassa: color-mix(in oklab, var(--paper) 4%, var(--ink));
 }
 
-/* ── L'elenco: le cinque anteprime si leggono TUTTE prima di scegliere. Chi
-      non apre niente esce comunque avendo letto cinque volte che problemi
-      tratti, ed e' la ragione per cui questa forma ha vinto sulle altre. ── */
-[data-elenco] {
-  background: var(--paper);
-  padding: 0.35rem;
+/* `.eyebrow` porta --fg-muted, che qui si ribalterebbe col tema. */
+[data-scontrino] .eyebrow { color: var(--ink); }
+
+[data-scontrino-testa] {
+  grid-column: 1;
+  grid-row: 1;
+  max-width: 32rem;
+  padding-top: clamp(1.2rem, 4vh, 2.5rem);
 }
-[data-mail] {
-  display: block;
-  padding: 0.85rem 0.9rem;
-  border-block-end: 1px solid var(--riga);
-  cursor: pointer;
-  transition: background-color 0.14s ease;
-}
-[data-mail]:last-child { border-block-end: 0; }
-[data-mail] input {
-  /* Nascosto alla vista, non all'accesso: resta focalizzabile e resta un
-     radio, che e' tutto quello che serve perche' la tastiera funzioni. */
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-[data-mail]:hover { background: color-mix(in oklab, var(--ink) 6%, transparent); }
-[data-mail]:has(input:checked) {
-  background: var(--ink);
+/* Carta sull'arancio fa 3,27:1: regge solo perche' il titolo e' grande. */
+[data-scontrino-testa] h2 {
+  margin-top: 0.75rem;
+  font-size: clamp(1.9rem, 4.2vw, 3.2rem);
+  line-height: 1;
   color: var(--paper);
-  --riga: color-mix(in oklab, var(--paper) 26%, var(--ink));
-  --fioco: color-mix(in oklab, var(--paper) 72%, var(--ink));
 }
-/* currentColor: inchiostro sulla riga a riposo, carta su quella aperta. Un
-   colore fisso sparirebbe su uno dei due fondi — e l'arancio, che era la
-   scelta ovvia, sparisce contro la sezione. */
-[data-mail]:has(input:focus-visible) {
+[data-scontrino-lead] {
+  margin-top: 0.8rem;
+  max-width: 30rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Il fuoco da tastiera del sito e' un anello arancione, che sull'arancio non
+   si vede: qui e' dentro il bordo, del colore del testo del bottone. */
+[data-scontrino] :is(button, a):focus-visible {
   outline: 2px solid currentColor;
-  outline-offset: -3px;
+  outline-offset: -4px;
 }
 
-/* Un elemento solo da quando la frequenza non c'e' piu': niente da separare
-   ai due estremi, e la riga resta un blocco. */
-[data-mail-testa] { display: block; }
-[data-mail-da] {
-  font-family: var(--font-mono), monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--fioco);
-}
-[data-mail-ogg] {
-  display: block;
-  margin-block-start: 0.35rem;
-  font-weight: 700;
-  font-size: 1rem;
-  line-height: 1.25;
-}
-[data-mail-ant] {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin-block-start: 0.25rem;
-  font-size: 0.87rem;
-  line-height: 1.4;
-  color: var(--fioco);
-}
-
-/* ── La lettura ── */
-[data-lettura] {
-  background: var(--paper);
-  padding: 1.3rem 1.2rem;
-}
-[data-vuoto] {
-  color: var(--fioco);
-  font-size: 0.96rem;
-  max-inline-size: 26rem;
-}
-
-/* Le mail stanno tutte nel DOM: senza fogli di stile si leggono tutte e cinque
-   di fila — lunga, ma completa. E' il patto del fallback. */
-[data-msg] { display: none; }
-[data-casella]:has([data-mail]:nth-child(1) input:checked) [data-msg]:nth-child(1),
-[data-casella]:has([data-mail]:nth-child(2) input:checked) [data-msg]:nth-child(2),
-[data-casella]:has([data-mail]:nth-child(3) input:checked) [data-msg]:nth-child(3),
-[data-casella]:has([data-mail]:nth-child(4) input:checked) [data-msg]:nth-child(4),
-[data-casella]:has([data-mail]:nth-child(5) input:checked) [data-msg]:nth-child(5) {
-  display: block;
-}
-[data-casella]:has(input:checked) [data-vuoto] { display: none; }
-
-@media (prefers-reduced-motion: no-preference) {
-  [data-msg] { animation: casella-apri 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
-}
-@keyframes casella-apri {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
-}
-
-[data-msg-testa] {
-  padding-block-end: 1rem;
-  border-block-end: 1px solid var(--riga);
-}
-[data-msg-testa] dl {
-  margin: 0;
+/* ── I tasti e la stampante ── */
+[data-scontrino-banco] {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: min(26rem, 100%);
+  justify-self: center;
+  padding-top: clamp(1.5rem, 5vh, 3.5rem);
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.15rem 0.9rem;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.68rem;
+  gap: 0.9rem;
+  justify-items: center;
+  align-content: start;
 }
-[data-msg-testa] dt {
-  color: var(--fioco);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+[data-scontrino-tasti] {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  width: 100%;
 }
-[data-msg-testa] dd { margin: 0; }
-[data-msg-oggetto] {
-  margin-block-start: 0.85rem;
-  font-size: 1.35rem;
-  line-height: 1.15;
+[data-scontrino-tasto] {
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: left;
+  padding: 0.7rem 0.8rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--paper);
   color: var(--ink);
+  border: 0;
+  box-shadow:
+    0 4px 0 color-mix(in oklab, var(--ink) 60%, var(--paper)),
+    0 6px 12px -4px color-mix(in oklab, var(--ink) 60%, transparent);
+  transition: transform 0.08s, box-shadow 0.08s, background-color 0.08s;
 }
-
-[data-msg-corpo] { margin-block-start: 1.3rem; }
-[data-msg-corpo] p { margin-block-start: 1rem; font-size: 1rem; }
-[data-msg-corpo] p:first-child { margin-block-start: 0; }
-[data-msg-et] {
+[data-scontrino-tasto] span {
   display: block;
-  margin-block-end: 0.2rem;
-  font-family: var(--font-mono), monospace;
+  margin-bottom: 0.25rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.6rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   color: var(--accento-su-carta);
 }
-
-[data-firma] {
-  margin-block-start: 1.5rem;
-  padding-block-start: 1rem;
-  border-block-start: 1px solid var(--riga);
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
+[data-scontrino-tasto]:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--ink) 60%, var(--paper));
 }
-[data-firma-faccia] {
-  inline-size: 2.4rem;
-  block-size: 2.4rem;
-  flex: 0 0 auto;
-  border-radius: 999px;
-  object-fit: cover;
-}
-[data-firma-testo] {
-  font-family: var(--font-mono), monospace;
-  font-size: 0.68rem;
-  line-height: 1.45;
-  color: var(--fioco);
+/* Il tasto premuto resta giu' di un filo e si scalda appena: 90% e non 80
+   come nel prototipo, perche' il numero arancio scuro ci resti sopra 4,5:1. */
+[data-scontrino-tasto][aria-pressed="true"] {
+  background: color-mix(in oklab, var(--paper) 90%, var(--accent));
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 color-mix(in oklab, var(--ink) 60%, var(--paper));
 }
 
-[data-msg-azioni] {
-  margin-block-start: 1.4rem;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: center;
+[data-scontrino-macchina] {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 5.6rem;
+  border-radius: 16px 16px 10px 10px;
+  background: linear-gradient(180deg, var(--macchina-alta), var(--macchina-bassa));
+  box-shadow:
+    0 16px 30px -12px color-mix(in oklab, var(--ink) 85%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--paper) 24%, var(--ink));
 }
-[data-msg-cta] {
-  font-family: var(--font-mono), monospace;
+[data-marca] {
+  position: absolute;
+  left: 1rem;
+  top: 0.9rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  /* Sopra 4,5:1 anche sulla parte alta della stampante, la piu' chiara. */
+  color: color-mix(in oklab, var(--paper) 72%, var(--ink));
+}
+[data-spia] {
+  position: absolute;
+  right: 1.1rem;
+  top: 1rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--paper) 25%, var(--ink));
+}
+[data-fessura] {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 1.1rem;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--paper) 16%, var(--ink));
+}
+[data-scontrino-macchina][data-lavora] { animation: scontrino-ronza 0.09s linear infinite; }
+[data-scontrino-macchina][data-lavora] [data-spia] {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  animation: scontrino-lampeggia 0.4s steps(2) infinite;
+}
+@keyframes scontrino-ronza { 50% { transform: translateY(0.5px); } }
+@keyframes scontrino-lampeggia { 50% { opacity: 0.3; } }
+
+/* ── Lo scontrino ── */
+[data-scontrino-uscita] {
+  position: relative;
+  width: 78%;
+  margin-top: -1.55rem;
+  display: grid;
+}
+[data-scontrino-carta] {
+  padding: 1rem 1rem 1.6rem;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  line-height: 1.55;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), 95% 100%, 90% calc(100% - 8px), 85% 100%, 80% calc(100% - 8px), 75% 100%, 70% calc(100% - 8px), 65% 100%, 60% calc(100% - 8px), 55% 100%, 50% calc(100% - 8px), 45% 100%, 40% calc(100% - 8px), 35% 100%, 30% calc(100% - 8px), 25% 100%, 20% calc(100% - 8px), 15% 100%, 10% calc(100% - 8px), 5% 100%, 0 calc(100% - 8px));
+}
+/* I fantasmi: occupano la cella, non si vedono e non si leggono. */
+[data-scontrino-carta][data-fantasma] {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+[data-scontrino-carta]:not([data-fantasma]) {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 0;
+  overflow: hidden;
+  transition: max-height 0.12s linear;
+}
+[data-riga] { white-space: pre-wrap; }
+[data-riga="grosso"] {
+  margin: 0.3rem 0;
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+[data-scontrino-azioni] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+/* Fuori dal flusso finche' la stampa non e' finita: la carta che esce e' solo
+   quella stampata. I fantasmi li tengono, perche' misurano lo scontrino intero. */
+[data-scontrino-carta]:not([data-fantasma], [data-finito]) [data-scontrino-azioni] { display: none; }
+[data-scontrino-carta][data-finito] [data-scontrino-azioni] { animation: scontrino-appare 0.3s ease both; }
+@keyframes scontrino-appare { from { opacity: 0; } }
+[data-scontrino-azioni] > * {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  padding: 0.75rem 1.25rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+}
+[data-scontrino-azioni] > :first-child {
   background: var(--ink);
   color: var(--paper);
-  border-radius: 999px;
-  text-decoration: none;
-  font-weight: 500;
-  transition: background-color 0.16s ease, color 0.16s ease;
 }
-[data-msg-cta]:hover { background: var(--accent); color: var(--ink); }
-/* La prova non e' un secondo bottone: e' un rimando. Due bottoni pari
-   costringerebbero a scegliere fra due cose che non sono alternative. */
+[data-scontrino-azioni] > :last-child {
+  background: transparent;
+  border: 1px dashed color-mix(in oklab, var(--ink) 55%, var(--paper));
+  color: var(--ink);
+}
+[data-scontrino-carta][data-fase="strappo"] {
+  animation: scontrino-cade 0.6s cubic-bezier(0.5, 0, 0.8, 0.4) forwards;
+}
+@keyframes scontrino-cade { to { transform: translateY(120vh) rotate(14deg); opacity: 0.6; } }
 
-@media (max-width: 899.98px) {
-  /* I due riquadri si impilano, e cinque anteprime da due righe sarebbero un
-     muro di testo prima ancora di arrivare a una risposta: sul telefono
-     l'elenco resta cinque righe di solo oggetto. */
-  [data-mail] { padding: 0.7rem 0.8rem; }
-  [data-mail-ant] { display: none; }
-  [data-mail-ogg] { font-size: 0.95rem; }
+/* Nello spazio dello scontrino, quando non ce n'e' uno: assoluto anche lui. */
+[data-scontrino-invito] {
+  position: absolute;
+  inset: 2.2rem 0 auto;
+  text-align: center;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
-@media (min-width: 900px) {
-  [data-casella] { grid-template-columns: 21rem 1fr; }
-  /* L'altezza minima tiene in piedi il telaio solo affiancata. Impilata non
-     terrebbe niente: sarebbe mezzo schermo di carta vuota fra l'elenco e la
-     fine della sezione, prima ancora di aver scelto. */
-  [data-lettura] { min-block-size: 32rem; padding: 1.6rem 1.7rem; }
-  [data-msg-oggetto] { font-size: 1.6rem; }
+
+/* ── La tavola ── */
+[data-scontrino-oggetto] {
+  grid-column: 1;
+  grid-row: 2;
+  position: relative;
+  min-height: 22rem;
+  align-self: stretch;
+}
+[data-scontrino-tavola] { position: absolute; inset: 0; }
+[data-scontrino-tavola] svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+[data-scontrino-tavola] [data-tratto] {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-scontrino-tavola] [data-tratto="fioco"] {
+  stroke: var(--tratto-fioco);
+  stroke-width: 1;
+}
+[data-scontrino-tavola] [data-richiamo] {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 1.2;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.6s ease;
+}
+[data-scontrino-tavola] [data-punto] {
+  fill: var(--paper);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+/* 10px e non gli 11 del prototipo: «1 · THE FIRST 3 SECONDS» e «2 ·
+   MANAGEMENT SYSTEM» a 11 uscivano dalla cornice. */
+[data-scontrino-tavola] text {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  fill: var(--ink);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+[data-scontrino-tavola] [data-cartiglio="titolo"] {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+[data-scontrino-tavola] [data-cartiglio="piccolo"] { font-size: 8.5px; }
+[data-scontrino-tavola] [data-nota-numero] {
+  display: none;
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 26px;
+  letter-spacing: 0;
+}
+[data-scontrino-tavola] svg[data-traccia] :is([data-tratto], [data-richiamo]) { stroke-dashoffset: 0; }
+[data-scontrino-tavola] svg[data-traccia] :is([data-punto], text) { opacity: 1; }
+
+@media (max-width: 860px) {
+  [data-scontrino] {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    padding-bottom: 3rem;
+  }
+  [data-scontrino-testa],
+  [data-scontrino-oggetto],
+  [data-scontrino-banco] {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  [data-scontrino-oggetto] { min-height: 19rem; margin-top: 1rem; }
+  [data-scontrino-banco] { padding-top: 1rem; }
+  /* Il disegno scala a poco piu' di mezzo: il testo scenderebbe a 5 o 6
+     pixel e i tratti sotto il pixel. Restano i numeri, grandi, e la lista
+     numerata e' quella dello scontrino. */
+  [data-scontrino-tavola] [data-nota] { display: none; }
+  [data-scontrino-tavola] [data-nota-numero] { display: inline; }
+  [data-scontrino-tavola] :is([data-divisorio], [data-cartiglio="piccolo"]) { display: none; }
+  [data-scontrino-tavola] [data-cartiglio="titolo"] { font-size: 18px; }
+  [data-scontrino-tavola] [data-tratto] { stroke-width: 2.4; }
+  [data-scontrino-tavola] [data-tratto="fioco"] { stroke-width: 1.6; }
+  [data-scontrino-tavola] [data-richiamo] { stroke-width: 2; }
+  [data-scontrino-tavola] [data-punto] { r: 5px; }
+}
+/* Sugli schermi bassi (1366 x 768) lo scontrino piu' lungo, in inglese,
+   finiva una quarantina di pixel sotto il bordo: si stringe l'aria sopra i
+   tasti e l'interlinea, e ci sta. */
+@media (min-width: 861px) and (max-height: 820px) {
+  [data-scontrino-banco] { padding-top: 0.75rem; gap: 0.7rem; }
+  [data-scontrino-carta] { line-height: 1.42; }
+}
+/* La barra in basso sta sopra l'ultima riga: lo spazio va dentro la sezione. */
+@media (max-width: 767px) {
+  [data-scontrino] { padding-bottom: calc(3rem + 3.25rem + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
    COME LAVORO: le quattro consegne
 
-   Testo|disegno, disegno|testo, scendendo. L'impaginato e' quello di «E in
-   pratica?», ma il gesto no: li' l'alternanza serve alla freccia, che deve
-   passare solo sopra i disegni; qui serve a una cosa piu' semplice, evitare
-   quattro voci in colonna con mezza pagina bianca accanto.
+   Testo|disegno, disegno|testo, scendendo, per evitare quattro voci in
+   colonna con mezza pagina bianca accanto.
 
    I disegni sono le sagome del tavolo (DeskShapeArt) coi campioni di questa
    sezione (ProcessSpecimen): il materiale del sito e' uno solo, il frammento
@@ -2632,7 +2542,7 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
 
 /* Il pezzo e' il contenitore di posizionamento del suo campione (che e'
    assoluto) ED e' il suo contenitore di interrogazione. La seconda cosa qui
-   non e' teorica come in «E in pratica?»: «Il numero» E' un campione di testo,
+   non e' teorica: «Il numero» E' un campione di testo,
    il primo disegnato fuori dal tavolo, e senza container-type i suoi cqw si
    risolverebbero sul viewport. */
 [data-process-art] [data-desk-piece] {
@@ -3492,9 +3402,8 @@ textarea[data-contact-campo] {
    del sito significa «sei qui». Dentro contro fuori li tiene distinti a colpo
    d'occhio, e sono due segnali diversi che possono anche coesistere.
 
-   `:has()` e' gia' nel vocabolario del foglio (la casella di posta lo usa per
-   sapere quale mail e' aperta). Su touch l'hover non esiste: l'anello resta
-   dov'e', che e' il comportamento giusto e non un ripiego.
+   Su touch l'hover non esiste: l'anello resta dov'e', che e' il comportamento
+   giusto e non un ripiego.
    ────────────────────────────────────────────────────────────────────────── */
 [data-hero-cta] > a {
   box-shadow: inset 0 0 0 0 transparent;
@@ -3521,39 +3430,6 @@ textarea[data-contact-campo] {
 
 @media (prefers-reduced-motion: reduce) {
   [data-hero-cta] > a { transition: none; }
-}
-
-/* ──────────────────────────────────────────────────────────────────────────
-   Il piede della mail sta in fondo al riquadro, non sotto al testo.
-
-   Le cinque risposte sono lunghe diverso. Con il piede (la firma e i due
-   bottoni) appeso alla fine del testo, passando da una mail all'altra quel
-   blocco saltava su e giu' di centinaia di pixel dentro una scatola che invece
-   sta ferma, ed era la cosa che faceva sembrare instabile una forma nata per
-   essere stabile. Inchiodato in fondo, cambia solo il testo.
-
-   Serve una catena di flex fino al messaggio: il riquadro di lettura, la pila
-   dei messaggi e il messaggio stesso. L'ultimo `margin-block-start: auto`
-   spinge firma e bottoni contro il fondo, e si porta dietro anche i bottoni
-   perche' vengono dopo.
-
-   Solo da 900px in su: sotto, il riquadro e' alto quanto il contenuto e "in
-   fondo" e' gia' dove finisce il testo. La `min-block-size: 32rem` che da' lo
-   spazio da riempire vive nella stessa soglia.
-   ────────────────────────────────────────────────────────────────────────── */
-@media (min-width: 900px) {
-  [data-lettura] { display: flex; flex-direction: column; }
-  [data-messaggi] { display: flex; flex: 1; min-block-size: 0; }
-  [data-casella]:has([data-mail]:nth-child(1) input:checked) [data-msg]:nth-child(1),
-  [data-casella]:has([data-mail]:nth-child(2) input:checked) [data-msg]:nth-child(2),
-  [data-casella]:has([data-mail]:nth-child(3) input:checked) [data-msg]:nth-child(3),
-  [data-casella]:has([data-mail]:nth-child(4) input:checked) [data-msg]:nth-child(4),
-  [data-casella]:has([data-mail]:nth-child(5) input:checked) [data-msg]:nth-child(5) {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-  [data-firma] { margin-block-start: auto; }
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -3796,10 +3672,10 @@ textarea[data-contact-campo] {
 /* ══════════════════════════════════════════════════════════════════════════
    LA SECONDA SEZIONE PASSA SOPRA LA PRIMA
 
-   Hero si ferma sotto la testata e Seeking gli sale sopra come un foglio, con
+   Hero si ferma sotto la testata e la stampante gli sale sopra come un foglio, con
    gli angoli alti arrotondati e un'ombra sul bordo. Intanto Hero «va sotto»:
    un velo d'inchiostro, si stringe, sale. Tutto proporzionale a --copertura
-   (0 quando Seeking tocca il fondo di Hero, 1 quando ne raggiunge la cima),
+   (0 quando la stampante tocca il fondo di Hero, 1 quando ne raggiunge la cima),
    che scrive SottoIlFoglio insieme a --attacco, il punto in cui Hero si ferma.
 
    Ogni regola che muove qualcosa sta sotto [data-acceso], che il componente
@@ -3810,11 +3686,11 @@ textarea[data-contact-campo] {
    contesto di impilamento suo, z-index o no: lo strato fisso della carta
    (z-index 40) dentro Hero finirebbe sotto il foglio, ed e' per questo che a
    "full" CartaStropicciata lo porta in fondo a <body>. Alla sezione non si da'
-   ne' z-index ne' isolation: non servono, Seeking le passa sopra lo stesso.
+   ne' z-index ne' isolation: non servono, la stampante le passa sopra lo stesso.
    Il contesto lo apre dichiarato lo strato del contenuto, che dentro Hero
    separa il ritratto (z-index 10) dal velo: senza, il ritratto resterebbe
    acceso sopra il velo. La trasformazione ne apre gia' uno, ma e' un effetto
-   collaterale, e non ci si appoggia. Seeking sta a 2: sopra Hero, sotto le
+   collaterale, e non ci si appoggia. La stampante sta a 2: sopra Hero, sotto le
    due barre.
 
    I numeri sono quelli tarati nel prototipo
@@ -3886,7 +3762,7 @@ textarea[data-contact-campo] {
 
 /* L'ombra sulla sezione stessa: `overflow: hidden` ritaglia il contenuto, non
    la box-shadow esterna. */
-[data-sotto-il-foglio][data-acceso] #seeking {
+[data-sotto-il-foglio][data-acceso] #scontrino {
   z-index: 2;
   border-radius: var(--raggio) var(--raggio) 0 0;
   box-shadow: 0 -18px 40px -12px color-mix(in oklab, var(--ink) 55%, transparent);

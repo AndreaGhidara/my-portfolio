@@ -6,10 +6,10 @@ import { attacco, copertura } from "./foglio";
 
 /**
  * La seconda sezione passa sopra la prima. Hero si ferma sotto la testata,
- * Seeking gli sale sopra come un foglio, e intanto Hero «va sotto»: si
- * scurisce, si stringe e sale. Poi la pagina scorre come sempre, perche' lo
- * sticky di Hero vale solo dentro questo contenitore: finita Seeking, Hero se
- * ne va con lei. Nessuna corsa in piu'.
+ * la stampante dei servizi gli sale sopra come un foglio, e intanto Hero «va
+ * sotto»: si scurisce, si stringe e sale. Poi la pagina scorre come sempre,
+ * perche' lo sticky di Hero vale solo dentro questo contenitore: finita la
+ * stampante, Hero se ne va con lei. Nessuna corsa in piu'.
  *
  * Il movimento lo fa il CSS (tokens.css), tutto sotto `data-acceso`, che si
  * scrive qui dopo aver misurato e si toglie nella pulizia: senza JavaScript e
@@ -32,15 +32,15 @@ export function SottoIlFoglio({ children }: { children: ReactNode }) {
     const sentinellaEl = sentinella.current;
     const sondaEl = sonda.current;
     const hero = root?.querySelector<HTMLElement>("#hero");
-    const seeking = root?.querySelector<HTMLElement>("#seeking");
-    if (level === "none" || !root || !sentinellaEl || !sondaEl || !hero || !seeking) return;
+    const sopra = root?.querySelector<HTMLElement>("#scontrino");
+    if (level === "none" || !root || !sentinellaEl || !sondaEl || !hero || !sopra) return;
 
     let testata = 0;
     let fermo = 0;
     let fotogramma = 0;
     let scritta = -1;
 
-    const quanto = () => copertura(hero.getBoundingClientRect(), seeking.getBoundingClientRect());
+    const quanto = () => copertura(hero.getBoundingClientRect(), sopra.getBoundingClientRect());
 
     const muovi = () => {
       // Tre decimali bastano all'occhio, e risparmiano le scritture (e il

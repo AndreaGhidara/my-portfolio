@@ -3,54 +3,90 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { render } from "@testing-library/react";
 import { ThreadSegment } from "../ThreadSegment";
-import { THREAD_ANCHORS, SECTION_ORDER, INTERRUZIONE } from "../anchors";
+import { THREAD_ANCHORS, SECTION_ORDER, INTERRUZIONE, NASCOSTE, IN_PAGINA } from "../anchors";
+
+// Senza commenti: quello sopra la sezione nascosta dice come rimetterla, e
+// nomina il componente.
+const pagina = readFileSync("src/app/[locale]/page.tsx", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+/** Il componente che rende ogni sezione del filo in page.tsx. */
+const COMPONENTE: Record<string, string> = { hero: "Hero", process: "Process", contact: "Contact" };
 
 describe("ancoraggi del filo", () => {
   it("copre tutte le sezioni attraversate dal filo", () => {
     expect(Object.keys(THREAD_ANCHORS).sort()).toEqual([...SECTION_ORDER].sort());
   });
 
+  it("le sezioni nascoste sono dichiarate, e sono davvero fuori dalla pagina", () => {
+    // Una sezione tolta da page.tsx senza passare di qui lasciava il filo con
+    // un buco che la prova di continuita' non vedeva: guardava la mappa, non
+    // la pagina. Adesso le due cose devono dire lo stesso.
+    for (const { sezione, perche } of NASCOSTE) {
+      expect(SECTION_ORDER, `${sezione} non e' una sezione del filo`).toContain(sezione);
+      expect(perche.trim().length, `${sezione} nascosta senza un perche'`).toBeGreaterThan(20);
+      expect(pagina, `${sezione} e' dichiarata nascosta ma e' in pagina`).not.toMatch(
+        new RegExp(`<${COMPONENTE[sezione]} />`),
+      );
+    }
+    for (const sezione of IN_PAGINA) {
+      expect(pagina, `${sezione} manca dalla pagina senza essere dichiarata nascosta`).toMatch(
+        new RegExp(`<${COMPONENTE[sezione]} />`),
+      );
+    }
+  });
+
   it("il filo è continuo, tranne dove è dichiarato che si interrompe", () => {
-    // Il filo si interrompe solo dove una scena agganciata non lascia passare
-    // una linea verticale: il tavolo con l'archivio dei Lavori, e il percorso. Ogni interruzione e'
+    // Il filo si interrompe solo dove una scena non lascia passare una linea
+    // verticale (la stampante, il tavolo e l'archivio dei Lavori, il
+    // percorso) o dove una sezione e' nascosta. Ogni interruzione e'
     // DICHIARATA in anchors.ts con il suo perche', e questa prova pretende che
     // le rotture siano esattamente quelle: una in piu' vuol dire che il filo
-    // si e' spezzato senza che nessuno l'abbia deciso.
+    // si e' spezzato senza che nessuno l'abbia deciso. Si contano sulle
+    // sezioni che stanno davvero in pagina, non sulla mappa intera.
     const rotture: string[] = [];
-    for (let i = 0; i < SECTION_ORDER.length - 1; i++) {
-      const da = SECTION_ORDER[i];
-      const a = SECTION_ORDER[i + 1];
+    for (let i = 0; i < IN_PAGINA.length - 1; i++) {
+      const da = IN_PAGINA[i];
+      const a = IN_PAGINA[i + 1];
       if (THREAD_ANCHORS[a].in !== THREAD_ANCHORS[da].out) rotture.push(`${da}->${a}`);
     }
+    // Le interruzioni che toccano una sezione nascosta tornano a valere
+    // quando lei torna: adesso non ci sono, e non si contano.
+    const inVigore = INTERRUZIONE.filter(({ tra }) => tra.every((s) => IN_PAGINA.includes(s)));
     expect(rotture, "il filo si spezza in un punto non dichiarato").toEqual(
-      INTERRUZIONE.map(({ tra: [da, a] }) => `${da}->${a}`),
+      inVigore.map(({ tra: [da, a] }) => `${da}->${a}`),
     );
   });
 
-  it("le interruzioni sono queste due, e nessun'altra", () => {
+  it("le interruzioni sono queste tre, e nessun'altra", () => {
     // Scritte per esteso: aggiungerne una deve passare di qui, e chi lo fa
-    // legge la regola nel commento di INTERRUZIONE. La prima copre tavolo e
-    // archivio insieme: sono due scene di fila, e in mezzo non c'e' niente
-    // che il filo possa attraversare.
+    // legge la regola nel commento di INTERRUZIONE. La prima copre stampante,
+    // tavolo e archivio insieme: sono tre scene di fila, e in mezzo non c'e'
+    // niente che il filo possa attraversare. La terza vale solo finche' «Come
+    // lavoro» e' nascosta.
     expect(INTERRUZIONE.map(({ tra }) => tra)).toEqual([
-      ["seeking", "process"],
+      ["hero", "process"],
       ["process", "contact"],
+      ["hero", "contact"],
     ]);
   });
 
   it("ogni interruzione nomina due sezioni consecutive e dice perche'", () => {
+    // Consecutive nella mappa intera, o nella pagina com'e' adesso: la terza
+    // esiste solo perche' in mezzo c'e' una sezione nascosta.
     for (const { tra: [da, a], perche } of INTERRUZIONE) {
       expect(SECTION_ORDER).toContain(da);
       expect(SECTION_ORDER).toContain(a);
-      expect(SECTION_ORDER.indexOf(a)).toBe(SECTION_ORDER.indexOf(da) + 1);
+      const vicine = (ordine: readonly string[]) =>
+        ordine.includes(da) && ordine.indexOf(a) === ordine.indexOf(da) + 1;
+      expect(vicine(SECTION_ORDER) || vicine(IN_PAGINA), `${da}->${a} non sono vicine`).toBe(true);
       expect(perche.trim().length, `${da}->${a} senza un perche'`).toBeGreaterThan(20);
     }
   });
 
-  it("le sezioni agganciate non hanno una corsa del filo", () => {
-    // Il tavolo, l'archivio dei Lavori e il percorso non disegnano il filo:
-    // se tornassero in lista, qualcuno gli rimonterebbe un ThreadSegment sopra
-    // la scena.
+  it("le scene non hanno una corsa del filo", () => {
+    // La stampante, il tavolo, l'archivio dei Lavori e il percorso non
+    // disegnano il filo: se tornassero in lista, qualcuno gli rimonterebbe un
+    // ThreadSegment sopra la scena.
+    expect(SECTION_ORDER).not.toContain("scontrino");
     expect(SECTION_ORDER).not.toContain("services");
     expect(SECTION_ORDER).not.toContain("works");
     expect(SECTION_ORDER).not.toContain("journey");
@@ -141,7 +177,6 @@ describe("chi disegna il filo", () => {
     // nessuno puo' distinguerla dal filo, e infatti non e' stata distinta.
     for (const percorso of [
       "src/components/sections/Services/DeskTable.tsx",
-      "src/components/sections/Services/Practice.tsx",
     ]) {
       const codice = readFileSync(path.resolve(__dirname, "../../../..", percorso), "utf8");
       expect(codice, `${percorso} ha ricominciato a disegnare col colore del filo`).not.toMatch(
@@ -154,13 +189,17 @@ describe("chi disegna il filo", () => {
     // Le due sezioni arancioni lo montavano con `opacity-40`, moltiplicando
     // per 0,4 un tratto gia' dipinto al 29%: l'11% misurato in pagina. Erano
     // anche le due in cui il colore era gia' il piu' debole.
-    // Il percorso non monta piu' il filo (vedi INTERRUZIONE): resta la
-    // sezione arancione che lo disegna ancora.
-    for (const vista of ["Seeking/SeekingView"]) {
+    // Oggi nessuna sezione arancione monta il filo (vedi INTERRUZIONE): la
+    // prova guarda tutte quelle che lo montano, perche' il difetto non e'
+    // dell'arancio ma dell'opacity.
+    // Process/ProcessView e' un componente nascosto (vedi NASCOSTE): si
+    // controlla lo stesso, perche' rimetterlo in pagina e' una riga.
+    for (const vista of ["Hero/HeroView", "Process/ProcessView", "Contact/ContactView"]) {
       const codice = readFileSync(
         path.resolve(__dirname, "../../sections", `${vista}.tsx`),
         "utf8",
       );
+      expect(codice, `${vista} non monta piu' il filo`).toMatch(/<ThreadSegment/);
       expect(codice, `${vista} sbiadisce il filo`).not.toMatch(/<ThreadSegment[^>]*opacity-/);
     }
   });

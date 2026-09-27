@@ -35,15 +35,7 @@ const props: ServicesViewProps = {
   punch: "Quello che chiami 'un sito' è lo schermo al centro.",
   blank: "E la tua, qual è?",
   note: "23.777 caffè",
-  practice: "E in pratica?",
-  intro: "Quattro modi di lavorare.",
   layers: [layer("site", 6), layer("logic", 6), layer("infra", 6), layer("growth", 6, true)],
-  items: [
-    { id: "sites", title: "Siti e landing", description: "Niente temi comprati." },
-    { id: "ecommerce", title: "E-commerce", description: "Il catalogo lo collego." },
-    { id: "webapp", title: "Web app", description: "Si parte dalla versione piccola." },
-    { id: "ai", title: "AI e automazioni", description: "Collegate ai tuoi dati veri." },
-  ],
 };
 
 describe("la sezione del tavolo", () => {
@@ -276,11 +268,12 @@ describe("i materiali", () => {
   });
 
   it("la sagoma sa che disegno e': la maschera pende da lei, non dall'oggetto", () => {
-    // Perche' questa prova esiste: «E in pratica?» usa le stesse sagome fuori
-    // dal tavolo, molto piu' grandi. Finche' le maschere pendevano da
-    // [data-desk-object], un disegno la' non le prendeva, e dargli
-    // data-desk-object avrebbe rotto il conteggio dei ventiquattro, che e' una
-    // prova giusta. La sagoma sa gia' che disegno e': glielo si chiede.
+    // Perche' questa prova esiste: le stesse sagome si usano fuori dal tavolo
+    // (le consegne di «Come lavoro», e prima «E in pratica?»). Finche' le
+    // maschere pendevano da [data-desk-object], un disegno la' non le
+    // prendeva, e dargli data-desk-object avrebbe rotto il conteggio dei
+    // ventiquattro, che e' una prova giusta. La sagoma sa gia' che disegno e':
+    // glielo si chiede.
     const { container } = render(<ServicesView {...props} />);
     const sagoma = container.querySelector(`${SOLI_VERI} [data-desk-shape]`) as HTMLElement;
     expect(sagoma).toHaveAttribute("data-shape", "sheet");
@@ -305,25 +298,5 @@ describe("il patto del fallback", () => {
     const primo = container.querySelector(SOLI_VERI) as HTMLElement;
     expect(primo.style.getPropertyValue("--from")).not.toBe("");
     expect(primo.style.getPropertyValue("--span")).not.toBe("");
-  });
-});
-
-describe("E in pratica?", () => {
-  it("i quattro testi lunghi restano: il tavolo è lo spettacolo, questi la sostanza", () => {
-    render(<ServicesView {...props} />);
-    for (const item of props.items) {
-      // Livello 4 e non 3: stanno dentro il blocco "E in pratica?", che e' il
-      // loro <h3>. Al livello 3 sarebbero fratelli del titolo che li contiene.
-      expect(screen.getByRole("heading", { level: 4, name: item.title })).toBeInTheDocument();
-      expect(screen.getByText(item.description)).toBeInTheDocument();
-    }
-  });
-
-  it("rispondono in ordine alle quattro voci, e l'ordine è visibile", () => {
-    const { container } = render(<ServicesView {...props} />);
-    const ol = container.querySelector("[data-practice]");
-    expect(ol?.tagName).toBe("OL");
-    expect(within(ol as HTMLElement).getByText("01")).toBeVisible();
-    expect(within(ol as HTMLElement).getByText("04")).toBeVisible();
   });
 });

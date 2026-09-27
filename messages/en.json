@@ -19,79 +19,24 @@
     "scrollHint": "Scroll",
     "avatarAlt": "Illustrated portrait of Andrea Ghidara"
   },
-  "seeking": {
-    "eyebrow": "Let's start here",
-    "title": "The five requests I get asked most often",
-    "intro": "They rarely turn up alone: a single project usually holds most of them, and deciding which to answer first is already designing it. I rewrote them, they aren't anyone's mail, but the answers are the real ones.",
-    "labels": {
-      "tipo": "What kind of work it is"
-    },
-    "casella": {
-      "etichettaDa": "From",
-      "etichettaA": "To",
-      "da": "a request like yours",
-      "a": "Andrea",
-      "vuoto": "Open one. The replies are the ones I actually write: not a quote, but where I'd start. And one in five ends with «you don't need this».",
-      "firma": "Andrea Ghidara",
-      "ruolo": "Web developer · Full stack"
-    },
-    "list": {
-      "capire": {
-        "nome": "Being understood",
-        "oggetto": "Our site doesn't reflect our direction",
-        "anteprima": "We have a site but the people who land on it don't understand what we actually do. We'd like to redo it, but we don't know where to start…",
-        "et": "What it usually means",
-        "titolo": "It's almost never a wording problem.",
-        "etPrima": "A test you can run today, in ten minutes",
-        "prima": "Write down the three questions people ask you on the phone before they buy. Then open your homepage and count how many it answers in the first screenful. If it's none or one, the problem isn't how it's written, it's the order it's in: the site describes how the company is organised instead of answering the person who just arrived.",
-        "tipo": "The real work is deciding what comes first, not producing copy. A few weeks, and you don't need to redo the design to find out.",
-        "cta": "This one's mine, write to me"
-      },
-      "strumento": {
-        "nome": "A tool",
-        "oggetto": "One step costs us hours a week",
-        "anteprima": "What we have works, but there are things we redo by hand every week. Can it be automated?",
-        "et": "What it usually means",
-        "titolo": "It's the only one of the five where you know if it's worth it before you start.",
-        "etPrima": "The maths you can do today",
-        "prima": "Hours a week, times what an hour of that person costs, times forty-five weeks. If the number that comes out isn't at least double what the tool costs, the step to automate is a different one.",
-        "tipo": "A small, self-standing piece, wired into what you already use. Then it gets calibrated: how you really need it only shows once it's in use, and from there it gets taken in.",
-        "cta": "This one's mine, write to me"
-      },
-      "aggiunta": {
-        "nome": "An addition",
-        "oggetto": "The platform is there, but it needs to do more",
-        "anteprima": "The platform is already there and it works, but we need a couple of new things. Roughly how long would it take?",
-        "et": "What it usually means",
-        "titolo": "Almost always the platform was built for the company you were, not the one you are.",
-        "etPrima": "The two numbers to compare",
-        "prima": "Count how many people use it today against how many used it in the first month, and how many things it does today against how many it did. If either number has doubled, what you're asking for isn't one more feature: it's the structure underneath that has to grow with you.",
-        "tipo": "It starts with reading, not writing: first you look at what already holds up, then you say whether what you're asking is an addition or the first piece of a new structure.",
-        "cta": "This one's mine, write to me"
-      },
-      "fulcro": {
-        "nome": "A hub",
-        "oggetto": "Every morning I log into five different tools",
-        "anteprima": "Five logins, five accounts, and none of them talk to each other. We'd like one single thing, built around us…",
-        "et": "What it usually means",
-        "titolo": "The problem isn't the five logins. It's that nobody knows which of the five holds the right number.",
-        "etPrima": "The number to look up twice",
-        "prima": "Take a number you need every day, open orders or active clients, and look it up in every tool where it might live. If you get two different answers, that's the job: not merging the logins, deciding which one is right.",
-        "tipo": "In stages, and the first one has to genuinely replace something. One piece that people actually use is worth more than ten that are finished and switched off.",
-        "cta": "This one's mine, write to me"
-      },
-      "nonancora": {
-        "nome": "Not yet",
-        "oggetto": "I have an idea, but I don't know if it fits our processes",
-        "anteprima": "I have something in mind that would make our life easier, but I don't know if it's doable with what we use…",
-        "et": "What it usually means",
-        "titolo": "Nobody arrives knowing whether they need a tool or a platform.",
-        "etPrima": "A question you can answer on your own, today",
-        "prima": "If one single person disappeared from the company tomorrow, what would stop? That thing is where any sensible project starts, and it's almost always the same thing costing you too much time right now.",
-        "tipo": "None, for now. Answering that question is worth more than any quote, and you don't need me to do it.",
-        "cta": "Write to me anyway"
-      }
-    }
+  "scontrino": {
+    "eyebrow": "Services",
+    "title": "Pick one, and I'll print it",
+    "lead": "Press a key: out comes the receipt with the service, and next to it what you'll find inside.",
+    "hint": "The printer is ready: press a key.",
+    "tasti": "Pick the service to print",
+    "marca": "ANDREA GHIDARA · SERVICES",
+    "nome": "ANDREA GHIDARA",
+    "mestiere": "web development · full stack",
+    "numero": "No.",
+    "totale": "TOTAL",
+    "daParlarne": "LET'S TALK",
+    "parliamone": "Let's talk",
+    "strappa": "tear off ✂",
+    "disegno": "Technical drawing of “{titolo}”, with its parts: {pezzi}.",
+    "tavola": "SHEET",
+    "scala": "SCALE 1:1",
+    "firma": "A. GHIDARA"
   },
   "services": {
     "eyebrow": "The method",
@@ -99,19 +44,48 @@
     "list": {
       "sites": {
         "title": "Sites and landing pages",
-        "description": "No bought themes filled with text. It starts from what a visitor has to understand in the first three seconds; structure, words and images follow from that. Then speed and indexing: the difference between having a site and being found."
+        "description": "No bought themes filled with text. It starts from what a visitor has to understand in the first three seconds; structure, words and images follow from that. Then speed and indexing: the difference between having a site and being found.",
+        "pezzi": {
+          "treSecondi": "the first 3 seconds",
+          "struttura": "structure",
+          "parole": "words",
+          "immagini": "images",
+          "velocita": "speed",
+          "indicizzazione": "indexing"
+        }
       },
       "ecommerce": {
         "title": "E-commerce",
-        "description": "I connect the catalogue to what you already run (back office, warehouse, courier) instead of asking you to update two systems by hand. Payments and shipping stay configurable: tomorrow you can switch provider without rebuilding the shop."
+        "description": "I connect the catalogue to what you already run (back office, warehouse, courier) instead of asking you to update two systems by hand. Payments and shipping stay configurable: tomorrow you can switch provider without rebuilding the shop.",
+        "pezzi": {
+          "catalogo": "catalogue",
+          "gestionale": "management system",
+          "magazzino": "warehouse",
+          "corriere": "courier",
+          "pagamenti": "payments",
+          "spedizioni": "shipping"
+        }
       },
       "webapp": {
         "title": "Web apps and platforms",
-        "description": "We start from the smallest version that stands up and put it in front of a real person early. Roles, permissions and subscriptions get built from the start: adding them later means rewriting."
+        "description": "We start from the smallest version that stands up and put it in front of a real person early. Roles, permissions and subscriptions get built from the start: adding them later means rewriting.",
+        "pezzi": {
+          "versionePiccola": "smallest version",
+          "utentiVeri": "real users",
+          "ruoli": "roles",
+          "permessi": "permissions",
+          "abbonamenti": "subscriptions"
+        }
       },
       "ai": {
         "title": "AI and automation",
-        "description": "Connected to your real data, not to a model that guesses. And one rule I don't negotiate: when the assistant doesn't know, it hands over to a person instead of inventing an answer."
+        "description": "Connected to your real data, not to a model that guesses. And one rule I don't negotiate: when the assistant doesn't know, it hands over to a person instead of inventing an answer.",
+        "pezzi": {
+          "dati": "your data",
+          "assistente": "the assistant",
+          "nonSa": "doesn't know?",
+          "persona": "a real person"
+        }
       }
     },
     "stageTitle": "Everything you don't see",
@@ -120,7 +94,6 @@
     "composto": "What it's made of",
     "blank": "And yours, what is it? Write to me.",
     "punch": "What you call «a website» is the screen in the middle. The rest is the work behind it.",
-    "practice": "Four pieces, and they fit together",
     "layers": {
       "site": {
         "title": "The site",

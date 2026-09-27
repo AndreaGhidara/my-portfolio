@@ -46,7 +46,7 @@ export function ProcessView({ eyebrow, title, intro, deliveries }: ProcessViewPr
         {/* Ordinata, e non e' un dettaglio: «in quest'ordine» e' meta' del
             titolo, e una <ol> e' il modo in cui quell'ordine arriva anche a chi
             la pagina non la vede. Le voci si accoppiano al contenuto per
-            posizione, come fa Practice con le sue scene. */}
+            posizione. */}
         {/* Ogni consegna entra dal lato in cui e' gia' impaginata: `data-lato`
             alterna destra e sinistra scendendo, e l'entrata non fa che
             rendere visibile quell'alternanza. */}

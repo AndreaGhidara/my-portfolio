@@ -71,9 +71,9 @@ export function DeskShapeArt({ drawing }: { drawing: DeskDrawing }) {
  * misurare il tavolo. `data-desk-piece` vuol dire «un pezzo disegnato»: una
  * sagoma, il suo materiale, il suo campione dentro. E' da li' che pendono la
  * tavola dei materiali e la scatola del campione, e ce l'ha anche ogni disegno
- * di «E in pratica?» — che e' la seconda cosa e non la prima. Senza,
- * quei disegni sarebbero contorni nudi in colore di testo, col campione
- * impaginato SOTTO la sagoma invece che dentro.
+ * fuori dal tavolo, come le consegne di «Come lavoro»: la seconda cosa e non
+ * la prima. Senza, quei disegni sarebbero contorni nudi in colore di testo,
+ * col campione impaginato SOTTO la sagoma invece che dentro.
  */
 export function DeskObject({
   shape,

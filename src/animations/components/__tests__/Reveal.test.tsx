@@ -30,11 +30,11 @@ describe("Reveal", () => {
   // poterli scrivere, e l'elemento che conta smette di essere quello reso.
   it("inoltra anche gli attributi che non conosce", () => {
     const { container } = render(
-      <Reveal as="ol" data-practice id="lista">
+      <Reveal as="ol" data-lista id="lista">
         <li>Voce</li>
       </Reveal>,
     );
-    const ol = container.querySelector("[data-practice]");
+    const ol = container.querySelector("[data-lista]");
     expect(ol?.tagName).toBe("OL");
     expect(ol).toHaveAttribute("id", "lista");
   });

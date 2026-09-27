@@ -106,8 +106,8 @@ export function WorksShelf({
     let inVista = false;
     let inSospeso = false;
     const fine = window.matchMedia(MEDIA.finePointer);
-    // Solo in sviluppo e solo con ?righelli, come il righello della pratica:
-    // un archivio che resta in colonna senza dire perche' non si diagnostica.
+    // Solo in sviluppo e solo con ?righelli: un archivio che resta in colonna
+    // senza dire perche' non si diagnostica.
     const racconta =
       process.env.NODE_ENV !== "production" &&
       new URLSearchParams(window.location.search).has("righelli");
@@ -262,7 +262,7 @@ export function WorksShelf({
       senzaSpostare(sezione, () => {
         lista.setAttribute("data-archivio-acceso", "");
         // La sezione e' appena cresciuta di qualche schermo: tutto quello che
-        // sta sotto (le entrate, il filo di «Come lavoro», il percorso) va
+        // sta sotto (le entrate, il percorso, il filo del «tuo turno») va
         // rimisurato.
         ScrollTrigger.refresh();
       });

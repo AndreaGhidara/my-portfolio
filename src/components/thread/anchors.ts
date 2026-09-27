@@ -1,20 +1,41 @@
 /**
  * Le corse del filo attraverso la pagina.
  *
- * Non tutte le sezioni ne hanno una: «Il tavolo», i Lavori e «Dove ho
- * imparato» NON disegnano il filo, ed e' una scelta, non una dimenticanza. Sono
- * tutte e tre scene agganciate: qualcosa di sticky fermo sullo schermo mentre
- * la pagina gli scorre sotto per migliaia di pixel. Una linea verticale che le
- * attraversa o passa SOPRA la scena, e allora la taglia, o passa DIETRO, e
- * allora resta coperta per tutta la corsa. Non esiste una terza possibilita'
- * finche' quelle sezioni sono scene. Il filo quindi si interrompe prima e
- * riprende dopo: le interruzioni sono in INTERRUZIONE. Il tavolo e l'archivio
- * stanno di fila, e li' l'interruzione e' una sola.
+ * Non tutte le sezioni ne hanno una: la stampante dei servizi, «Il tavolo», i
+ * Lavori e «Dove ho imparato» NON disegnano il filo, ed e' una scelta, non una
+ * dimenticanza. Le ultime tre sono scene agganciate: qualcosa di sticky fermo
+ * sullo schermo mentre la pagina gli scorre sotto per migliaia di pixel. Una
+ * linea verticale che le attraversa o passa SOPRA la scena, e allora la taglia,
+ * o passa DIETRO, e allora resta coperta per tutta la corsa. Non esiste una
+ * terza possibilita' finche' quelle sezioni sono scene. La stampante non e'
+ * agganciata, ma ha le sue linee (la tavola da progetto) e una verticale le
+ * taglierebbe. Il filo quindi si interrompe prima e riprende dopo: le
+ * interruzioni sono in INTERRUZIONE. Stampante, tavolo e archivio stanno di
+ * fila, e li' l'interruzione e' una sola.
  */
-export type SectionId = "hero" | "seeking" | "process" | "contact";
+export type SectionId = "hero" | "process" | "contact";
 
-/** L'ordine in cui il filo attraversa la pagina. */
-export const SECTION_ORDER: SectionId[] = ["hero", "seeking", "process", "contact"];
+/** L'ordine in cui il filo attraversa la pagina, sezioni nascoste comprese. */
+export const SECTION_ORDER: SectionId[] = ["hero", "process", "contact"];
+
+/**
+ * Le sezioni del filo che adesso non sono in pagina. Restano in SectionId e in
+ * THREAD_ANCHORS, con la loro corsa, perche' rimetterle sia una riga: togliere
+ * la voce qui e riportare il componente in page.tsx. Una prova controlla che
+ * questa lista e page.tsx dicano la stessa cosa.
+ */
+export const NASCOSTE: readonly { sezione: SectionId; perche: string }[] = [
+  {
+    sezione: "process",
+    perche:
+      "«Come possiamo proseguire» e' nascosta per scelta, non tolta: componente, testi e prove restano, e in page.tsx c'e' scritto come rimetterla.",
+  },
+];
+
+/** Le sezioni che il filo attraversa davvero, nell'ordine della pagina. */
+export const IN_PAGINA: SectionId[] = SECTION_ORDER.filter(
+  (sezione) => !NASCOSTE.some((n) => n.sezione === sezione),
+);
 
 /**
  * I punti in cui il filo si interrompe, dichiarati invece che dedotti. Ogni
@@ -22,17 +43,26 @@ export const SECTION_ORDER: SectionId[] = ["hero", "seeking", "process", "contac
  * PERCHE' li' il filo non passa: la prova di continuita' salta esattamente
  * queste coppie e nessun'altra. Una rottura senza una voce qui, o una voce
  * senza una ragione, e' un filo spezzato per sbaglio.
+ *
+ * Le coppie che toccano una sezione nascosta restano scritte e non contano
+ * finche' lei non torna; quella fra le due sezioni rimaste vicine conta solo
+ * finche' e' nascosta.
  */
 export const INTERRUZIONE: readonly { tra: readonly [SectionId, SectionId]; perche: string }[] = [
   {
-    tra: ["seeking", "process"],
+    tra: ["hero", "process"],
     perche:
-      "Tavolo e archivio, due scene di fila: il tavolo e' una camera alta 380vh col palco inchiodato, l'archivio sono quattro cartelle sticky che si salgono sopra a tutta pagina. Il filo o taglia le due scene o resta coperto per tutta la corsa.",
+      "Stampante, tavolo e archivio, tre scene di fila: la stampante ha le linee della sua tavola da progetto, il tavolo e' una camera alta 380vh col palco inchiodato, l'archivio sono quattro cartelle sticky che si salgono sopra a tutta pagina. Il filo o taglia le scene o resta coperto per tutta la corsa.",
   },
   {
     tra: ["process", "contact"],
     perche:
       "In mezzo c'e' il percorso, una scena agganciata che scorre in orizzontale: una linea verticale non la attraversa senza tagliarla. La riga di quella sezione e' la sua onda, dello stesso colore.",
+  },
+  {
+    tra: ["hero", "contact"],
+    perche:
+      "Con «Come lavoro» nascosta il filo va dall'apertura al «tuo turno», e in mezzo ci sono quattro scene di fila: la stampante, il tavolo, l'archivio e il percorso. Nessuna lascia passare una linea verticale.",
   },
 ];
 
@@ -46,7 +76,6 @@ export const INTERRUZIONE: readonly { tra: readonly [SectionId, SectionId]; perc
  */
 export const THREAD_ANCHORS: Record<SectionId, { in: number; out: number }> = {
   hero: { in: 6, out: 82 },
-  seeking: { in: 82, out: 14 },
   /**
    * Il corridoio, non la diagonale. Da 20 a 50 il filo tagliava in obliquo
    * tutta la sezione e passava in mezzo al testo della seconda consegna: una
@@ -67,9 +96,9 @@ export const THREAD_ANCHORS: Record<SectionId, { in: number; out: number }> = {
    * tutta la larghezza: li' il corridoio non esiste e nessun valore lo salva.
    * Vale gia' adesso, con qualunque ancoraggio.
    *
-   * Entra al 50 e non al 14 dove il filo esce da «Partiamo da qui»: in mezzo
-   * ci sono il tavolo e l'archivio dei Lavori, alti diverse schermate, e i due
-   * capi non si vedono mai insieme. Un'entrata che combaciasse costerebbe il
+   * Entra al 50 e non all'82 dove il filo esce dall'apertura: in mezzo ci sono
+   * la stampante, il tavolo e l'archivio dei Lavori, alti diverse schermate, e
+   * i due capi non si vedono mai insieme. Un'entrata che combaciasse costerebbe il
    * corridoio.
    */
   process: { in: 50, out: 52 },
