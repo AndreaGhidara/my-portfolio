@@ -11,28 +11,45 @@ describe("ancoraggi del filo", () => {
   });
 
   it("il filo è continuo, tranne dove è dichiarato che si interrompe", () => {
-    // Il tavolo non disegna il filo, e non e' una dimenticanza: e' una camera
-    // alta 380vh col palco inchiodato, e una linea che la attraversa o taglia
-    // la scena o resta coperta per tutta la corsa. L'interruzione e' quindi
-    // DICHIARATA in anchors.ts, e questa prova pretende che sia esattamente
-    // una e che sia quella: una seconda vuol dire che il filo si e' spezzato
-    // per sbaglio da qualche altra parte.
+    // Il filo si interrompe solo dove una scena agganciata non lascia passare
+    // una linea verticale: il tavolo e il percorso. Ogni interruzione e'
+    // DICHIARATA in anchors.ts con il suo perche', e questa prova pretende che
+    // le rotture siano esattamente quelle: una in piu' vuol dire che il filo
+    // si e' spezzato senza che nessuno l'abbia deciso.
     const rotture: string[] = [];
     for (let i = 0; i < SECTION_ORDER.length - 1; i++) {
       const da = SECTION_ORDER[i];
       const a = SECTION_ORDER[i + 1];
       if (THREAD_ANCHORS[a].in !== THREAD_ANCHORS[da].out) rotture.push(`${da}->${a}`);
     }
-    expect(rotture, "il filo si spezza in un punto non dichiarato").toEqual([
-      `${INTERRUZIONE[0]}->${INTERRUZIONE[1]}`,
+    expect(rotture, "il filo si spezza in un punto non dichiarato").toEqual(
+      INTERRUZIONE.map(({ tra: [da, a] }) => `${da}->${a}`),
+    );
+  });
+
+  it("le interruzioni sono queste due, e nessun'altra", () => {
+    // Scritte per esteso: aggiungerne una deve passare di qui, e chi lo fa
+    // legge la regola nel commento di INTERRUZIONE.
+    expect(INTERRUZIONE.map(({ tra }) => tra)).toEqual([
+      ["seeking", "works"],
+      ["process", "contact"],
     ]);
   });
 
-  it("l'interruzione nomina due sezioni che esistono e sono consecutive", () => {
-    const [da, a] = INTERRUZIONE;
-    expect(SECTION_ORDER).toContain(da);
-    expect(SECTION_ORDER).toContain(a);
-    expect(SECTION_ORDER.indexOf(a)).toBe(SECTION_ORDER.indexOf(da) + 1);
+  it("ogni interruzione nomina due sezioni consecutive e dice perche'", () => {
+    for (const { tra: [da, a], perche } of INTERRUZIONE) {
+      expect(SECTION_ORDER).toContain(da);
+      expect(SECTION_ORDER).toContain(a);
+      expect(SECTION_ORDER.indexOf(a)).toBe(SECTION_ORDER.indexOf(da) + 1);
+      expect(perche.trim().length, `${da}->${a} senza un perche'`).toBeGreaterThan(20);
+    }
+  });
+
+  it("le sezioni agganciate non hanno una corsa del filo", () => {
+    // Il tavolo e il percorso non disegnano il filo: se tornassero in lista,
+    // qualcuno gli rimonterebbe un ThreadSegment sopra la scena.
+    expect(SECTION_ORDER).not.toContain("services");
+    expect(SECTION_ORDER).not.toContain("journey");
   });
 
   it("ogni ancoraggio sta dentro la larghezza della pagina", () => {
@@ -133,7 +150,9 @@ describe("chi disegna il filo", () => {
     // Le due sezioni arancioni lo montavano con `opacity-40`, moltiplicando
     // per 0,4 un tratto gia' dipinto al 29%: l'11% misurato in pagina. Erano
     // anche le due in cui il colore era gia' il piu' debole.
-    for (const vista of ["Seeking/SeekingView", "Journey/JourneyView"]) {
+    // Il percorso non monta piu' il filo (vedi INTERRUZIONE): resta la
+    // sezione arancione che lo disegna ancora.
+    for (const vista of ["Seeking/SeekingView"]) {
       const codice = readFileSync(
         path.resolve(__dirname, "../../sections", `${vista}.tsx`),
         "utf8",
