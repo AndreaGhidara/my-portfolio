@@ -101,7 +101,7 @@ export function stamp(
  */
 // Le finestre di scorrimento stanno in ./finestre: e' un modulo di soli dati,
 // senza "use client", cosi' lo possono leggere anche i Server Component.
-export { TESSITURA, FINESTRA, CORSA_FRECCIA, FINESTRE_FILO, INIZIO_ENTRATA } from "./finestre";
+export { TESSITURA, FINESTRA, FINESTRE_FILO, INIZIO_ENTRATA } from "./finestre";
 import { TESSITURA, FINESTRA, INIZIO_ENTRATA } from "./finestre";
 
 /**
@@ -401,9 +401,8 @@ export function reveal(
 /**
  * ARRIVA DI LATO — entra scorrendo dal bordo che gli e' stato assegnato.
  *
- * Il verso non se lo inventa l'animazione: i blocchi di «E in pratica?» e le
- * quattro consegne portano gia' un `data-lato`, che e' il lato da cui il
- * disegno sta gia' impaginato. Facendoli entrare da li', il movimento e'
+ * Il verso non se lo inventa l'animazione: le quattro consegne portano gia'
+ * un `data-lato`, che e' il lato da cui il disegno sta gia' impaginato. Facendoli entrare da li', il movimento e'
  * l'impaginato che si compone, non un effetto appiccicato sopra.
  *
  * Le distanze sono corte apposta: un blocco che attraversa mezzo schermo su un

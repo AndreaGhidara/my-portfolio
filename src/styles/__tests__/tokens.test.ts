@@ -187,39 +187,6 @@ describe("le entrate laterali non allargano la pagina", () => {
   });
 });
 
-describe("le voci di «E in pratica?» sul tablet", () => {
-  it("sotto i 900px il blocco di testo e' centrato, non appoggiato a sinistra", () => {
-    // Li' la voce e' una colonna sola larga quanto la pagina e il testo e' un
-    // blocco da 36ch: appoggiato a sinistra lasciava il resto vuoto. Misurato
-    // su 834px prima della correzione: 464px di niente a destra.
-    const blocco = css.match(/@media \(max-width: 899px\) \{[\s\S]*?\n\}/)?.[0];
-    expect(blocco, "manca il blocco sotto i 900px").toBeTruthy();
-    expect(blocco).toMatch(/\[data-practice-text\][^}]*margin-inline:\s*auto/);
-  });
-
-  it("sotto i 900px anche i disegni stanno al centro, e con una larghezza vera", () => {
-    // La scatola dei disegni contiene solo figli assoluti: con margin-inline
-    // auto collassa a larghezza zero e i disegni spariscono dalla pagina.
-    // Successo davvero, e misurato: scatola larga 0px al centro della voce.
-    // Serve una larghezza dichiarata piu' justify-self.
-    const blocco = css.match(/@media \(max-width: 899px\) \{[\s\S]*?\[data-practice-art\][\s\S]*?\n\}/)?.[0];
-    expect(blocco, "i disegni di «E in pratica?» non si centrano").toBeTruthy();
-    expect(blocco).toMatch(/\[data-practice-art\]\s*\{[^}]*width:\s*min\(/);
-    expect(blocco).toMatch(/justify-self:\s*center/);
-    expect(blocco, "margin-inline auto qui fa collassare la scatola").not.toMatch(
-      /\[data-practice-art\]\s*\{[^}]*margin-inline:\s*auto/,
-    );
-  });
-
-  it("sopra i 900px non si tocca: li' c'e' l'alternanza a due colonne", () => {
-    const due = css.match(/@media \(min-width: 900px\) \{[\s\S]*?\n\}/)?.[0];
-    expect(due).toMatch(/grid-template-columns/);
-    expect(due, "il centraggio e' finito anche dove non serve").not.toMatch(
-      /\[data-practice-text\] \{[^}]*margin-inline:\s*auto/,
-    );
-  });
-});
-
 describe("le consegne sul tablet", () => {
   it("sotto i 900px il testo della consegna e' centrato", () => {
     // Misurato a 768px prima della correzione: il testo si fermava a 34rem e

@@ -1,21 +1,19 @@
 import { setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/sections/Hero";
 import { SottoIlFoglio } from "@/components/sections/Hero/SottoIlFoglio";
-import { Seeking } from "@/components/sections/Seeking";
+import { Scontrino } from "@/components/sections/Scontrino";
 import { Services } from "@/components/sections/Services";
 import { Works } from "@/components/sections/Works";
-import { Process } from "@/components/sections/Process";
 import { Journey } from "@/components/sections/Journey";
 import { Contact } from "@/components/sections/Contact";
 
 /**
- * L'ordine è quello deciso nella spec e non è arbitrario:
- * al secondo posto sta il riconoscimento — cinque richieste che il visitatore
- * si e' gia' detto — e subito dopo la risposta a quelle frasi, nello stesso
- * ordine. Prima si fa dire "questo sono io", poi si spiega come si risolve:
- * invertirli significa descrivere una soluzione a chi non ha ancora ammesso
- * di avere il problema. I lavori vengono dopo, perche' servono a dimostrare
- * quello che i primi due blocchi hanno promesso.
+ * Al secondo posto la stampante dei servizi: si sceglie un servizio e si vede
+ * di che pezzi e' fatto. Poi il tavolo, tutto quello che sta sotto un sito
+ * finito, e i lavori, che servono a dimostrare quello che i primi blocchi hanno
+ * promesso. Poi il percorso, dove ho imparato, e in fondo «Il tuo turno», i
+ * contatti. «Come lavoro» (Process) stava fra i lavori e il percorso: e'
+ * nascosta per scelta, non tolta, e il filo lo sa (NASCOSTE in anchors.ts).
  *
  * Il Footer non è qui: vive nel layout, fuori da <main>, perché è chrome
  * di sito (come la Navbar) e un <footer> dentro <main> perde il ruolo
@@ -33,16 +31,18 @@ export default async function Home({
 
   return (
     <>
-      {/* Insieme, e solo loro: Hero si ferma e Seeking gli passa sopra, e lo
+      {/* Insieme, e solo loro: Hero si ferma e la stampante gli passa sopra, e lo
           sticky di Hero finisce dove finisce questo contenitore. Dentro <main>
           resterebbe incollato dietro tutte le sezioni fino in fondo. */}
       <SottoIlFoglio>
         <Hero />
-        <Seeking />
+        <Scontrino />
       </SottoIlFoglio>
       <Services />
       <Works />
-      <Process />
+      {/* «Come possiamo proseguire» (Process) e' nascosta per scelta, non tolta:
+          componente, testi e prove restano. Per rimetterla basta riportare qui
+          <Process /> (import da "@/components/sections/Process"). */}
       <Journey />
       <Contact />
     </>

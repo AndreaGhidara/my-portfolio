@@ -1,5 +1,4 @@
 import type { DeskShape } from "./desk";
-import type { Lato } from "./practice";
 
 /**
  * Quello che ti resta in mano, e quando.
@@ -17,6 +16,9 @@ import type { Lato } from "./practice";
  */
 export type ProcessSample = "accordo" | "bozza" | "indirizzo" | "numero";
 
+/** Da che parte sta il disegno. Il testo sta dall'altra. */
+export type Lato = "dx" | "sx";
+
 export type ProcessDelivery = {
   /** E' anche la chiave di traduzione: process.list.<id>.* */
   id: string;
@@ -29,8 +31,8 @@ export type ProcessDelivery = {
   lato: Lato;
   /**
    * La sagoma e' quella del tavolo (le stesse di `public/brand/desk/`) e non
-   * un disegno nuovo. La regola sta scritta in PracticeBlock.tsx e vale anche
-   * qui: il sito non aggiunge vocabolari di illustrazione, li riusa.
+   * un disegno nuovo: il sito non aggiunge vocabolari di illustrazione, li
+   * riusa.
    *
    * Due consegne su quattro sono lo stesso `sheet`, ed e' voluto: un documento
    * e un wireframe SONO due fogli. A distinguerli e' il campione, che e' la

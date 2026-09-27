@@ -5,10 +5,8 @@ import type { ProcessDeliveryView } from "./ProcessView";
 
 /**
  * Una consegna. Da una parte il testo, dall'altra il disegno, e i lati si
- * alternano scendendo, che qui non e' la regola della freccia di «E in
- * pratica?» (li' il tracciato non deve passare sopra un paragrafo) ma una cosa
- * piu' semplice: quattro voci dallo stesso lato sono una colonna di testo con
- * mezza pagina bianca accanto.
+ * alternano scendendo, per una ragione semplice: quattro voci dallo stesso
+ * lato sono una colonna di testo con mezza pagina bianca accanto.
  *
  * Il testo e' in quattro tempi, ed e' l'ordine che regge la voce della sezione:
  * quando arriva, cosa contiene, cosa NON e', e perche' quella cosa li'

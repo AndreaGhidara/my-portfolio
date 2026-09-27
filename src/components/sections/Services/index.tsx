@@ -1,5 +1,4 @@
 import { getTranslations } from "next-intl/server";
-import { services } from "@/content/services";
 import { deskLayers } from "@/content/desk";
 import { metricById } from "@/content/metrics";
 import { ServicesView } from "./ServicesView";
@@ -39,14 +38,7 @@ export async function Services() {
       blank={t("blank")}
       note={`${caffe.value} ${tMetrics(caffe.id)}`}
       punch={t("punch")}
-      practice={t("practice")}
-      intro={t("intro")}
       layers={layers}
-      items={services.map((service) => ({
-        id: service.id,
-        title: t(`list.${service.id}.title`),
-        description: t(`list.${service.id}.description`),
-      }))}
     />
   );
 }

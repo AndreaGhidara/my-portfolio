@@ -201,7 +201,7 @@ export function CartaStropicciata() {
     const dentro = (e: PointerEvent) =>
       lettere.find((L) => !L.via && L.img === (e.target as Node));
 
-    /* Una lettera che sta andando sotto il foglio di Seeking (SottoIlFoglio
+    /* Una lettera che sta andando sotto il foglio della stampante (SottoIlFoglio
        scrive --copertura su #hero) non si sgualcisce e non si prende: la tela
        e la pallina stanno sopra il velo, e si accenderebbe una lettera sola
        in mezzo alle altre scurite. Lo stile inline e non quello calcolato:
@@ -310,8 +310,8 @@ export function CartaStropicciata() {
   // solo il posto dove le tele vanno a stare. Decorativo per intero — il nome
   // che uno screen reader legge resta quello del wordmark.
   const tela = <div ref={strato} data-carta aria-hidden="true" />;
-  /* A "full" lo strato va in fondo a <body>, fuori da #hero. Quando Seeking
-     passa sopra Hero (SottoIlFoglio), #hero e' sticky, e un elemento sticky
+  /* A "full" lo strato va in fondo a <body>, fuori da #hero. Quando la
+     stampante passa sopra Hero (SottoIlFoglio), #hero e' sticky, e un elemento sticky
      apre sempre un contesto di impilamento suo, z-index o no: lo z-index 40
      dello strato varrebbe solo dentro Hero, e la pallina lanciata finirebbe
      sotto il foglio arancione. Da <body> se la gioca con il resto della

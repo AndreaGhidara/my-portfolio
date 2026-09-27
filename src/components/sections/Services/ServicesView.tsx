@@ -1,8 +1,5 @@
 import { DeskStage } from "./DeskStage";
-import { Practice } from "./Practice";
 import type { DeskLayerData } from "./DeskTable";
-
-export type ServiceItem = { id: string; title: string; description: string };
 
 export type ServicesViewProps = {
   eyebrow: string;
@@ -20,22 +17,16 @@ export type ServicesViewProps = {
    *  che qualcuno lo prema. */
   note: string;
   punch: string;
-  practice: string;
-  intro: string;
   layers: DeskLayerData[];
-  items: ServiceItem[];
 };
 
 /**
- * La risposta alle quattro frasi della sezione precedente. Non e' un elenco di
- * risposte: e' un tavolo, e la risposta e' "qualunque delle quattro sia la tua,
- * il lavoro e' questo tavolo qui".
+ * Il tavolo: tutto quello che sta sotto un sito finito. I quattro servizi, uno
+ * per uno, li stampa la stampante della sezione sopra.
  *
- * "E in pratica?" viene dopo, ed e' deliberatamente separabile: il tavolo e' lo
- * spettacolo, quella scena e' la sostanza, e conserva la risposta 1:1 alle
- * quattro voci. Costa una scena — quattro voci alternate testo|disegno, con gli
- * stessi oggetti del tavolo ingranditi — e non piu' un elenco asciutto. Se un
- * giorno pesa, si toglie senza toccare il tavolo.
+ * Sotto il tavolo c'era «E in pratica?», le quattro voci con i loro disegni e
+ * una freccia che le attraversava. E' stata tolta: le quattro descrizioni
+ * adesso si leggono sullo scontrino.
  */
 export function ServicesView({
   eyebrow,
@@ -46,10 +37,7 @@ export function ServicesView({
   blank,
   note,
   punch,
-  practice,
-  intro,
   layers,
-  items,
 }: ServicesViewProps) {
   return (
     <section id="services" className="relative">
@@ -67,12 +55,6 @@ export function ServicesView({
         punch={punch}
         layers={layers}
       />
-
-      {/* Il palco e' largo 74rem e non 64: non e' una colonna di lettura, e'
-          una scena in cui un braccio deve poter oscillare. Il testo dentro
-          resta a 36ch. La misura e' anche quella su cui il gesto e' stato
-          calibrato, cosi' i numeri partono vicini al punto giusto. */}
-      <Practice practice={practice} intro={intro} items={items} />
     </section>
   );
 }

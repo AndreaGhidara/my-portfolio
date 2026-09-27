@@ -1,5 +1,5 @@
 /**
- * Le finestre di scorrimento del filo e della freccia.
+ * Le finestre di scorrimento del filo e delle entrate.
  *
  * NIENTE "use client" IN CIMA, ed e' l'unica ragione per cui questo file
  * esiste separato da presets.ts. Le costanti stavano li', insieme alle
@@ -63,15 +63,6 @@ export const INIZIO_ENTRATA = {
  * che si sta leggendo, e tutto quello che e' gia' passato di li' e' cucito.
  */
 export const TESSITURA = { inizio: "top 85%", fine: "bottom 85%" } as const;
-
-/**
- * La riga su cui la freccia della pratica parte e finisce. Sta qui e non dentro
- * la sezione perche' la legge anche il righello di sviluppo (Righelli.tsx), e
- * due numeri uguali scritti in due file divergono al primo che ne tocca uno.
- * Prima la sapeva anche il filo dei Lavori, che apriva appena dopo: i Lavori
- * sono diventati un archivio e il filo li' non passa piu' (vedi anchors.ts).
- */
-export const CORSA_FRECCIA = { inizio: "top 46%", fine: "bottom 46%" } as const;
 
 /**
  * L'entrata del filo al caricamento, tarata sulla timeline di HeroMotion e non

@@ -252,10 +252,16 @@ describe("tokens.css dichiara esattamente la tavola dei materiali", () => {
  */
 describe("l'ombra sta sulle superfici e su niente altro", () => {
   it("la dichiara la sagoma, e nessun'altra regola del foglio di stile", () => {
-    const regole = [...TOKENS.matchAll(/(^|\})([^{}]+)\{([^{}]*)\}/g)];
+    // La graffa di chiusura sta nel lookbehind e non nel match: consumandola,
+    // ogni regola saltava la successiva, e la prova ne leggeva una su due.
+    // Si e' visto togliendo un blocco del foglio: l'ombra delle palline di
+    // carta dell'apertura, che c'era gia', e' comparsa di colpo. Il tavolo e'
+    // quello che conta qui: le palline non sono una superficie del tavolo.
+    const regole = [...TOKENS.matchAll(/(?<=^|\})([^{}]+)\{([^{}]*)\}/g)];
     const conOmbra = regole
-      .filter((r) => /drop-shadow/.test(r[3]))
-      .map((r) => r[2].trim().replace(/\s+/g, " "));
+      .filter((r) => /drop-shadow/.test(r[2]))
+      .map((r) => r[1].trim().replace(/\s+/g, " "))
+      .filter((selettore) => /\[data-desk/.test(selettore));
     expect(conOmbra).toEqual(["[data-desk-shape]"]);
   });
 

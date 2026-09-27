@@ -19,79 +19,24 @@
     "scrollHint": "Scorri",
     "avatarAlt": "Ritratto illustrato di Andrea Ghidara"
   },
-  "seeking": {
-    "eyebrow": "Partiamo da qui",
-    "title": "Le cinque richieste che mi fanno più spesso",
-    "intro": "Raramente arrivano da sole: in un progetto solo ci stanno quasi tutte, e decidere a quale rispondere per prima è già progettarlo. Le ho riscritte io, non sono le mail di nessuno, ma le risposte sono quelle vere.",
-    "labels": {
-      "tipo": "Che tipo di lavoro è"
-    },
-    "casella": {
-      "etichettaDa": "Da",
-      "etichettaA": "A",
-      "da": "una richiesta come la tua",
-      "a": "Andrea",
-      "vuoto": "Aprine una. Le risposte sono quelle che scrivo davvero: non un preventivo, ma da dove partirei. E in un caso su cinque finiscono con «non ti serve».",
-      "firma": "Andrea Ghidara",
-      "ruolo": "Sviluppatore web · Full stack"
-    },
-    "list": {
-      "capire": {
-        "nome": "Farsi capire",
-        "oggetto": "Il sito non esprime la nostra direzione",
-        "anteprima": "Abbiamo un sito ma chi ci arriva non capisce di cosa ci occupiamo. Vorremmo rifarlo, ma non sappiamo da dove cominciare…",
-        "et": "Quello che di solito significa",
-        "titolo": "Quasi mai è un problema di parole.",
-        "etPrima": "La prova che puoi fare oggi, in dieci minuti",
-        "prima": "Scrivi le tre domande che ti fanno al telefono prima di comprare. Poi apri la tua home e conta a quante risponde nella prima schermata. Se sono zero o una, il problema non è come è scritto, è l'ordine in cui è messo: il sito racconta com'è fatta l'azienda invece di rispondere a chi arriva.",
-        "tipo": "Il lavoro grosso è decidere cosa viene prima, non produrre testo. Poche settimane, e non serve rifare la grafica per scoprirlo.",
-        "cta": "Questa è la mia, scrivimi"
-      },
-      "strumento": {
-        "nome": "Uno strumento",
-        "oggetto": "Un passaggio ci ruba ore a settimana",
-        "anteprima": "Quello che abbiamo funziona, ma ci sono cose che rifacciamo a mano ogni settimana. Si può automatizzare?",
-        "et": "Quello che di solito significa",
-        "titolo": "È l'unica delle cinque in cui sai se conviene prima di cominciare.",
-        "etPrima": "Il conto che puoi fare oggi",
-        "prima": "Ore a settimana, per quanto costa un'ora di quella persona, per quarantacinque settimane. Se il numero che esce non è almeno il doppio di quanto costa lo strumento, il passaggio da automatizzare è un altro.",
-        "tipo": "Un pezzo piccolo e a sé, collegato a quello che già usi. Poi si calibra: come ti serve davvero si scopre usandolo, e da lì lo si stringe addosso.",
-        "cta": "Questa è la mia, scrivimi"
-      },
-      "aggiunta": {
-        "nome": "Un'aggiunta",
-        "oggetto": "La piattaforma c'è, ma deve fare di più",
-        "anteprima": "La piattaforma c'è già e funziona, ma servono un paio di cose nuove. Quanto ci vuole più o meno?",
-        "et": "Quello che di solito significa",
-        "titolo": "Quasi sempre la piattaforma è stata costruita per l'azienda che eri, non per quella che sei.",
-        "etPrima": "I due numeri da confrontare",
-        "prima": "Conta quante persone la usano oggi contro quante la usavano il primo mese, e quante cose fa oggi contro quante ne faceva. Se uno dei due numeri è raddoppiato, quello che stai chiedendo non è una funzionalità in più: è la struttura sotto che deve crescere con te.",
-        "tipo": "Si comincia leggendo, non scrivendo: prima si guarda cosa regge già, poi si dice se quello che chiedi è un'aggiunta o il primo pezzo di una struttura nuova.",
-        "cta": "Questa è la mia, scrivimi"
-      },
-      "fulcro": {
-        "nome": "Un fulcro",
-        "oggetto": "Ogni mattina entro in cinque strumenti diversi",
-        "anteprima": "Cinque accessi, cinque account, e nessuno parla con gli altri. Vorremmo una cosa sola, fatta su di noi…",
-        "et": "Quello che di solito significa",
-        "titolo": "Il problema non sono i cinque accessi. È che nessuno sa quale dei cinque ha il dato giusto.",
-        "etPrima": "Il numero da cercare due volte",
-        "prima": "Prendi un numero che ti serve tutti i giorni, quanti ordini aperti o quanti clienti attivi, e cercalo in ogni strumento dove potrebbe stare. Se ti escono due numeri diversi, quello è il lavoro: non unire gli accessi, decidere chi ha ragione.",
-        "tipo": "A fasi, e la prima deve sostituire qualcosa per davvero. Un pezzo entrato in uso vale più di dieci pronti e spenti.",
-        "cta": "Questa è la mia, scrivimi"
-      },
-      "nonancora": {
-        "nome": "Non ancora",
-        "oggetto": "Ho un'idea, ma non so se si può fare sui miei processi",
-        "anteprima": "Ho in mente una cosa che ci semplificherebbe la vita, ma non so se è fattibile con quello che usiamo…",
-        "et": "Quello che di solito significa",
-        "titolo": "Nessuno arriva sapendo se gli serve uno strumento o una piattaforma.",
-        "etPrima": "Una domanda a cui puoi rispondere da solo, oggi",
-        "prima": "Se domani sparisse una persona sola dall'azienda, cosa si fermerebbe? Quella cosa è il punto da cui parte qualunque progetto sensato, e quasi sempre è la stessa che ti costa troppo tempo adesso.",
-        "tipo": "Nessuno, per ora. Rispondere a quella domanda vale più di qualunque preventivo, e per farlo non servo io.",
-        "cta": "Scrivimi lo stesso"
-      }
-    }
+  "scontrino": {
+    "eyebrow": "Servizi",
+    "title": "Scegli, e te lo stampo",
+    "lead": "Premi un tasto: esce lo scontrino con il servizio, e accanto quello che ci trovi dentro.",
+    "hint": "La stampante è pronta: premi un tasto.",
+    "tasti": "Scegli il servizio da stampare",
+    "marca": "ANDREA GHIDARA · SERVIZI",
+    "nome": "ANDREA GHIDARA",
+    "mestiere": "sviluppo web · full stack",
+    "numero": "N.",
+    "totale": "TOTALE",
+    "daParlarne": "DA PARLARNE",
+    "parliamone": "Parliamone",
+    "strappa": "strappa ✂",
+    "disegno": "Schema tecnico di «{titolo}», con i suoi pezzi: {pezzi}.",
+    "tavola": "TAV.",
+    "scala": "SCALA 1:1",
+    "firma": "A. GHIDARA"
   },
   "services": {
     "eyebrow": "Il metodo",
@@ -99,19 +44,48 @@
     "list": {
       "sites": {
         "title": "Siti e landing",
-        "description": "Niente temi comprati e riempiti di testo. Si parte da cosa deve capire chi atterra nei primi tre secondi, e da lì scendono struttura, parole e immagini. Poi velocità e indicizzazione: sono la differenza fra avere un sito ed essere trovati."
+        "description": "Niente temi comprati e riempiti di testo. Si parte da cosa deve capire chi atterra nei primi tre secondi, e da lì scendono struttura, parole e immagini. Poi velocità e indicizzazione: sono la differenza fra avere un sito ed essere trovati.",
+        "pezzi": {
+          "treSecondi": "i primi 3 secondi",
+          "struttura": "struttura",
+          "parole": "parole",
+          "immagini": "immagini",
+          "velocita": "velocità",
+          "indicizzazione": "indicizzazione"
+        }
       },
       "ecommerce": {
         "title": "E-commerce",
-        "description": "Il catalogo lo collego a quello che hai già (gestionale, magazzino, corriere) invece di chiederti di aggiornare due sistemi a mano. Pagamenti e spedizioni restano configurabili: domani puoi cambiare fornitore senza rifare il negozio."
+        "description": "Il catalogo lo collego a quello che hai già (gestionale, magazzino, corriere) invece di chiederti di aggiornare due sistemi a mano. Pagamenti e spedizioni restano configurabili: domani puoi cambiare fornitore senza rifare il negozio.",
+        "pezzi": {
+          "catalogo": "catalogo",
+          "gestionale": "gestionale",
+          "magazzino": "magazzino",
+          "corriere": "corriere",
+          "pagamenti": "pagamenti",
+          "spedizioni": "spedizioni"
+        }
       },
       "webapp": {
         "title": "Web app e piattaforme",
-        "description": "Si parte dalla versione più piccola che sta in piedi e la si mette presto davanti a qualcuno vero. Ruoli, permessi e abbonamenti si costruiscono da subito: aggiungerli a cose fatte vuol dire riscrivere."
+        "description": "Si parte dalla versione più piccola che sta in piedi e la si mette presto davanti a qualcuno vero. Ruoli, permessi e abbonamenti si costruiscono da subito: aggiungerli a cose fatte vuol dire riscrivere.",
+        "pezzi": {
+          "versionePiccola": "versione piccola",
+          "utentiVeri": "utenti veri",
+          "ruoli": "ruoli",
+          "permessi": "permessi",
+          "abbonamenti": "abbonamenti"
+        }
       },
       "ai": {
         "title": "AI e automazioni",
-        "description": "Collegate ai tuoi dati veri, non a un modello che indovina. E una regola che non negozio: quando l'assistente non sa, passa a una persona invece di inventare una risposta."
+        "description": "Collegate ai tuoi dati veri, non a un modello che indovina. E una regola che non negozio: quando l'assistente non sa, passa a una persona invece di inventare una risposta.",
+        "pezzi": {
+          "dati": "i tuoi dati",
+          "assistente": "l'assistente",
+          "nonSa": "non sa?",
+          "persona": "una persona"
+        }
       }
     },
     "stageTitle": "Tutto quello che non si vede",
@@ -120,7 +94,6 @@
     "composto": "Da cosa è composto",
     "blank": "E la tua, qual è? Scrivimi.",
     "punch": "Quello che chiami «un sito» è lo schermo al centro. Il resto è il lavoro che c'è dietro.",
-    "practice": "Quattro pezzi, e si montano insieme",
     "layers": {
       "site": {
         "title": "Il sito",
