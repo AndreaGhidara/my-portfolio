@@ -182,6 +182,7 @@
       "visit": "Visit the site",
       "open": "Open the case",
       "close": "Close",
+      "riporta": "bring this folder to the front",
       "screenshotAlt": "{name}: screenshot of the project",
       "riservato": "Covered by a non-disclosure agreement"
     },

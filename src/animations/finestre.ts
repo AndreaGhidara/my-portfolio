@@ -66,79 +66,12 @@ export const TESSITURA = { inizio: "top 85%", fine: "bottom 85%" } as const;
 
 /**
  * La riga su cui la freccia della pratica parte e finisce. Sta qui e non dentro
- * la sezione perche' non e' piu' un fatto privato di quell'animazione: il filo
- * dei Lavori deve saperla, e due numeri uguali scritti in due file divergono al
- * primo che ne tocca uno.
+ * la sezione perche' la legge anche il righello di sviluppo (Righelli.tsx), e
+ * due numeri uguali scritti in due file divergono al primo che ne tocca uno.
+ * Prima la sapeva anche il filo dei Lavori, che apriva appena dopo: i Lavori
+ * sono diventati un archivio e il filo li' non passa piu' (vedi anchors.ts).
  */
 export const CORSA_FRECCIA = { inizio: "top 46%", fine: "bottom 46%" } as const;
-
-/**
- * La finestra del filo dei Lavori, e l'unica della pagina che non usa TESSITURA.
- *
- * Il motivo, che la regola di TESSITURA pretende: subito sopra i Lavori finisce
- * la corsa della freccia della pratica, e con l'apertura di default il filo
- * cominciava a disegnarsi mentre la freccia era ancora per strada. Non era un
- * caso limite. La freccia finisce quando il fondo del percorso arriva al 46%
- * dello schermo, il filo partiva quando il bordo alto dei Lavori arrivava
- * all'85%: perche' i due non si accavallassero sarebbe servito che fra i due
- * bordi ci fossero 39vh, e ce ne sono 128px di padding.
- *
- * L'apertura e' la STESSA riga su cui la freccia finisce, e non un numero
- * tarato a occhio. Il bordo alto dei Lavori sta sempre sotto il fondo del
- * percorso, quindi attraversa una data riga sempre dopo: partendo di li' il
- * filo e' in ritardo sulla freccia per costruzione, su ogni schermo e qualunque
- * sia lo spazio fra le due sezioni. La chiusura resta quella di tutti, cosi' la
- * consegna alla sezione successiva non cambia.
- */
-const RIGA_FRECCIA = Number.parseFloat(CORSA_FRECCIA.fine.split(" ")[1]);
-
-/**
- * Di quanti punti percentuali il filo apre PIU' IN BASSO della riga su cui la
- * freccia chiude. Sommato, non sottratto, e il segno e' il punto delicato di
- * tutto il file: sembra un errore e non lo e'.
- *
- * I due inneschi sono agganciati a due elementi diversi, e il bordo alto dei
- * Lavori sta 128px SOTTO il fondo del percorso — e' il padding di chiusura
- * della pratica. Quei 128px, su uno schermo da 860, valgono gia' quindici
- * punti percentuali: quando la freccia si posa, il bordo dei Lavori e' al 61%
- * e non al 46%. Mettere la riga del filo SOPRA quella della freccia, come
- * faceva la versione precedente, aggiungeva quei quindici punti al ritardo
- * invece di toglierli: erano 266px di attesa fra l'atterraggio e la partenza.
- *
- * Con la riga POCO SOTTO, il filo apre appena dopo l'atterraggio. Piu' il
- * numero e' alto, prima parte: alzarlo abbassa la riga sullo schermo, e una
- * riga piu' in basso l'elemento la raggiunge prima. Non zero, perche' senza
- * respiro le due cose si leggono come una sola.
- *
- * IL PREZZO, ed e' la ragione per cui questo numero non si alza a cuor leggero:
- * la garanzia che il filo non anticipi la freccia regge finche' i 128px di
- * stacco valgono piu' di RITARDO_LAVORI punti di schermo. A 9 il tetto e' una
- * finestra alta circa 1420px; a 6 era 2100. Piu' e' corto il respiro, meno
- * margine resta sugli schermi alti. Una prova verifica il tetto dichiarato.
- *
- * Il modo di avere tutti e due — respiro corto e nessun tetto — e' agganciare
- * i due inneschi allo STESSO elemento, esprimendo lo stacco in pixel invece che
- * in punti percentuali. Si puo' fare, costa una riscrittura piu' larga, e finche'
- * nessuno guarda il sito su una finestra piu' alta di 1420px non serve.
- */
-const RITARDO_LAVORI = 9;
-
-/**
- * La finestra del filo dei Lavori, e l'unica della pagina che non usa TESSITURA.
- *
- * Il motivo, che la regola di TESSITURA pretende: subito sopra i Lavori finisce
- * la corsa della freccia della pratica, e con l'apertura di default — l'85% —
- * il filo cominciava a disegnarsi mentre la freccia era ancora a meta' strada.
- * Non era un caso limite: perche' le due non si accavallassero sarebbe servito
- * che fra i due bordi ci fossero 39vh, e ce ne sono 128px.
- *
- * La chiusura resta quella di tutti, cosi' la consegna alla sezione successiva
- * non cambia: si sposta solo l'apertura.
- */
-export const TESSITURA_LAVORI = {
-  inizio: `top ${RIGA_FRECCIA + RITARDO_LAVORI}%`,
-  fine: TESSITURA.fine,
-} as const;
 
 /**
  * L'entrata del filo al caricamento, tarata sulla timeline di HeroMotion e non
@@ -160,8 +93,10 @@ export const FINESTRA = Number.parseFloat(TESSITURA.inizio.split(" ")[1]) / 100;
  * La consulta ThreadSegment, che e' un componente client: cosi' la scelta
  * avviene DENTRO il lato client e nessun valore attraversa il confine. Prima
  * la finestra gliela passava la sezione come proprieta', e per i Lavori quella
- * sezione e' un Server Component: vedi il commento in cima al file.
+ * sezione era un Server Component: vedi il commento in cima al file.
+ *
+ * Oggi e' vuota: l'unica eccezione erano i Lavori, che il filo non attraversa
+ * piu'. La mappa resta perche' il posto giusto per la prossima eccezione e'
+ * questo, e non una proprieta' che attraversa il confine.
  */
-export const FINESTRE_FILO: Record<string, { inizio: string; fine: string }> = {
-  works: TESSITURA_LAVORI,
-};
+export const FINESTRE_FILO: Record<string, { inizio: string; fine: string }> = {};

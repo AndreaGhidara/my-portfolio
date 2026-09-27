@@ -50,4 +50,6 @@ export type WorkCaseLabels = {
   riservato: string;
   open: string;
   close: string;
+  /** Il nome della linguetta per chi legge a voce: cosa fa il bottone. */
+  riporta: string;
 };

@@ -101,7 +101,7 @@ export function stamp(
  */
 // Le finestre di scorrimento stanno in ./finestre: e' un modulo di soli dati,
 // senza "use client", cosi' lo possono leggere anche i Server Component.
-export { TESSITURA, FINESTRA, CORSA_FRECCIA, TESSITURA_LAVORI, FINESTRE_FILO, INIZIO_ENTRATA } from "./finestre";
+export { TESSITURA, FINESTRA, CORSA_FRECCIA, FINESTRE_FILO, INIZIO_ENTRATA } from "./finestre";
 import { TESSITURA, FINESTRA, INIZIO_ENTRATA } from "./finestre";
 
 /**

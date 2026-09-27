@@ -12,7 +12,7 @@ describe("ancoraggi del filo", () => {
 
   it("il filo è continuo, tranne dove è dichiarato che si interrompe", () => {
     // Il filo si interrompe solo dove una scena agganciata non lascia passare
-    // una linea verticale: il tavolo e il percorso. Ogni interruzione e'
+    // una linea verticale: il tavolo con l'archivio dei Lavori, e il percorso. Ogni interruzione e'
     // DICHIARATA in anchors.ts con il suo perche', e questa prova pretende che
     // le rotture siano esattamente quelle: una in piu' vuol dire che il filo
     // si e' spezzato senza che nessuno l'abbia deciso.
@@ -29,9 +29,11 @@ describe("ancoraggi del filo", () => {
 
   it("le interruzioni sono queste due, e nessun'altra", () => {
     // Scritte per esteso: aggiungerne una deve passare di qui, e chi lo fa
-    // legge la regola nel commento di INTERRUZIONE.
+    // legge la regola nel commento di INTERRUZIONE. La prima copre tavolo e
+    // archivio insieme: sono due scene di fila, e in mezzo non c'e' niente
+    // che il filo possa attraversare.
     expect(INTERRUZIONE.map(({ tra }) => tra)).toEqual([
-      ["seeking", "works"],
+      ["seeking", "process"],
       ["process", "contact"],
     ]);
   });
@@ -46,9 +48,11 @@ describe("ancoraggi del filo", () => {
   });
 
   it("le sezioni agganciate non hanno una corsa del filo", () => {
-    // Il tavolo e il percorso non disegnano il filo: se tornassero in lista,
-    // qualcuno gli rimonterebbe un ThreadSegment sopra la scena.
+    // Il tavolo, l'archivio dei Lavori e il percorso non disegnano il filo:
+    // se tornassero in lista, qualcuno gli rimonterebbe un ThreadSegment sopra
+    // la scena.
     expect(SECTION_ORDER).not.toContain("services");
+    expect(SECTION_ORDER).not.toContain("works");
     expect(SECTION_ORDER).not.toContain("journey");
   });
 
@@ -85,10 +89,10 @@ describe("ThreadSegment", () => {
   });
 
   it("disegna il tratto dall'ancoraggio di entrata a quello di uscita", () => {
-    const { container } = render(<ThreadSegment section="works" />);
+    const { container } = render(<ThreadSegment section="process" />);
     const d = container.querySelector("path")?.getAttribute("d") ?? "";
-    expect(d).toContain(`M${THREAD_ANCHORS.works.in} 0`);
-    expect(d).toContain(`${THREAD_ANCHORS.works.out} 100`);
+    expect(d).toContain(`M${THREAD_ANCHORS.process.in} 0`);
+    expect(d).toContain(`${THREAD_ANCHORS.process.out} 100`);
   });
 });
 

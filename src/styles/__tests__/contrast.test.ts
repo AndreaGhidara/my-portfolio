@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { contrastRatio, relativeLuminance } from "../contrast";
 import { palette } from "../palette";
+import { LINGUETTA, PARAMETRI, tonoLinguetta } from "../../components/sections/Works/archivio";
 
 describe("relativeLuminance", () => {
   it("vale 0 sul nero e 1 sul bianco", () => {
@@ -111,5 +112,92 @@ describe("il filo che attraversa la pagina", () => {
   it("il colore vecchio del filo sull'arancio NON si leggeva: e' il difetto che questi test bloccano", () => {
     expect(contrastRatio(palette.graph, palette.orange)).toBeLessThan(SOGLIA);
     expect(contrastRatio(palette.graph, palette.paper)).toBeLessThan(SOGLIA);
+  });
+});
+
+describe("l'archivio dei Lavori", () => {
+  // Anche qui i fondi e i testi sono color-mix: i valori sono quelli risolti da
+  // Chrome (disegnati su una tela e letti dal pixel), non ricavati a mente.
+  const dorsoChiaro = "#DBD7CF"; // inchiostro al 10% nella carta
+  const tenueChiaro = "#5A5449"; // --fg-muted all'80% verso --fg
+  const facciaScura = "#262420"; // inchiostro al 90% con la carta
+  const dorsoScuro = "#1F1D19"; // inchiostro al 94% con la carta
+  const riquadroScuro = "#383531"; // carta al 10% nella faccia scura
+  const accentoScuro = "#E86944"; // arancio al 90% verso la carta
+
+  it("sul chiaro l'anno della linguetta e la scritta del riservato superano AA", () => {
+    // Col tenue globale erano 3,90:1: il dorso e' piu' scuro della carta.
+    expect(contrastRatio(palette.muted, dorsoChiaro)).toBeLessThan(4.5);
+    expect(contrastRatio(tenueChiaro, dorsoChiaro)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(tenueChiaro, palette.paper)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("sullo scuro il tenue globale basta gia'", () => {
+    expect(contrastRatio(palette.mutedDark, dorsoScuro)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(palette.mutedDark, riquadroScuro)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * Il fondo della linguetta a profondita' p: il dorso mischiato con
+   * l'inchiostro in sRGB, come fa il CSS (color-mix in srgb), che e' la stessa
+   * cosa di un velo d'inchiostro sopra. Nel tono chiaro il velo non scende
+   * sotto LINGUETTA.buioMinimo.
+   */
+  const fondoLinguetta = (dorso: string, p: number) => {
+    const quota = Math.min(
+      1,
+      tonoLinguetta(p) === 2
+        ? Math.max(p * PARAMETRI.scurisce, LINGUETTA.buioMinimo)
+        : p * PARAMETRI.scurisce,
+    );
+    const canali = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+    const a = canali(dorso);
+    const b = canali(palette.ink);
+    return (
+      "#" +
+      a.map((v, i) => Math.round(v * (1 - quota) + b[i] * quota).toString(16).padStart(2, "0")).join("")
+    );
+  };
+  /** Nome e anno nei tre toni: sul chiaro cambiano, sullo scuro no. */
+  const testiChiaro = (p: number) =>
+    [
+      [palette.ink, tenueChiaro],
+      [palette.ink, palette.ink],
+      [palette.paper, palette.paper],
+    ][tonoLinguetta(p)];
+  const testiScuro = [palette.paper, palette.mutedDark];
+
+  it("la linguetta si legge alle due profondita' estreme, nei due temi", () => {
+    for (const p of [0, 3]) {
+      for (const testo of testiChiaro(p)) {
+        expect(contrastRatio(testo, fondoLinguetta(dorsoChiaro, p)), `chiaro a ${p}`).toBeGreaterThanOrEqual(4.5);
+      }
+      for (const testo of testiScuro) {
+        expect(contrastRatio(testo, fondoLinguetta(dorsoScuro, p)), `scuro a ${p}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+
+  it("e anche a ogni profondita' di mezzo, mentre la cartella scende", () => {
+    for (let p = 0; p <= 3.0001; p += 0.01) {
+      for (const testo of testiChiaro(p)) {
+        expect(
+          contrastRatio(testo, fondoLinguetta(dorsoChiaro, p)),
+          `chiaro a ${p.toFixed(2)}`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+      for (const testo of testiScuro) {
+        expect(
+          contrastRatio(testo, fondoLinguetta(dorsoScuro, p)),
+          `scuro a ${p.toFixed(2)}`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+
+  it("«Apri il caso» sullo scuro supera AA solo con l'arancio schiarito", () => {
+    // Pieno faceva 4,21:1 sulla faccia, che e' un gradino sopra l'inchiostro.
+    expect(contrastRatio(palette.orange, facciaScura)).toBeLessThan(4.5);
+    expect(contrastRatio(accentoScuro, facciaScura)).toBeGreaterThanOrEqual(4.5);
   });
 });
