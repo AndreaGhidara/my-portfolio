@@ -48,7 +48,7 @@ describe("la stampante dei servizi", () => {
     const { container } = render(<ScontrinoView {...props} />);
     const sezione = container.querySelector("section");
     expect(sezione).toHaveAttribute("id", "scontrino");
-    expect(sezione).toHaveAttribute("data-fondo", "accento");
+    expect(sezione?.className).toContain("bg-[var(--accent)]");
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(props.title);
   });
 

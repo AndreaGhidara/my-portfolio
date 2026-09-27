@@ -24,28 +24,6 @@ describe("tokens.css", () => {
     expect(blocco).toContain("@media (hover: hover)");
   });
 
-  it("sotto i 1024px il filo non attraversa la pagina", () => {
-    // Il filo misura quanto si e' scesi serpeggiando fra i due bordi: su uno
-    // schermo stretto i bordi sono vicini, la corsa taglia il testo in
-    // diagonale e non misura piu' niente. Il disegnatore e' uno solo da quando
-    // il tavolo non disegna piu' niente (vedi anchors.ts).
-    const blocco = css.match(
-      /@media \(max-width: 1023px\) \{[^}]*\[data-thread\][\s\S]*?\}\s*\}/,
-    )?.[0];
-    expect(blocco, "la regola che spegne il filo sul telefono non c'e' piu'").toBeTruthy();
-    expect(blocco, "[data-thread] disegna ancora il filo sul telefono").toContain("[data-thread]");
-    expect(blocco).toMatch(/display:\s*none/);
-  });
-
-  it("il filo ha un token suo, e sulle sezioni a fondo pieno cambia", () => {
-    // --line e' il colore dei bordi, scelto contro il fondo di pagina. Il filo
-    // attraversa anche l'arancio, dove --line fa 2.47:1 in chiaro e 1.52:1 in
-    // scuro: sotto la soglia 3:1. Serve un token suo, che le sezioni a fondo
-    // pieno ridefiniscono senza toccare i bordi di tutto il resto del sito.
-    expect(css).toMatch(/:root\s*\{[^}]*--filo:\s*var\(--muted\)/);
-    expect(css).toMatch(/\[data-fondo="accento"\][^{]*\{[^}]*--filo:\s*var\(--on-accent\)/);
-  });
-
   it("definisce ogni token della palette con lo stesso valore", () => {
     const paletteVarsInCss = ["paper", "ink", "orange", "graph", "muted"];
     for (const name of paletteVarsInCss) {
@@ -197,9 +175,9 @@ describe("le consegne sul tablet", () => {
     expect(blocco).toMatch(/margin-inline:\s*auto/);
   });
 
-  it("la testata si centra fino a 1023px, perche' fino a li' il filo non c'e'", () => {
-    // Il tetto stretto della testata esiste per lasciar passare il filo nel
-    // corridoio fra le due colonne, e il filo sotto i 1024px e' spento.
+  it("la testata si centra fino a 1023px, non solo dove le consegne sono una colonna", () => {
+    // Fra i 900 e i 1023 le consegne sono gia' a due colonne, ma la testata
+    // col suo tetto stretto resterebbe appoggiata a sinistra.
     const blocco = css.match(/@media \(max-width: 1023px\) \{[\s\S]*?\[data-process-testata\][\s\S]*?\n\}/)?.[0];
     expect(blocco, "la testata del processo non si centra sotto i 1024px").toBeTruthy();
     expect(blocco).toMatch(/margin-inline:\s*auto/);

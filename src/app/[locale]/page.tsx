@@ -13,7 +13,7 @@ import { Contact } from "@/components/sections/Contact";
  * finito, e i lavori, che servono a dimostrare quello che i primi blocchi hanno
  * promesso. Poi il percorso, dove ho imparato, e in fondo «Il tuo turno», i
  * contatti. «Come lavoro» (Process) stava fra i lavori e il percorso: e'
- * nascosta per scelta, non tolta, e il filo lo sa (NASCOSTE in anchors.ts).
+ * nascosta per scelta, non tolta.
  *
  * Il Footer non è qui: vive nel layout, fuori da <main>, perché è chrome
  * di sito (come la Navbar) e un <footer> dentro <main> perde il ruolo

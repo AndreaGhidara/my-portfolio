@@ -134,11 +134,6 @@ describe("ContactView", () => {
     expect(griglia!.querySelector("[data-contact-foglio]")).not.toBeNull();
     expect(griglia!.querySelector("[data-contact-tempi]")).not.toBeNull();
   });
-
-  it("il filo attraversa la sezione", () => {
-    const { container } = render(<ContactView {...props} />);
-    expect(container.querySelector('[data-thread="contact"]')).not.toBeNull();
-  });
 });
 
 describe("i campi sono righe, non riquadri", () => {

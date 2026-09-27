@@ -7,8 +7,7 @@ export type Beat = { from: number; span: number };
 /**
  * Le proporzioni del mondo, e nient'altro. Le coordinate degli oggetti sono
  * in percentuale: il mondo prende la misura che vuole dal CSS (aspect-ratio
- * piu' width) e qui dentro non si sa quanto e' grande lo schermo. E' lo stesso
- * trucco del filo, che usa un viewBox in percentuali per non ricalcolare nulla.
+ * piu' width) e qui dentro non si sa quanto e' grande lo schermo.
  */
 export const WORLD: Record<DeskLayout, { width: number; height: number }> = {
   wide: { width: 1440, height: 920 },

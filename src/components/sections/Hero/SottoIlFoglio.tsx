@@ -13,9 +13,8 @@ import { attacco, copertura } from "./foglio";
  *
  * Il movimento lo fa il CSS (tokens.css), tutto sotto `data-acceso`, che si
  * scrive qui dopo aver misurato e si toglie nella pulizia: senza JavaScript e
- * a "none" la pagina e' quella di prima. Qui si scrivono solo tre numeri:
- * dove Hero si ferma (`--attacco`), quanto e' coperto (`--copertura`) e quanto
- * e' alta la sentinella del filo.
+ * a "none" la pagina e' quella di prima. Qui si scrivono solo due numeri:
+ * dove Hero si ferma (`--attacco`) e quanto e' coperto (`--copertura`).
  *
  * La copertura la calcola un ascoltatore di scroll nativo, come
  * HeaderScrollState, e non uno ScrollTrigger: e' una proporzione fra due
@@ -23,17 +22,15 @@ import { attacco, copertura } from "./foglio";
  */
 export function SottoIlFoglio({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement | null>(null);
-  const sentinella = useRef<HTMLDivElement | null>(null);
   const sonda = useRef<HTMLDivElement | null>(null);
   const level = useMotionLevel();
 
   useEffect(() => {
     const root = scope.current;
-    const sentinellaEl = sentinella.current;
     const sondaEl = sonda.current;
     const hero = root?.querySelector<HTMLElement>("#hero");
     const sopra = root?.querySelector<HTMLElement>("#scontrino");
-    if (level === "none" || !root || !sentinellaEl || !sondaEl || !hero || !sopra) return;
+    if (level === "none" || !root || !sondaEl || !hero || !sopra) return;
 
     let testata = 0;
     let fermo = 0;
@@ -64,8 +61,6 @@ export function SottoIlFoglio({ children }: { children: ReactNode }) {
 
     const misura = () => {
       const altezza = hero.offsetHeight;
-      // La sentinella occupa il posto naturale di Hero, per il filo: vedi sotto.
-      sentinellaEl.style.height = `${altezza}px`;
       testata = document.querySelector<HTMLElement>("[data-site-header]")?.offsetHeight ?? 0;
       // offsetHeight e' zero dove la barra in basso non c'e' (sopra i 768px):
       // la media query la dice gia' il CSS, qui non si ripete. E' zero anche
@@ -91,9 +86,7 @@ export function SottoIlFoglio({ children }: { children: ReactNode }) {
     };
 
     /* Hero cresce anche da solo (un carattere che arriva tardi, il claim che va
-       a capo): la sentinella e l'attacco lo devono sapere. Il filo di Hero
-       osserva la sentinella, non Hero: si rimisura quando questa la allunga,
-       qualunque dei due osservatori risponda per primo. */
+       a capo): l'attacco lo deve sapere. */
     const osservatore = new ResizeObserver(() => {
       misura();
       muovi();
@@ -156,19 +149,11 @@ export function SottoIlFoglio({ children }: { children: ReactNode }) {
       root.removeAttribute("data-acceso");
       hero.style.removeProperty("--copertura");
       hero.style.removeProperty("--attacco");
-      sentinellaEl.style.removeProperty("height");
     };
   }, [level]);
 
   return (
     <div ref={scope} data-sotto-il-foglio>
-      {/* Il posto naturale di Hero, per il filo dell'apertura. ScrollTrigger
-          misura il suo trigger con getBoundingClientRect senza sapere dello
-          sticky: con la pagina gia' scorsa (un link a #contact, una ricarica)
-          misurerebbe Hero fermo dove si e' fermato, e il filo in cima
-          risulterebbe spostato. La sentinella sta dove Hero starebbe, e non si
-          muove mai. */}
-      <div ref={sentinella} data-foglio-sentinella aria-hidden="true" />
       {/* Alta 100svh, larga zero: il palco visibile che non cambia con la
           barra del browser, come la sonda del percorso. */}
       <div ref={sonda} data-foglio-sonda aria-hidden="true" />

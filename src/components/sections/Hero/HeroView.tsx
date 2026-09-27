@@ -1,7 +1,6 @@
 import { Avatar } from "@/components/brand/Avatar";
 import { InkCircle } from "@/components/brand/InkCircle";
 import { Wordmark } from "@/components/brand/Wordmark";
-import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { HeroMotion } from "./HeroMotion";
 import { CartaStropicciata } from "./CartaStropicciata";
 
@@ -30,15 +29,6 @@ export function HeroView({
 }: HeroViewProps) {
   return (
     <section id="hero" className="relative overflow-hidden px-[var(--gutter)] pb-16 pt-6">
-      {/* Il trigger e' la sentinella di SottoIlFoglio e non la sezione: Hero
-          puo' essere sticky, e misurato da fermo il filo si sfaserebbe. Dove
-          la sentinella non c'e', il filo torna a misurare se stesso. */}
-      <ThreadSegment
-        section="hero"
-        trigger="[data-foglio-sentinella]"
-        className="pointer-events-none absolute inset-0 -z-10"
-      />
-
       {/* Le lettere del nome sono fogli, e si possono appallottolare. Non
           sostituisce le <img>: si sovrappone alla lettera che si sta toccando
           e ne segue il rettangolo, cosi' eredita il parallasse di HeroMotion e

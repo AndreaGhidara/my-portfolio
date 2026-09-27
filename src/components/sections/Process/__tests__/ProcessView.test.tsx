@@ -74,9 +74,4 @@ describe("ProcessView", () => {
       expect(art).toHaveAttribute("aria-hidden", "true");
     }
   });
-
-  it("il filo attraversa la sezione", () => {
-    const { container } = render(<ProcessView {...props} />);
-    expect(container.querySelector('[data-thread="process"]')).not.toBeNull();
-  });
 });

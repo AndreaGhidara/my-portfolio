@@ -190,11 +190,6 @@ describe("WorksView", () => {
     expect(img).toHaveAttribute("sizes", SHOT_SIZES);
   });
 
-  it("il filo del sito si interrompe sull'archivio", () => {
-    const { container } = render(<WorksView {...props} />);
-    expect(container.querySelector("[data-thread]")).toBeNull();
-  });
-
   it("all'inizio nessun dossier è aperto", () => {
     render(<WorksView {...props} />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

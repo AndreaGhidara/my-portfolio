@@ -53,9 +53,7 @@ export function JourneyView({
     // migliaia di pixel e in y il foglio dei numeri che cade deve sparire sul
     // bordo della sezione, non finire sopra «Il tuo turno». clip non crea un
     // contenitore di scorrimento, quindi lo sticky regge.
-    <section id="journey" data-fondo="accento" className="relative overflow-clip bg-[var(--accent)]">
-      {/* Il filo del sito si interrompe qui, come sul tavolo: la riga di questa
-          sezione e' l'onda, dello stesso colore. */}
+    <section id="journey" className="relative overflow-clip bg-[var(--accent)]">
       <JourneyBinario
         n={entries.length}
         annoIniziale={entries[0]?.year ?? 0}

@@ -41,13 +41,12 @@ describe("la seconda sezione che passa sopra la prima", () => {
     expect(container.querySelector("#hero")).not.toHaveAttribute("style");
   });
 
-  it("la sentinella e la sonda non si leggono", () => {
+  it("la sonda non si legge", () => {
     const { container } = render(
       <SottoIlFoglio>
         <section id="hero" />
       </SottoIlFoglio>,
     );
-    expect(container.querySelector("[data-foglio-sentinella]")).toHaveAttribute("aria-hidden", "true");
     expect(container.querySelector("[data-foglio-sonda]")).toHaveAttribute("aria-hidden", "true");
   });
 
@@ -66,12 +65,6 @@ describe("la seconda sezione che passa sopra la prima", () => {
     expect(strato, "il contenuto di Hero non ha piu' il suo strato").not.toBeNull();
     expect(strato?.querySelector("h1")).not.toBeNull();
     expect(strato?.querySelector("[data-carta]")).toBeNull();
-    expect(strato?.querySelector("[data-thread]")).toBeNull();
-  });
-
-  it("il filo di Hero si misura sulla sentinella, che non e' sticky", () => {
-    const vista = leggi("src/components/sections/Hero/HeroView.tsx");
-    expect(vista).toMatch(/<ThreadSegment[^>]*section="hero"[^>]*trigger="\[data-foglio-sentinella\]"/);
   });
 });
 

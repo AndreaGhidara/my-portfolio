@@ -22,8 +22,7 @@ export type ScontrinoViewProps = {
  *
  * E' una scena a tutto schermo in flusso normale, senza aggancio: chi vuole
  * giocare si ferma con lo scroll. Passa sopra l'apertura come la sezione che
- * c'era prima (SottoIlFoglio), e il filo qui non passa: la tavola ha le sue
- * linee, e una verticale le taglierebbe (vedi INTERRUZIONE in anchors.ts).
+ * c'era prima (SottoIlFoglio).
  *
  * Il fondo e' arancione e di notte resta arancione: dentro solo carta e
  * inchiostro, come nel percorso. Le regole stanno in tokens.css.
@@ -32,7 +31,6 @@ export function ScontrinoView({ eyebrow, title, lead, locale, servizi, testi }: 
   return (
     <section
       id="scontrino"
-      data-fondo="accento"
       data-scontrino
       className="relative bg-[var(--accent)]"
     >

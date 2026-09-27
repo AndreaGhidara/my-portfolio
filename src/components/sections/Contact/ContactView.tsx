@@ -1,5 +1,4 @@
 import { Reveal } from "@/animations/components/Reveal";
-import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { ContactForm, type ContactFormCopy } from "./ContactForm";
 
 /** Un momento di quello che succede dopo l'invio. L'ordine è nel tempo. */
@@ -57,8 +56,6 @@ export function ContactView({
 
   return (
     <section id="contact" className="relative px-[var(--gutter)] py-[var(--section-y)]">
-      <ThreadSegment section="contact" className="pointer-events-none absolute inset-0 -z-10" />
-
       <div className="mx-auto max-w-[56rem]">
         <Reveal moto="dietro" stagger={0.08}>
           <p className="eyebrow">{eyebrow}</p>
