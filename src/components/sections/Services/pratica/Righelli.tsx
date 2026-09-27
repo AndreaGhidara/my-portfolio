@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { CORSA_FRECCIA, TESSITURA_LAVORI } from "@/animations/finestre";
+import { CORSA_FRECCIA } from "@/animations/finestre";
 
 /**
- * Il righello della consegna fra la freccia e il filo. `?righelli`, solo in
- * sviluppo, come il calibratore.
+ * Il righello della freccia: dove si appoggia. `?righelli`, solo in sviluppo,
+ * come il calibratore.
+ *
+ * Era il righello della consegna fra la freccia e il filo dei Lavori, che
+ * apriva appena dopo. I Lavori sono diventati un archivio e il filo li' non
+ * passa piu' (vedi anchors.ts): la meta' che misurava il filo se n'e' andata
+ * con lui, resta quella della freccia.
  *
  * DUE VERSIONI PRIMA DI QUESTA ERANO COSTRUITE MALE, e vale la pena scriverlo
  * perche' l'errore e' istruttivo. Misuravano MOMENTI nello scorrimento — a che
@@ -16,17 +21,13 @@ import { CORSA_FRECCIA, TESSITURA_LAVORI } from "@/animations/finestre";
  *
  * Qui ci sono tutte e due, dichiarate per quello che sono:
  *
- *  - PUNTI DI PAGINA (i pallini): dove il tracciato finisce e dove il filo
- *    comincia. Sono posti fissi nel documento, scorrono con il contenuto, e si
- *    possono indicare a dito.
- *  - MOMENTI (il pannello): a che scrollY le due finestre si aprono e si
- *    chiudono. Sono quelli che decidono l'ordine in cui le cose succedono.
+ *  - PUNTI DI PAGINA (i pallini): dove il tracciato finisce. E' un posto fisso
+ *    nel documento, scorre con il contenuto, e si puo' indicare a dito.
+ *  - MOMENTI (il pannello): a che scrollY la finestra della freccia si chiude.
  *
- * E un terzo pallino lo metti tu: CLICCA dove vedi la freccia appoggiarsi. Se
- * il tuo pallino e quello arancione non coincidono, l'errore e' nel punto che
- * il codice crede sia la fine della corsa, e non nelle finestre. Se coincidono,
- * l'errore e' nelle finestre. Un clic separa i due casi, che due versioni di
- * strumento non erano riuscite a separare.
+ * E un secondo pallino lo metti tu: CLICCA dove vedi la freccia appoggiarsi.
+ * Se il tuo pallino e quello arancione non coincidono, l'errore e' nel punto
+ * che il codice crede sia la fine della corsa, e non nella finestra.
  *
  * NON tocca niente: legge il DOM. Uno strumento che perturba quello che misura
  * e' peggio di nessuno strumento.
@@ -35,25 +36,15 @@ import { CORSA_FRECCIA, TESSITURA_LAVORI } from "@/animations/finestre";
 const frazione = (s: string) => Number.parseFloat(s.split(" ")[1]) / 100;
 
 const F_FRECCIA = frazione(CORSA_FRECCIA.fine);
-const F_FILO = frazione(TESSITURA_LAVORI.inizio);
-const F_CHIUDE_FILO = frazione(TESSITURA_LAVORI.fine);
 
 type Stato = {
   scroll: number;
   /** Punto di pagina in cui finisce la strada: dove la freccia si appoggia. */
   fineStrada: number | null;
-  /** Punto di pagina in cui comincia il tratto del filo dei Lavori. */
-  inizioFilo: number | null;
   /** Dove sta la punta della freccia adesso, in pagina. */
   punta: number | null;
   /** scrollY a cui si chiude la finestra della freccia. */
   chiudeFreccia: number | null;
-  /** scrollY a cui si apre la finestra del filo. */
-  apreFilo: number | null;
-  /** scrollY a cui si CHIUDE la finestra del filo. */
-  chiudeFilo: number | null;
-  /** Quanto il tratto del filo e' disegnato davvero, da 0 a 100. */
-  filoReale: number | null;
   /** Una schermata sopra la pratica: la partenza ripetibile. */
   partenza: number | null;
 };
@@ -61,12 +52,8 @@ type Stato = {
 const VUOTO: Stato = {
   scroll: 0,
   fineStrada: null,
-  inizioFilo: null,
   punta: null,
   chiudeFreccia: null,
-  apreFilo: null,
-  chiudeFilo: null,
-  filoReale: null,
   partenza: null,
 };
 
@@ -85,38 +72,19 @@ export function Righelli() {
       const H = window.innerHeight;
       const y = window.scrollY;
       const perc = document.querySelector("[data-pratica-percorso]");
-      const lavori = document.querySelector("#works");
       const pratica = document.querySelector("[data-pratica]");
       const fre = document.querySelector("[data-pratica-freccia]");
 
       const rp = perc?.getBoundingClientRect();
-      const rl = lavori?.getBoundingClientRect();
       const ra = pratica?.getBoundingClientRect();
       const rf = fre?.getBoundingClientRect();
-      const path = document.querySelector<SVGPathElement>('[data-thread="works"] path');
-
-      // Quanto e' disegnato DAVVERO. E' la misura che distingue una finestra
-      // tarata male da un secondo motore che scrive sullo stesso tratto: se
-      // questo numero e' maggiore di zero prima che la finestra si apra,
-      // spostare la finestra non servira' mai a niente.
-      let filoReale: number | null = null;
-      if (path) {
-        const st = getComputedStyle(path);
-        const arr = Number.parseFloat(st.strokeDasharray) || 0;
-        const off = Number.parseFloat(st.strokeDashoffset) || 0;
-        filoReale = arr > 0 ? Math.max(0, Math.min(1, 1 - off / arr)) * 100 : 0;
-      }
 
       const next: Stato = {
         scroll: y,
         fineStrada: rp ? y + rp.bottom : null,
-        inizioFilo: rl ? y + rl.top : null,
         punta: rf ? y + rf.top + rf.height / 2 : null,
-        // Le stesse formule di ScrollTrigger per "bottom 46%" e "top 30%".
+        // La stessa formula di ScrollTrigger per "bottom 46%".
         chiudeFreccia: rp ? y + rp.bottom - F_FRECCIA * H : null,
-        apreFilo: rl ? y + rl.top - F_FILO * H : null,
-        chiudeFilo: rl ? y + rl.bottom - F_CHIUDE_FILO * H : null,
-        filoReale,
         partenza: ra ? Math.max(0, y + ra.top - H) : null,
       };
 
@@ -183,24 +151,11 @@ export function Righelli() {
     );
   };
 
-  const distanza =
-    s.fineStrada !== null && s.inizioFilo !== null ? s.inizioFilo - s.fineStrada : null;
-
-  /** Quanto il filo DOVREBBE essere disegnato, secondo la sua sola finestra. */
-  const atteso =
-    s.apreFilo !== null && s.chiudeFilo !== null && s.chiudeFilo > s.apreFilo
-      ? Math.max(0, Math.min(1, (s.scroll - s.apreFilo) / (s.chiudeFilo - s.apreFilo))) * 100
-      : null;
-  // Lo scrub ha 0,6s di ritardo, quindi il reale insegue l'atteso: una
-  // differenza in PIU' del reale non e' ritardo, e' un altro che scrive.
-  const fuoriFinestra =
-    atteso !== null && s.filoReale !== null && s.filoReale > atteso + 1.5;
   const scostamentoTuo = tuo !== null && s.fineStrada !== null ? tuo - s.fineStrada : null;
 
   return (
     <>
       {punto(s.fineStrada, "#E4572E", "FINE STRADA (freccia si appoggia qui)", "sx")}
-      {punto(s.inizioFilo, "#1B6B5A", "INIZIO FILO LAVORI", "dx")}
       {tuo !== null ? punto(tuo, "#14120F", "IL TUO PUNTO", "sx") : null}
 
       <div
@@ -226,8 +181,6 @@ export function Righelli() {
           ``,
           `— PUNTI DELLA PAGINA —`,
           `fine strada          ${px(s.fineStrada)}`,
-          `inizio filo lavori   ${px(s.inizioFilo)}`,
-          `distanza             ${px(distanza)}px`,
           `punta della freccia  ${px(s.punta)}`,
           ``,
           `il tuo punto         ${px(tuo)}`,
@@ -240,19 +193,11 @@ export function Righelli() {
           `— MOMENTI (scrollY) —`,
           `sei a                ${px(s.scroll)}`,
           `chiude freccia       ${px(s.chiudeFreccia)}`,
-          `apre filo            ${px(s.apreFilo)}`,
-          ``,
-          `— IL FILO —`,
-          `disegnato DAVVERO    ${s.filoReale === null ? "——" : `${s.filoReale.toFixed(1)}%`}`,
-          `dovrebbe essere      ${atteso === null ? "——" : `${atteso.toFixed(1)}%`}`,
-          fuoriFinestra
-            ? `>>> DISEGNATO FUORI DALLA SUA FINESTRA <<<`
-            : `coerente con la finestra`,
           ``,
           scostamentoTuo === null
             ? `clicca dove vedi la freccia posarsi`
             : Math.abs(scostamentoTuo) < 40
-              ? `d'accordo sul punto: l'errore sta nelle finestre`
+              ? `d'accordo sul punto: l'errore sta nella finestra`
               : `NON d'accordo: la fine strada non e' dove la vedi tu`,
         ].join("\n")}
       </div>

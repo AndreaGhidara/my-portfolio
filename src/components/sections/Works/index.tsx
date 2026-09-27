@@ -40,6 +40,7 @@ export async function Works() {
         riservato: t("labels.riservato"),
         open: t("labels.open"),
         close: t("labels.close"),
+        riporta: t("labels.riporta"),
       }}
       items={items}
     />
