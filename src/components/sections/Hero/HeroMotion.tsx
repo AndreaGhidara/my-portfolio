@@ -90,5 +90,14 @@ export function HeroMotion({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("pointermove", move);
   }, scope);
 
-  return <div ref={scope}>{children}</div>;
+  /* data-hero-strato: e' lo strato che si stringe e sale quando Seeking passa
+     sopra (SottoIlFoglio, regole in tokens.css). Contiene solo il contenuto:
+     una trasformazione sulla sezione diventerebbe il riferimento dello strato
+     fisso della carta, che smetterebbe di coprire lo schermo. Carta e filo
+     stanno fuori, in HeroView. */
+  return (
+    <div ref={scope} data-hero-strato>
+      {children}
+    </div>
+  );
 }

@@ -30,7 +30,14 @@ export function HeroView({
 }: HeroViewProps) {
   return (
     <section id="hero" className="relative overflow-hidden px-[var(--gutter)] pb-16 pt-6">
-      <ThreadSegment section="hero" className="pointer-events-none absolute inset-0 -z-10" />
+      {/* Il trigger e' la sentinella di SottoIlFoglio e non la sezione: Hero
+          puo' essere sticky, e misurato da fermo il filo si sfaserebbe. Dove
+          la sentinella non c'e', il filo torna a misurare se stesso. */}
+      <ThreadSegment
+        section="hero"
+        trigger="[data-foglio-sentinella]"
+        className="pointer-events-none absolute inset-0 -z-10"
+      />
 
       {/* Le lettere del nome sono fogli, e si possono appallottolare. Non
           sostituisce le <img>: si sovrappone alla lettera che si sta toccando

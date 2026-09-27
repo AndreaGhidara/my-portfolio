@@ -14,6 +14,7 @@ export function ThreadSegment({
   section,
   scrub = true,
   intro = true,
+  trigger,
   className,
 }: {
   section: SectionId;
@@ -35,6 +36,15 @@ export function ThreadSegment({
    * perche' la testa dell'entrata non arriva mai fino a loro.
    */
   intro?: boolean;
+  /**
+   * Un selettore per l'elemento su cui misurare la corsa, al posto del filo
+   * stesso. Serve a chi sta dentro un elemento sticky: ScrollTrigger misura il
+   * trigger con getBoundingClientRect senza sapere dello sticky, e con la
+   * pagina gia' scorsa calcolerebbe la corsa dal punto in cui la sezione si e'
+   * fermata invece che da dove sta. Un selettore e non un ref perche' chi lo
+   * passa e' un Server Component. Se non trova niente, misura il filo.
+   */
+  trigger?: string;
   className?: string;
 }) {
   const scope = useRef<HTMLDivElement | null>(null);
@@ -55,9 +65,10 @@ export function ThreadSegment({
   useSectionAnimation(({ level, presets }) => {
     const { weave } = presets;
     const paths = Array.from(scope.current?.querySelectorAll("path") ?? []);
+    const bersaglio = trigger ? document.querySelector(trigger) : null;
     const tl = weave(paths as SVGPathElement[], {
       level,
-      trigger: scope.current,
+      trigger: bersaglio ?? scope.current,
       scrub,
       intro,
       start: finestra?.inizio,
@@ -82,7 +93,10 @@ export function ThreadSegment({
      * che nessuno ha chiesto. La soglia di un pixel evita il ciclo infinito
      * fra l'osservatore e la ristesa che lui stesso provoca.
      */
-    const el = scope.current;
+    // Con un trigger dato si osserva lui: e' la sua altezza che ScrollTrigger
+    // misura, ed e' quando cambia lui che la corsa va rifatta. Chi lo scrive
+    // (la sentinella di SottoIlFoglio) non deve sapere chi arriva prima.
+    const el = bersaglio instanceof HTMLElement ? bersaglio : scope.current;
     const st = tl?.scrollTrigger;
     if (!el || !st) return;
     let altezza = el.getBoundingClientRect().height;
@@ -94,7 +108,7 @@ export function ThreadSegment({
     });
     osservatore.observe(el);
     return () => osservatore.disconnect();
-  }, scope, [intro, finestra?.inizio, finestra?.fine]);
+  }, scope, [intro, trigger, finestra?.inizio, finestra?.fine]);
 
   return (
     <div ref={scope} className={className} data-thread={section}>
