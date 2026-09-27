@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/sections/Hero";
+import { SottoIlFoglio } from "@/components/sections/Hero/SottoIlFoglio";
 import { Seeking } from "@/components/sections/Seeking";
 import { Services } from "@/components/sections/Services";
 import { Works } from "@/components/sections/Works";
@@ -32,8 +33,13 @@ export default async function Home({
 
   return (
     <>
-      <Hero />
-      <Seeking />
+      {/* Insieme, e solo loro: Hero si ferma e Seeking gli passa sopra, e lo
+          sticky di Hero finisce dove finisce questo contenitore. Dentro <main>
+          resterebbe incollato dietro tutte le sezioni fino in fondo. */}
+      <SottoIlFoglio>
+        <Hero />
+        <Seeking />
+      </SottoIlFoglio>
       <Services />
       <Works />
       <Process />
