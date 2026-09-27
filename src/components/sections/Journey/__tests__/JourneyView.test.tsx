@@ -11,15 +11,21 @@ const props: JourneyViewProps = {
   senzaTesserino: "Nessun tesserino",
   etichettaLezione: "Cosa mi ha insegnato",
   nota: "Da freelance il tesserino non te lo dà nessuno.",
-  entries: journey.map((e) => ({
-    id: e.id,
-    company: e.company,
-    year: e.year,
-    tesserino: e.tesserino,
-    role: `Ruolo ${e.id}`,
-    body: `Corpo ${e.id}`,
-    lezione: `Lezione ${e.id}`,
-  })),
+  suggerimento: "continua a scorrere",
+  // Come le prepara index.tsx: «a oggi» sulla piu' recente, calcolato sul dato
+  // (che e' dal piu' recente), poi la lista girata per raccontarla dal 2023.
+  entries: journey
+    .map((e, index) => ({
+      id: e.id,
+      company: e.company,
+      year: e.year,
+      tesserino: e.tesserino,
+      present: index === 0,
+      role: `Ruolo ${e.id}`,
+      body: `Corpo ${e.id}`,
+      lezione: `Lezione ${e.id}`,
+    }))
+    .reverse(),
   stats: [
     { id: "years", value: "3", label: "anni di sviluppo web" },
     { id: "responseTime", value: "24h", label: "tempo di risposta" },
@@ -27,12 +33,22 @@ const props: JourneyViewProps = {
 };
 
 describe("JourneyView", () => {
-  it("presenta il percorso come lista ordinata dal più recente", () => {
+  it("presenta il percorso come lista ordinata dal 2023 a oggi", () => {
     render(<JourneyView {...props} />);
-    // La prima tappa e' quella corrente, ed e' da freelance: al posto del nome
-    // dell'azienda c'e' la riga del tesserino che non esiste, quindi la prova
-    // dell'ordine sta sull'anno.
-    expect(screen.getAllByRole("listitem")[0]).toHaveTextContent("2026");
+    // L'onda e' un <li> aria-hidden e non conta: la prima voce che si legge
+    // e' la prima tappa. La prova dell'ordine sta sull'anno, perche' la prima
+    // e l'ultima sono tutte e due da freelance.
+    const voci = screen.getAllByRole("listitem");
+    expect(voci[0]).toHaveTextContent("2023");
+    expect(voci[journey.length - 1]).toHaveTextContent("2026");
+  });
+
+  it("«a oggi» sta sul 2026, non sulla prima tappa della lista", () => {
+    const { container } = render(<JourneyView {...props} />);
+    const occhielli = [...container.querySelectorAll("[data-journey-item] .eyebrow")];
+    const conOggi = occhielli.filter((p) => p.textContent?.includes(props.present));
+    expect(conOggi).toHaveLength(1);
+    expect(conOggi[0]).toHaveTextContent("2026");
   });
 
   it("ogni tappa è un tesserino appuntato sul suo foglio", () => {
@@ -62,7 +78,7 @@ describe("JourneyView", () => {
     const { container } = render(<JourneyView {...props} />);
     const times = container.querySelectorAll("time");
     expect(times).toHaveLength(journey.length);
-    expect(times[0]).toHaveAttribute("dateTime", "2026");
+    expect(times[0]).toHaveAttribute("dateTime", "2023");
   });
 
   it("i numeri restano leggibili anche senza JavaScript: il valore è già nel markup", () => {
@@ -76,9 +92,32 @@ describe("JourneyView", () => {
     expect(container.querySelectorAll("dl dd")).toHaveLength(2);
   });
 
-  it("il filo attraversa la sezione", () => {
+  it("i numeri sono l'ultima fermata: la <dl> sta nell'ultimo <li>, con la nota", () => {
+    render(<JourneyView {...props} />);
+    const voci = screen.getAllByRole("listitem");
+    const ultima = voci[voci.length - 1];
+    expect(ultima).toHaveAttribute("data-journey-arrivo");
+    expect(ultima.querySelectorAll("dl dd")).toHaveLength(2);
+    expect(ultima).toHaveTextContent(props.nota);
+  });
+
+  it("onda, anno grande e barra non si leggono: sono disegno", () => {
     const { container } = render(<JourneyView {...props} />);
-    expect(container.querySelector('[data-thread="journey"]')).not.toBeNull();
+    for (const sel of ["[data-journey-onda]", "[data-journey-anno]", "[data-journey-avanzamento]"]) {
+      expect(container.querySelector(sel)).toHaveAttribute("aria-hidden", "true");
+    }
+  });
+
+  it("parte in colonna: la scena orizzontale la accende il componente, non il markup", () => {
+    // Il server e il primo render non sanno se c'e' GSAP ne' quanto e' alto lo
+    // schermo: la colonna si legge sempre, l'orizzontale va guadagnata.
+    const { container } = render(<JourneyView {...props} />);
+    expect(container.querySelector("[data-scena]")).toBeNull();
+  });
+
+  it("il filo del sito si interrompe sul percorso: la riga qui e' l'onda", () => {
+    const { container } = render(<JourneyView {...props} />);
+    expect(container.querySelector("[data-thread]")).toBeNull();
   });
 });
 
@@ -122,22 +161,5 @@ describe("i colori del percorso", () => {
     // regola non nomina il percorso. Dentro un tesserino di carta va
     // ridichiarato, o di notte l'anno sparisce.
     expect(regoleDelPercorso.some((r) => /\.eyebrow/.test(r.selettore))).toBe(true);
-  });
-});
-
-describe("i fogli non combaciano", () => {
-
-  it("ogni foglio ha la sua inclinazione, e non sono la stessa", () => {
-    // Fogli con lo stesso angolo sono un errore di stampa, e fogli
-    // dritti sono una tabella. Quello che li fa leggere come cose appoggiate
-    // su un piano è che non combaciano: la regola sta qui perché è una
-    // decisione di disegno, e una modifica distratta la annullerebbe senza
-    // rompere niente.
-    const regole = [...css.matchAll(/\[data-journey-item\][^{]*\{([^}]*)\}/g)].map((m) => m[1]);
-    const angoli = regole
-      .map((corpo) => corpo.match(/rotate\((-?[\d.]+)deg\)/)?.[1])
-      .filter(Boolean);
-    expect(angoli.length).toBe(journey.length);
-    expect(new Set(angoli).size).toBe(journey.length);
   });
 });

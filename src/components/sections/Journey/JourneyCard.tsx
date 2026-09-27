@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+import type { Posa } from "./binario";
 import type { JourneyEntryView } from "./JourneyView";
 
 /**
@@ -14,20 +16,33 @@ import type { JourneyEntryView } from "./JourneyView";
  * sia il tratteggio del cartellino sia tutto quello che un domani volesse
  * distinguere quella tappa: un posto che non ti dà un tesserino è un fatto
  * della tappa, non del disegno.
+ *
+ * La posa arriva in linea da POSE, per posizione nella fila: con nth-child
+ * l'onda, che e' il primo <li>, sposterebbe tutti i conti di uno. Lo
+ * scostamento sta anche in `data-scostamento`, perche' l'onda deve passare
+ * dove il foglio e' spostato e offsetTop un translate non lo vede.
  */
 export function JourneyCard({
   entry,
   present,
   senzaTesserino,
   etichettaLezione,
+  posa,
 }: {
   entry: JourneyEntryView;
+  posa: Posa;
   present: string;
   senzaTesserino: string;
   etichettaLezione: string;
 }) {
   return (
-    <li data-journey-item data-tesserino={entry.tesserino ? undefined : "no"}>
+    <li
+      data-journey-item
+      data-tesserino={entry.tesserino ? undefined : "no"}
+      data-anno={entry.year}
+      data-scostamento={posa.scostamento}
+      style={{ "--r": `${posa.rotazione}deg`, "--dy": `${posa.scostamento}rem` } as CSSProperties}
+    >
       <div data-journey-badge>
         <span data-journey-clip aria-hidden="true" />
         <div data-journey-badge-body>

@@ -1,28 +1,39 @@
 /**
  * Le corse del filo attraverso la pagina.
  *
- * Non tutte le sezioni ne hanno una: «Il tavolo» NON disegna il filo, ed e' una
- * scelta, non una dimenticanza. Quella sezione e' una camera alta 380vh con il
- * palco inchiodato al centro dello schermo: una linea che la attraversa o passa
- * SOPRA il tavolo, e allora taglia in diagonale la scena, o passa DIETRO, e
- * allora resta coperta dal palco per tutta la corsa. Non esiste una terza
- * possibilita' finche' quella sezione e' una camera. Il filo quindi si
- * interrompe alla fine di «Cosa stai cercando?» e riprende con «I lavori».
+ * Non tutte le sezioni ne hanno una: «Il tavolo» e «Dove ho imparato» NON
+ * disegnano il filo, ed e' una scelta, non una dimenticanza. Sono tutte e due
+ * scene agganciate: un palco sticky fermo sullo schermo mentre la pagina gli
+ * scorre sotto per migliaia di pixel. Una linea verticale che le attraversa o
+ * passa SOPRA la scena, e allora la taglia, o passa DIETRO, e allora resta
+ * coperta dal palco per tutta la corsa. Non esiste una terza possibilita'
+ * finche' quelle sezioni sono scene. Il filo quindi si interrompe prima di
+ * ciascuna e riprende dopo: le due interruzioni sono in INTERRUZIONE.
  */
-export type SectionId = "hero" | "seeking" | "works" | "process" | "journey" | "contact";
+export type SectionId = "hero" | "seeking" | "works" | "process" | "contact";
 
 /** L'ordine in cui il filo attraversa la pagina. */
-export const SECTION_ORDER: SectionId[] = [
-  "hero", "seeking", "works", "process", "journey", "contact",
-];
+export const SECTION_ORDER: SectionId[] = ["hero", "seeking", "works", "process", "contact"];
 
 /**
- * L'unico punto in cui il filo si interrompe, dichiarato invece che dedotto.
- * Fra queste due sezioni c'e' il tavolo, che non lo disegna: la prova di
- * continuita' salta questa coppia e pretende che sia esattamente questa.
- * Aggiungerne una seconda vuol dire aver spezzato il filo per sbaglio.
+ * I punti in cui il filo si interrompe, dichiarati invece che dedotti. Ogni
+ * coppia e' fatta di due sezioni consecutive del filo, e ognuna deve dire
+ * PERCHE' li' il filo non passa: la prova di continuita' salta esattamente
+ * queste coppie e nessun'altra. Una rottura senza una voce qui, o una voce
+ * senza una ragione, e' un filo spezzato per sbaglio.
  */
-export const INTERRUZIONE: readonly [SectionId, SectionId] = ["seeking", "works"];
+export const INTERRUZIONE: readonly { tra: readonly [SectionId, SectionId]; perche: string }[] = [
+  {
+    tra: ["seeking", "works"],
+    perche:
+      "In mezzo c'e' il tavolo, una camera alta 380vh col palco inchiodato: il filo o taglia la scena o resta coperto per tutta la corsa.",
+  },
+  {
+    tra: ["process", "contact"],
+    perche:
+      "In mezzo c'e' il percorso, una scena agganciata che scorre in orizzontale: una linea verticale non la attraversa senza tagliarla. La riga di quella sezione e' la sua onda, dello stesso colore.",
+  },
+];
 
 /**
  * Il filo NON è un unico path globale: sarebbe fragile e impossibile da
@@ -65,9 +76,15 @@ export const THREAD_ANCHORS: Record<SectionId, { in: number; out: number }> = {
    *
    * Le due sezioni vicine si adeguano perche' l'uscita di una e' l'entrata
    * della successiva e una prova lo verifica: i Lavori escono al 50 (sotto la
-   * mensola, dove non c'e' niente) e il percorso entra al 52.
+   * mensola, dove non c'e' niente).
    */
   process: { in: 50, out: 52 },
-  journey: { in: 52, out: 10 },
+  /**
+   * Entra al 10 e non al 52 dove il filo esce da «Come lavoro»: in mezzo c'e'
+   * il percorso, alto diverse schermate, e i due capi non si vedono mai
+   * insieme. E' la stessa ragione per cui i Lavori entrano all'88. Il 10 e'
+   * la corsa che questa sezione aveva gia', quando il filo ci arrivava dal
+   * percorso: spostarlo per farlo combaciare costerebbe il suo disegno.
+   */
   contact: { in: 10, out: 50 },
 };
