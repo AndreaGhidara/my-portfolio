@@ -22,14 +22,6 @@
   --accent: var(--orange);
   --on-accent: var(--ink);
 
-  /* Il filo che attraversa la pagina ha un colore suo, e non e' --line.
-     --line e' il colore dei bordi, scelto contro il fondo di PAGINA: sulla
-     carta fa 1,32:1 e sull'arancio 2,47:1, tutti e due sotto la soglia 3:1
-     di WCAG per gli elementi non testuali. --muted invece fa 4,97:1 sulla
-     carta e 3,34:1 sull'inchiostro, e vale per tutti e due i temi senza
-     ribaltarsi. Non entra nessun colore nuovo in tavolozza. */
-  --filo: var(--muted);
-
   /* Il fondo delle cose appoggiate sulla pagina: le cartelle dello schedario.
      Sul chiaro e' il fondo di pagina e non cambia niente, perche' li' il bordo
      basta a staccarle. Vedi la variante scura sotto. */
@@ -54,12 +46,6 @@
     --gutter: 2.5rem;
   }
 }
-
-/* Le sezioni a fondo pieno arancione ridefiniscono il filo, e nient'altro:
-   li' il colore giusto e' quello del testo che ci sta sopra (5,08:1). La
-   regola sta su un attributo e non sugli id perche' domani puo' diventare
-   arancione una terza sezione. */
-[data-fondo="accento"] { --filo: var(--on-accent); }
 
 [data-theme="dark"] {
   --bg: var(--ink);
@@ -2474,16 +2460,14 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
    a ogni consegna, tutto spinto da una parte.
    Si centra il BLOCCO, non le righe: dentro, il testo resta allineato a
    sinistra. Da 900px in su non si tocca, perche' li' le due colonne si
-   dividono la riga e il tetto stretto serve a lasciare passare il filo. */
+   dividono la riga. */
 @media (max-width: 899px) {
   [data-process-text] { margin-inline: auto; }
 }
 
-/* La testata si centra fino a 1023px e non fino a 899: il suo tetto stretto
-   esiste per lasciar passare il filo nel corridoio fra le due colonne, e il
-   filo sotto i 1024px non c'e' proprio (vedi la regola che lo spegne). Fra i
-   900 e i 1023 le consegne sono gia' a due colonne ma la testata resterebbe
-   comunque un blocco stretto appoggiato a sinistra. */
+/* La testata si centra fino a 1023px e non fino a 899: fra i 900 e i 1023 le
+   consegne sono gia' a due colonne ma la testata, col suo tetto stretto,
+   resterebbe un blocco appoggiato a sinistra. */
 @media (max-width: 1023px) {
   [data-process-testata] h2,
   [data-process-testata] p {
@@ -2925,8 +2909,8 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
 
 /* L'onda: tratteggiata e fioca sotto, piena sopra, ritagliata fin dove si e'
    gia' passati. Il tracciato lo disegna JourneyBinario, perche' dipende da
-   dove finiscono i fogli. --ink e non --filo: sull'arancio sono lo stesso
-   colore, e cosi' l'onda sta dentro la regola dei colori della sezione. */
+   dove finiscono i fogli. --ink, cosi' l'onda sta dentro la regola dei
+   colori della sezione. */
 [data-journey][data-scena="orizzontale"] [data-journey-onda] {
   display: block;
   position: absolute;
@@ -3363,29 +3347,6 @@ textarea[data-contact-campo] {
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Il filo non attraversa il telefono.
-
-   Il filo e' l'unico indicatore di avanzamento della pagina, e su uno schermo
-   largo funziona: serpeggia da un bordo all'altro, e quel serpeggiare e' la
-   misura di quanto si e' scesi. Sotto i 1024px i bordi sono a venti centimetri
-   l'uno dall'altro: la stessa corsa diventa una linea che taglia il testo in
-   diagonale senza avere piu' niente da misurare.
-
-   Restano solo i segmenti di sezione: i cavi del tavolo non esistono piu'
-   (vedi anchors.ts), e il tavolo non e' mai stato attraversato dal filo su
-   nessuna larghezza.
-
-   NOTA D'ORDINE: in fondo al foglio, e non per pigrizia. Queste tre regole
-   devono vincere su `position: absolute` e sulle geometrie dichiarate piu' su,
-   e a parita' di specificita' una @media non aggiunge peso: decide l'ordine.
-   ────────────────────────────────────────────────────────────────────────── */
-@media (max-width: 1023px) {
-  [data-thread] {
-    display: none;
-  }
-}
-
-/* ──────────────────────────────────────────────────────────────────────────
    I due bottoni dell'apertura: l'anello si sposta su quello che stai per
    scegliere.
 
@@ -3707,17 +3668,6 @@ textarea[data-contact-campo] {
   --raggio: 18px;
 }
 
-/* Il posto naturale di Hero, su cui si misura il suo filo: l'altezza la
-   scrive il componente. Larga zero, non si vede e non prende niente. */
-[data-foglio-sentinella] {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
 /* Il palco visibile: 100svh, il viewport piccolo, come la sonda del percorso. */
 [data-foglio-sonda] {
   position: fixed;
@@ -3736,7 +3686,7 @@ textarea[data-contact-campo] {
   top: var(--attacco, 3.75rem);
 }
 
-/* Il velo sta sulla sezione intera, gutter e filo compresi: e' Hero che va
+/* Il velo sta sulla sezione intera, gutter compreso: e' Hero che va
    sotto, non solo il suo contenuto. Uno pseudo-elemento non e' una
    trasformazione, e lo strato fisso della carta non se ne accorge. */
 [data-sotto-il-foglio][data-acceso] #hero::after {

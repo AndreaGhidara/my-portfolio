@@ -13,9 +13,6 @@ export type WorksViewProps = {
 
 export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewProps) {
   return (
-    // Niente filo qui: l'archivio e' una scena agganciata, e una linea
-    // verticale o taglia le cartelle o resta coperta. Vedi INTERRUZIONE in
-    // anchors.ts.
     <section id="works" className="relative px-[var(--gutter)] py-[var(--section-y)]">
       <Reveal className="mx-auto max-w-4xl" moto="dietro" stagger={0.08}>
         <div className="flex items-start justify-between gap-4">

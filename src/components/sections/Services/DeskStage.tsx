@@ -71,8 +71,7 @@ const SHORT_STAGE = 1000;
 /**
  * Il palco. Un solo ScrollTrigger, e non tocca un elemento: scrive due custom
  * property sul palco — --p (la progressione) e --s (la scala della camera) — e
- * le ventiquattro opacita' le calcola il CSS. E' lo stesso principio del filo,
- * che usa un viewBox in percentuali per non ricalcolare niente.
+ * le ventiquattro opacita' le calcola il CSS.
  *
  * Niente `pin`: il palco e' sticky dentro un track alto 380vh, cosi' non c'e'
  * un pin-spacer da far litigare con Lenis.

@@ -262,8 +262,7 @@ export function WorksShelf({
       senzaSpostare(sezione, () => {
         lista.setAttribute("data-archivio-acceso", "");
         // La sezione e' appena cresciuta di qualche schermo: tutto quello che
-        // sta sotto (le entrate, il percorso, il filo del «tuo turno») va
-        // rimisurato.
+        // sta sotto (le entrate, il percorso) va rimisurato.
         ScrollTrigger.refresh();
       });
       // Dopo l'accensione: i `top` sticky e i rettangoli valgono solo da qui.

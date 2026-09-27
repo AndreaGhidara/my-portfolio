@@ -114,11 +114,6 @@ describe("JourneyView", () => {
     const { container } = render(<JourneyView {...props} />);
     expect(container.querySelector("[data-scena]")).toBeNull();
   });
-
-  it("il filo del sito si interrompe sul percorso: la riga qui e' l'onda", () => {
-    const { container } = render(<JourneyView {...props} />);
-    expect(container.querySelector("[data-thread]")).toBeNull();
-  });
 });
 
 const css = readFileSync("src/styles/tokens.css", "utf8");

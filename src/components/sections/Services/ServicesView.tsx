@@ -41,9 +41,6 @@ export function ServicesView({
 }: ServicesViewProps) {
   return (
     <section id="services" className="relative">
-      {/* Niente <ThreadSegment> qui: in questa sezione il filo SONO i cavi, dentro
-          il tavolo. Due tratti sovrapposti sarebbero due fili, ed e' esattamente
-          la cosa che il concept vieta. */}
       <DeskStage
         eyebrow={eyebrow}
         title={stageTitle}
