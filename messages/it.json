@@ -593,6 +593,46 @@
     "years": "anni di sviluppo web",
     "responseTime": "tempo di risposta"
   },
+  "notizie": {
+    "eyebrow": "Le notizie della settimana",
+    "title": "Scegli cosa ti va, gira la manopola",
+    "intro": "Tre mondi che seguo da vicino: l'intelligenza artificiale, il design e il codice con cui lavoro. Premi il pulsante di quello che ti incuriosisce, gira, e ti esce una notizia di questi giorni.",
+    "categorie": {
+      "ia": { "nome": "I.A.", "testata": "La Gazzetta dell'I.A." },
+      "design": { "nome": "Design", "testata": "Il Foglio del Design" },
+      "codice": { "nome": "Codice", "testata": "Il Corriere del Codice" }
+    },
+    "timbri": {
+      "primaPagina": "in prima pagina",
+      "paper": "paper del giorno",
+      "piuLetto": "più letto",
+      "release": "nuova versione"
+    },
+    "dati": {
+      "punti": "punti",
+      "commenti": "commenti",
+      "voti": "voti",
+      "autori": "autori",
+      "reazioni": "reazioni",
+      "lettura": "di lettura",
+      "versione": "versione"
+    },
+    "minuti": "{n} min",
+    "rilascio": "{titolo} è uscito",
+    "leggiSu": "Leggi su {sito}",
+    "targa": "{categoria} · {n} palline",
+    "targaUna": "{categoria} · 1 pallina",
+    "gruppo": "Che notizie vuoi",
+    "manopola": "Gira la manopola: esce una notizia",
+    "aiuto": "Scegli il tipo, poi gira la manopola: un clic, o trascinala in tondo.",
+    "attesa": "Riempio la macchina con le notizie della settimana…",
+    "vuota": "Scegli fra I.A., Design e Codice, poi gira la manopola: la notizia si stampa qui.",
+    "errore": "Le notizie non sono arrivate. Gira la manopola per riprovare.",
+    "finite": "Le notizie {categoria} di oggi sono finite: prova un altro pulsante, o torna domani.",
+    "giaUscite": "già uscite",
+    "raccolteOggi": "Notizie raccolte alle {ora} di oggi: domani sono altre.",
+    "raccolteIl": "Notizie raccolte il {giorno} alle {ora}."
+  },
   "contact": {
     "eyebrow": "Contatti",
     "title": "Il tuo turno",
