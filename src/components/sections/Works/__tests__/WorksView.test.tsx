@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
-import { render, screen, fireEvent, act, within } from "@testing-library/react";
+import { render, screen, fireEvent, act, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { WorksView } from "../WorksView";
 import { SHOT_SIZES } from "../WorkShot";
@@ -16,6 +16,21 @@ const labels = {
   open: "Apri il caso",
   close: "Chiudi",
   riporta: "riporta davanti la cartella",
+  archivio: "Archivio lavori",
+  pratica: "Pratica n.",
+  comEra: "Com'era, quando sono arrivato",
+  cliente: "Cliente",
+  anno: "Anno",
+  stato: "Stato",
+  online: "Online",
+  allegato: "Allegato A · la piattaforma oggi",
+  rilevato: "Rilevato a fine lavoro",
+  rilevatoFinora: "Rilevato finora",
+  stima: "stima",
+  consegnato: "Consegnato",
+  inCorso: "In corso",
+  firmaNome: "A. Ghidara",
+  firmaRuolo: "sviluppatore",
 };
 
 const items = [
@@ -35,8 +50,9 @@ const items = [
     },
     screenshotAlt: "BDroppy: schermata",
     year: 2024,
+    stato: "consegnato" as const,
     tech: ["Next.js", "TypeScript"],
-    metrics: [{ id: "bdroppyComponents", value: "120", label: "componenti migrati" }],
+    metrics: [{ id: "bdroppyComponents", value: "120", label: "componenti migrati", estimated: true }],
   },
   {
     id: "aidify",
@@ -54,6 +70,7 @@ const items = [
     },
     screenshotAlt: "Aidify: schermata",
     year: 2024,
+    stato: "consegnato" as const,
     tech: ["Next.js", "Supabase"],
     metrics: [],
   },
@@ -360,6 +377,228 @@ describe("WorksView", () => {
   });
 });
 
+/** I campi della pratica come coppie etichetta → valore, nell'ordine del foglio. */
+const campi = (dialog: HTMLElement) =>
+  Array.from(dialog.querySelectorAll("[data-pratica-campi] > div")).map((campo) => [
+    campo.querySelector("dt")?.textContent,
+    campo.querySelector("dd")?.textContent,
+  ]);
+
+const riservato = {
+  ...items[1],
+  id: "riservato",
+  name: "Riservato",
+  year: 2026,
+  stato: "in-corso" as const,
+  screenshot: undefined,
+  url: undefined,
+  metrics: [{ id: "riservatoCycleTime", value: "15 min", label: "per un passaggio che prima chiedeva ore", estimated: true }],
+};
+
+describe("la pratica", () => {
+  it("porta cliente, anno, stato e il dominio senza protocollo ne' www", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    const dialog = screen.getByRole("dialog", { name: "BDroppy · 2024" });
+    expect(campi(dialog)).toEqual([
+      ["Cliente", "BDroppy"],
+      ["Anno", "2024"],
+      ["Stato", "Consegnato"],
+      ["Online", "bdroppy.com"],
+    ]);
+  });
+
+  it("il dominio e' quello del caso aperto, anche senza www davanti", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(apri()[1]);
+    expect(campi(screen.getByRole("dialog"))).toContainEqual(["Online", "aidify.cx"]);
+  });
+
+  it("dice quale pratica e' su quante, come la faccia della cartella", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(apri()[1]);
+    const testa = screen.getByRole("dialog").querySelector("[data-pratica-testa]");
+    expect(testa).toHaveTextContent("Pratica n.");
+    expect(testa).toHaveTextContent("02 / 02");
+    expect(testa).toHaveTextContent(labels.archivio);
+  });
+
+  it("il timbro dice lo stato, e la firma chi l'ha fatto", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    const dialog = screen.getByRole("dialog");
+    expect(dialog.querySelector("[data-pratica-timbro]")).toHaveTextContent(labels.consegnato);
+    expect(dialog.querySelector("[data-pratica-firma]")).toHaveTextContent(`${labels.firmaNome}${labels.firmaRuolo}`);
+  });
+
+  it("i numeri stimati lo dicono accanto al numero, e a lavoro finito sono «a fine lavoro»", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    const numeri = screen.getByRole("dialog").querySelector<HTMLElement>("[data-pratica-numeri]")!;
+    expect(within(numeri).getByRole("heading", { name: labels.rilevato })).toBeInTheDocument();
+    const valore = within(numeri).getByText("120");
+    expect(valore.parentElement).toHaveTextContent(`120${labels.stima}`);
+  });
+
+  it("un numero non stimato non porta la scritta «stima»", async () => {
+    const misurato = { ...items[0], metrics: [{ ...items[0].metrics[0], estimated: false }] };
+    render(<WorksView {...props} items={[misurato]} />);
+    await userEvent.click(apri()[0]);
+    const numeri = screen.getByRole("dialog").querySelector("[data-pratica-numeri]");
+    expect(numeri).not.toHaveTextContent(labels.stima);
+  });
+
+  it("il riservato: niente schermata ne' link, «Online» e il posto del link dicono perche', timbro «In corso»", async () => {
+    render(<WorksView {...props} items={[riservato]} />);
+    await userEvent.click(apri()[0]);
+    const dialog = screen.getByRole("dialog", { name: "Riservato · 2026" });
+    expect(campi(dialog)).toEqual([
+      ["Cliente", "Riservato"],
+      ["Anno", "2026"],
+      ["Stato", "In corso"],
+      ["Online", labels.riservato],
+    ]);
+    expect(dialog.querySelector("img")).toBeNull();
+    expect(dialog.querySelector("[data-pratica-riservato]")).toHaveTextContent(labels.riservato);
+    expect(within(dialog).queryByRole("link")).toBeNull();
+    expect(dialog.querySelector("[data-pratica-senza-link]")).toHaveTextContent(labels.riservato);
+    expect(dialog.querySelector("[data-pratica-timbro]")).toHaveTextContent(labels.inCorso);
+  });
+
+  it("su un lavoro in corso i numeri sono «rilevati finora», non a fine lavoro", async () => {
+    render(<WorksView {...props} items={[riservato]} />);
+    await userEvent.click(apri()[0]);
+    const numeri = screen.getByRole("dialog").querySelector<HTMLElement>("[data-pratica-numeri]")!;
+    expect(within(numeri).getByRole("heading", { name: labels.rilevatoFinora })).toBeInTheDocument();
+    expect(numeri).not.toHaveTextContent(labels.rilevato);
+  });
+
+  it("dentro la pratica niente .eyebrow: porta i colori della pagina, che si ribaltano col tema", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    expect(screen.getByRole("dialog").querySelector(".eyebrow")).toBeNull();
+  });
+});
+
+describe("aprire e chiudere la pratica", () => {
+  const archivio = (container: HTMLElement) => container.querySelector("[data-work-shelf]");
+
+  it("dal clic l'archivio sotto e' inerte: sotto la cartella caduta c'e' la faccia della precedente", async () => {
+    const { container } = render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    expect(archivio(container)).toHaveAttribute("inert");
+  });
+
+  it("× chiude: la pagina torna libera e il fuoco torna su «Apri il caso» della cartella aperta", async () => {
+    const { container } = render(<WorksView {...props} />);
+    await userEvent.click(apri()[1]);
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: labels.close }));
+
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    await waitFor(() => expect(document.documentElement).not.toHaveAttribute("data-dialog-open"));
+    expect(archivio(container)).not.toHaveAttribute("inert");
+    expect(apri()[1]).toHaveFocus();
+  });
+
+  it("Esc non chiude di colpo: il cancel si ferma, e la chiusura passa dalla sua animazione", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    const dialog = screen.getByRole("dialog");
+    const esc = new Event("cancel", { cancelable: true });
+    act(() => {
+      dialog.dispatchEvent(esc);
+    });
+    expect(esc.defaultPrevented).toBe(true);
+    await waitFor(() => expect(document.documentElement).not.toHaveAttribute("data-dialog-open"));
+    expect(apri()[0]).toHaveFocus();
+  });
+
+  it("un clic sul velo chiude come ×", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    await userEvent.click(screen.getByRole("dialog"));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+  });
+
+  it("un clic dentro il foglio non chiude", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    await userEvent.click(screen.getAllByText(items[0].scelta)[0]);
+    expect(screen.getByRole("dialog")).toBeVisible();
+  });
+
+  it("chiusa dal browser senza passare dal cancel, la pagina torna comunque libera", async () => {
+    // Il close watcher: al secondo Esc, o col gesto indietro di Android, il
+    // dialog si chiude da solo e il cancel non si puo' fermare.
+    const { container } = render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    act(() => {
+      (screen.getByRole("dialog") as HTMLDialogElement).close();
+    });
+    await waitFor(() => expect(document.documentElement).not.toHaveAttribute("data-dialog-open"));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(archivio(container)).not.toHaveAttribute("inert");
+    expect(apri()[0]).toHaveFocus();
+  });
+
+  it("dopo la chiusura si riapre, e mostra il caso nuovo", async () => {
+    render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: labels.close }));
+    await waitFor(() => expect(document.documentElement).not.toHaveAttribute("data-dialog-open"));
+    await userEvent.click(apri()[1]);
+    expect(screen.getByRole("dialog", { name: "Aidify · 2024" })).toBeVisible();
+  });
+
+  it("un Esc durante la caduta, prima che il dialog esista, non si perde: si chiude appena aperta", async () => {
+    // A "none" il dialog si apre subito dopo il commit e fra il clic e
+    // showModal() non c'e' un momento in cui premere Esc. Qui il livello e'
+    // "reduced" (nessuna preferenza, nessun puntatore fine) e le animazioni
+    // non finiscono finche' il test non le libera: la cartella resta a meta'
+    // caduta quanto serve.
+    let libera = () => {};
+    const inCorsa = new Promise<void>((risolvi) => {
+      libera = risolvi;
+    });
+    Object.defineProperty(Element.prototype, "animate", {
+      configurable: true,
+      value: () => ({ finished: inCorsa, cancel() {} }),
+    });
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      matches: false,
+      media: query,
+      addEventListener() {},
+      removeEventListener() {},
+    }));
+    try {
+      render(<WorksView {...props} />);
+      await userEvent.click(apri()[0]);
+      const dialog = document.querySelector<HTMLDialogElement>("[data-work-dialog]")!;
+      expect(dialog.open).toBe(false);
+
+      fireEvent.keyDown(document, { key: "Escape" });
+      await act(async () => {
+        libera();
+      });
+
+      await waitFor(() => expect(document.documentElement).not.toHaveAttribute("data-dialog-open"));
+      expect(dialog.open).toBe(false);
+      expect(apri()[0]).toHaveFocus();
+    } finally {
+      Reflect.deleteProperty(Element.prototype, "animate");
+    }
+  });
+
+  it("smontata a pratica aperta, la pagina non resta bloccata", async () => {
+    const { container, unmount } = render(<WorksView {...props} />);
+    await userEvent.click(apri()[0]);
+    const lista = archivio(container);
+    unmount();
+    expect(document.documentElement).not.toHaveAttribute("data-dialog-open");
+    expect(lista).not.toHaveAttribute("inert");
+  });
+});
+
 // Senza commenti: quello che precede una regola finirebbe nel suo selettore.
 const css = readFileSync("src/styles/tokens.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
 
@@ -512,5 +751,46 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
     );
     expect(faccia?.corpo).toContain("var(--barra-bassa)");
     expect(faccia?.corpo).toContain("100svh");
+  });
+});
+
+/** Le regole della pratica: tutte sotto il dialog, anche dentro le media query. */
+const regoleDellaPratica = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+  .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }))
+  .filter((r) => r.selettore.includes("[data-work-dialog]"));
+
+describe("i colori della pratica", () => {
+  it("il foglio e' carta nei due temi: dentro mai i colori che seguono il tema", () => {
+    // Come l'editor della cassetta e' scuro in tutti e due, la pratica e' un
+    // oggetto di carta: --fg, --bg e compagni si ribaltano col tema scuro, e
+    // il foglio diventerebbe inchiostro su inchiostro.
+    expect(regoleDellaPratica.length).toBeGreaterThan(20);
+    const vietati = /var\(--(fg|bg|fg-muted|line|accento-testo|cartella-[\w-]+)\)/;
+    const colpevoli = regoleDellaPratica.filter((r) => vietati.test(r.corpo));
+    expect(colpevoli.map((r) => r.selettore)).toEqual([]);
+  });
+
+  it("i colori del foglio sono i suoi, e vengono dalla tavolozza", () => {
+    const radice = regoleDellaPratica.find((r) => r.selettore === "[data-work-dialog]")?.corpo ?? "";
+    expect(radice).toMatch(/--carta:\s*var\(--paper\)/);
+    expect(radice).toMatch(/--inchiostro:\s*var\(--ink\)/);
+    expect(radice).toMatch(/--tenue:\s*var\(--muted\)/);
+    expect(radice).toMatch(/--arancio:\s*var\(--accento-su-carta\)/);
+    const scritti = regoleDellaPratica.filter((r) => /#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i.test(r.corpo));
+    expect(scritti.map((r) => r.selettore)).toEqual([]);
+  });
+
+  it("il timbro non si fonde con la carta: il suo colore e' quello misurato in contrast.test.ts", () => {
+    expect(regoleDellaPratica.filter((r) => /mix-blend-mode/.test(r.corpo))).toEqual([]);
+  });
+
+  it("sul computer il foglio si scorre invece di tagliare il testo", () => {
+    const computer = css.match(/@media \(min-width: 1024px\) and \(min-height: 700px\) \{[\s\S]*?\n\}/)?.[0];
+    expect(computer, "manca il blocco del computer della pratica").toBeTruthy();
+    expect(computer).toMatch(/\[data-pratica-foglio\]\s*\{[^}]*overflow-y:\s*auto/);
+    const nascosti = regoleDellaPratica.filter(
+      (r) => /\[data-pratica(-foglio)?\]$/.test(r.selettore) && /overflow(-y)?:\s*hidden/.test(r.corpo),
+    );
+    expect(nascosti.map((r) => r.selettore)).toEqual([]);
   });
 });

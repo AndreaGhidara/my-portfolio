@@ -1,193 +1,199 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useId, type RefObject } from "react";
+import { site } from "@/content/site";
+import { due } from "./WorkFolder";
 import { WorkShot } from "./WorkShot";
 import type { WorkCaseData, WorkCaseLabels } from "./types";
 
 export type WorkDialogProps = {
+  dialogo: RefObject<HTMLDialogElement | null>;
   data: WorkCaseData | null;
-  origin: DOMRect | null;
+  /** Il posto della cartella nell'archivio, da uno. */
+  numero: number;
+  totale: number;
   labels: WorkCaseLabels;
+  /** ×, Esc e clic sul velo: la chiusura la anima WorksShelf. */
+  onChiudi: () => void;
+  /** Il dialog si e' chiuso, orchestrato o no. */
   onClose: () => void;
 };
 
+/** Il dominio dell'indirizzo, senza protocollo e senza www: come si dice a voce. */
+const dominio = (url: string) => new URL(url).hostname.replace(/^www\./, "");
+
 /**
- * Il dossier aperto.
+ * La pratica: il dossier aperto, un foglio di carta sopra la pagina velata.
  *
- * E' un <dialog> nativo aperto con showModal(): la trappola del focus,
- * l'Escape, lo sfondo, lo strato superiore e il ritorno del focus sulla
- * cartella che l'ha aperto li fa il browser. Rifarli a mano e' il modo
- * classico per ritrovarsi con una trappola di focus rotta che nessuno prova.
+ * E' un <dialog> nativo aperto con showModal(): trappola del fuoco, strato
+ * superiore e pagina inerte li fa il browser. Aprirlo e chiuderlo no: lo fa
+ * WorksShelf, perche' in mezzo c'e' la cartella che scivola via (scivola.ts).
+ * Per questo l'Esc si ferma qui e diventa una richiesta di chiusura, come il
+ * × e il clic sul velo. Il contenuto c'e' da subito: l'entrata e' solo
+ * opacita' e spostamento, mai un montaggio ritardato.
  *
- * L'apertura cresce dal rettangolo della cartella cliccata, cosi' il dossier
- * sembra uscire da quella cartella li' e non comparire dal nulla.
+ * Il foglio e' carta in tutti e due i temi, come l'editor della cassetta e'
+ * scuro in tutti e due: e' un oggetto, non la pagina. I suoi colori sono suoi
+ * (vedi tokens.css), e niente di quello che si ribalta col tema entra qui,
+ * .eyebrow compreso.
  */
-export function WorkDialog({ data, origin, labels, onClose }: WorkDialogProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, onClose }: WorkDialogProps) {
   const titleId = useId();
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    if (!data) {
-      if (dialog.open) dialog.close();
-      return;
-    }
-
-    dialog.showModal();
-    // showModal() non blocca lo scroll della pagina sotto: senza questo, la
-    // rotellina scorre il sito dietro al dossier.
-    document.documentElement.setAttribute("data-dialog-open", "");
-
-    if (origin && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const target = dialog.getBoundingClientRect();
-      const dx = origin.left + origin.width / 2 - (target.left + target.width / 2);
-      const dy = origin.top + origin.height / 2 - (target.top + target.height / 2);
-      // Scala uniforme e non due fattori diversi: scalando larghezza e altezza
-      // in modo indipendente il testo si deforma in modo visibile. Si prende il
-      // rapporto piu' piccolo cosi' la partenza e' davvero piccola anche da
-      // telefono, dove la cartella e' larga quasi quanto lo schermo.
-      const scale = Math.max(
-        0.15,
-        Math.min(origin.width / target.width, origin.height / target.height),
-      );
-
-      dialog.animate(
-        [
-          // L'inclinazione e' l'apertura: il dossier parte dalla cartella,
-          // ribaltato come un coperchio, e si spiana venendo verso di te.
-          {
-            transform: `perspective(1600px) translate(${dx}px, ${dy}px) scale(${scale}) rotateX(-16deg)`,
-            opacity: 0,
-            offset: 0,
-          },
-          { opacity: 1, offset: 0.28 },
-          { transform: "perspective(1600px) translate(0px, 0px) scale(1) rotateX(0deg)", opacity: 1, offset: 1 },
-        ],
-        { duration: 520, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
-      );
-    }
-
-    return () => {
-      document.documentElement.removeAttribute("data-dialog-open");
-    };
-  }, [data, origin]);
+  const stato = data?.stato === "in-corso" ? labels.inCorso : labels.consegnato;
 
   return (
     <dialog
-      ref={dialogRef}
+      ref={dialogo}
       data-work-dialog
       aria-labelledby={titleId}
+      onCancel={(event) => {
+        event.preventDefault();
+        onChiudi();
+      }}
       onClose={onClose}
-      // Un click che finisce sull'elemento <dialog> stesso, e non su un suo
-      // figlio, e' un click sullo sfondo.
+      // Il dialog e' un piano trasparente grande quanto lo schermo: un clic
+      // che finisce su di lui, e non su un suo figlio, e' un clic sul velo.
       onClick={(event) => {
-        if (event.target === dialogRef.current) dialogRef.current?.close();
+        if (event.target === event.currentTarget) onChiudi();
       }}
     >
       {data && (
-        <div className="flex min-h-0 flex-1 flex-col">
-          <div className="border-b border-[var(--line)] px-[var(--gutter)] py-4">
-            <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-4">
-            <p id={titleId} className="eyebrow">
-              {data.name} · {data.year}
+        <>
+          <button type="button" data-pratica-chiudi data-entra onClick={onChiudi}>
+            <span aria-hidden="true">×</span>
+            <span className="sr-only">{labels.close}</span>
+          </button>
+
+          <article data-pratica>
+            {/* La linguetta e' il titolo: lo stesso della cartella che l'ha aperta. */}
+            <p id={titleId} data-pratica-linguetta>
+              <b>{data.name}</b> · {data.year}
             </p>
-            <button
-              type="button"
-              onClick={() => dialogRef.current?.close()}
-              className="-mt-1 grid size-10 shrink-0 place-items-center rounded-full border border-[var(--line)] text-[var(--fg)]"
-            >
-              <span aria-hidden="true" className="text-lg leading-none">×</span>
-              <span className="sr-only">{labels.close}</span>
-            </button>
-            </div>
-          </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-[var(--gutter)] py-6 lg:py-10">
-            <div className="mx-auto w-full max-w-5xl">
-            {/* Senza schermata il posto non resta vuoto: ci va un riquadro
-                tratteggiato che dichiara il perche'. E' lo stesso vocabolario
-                del cartellino mancante in «Dove ho imparato»: il tratteggio e'
-                gia' il modo in cui questo sito dice «questa cosa non c'e', e
-                non per dimenticanza». */}
-            {data.screenshot ? (
-              <WorkShot shot={data.screenshot} alt={data.screenshotAlt} />
-            ) : (
-              <p className="flex min-h-[8rem] items-center justify-center rounded-[var(--radius)] border border-dashed border-[var(--fg-muted)] px-6 py-8 text-center text-sm text-[var(--fg-muted)]">
-                {labels.riservato}
-              </p>
-            )}
+            <div data-pratica-foglio>
+              <header data-pratica-testa data-entra>
+                <p>
+                  <b>{site.name}</b> <span>{labels.archivio}</span>
+                </p>
+                <p data-pratica-numero>
+                  {labels.pratica}{" "}
+                  <strong>
+                    {due(numero)} / {due(totale)}
+                  </strong>
+                </p>
+              </header>
 
-            {/* Il lavoro, la scelta, la conduzione. La riga sulla cartella
-                chiusa non si ripete: quella dice in che situazione eravamo, ed
-                e' lei ad aver fatto aprire il dossier.
-                I tre pesi sono uguali apposta. Prima il terzo campo era il piu'
-                spento della fila, e il terzo campo e' la conduzione: cioe' la
-                cosa che un elenco di tecnologie non ha. Chi legge in diagonale
-                leggeva i due meno utili. */}
-            <div className="mt-7 grid gap-6 lg:grid-cols-3">
-              <div>
-                <p className="eyebrow">{labels.lavoro}</p>
-                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.lavoro}</p>
-              </div>
-              <div>
-                <p className="eyebrow">{labels.scelta}</p>
-                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.scelta}</p>
-              </div>
-              <div>
-                <p className="eyebrow">{labels.conduzione}</p>
-                <p className="mt-2 leading-relaxed text-[var(--fg)]">{data.conduzione}</p>
-              </div>
-            </div>
-
-            {data.metrics.length > 0 && (
-              <dl className="mt-8 flex flex-wrap gap-8 border-t border-[var(--line)] pt-6">
-                {data.metrics.map((metric) => (
-                  // flex-col-reverse: nel DOM l'ordine resta dt -> dd, come richiede
-                  // la specifica; a schermo il numero appare sopra la sua etichetta.
-                  <div key={metric.id} className="flex flex-col-reverse gap-1">
-                    <dt className="text-xs text-[var(--fg-muted)]">{metric.label}</dt>
-                    <dd className="text-3xl font-black leading-none text-[var(--fg)] lg:text-4xl">
-                      {metric.value}
-                    </dd>
-                  </div>
-                ))}
+              <dl data-pratica-campi data-entra>
+                <div>
+                  <dt>{labels.cliente}</dt>
+                  <dd>{data.name}</dd>
+                </div>
+                <div>
+                  <dt>{labels.anno}</dt>
+                  <dd>{data.year}</dd>
+                </div>
+                <div>
+                  <dt>{labels.stato}</dt>
+                  <dd>{stato}</dd>
+                </div>
+                <div>
+                  <dt>{labels.online}</dt>
+                  <dd>{data.url ? dominio(data.url) : labels.riservato}</dd>
+                </div>
               </dl>
-            )}
 
-            <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-[var(--line)] pt-6">
-              {/* Senza url il progetto non e' mai andato online: al posto del link
-                  resta la stessa forma, tratteggiata e non cliccabile, cosi' la
-                  riga non si sbilancia e l'assenza si legge come un dato. */}
-              {data.url ? (
-                <a
-                  href={data.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-full border-2 border-[var(--fg)] px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--fg)]"
-                >
-                  {labels.visit}
-                </a>
-              ) : (
-                <span className="rounded-full border-2 border-dashed border-[var(--fg-muted)] px-4 py-2 text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--fg-muted)]">
-                  {labels.riservato}
-                </span>
-              )}
-              <ul className="flex flex-wrap gap-2">
-                {data.tech.map((item) => (
-                  <li
-                    key={item}
-                    className="rounded-full border border-[var(--line)] px-3 py-1 text-xs text-[var(--fg-muted)]"
-                  >
-                    {item}
+              <div data-pratica-corpo>
+                {/* La riga della faccia torna qui come la situazione trovata:
+                    e' lei ad aver fatto aprire la pratica. */}
+                <div data-pratica-oggetto data-entra>
+                  <p>{labels.comEra}</p>
+                  <p>{data.riga}</p>
+                </div>
+
+                <div data-pratica-destra>
+                  {/* Senza schermata il posto non resta vuoto: il tratteggio e'
+                      il modo in cui questo sito dice «questa cosa non c'e', e
+                      non per dimenticanza». */}
+                  {data.screenshot ? (
+                    <figure data-pratica-allegato data-entra>
+                      <div data-pratica-schermata>
+                        <WorkShot shot={data.screenshot} alt={data.screenshotAlt} />
+                      </div>
+                      <figcaption>{labels.allegato}</figcaption>
+                    </figure>
+                  ) : (
+                    <p data-pratica-riservato data-entra>
+                      {labels.riservato}
+                    </p>
+                  )}
+
+                  {data.metrics.length > 0 && (
+                    <section data-pratica-numeri data-entra>
+                      {/* Un lavoro in corso non ha una fine da cui rilevare. */}
+                      <h3>{data.stato === "in-corso" ? labels.rilevatoFinora : labels.rilevato}</h3>
+                      <dl>
+                        {data.metrics.map((metric) => (
+                          <div key={metric.id}>
+                            <dt>{metric.label}</dt>
+                            <dd>
+                              <b>{metric.value}</b>
+                              {metric.estimated && <small>{labels.stima}</small>}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </section>
+                  )}
+                </div>
+              </div>
+
+              {/* Il lavoro, la scelta, la conduzione: tre pesi uguali apposta.
+                  La conduzione e' quello che un elenco di tecnologie non ha, e
+                  chi legge in diagonale non deve saltarla. */}
+              <ol data-pratica-voci>
+                {(
+                  [
+                    [labels.lavoro, data.lavoro],
+                    [labels.scelta, data.scelta],
+                    [labels.conduzione, data.conduzione],
+                  ] as const
+                ).map(([titolo, testo], n) => (
+                  <li key={titolo} data-entra>
+                    <span aria-hidden="true">{n + 1}</span>
+                    <div>
+                      <h3>{titolo}</h3>
+                      <p>{testo}</p>
+                    </div>
                   </li>
                 ))}
-              </ul>
+              </ol>
+
+              <footer data-pratica-piede data-entra>
+                <div data-pratica-piede-sx>
+                  <ul data-pratica-tech>
+                    {data.tech.map((voce) => (
+                      <li key={voce}>{voce}</li>
+                    ))}
+                  </ul>
+                  {/* Senza url il link lascia la sua forma, tratteggiata e non
+                      cliccabile: l'assenza si legge come un dato. */}
+                  {data.url ? (
+                    <a data-pratica-link href={data.url} target="_blank" rel="noopener noreferrer">
+                      {labels.visit} <span aria-hidden="true">↗</span>
+                    </a>
+                  ) : (
+                    <span data-pratica-senza-link>{labels.riservato}</span>
+                  )}
+                </div>
+                <p data-pratica-timbro>{stato}</p>
+                <p data-pratica-firma>
+                  <em>{labels.firmaNome}</em>
+                  {labels.firmaRuolo}
+                </p>
+              </footer>
             </div>
-            </div>
-          </div>
-        </div>
+          </article>
+        </>
       )}
     </dialog>
   );

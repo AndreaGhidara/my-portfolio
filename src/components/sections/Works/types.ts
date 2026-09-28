@@ -1,4 +1,7 @@
-export type WorkMetric = { id: string; value: string; label: string };
+import type { StatoLavoro } from "@/content/works";
+
+/** `estimated`: il numero non e' misurato, e la pratica lo dice accanto. */
+export type WorkMetric = { id: string; value: string; label: string; estimated: boolean };
 
 /**
  * La schermata gia' risolta: percorso, misure e anteprima sfocata.
@@ -34,6 +37,7 @@ export type WorkCaseData = {
   /** Gia' tradotto e gia' col nome dentro: il dialogo non compone testo. */
   screenshotAlt: string;
   year: number;
+  stato: StatoLavoro;
   tech: string[];
   metrics: WorkMetric[];
 };
@@ -52,4 +56,26 @@ export type WorkCaseLabels = {
   close: string;
   /** Il nome della linguetta per chi legge a voce: cosa fa il bottone. */
   riporta: string;
+  /** Le voci della pratica, il foglio che il dossier apre. */
+  archivio: string;
+  /** «Pratica n.», davanti al numero della cartella. */
+  pratica: string;
+  /** L'intestazione della riga: la situazione trovata. */
+  comEra: string;
+  cliente: string;
+  anno: string;
+  stato: string;
+  online: string;
+  /** La didascalia della schermata. */
+  allegato: string;
+  /** L'intestazione dei numeri a lavoro consegnato. */
+  rilevato: string;
+  /** La stessa, su un lavoro ancora in corso. */
+  rilevatoFinora: string;
+  /** Accanto a ogni numero non misurato. */
+  stima: string;
+  consegnato: string;
+  inCorso: string;
+  firmaNome: string;
+  firmaRuolo: string;
 };

@@ -86,6 +86,29 @@ describe("lavori", () => {
     expect(senzaNome[0].id).toBe("riservato");
   });
 
+  it("lo stato e' scritto, non ricavato dall'anno: in corso solo il lavoro di adesso", () => {
+    expect(Object.fromEntries(works.map((w) => [w.id, w.stato]))).toEqual({
+      riservato: "in-corso",
+      bdroppy: "consegnato",
+      aidify: "consegnato",
+      visualboost: "consegnato",
+    });
+  });
+
+  it("la pratica ha le sue etichette in entrambe le lingue", () => {
+    const chiavi = [
+      "archivio", "pratica", "comEra", "cliente", "anno", "stato", "online", "allegato",
+      "rilevato", "rilevatoFinora", "stima", "consegnato", "inCorso", "firmaNome", "firmaRuolo",
+    ];
+    for (const dizionario of [it_, en_]) {
+      for (const chiave of chiavi) {
+        const valore = valueAt(dizionario, `works.labels.${chiave}`);
+        expect(typeof valore, `works.labels.${chiave}`).toBe("string");
+        expect(valore).not.toBe("");
+      }
+    }
+  });
+
   it("ogni caso dice il lavoro, la scelta e la conduzione in entrambe le lingue", () => {
     for (const work of works) {
       for (const field of ["name", "riga", "lavoro", "scelta", "conduzione"]) {
