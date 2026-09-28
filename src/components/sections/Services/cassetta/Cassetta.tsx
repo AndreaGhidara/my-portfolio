@@ -182,8 +182,10 @@ export function Cassetta({ testi }: { testi: TestiCassetta }) {
       <div data-cassetta-elenco>
         <h3>{testi.elenco}</h3>
         {ZONE.map((z) => (
-          <section key={z.id} aria-labelledby={`cassetta-zona-${z.id}`}>
-            <h4 id={`cassetta-zona-${z.id}`}>{testi.zone[z.id].nome}</h4>
+          // Un div e non una section: nove scomparti sarebbero nove landmark,
+          // e la mappa della pagina ne resterebbe sommersa. Basta l'h4.
+          <div key={z.id}>
+            <h4>{testi.zone[z.id].nome}</h4>
             <p>{testi.zone[z.id].cosa}</p>
             <ul>
               {attrezziDi(z.id).map((a) => (
@@ -195,7 +197,7 @@ export function Cassetta({ testi }: { testi: TestiCassetta }) {
                 </li>
               ))}
             </ul>
-          </section>
+          </div>
         ))}
       </div>
     </div>

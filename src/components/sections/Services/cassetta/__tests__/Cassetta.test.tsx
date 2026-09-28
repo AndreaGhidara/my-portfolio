@@ -165,6 +165,13 @@ describe("la cassetta: senza JavaScript e per chi legge", () => {
     expect(elenco).toHaveTextContent(t.attrezzi.drizzle.cosa);
   });
 
+  it("gli scomparti dell'elenco non sono landmark: nove regioni affollerebbero la mappa della pagina", () => {
+    const { container } = render(<CassettaView {...props} />);
+    const elenco = container.querySelector("[data-cassetta-elenco]") as HTMLElement;
+    expect(within(elenco).queryAllByRole("region")).toHaveLength(0);
+    expect(elenco.querySelector("section")).toBeNull();
+  });
+
   it("il CSS mostra l'elenco quando lo scripting manca, e nasconde la scena", () => {
     const css = readFileSync("src/styles/tokens.css", "utf8");
     const blocco = css.match(/@media \(scripting: none\) \{[\s\S]*?\n\}/)?.[0] ?? "";

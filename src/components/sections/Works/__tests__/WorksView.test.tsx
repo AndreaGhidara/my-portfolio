@@ -88,6 +88,20 @@ afterEach(() => {
 });
 
 describe("WorksView", () => {
+
+  it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
+    render(<WorksView {...props} />);
+    const sezione = screen.getByRole("region", { name: props.title });
+    const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
+    expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
+    expect(titolo).toHaveClass("titolo-sezione");
+  });
+
+  it("ogni cartella ha un titolo: il nome del lavoro e l'anno, come il dossier che apre", () => {
+    render(<WorksView {...props} />);
+    const titoli = screen.getAllByRole("heading", { level: 3 });
+    expect(titoli.map((t) => t.textContent)).toEqual(items.map((i) => `${i.name} · ${i.year}`));
+  });
   it("ogni cartella chiusa mostra il lavoro in una frase: è ciò che fa riconoscere il cliente, e da telefono non c'è hover che lo riveli", () => {
     render(<WorksView {...props} />);
     for (const item of items) {

@@ -44,6 +44,14 @@ const vero = (container: HTMLElement) =>
   container.querySelector<HTMLElement>("[data-scontrino-carta]:not([data-fantasma])");
 
 describe("la stampante dei servizi", () => {
+
+  it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
+    render(<ScontrinoView {...props} />);
+    const sezione = screen.getByRole("region", { name: props.title });
+    const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
+    expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
+    expect(titolo).toHaveClass("titolo-sezione");
+  });
   it("e' la seconda sezione: arancione, con il suo id per l'effetto sopra l'apertura", () => {
     const { container } = render(<ScontrinoView {...props} />);
     const sezione = container.querySelector("section");

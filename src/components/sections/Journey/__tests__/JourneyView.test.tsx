@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { JourneyView, type JourneyViewProps } from "../JourneyView";
 import { journey } from "@/content/journey";
 
@@ -33,6 +33,14 @@ const props: JourneyViewProps = {
 };
 
 describe("JourneyView", () => {
+
+  it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
+    render(<JourneyView {...props} />);
+    const sezione = screen.getByRole("region", { name: props.title });
+    const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
+    expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
+    expect(titolo).toHaveClass("titolo-sezione");
+  });
   it("presenta il percorso come lista ordinata dal 2023 a oggi", () => {
     render(<JourneyView {...props} />);
     // L'onda e' un <li> aria-hidden e non conta: la prima voce che si legge

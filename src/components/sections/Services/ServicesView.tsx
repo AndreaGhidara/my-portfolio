@@ -45,7 +45,11 @@ export function ServicesView({
   cassetta,
 }: ServicesViewProps) {
   return (
-    <section id="services" className="relative">
+    // Il nome della sezione e' il titolo del tavolo: l'id sta in DeskStage.
+    // Scritto a mano in tutti e due i posti perche' DeskStage e' un modulo
+    // client, e una costante esportata da li' qui arriverebbe come riferimento
+    // client invece che come stringa.
+    <section id="services" aria-labelledby="titolo-services" className="relative">
       <DeskStage
         eyebrow={eyebrow}
         title={stageTitle}
