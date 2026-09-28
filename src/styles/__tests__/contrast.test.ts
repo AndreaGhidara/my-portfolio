@@ -173,3 +173,54 @@ describe("l'archivio dei Lavori", () => {
     expect(contrastRatio(accentoScuro, facciaScura)).toBeGreaterThanOrEqual(4.5);
   });
 });
+
+describe("l'editor della cassetta, scuro in tutti e due i temi", () => {
+  // I fondi sono quelli risolti da Chrome (disegnati su una tela e letti dal
+  // pixel): la riga nuova e' l'arancio al 10% nell'inchiostro, le barre la
+  // carta al 6%. Il codice sta sull'inchiostro pieno.
+  const rigaNuova = "#261913";
+  const barra = "#1F1D19";
+
+  it("i commenti che portano contenuto sono mutedDark, e superano AA sui tre fondi", () => {
+    // Il perche' di un capo e le alternative sono commenti: in muted sul fondo
+    // scuro farebbero 3,34:1, sotto AA per un testo di dodici pixel.
+    for (const fondo of [palette.ink, rigaNuova, barra]) {
+      expect(contrastRatio(palette.mutedDark, fondo)).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(contrastRatio(palette.muted, palette.ink)).toBeLessThan(4.5);
+  });
+
+  it("parole chiave, nomi e stringhe superano AA sul codice e sulla riga nuova", () => {
+    for (const fondo of [palette.ink, rigaNuova]) {
+      expect(contrastRatio(palette.orange, fondo)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(palette.graph, fondo)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(palette.paper, fondo)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("la barra di stato si legge", () => {
+    expect(contrastRatio(palette.graph, barra)).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+describe("la mappa della cassetta: i conti degli scomparti", () => {
+  // Il conto («5 attrezzi») e' --fg all'80% nel fondo, e le pezze sono toni
+  // della famiglia: tutti valori risolti da Chrome, letti dal pixel. Con
+  // --fg-muted le pezze piu' cariche del chiaro (front-end, back-end, dati,
+  // nel mezzo) scendevano sotto il 4,5:1.
+  const pezzeChiare = ["#F6D1C1", "#F6E1D4", "#E3DFD7", "#D4D0C8", "#F6DED1", "#DEDAD2", "#EBE7DE", "#F6E8DD", "#F5F1E8"];
+  const pezzeScure = ["#3C2218", "#281A14", "#211E1B", "#2C2A26", "#2B1B14", "#24221E", "#1B1916", "#1F1612", "#14120F"];
+
+  it("si legge su ogni pezza, nei due temi", () => {
+    for (const fondo of pezzeChiare) expect(contrastRatio("#3A3733", fondo), fondo).toBeGreaterThanOrEqual(4.5);
+    for (const fondo of pezzeScure) expect(contrastRatio("#C2BEB7", fondo), fondo).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("il tenue di prima non bastava sulle pezze cariche: e' il difetto che questa prova blocca", () => {
+    expect(contrastRatio(palette.muted, "#D4D0C8")).toBeLessThan(4.5);
+  });
+
+  it("i numeri di riga dell'editor sono mutedDark, non muted", () => {
+    expect(contrastRatio(palette.mutedDark, palette.ink)).toBeGreaterThanOrEqual(4.5);
+  });
+});

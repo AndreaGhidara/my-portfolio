@@ -40,7 +40,6 @@
   },
   "services": {
     "eyebrow": "The method",
-    "intro": "Each one stands on its own: you can ask me for just a site, or just the automation that saves you two hours a week. But they're built to fit, and together they become the place where the work actually happens. You start with the piece that weighs most, the rest gets added when it's needed.",
     "list": {
       "sites": {
         "title": "Sites and landing pages",
@@ -140,6 +139,298 @@
           "analytics": "The numbers",
           "seo": "Being found",
           "care": "Upkeep"
+        }
+      }
+    }
+  },
+  "cassetta": {
+    "eyebrow": "The tools",
+    "title": "Everything I know how to use. For you, I pick what to sew.",
+    "lead": "This is my toolbox: the tools I know, sorted by what they do. I don't use them all every time, just as a tailor doesn't use every fabric for one suit. Tell me what you need and I'll show you which ones I'd pick, and what I could use instead.",
+    "cuciPer": "Sew for",
+    "tutta": "the whole toolbox",
+    "partenza": "A starting point, not a fixed recipe: I look at every job closely before choosing.",
+    "elenco": "The toolbox, compartment by compartment",
+    "attrezziZona": "{n, plural, one {# tool} other {# tools}}",
+    "radice": {
+      "nome": "Your site",
+      "cosa": "The finished garment. Everything below is the toolbox: for each site I take only what it needs."
+    },
+    "etichetta": {
+      "nome": "The label",
+      "marca": "A. GHIDARA · TAILORED",
+      "composizione": "COMPOSITION",
+      "stima": "estimate",
+      "fibre": "FIBRES",
+      "cura": "CARE",
+      "curaSe": "if needed,",
+      "alPosto": "instead of",
+      "contiene": "CONTAINS",
+      "scomparto": "COMPARTMENT",
+      "entraIn": "GOES INTO",
+      "suRichiesta": "on request",
+      "siAbbina": "PAIRS WITH",
+      "provato": "USED",
+      "lavoro": "used in real work",
+      "conosciuto": "known, ready when needed",
+      "taglia": "MADE TO MEASURE · {n, plural, one {# PIECE} other {# PIECES}}",
+      "indietro": "back",
+      "chiudi": "close"
+    },
+    "editor": {
+      "nome": "The toolbox as a configuration file",
+      "cartelle": "The toolbox compartments",
+      "file": "your-site.config.ts",
+      "cartella": "toolbox",
+      "pacchetto": "@andrea/toolbox",
+      "funzione": "defineSite",
+      "tipo": "kind",
+      "vuoto": "pick a job above: I'll write the rest",
+      "seServe": "if needed:",
+      "serve": "needed",
+      "stato": "{n, plural, one {# tool} other {# tools}} · 0 errors",
+      "zeroErrori": "0 errors"
+    },
+    "zone": {
+      "front": {
+        "nome": "Front end",
+        "snodo": "Front end",
+        "corto": "front-end",
+        "chiave": "frontEnd",
+        "cosa": "What the people using the site see and touch."
+      },
+      "stili": {
+        "nome": "Styling and motion",
+        "snodo": "Styling",
+        "corto": "styling",
+        "chiave": "styling",
+        "cosa": "How it looks and how it moves."
+      },
+      "mezzo": {
+        "nome": "In between",
+        "snodo": "In between",
+        "corto": "between",
+        "chiave": "between",
+        "cosa": "How front end and back end talk, and the fast memory between them."
+      },
+      "back": {
+        "nome": "Back end",
+        "snodo": "Back end",
+        "corto": "back-end",
+        "chiave": "backEnd",
+        "cosa": "The rules: who can do what, and what happens when they do."
+      },
+      "auth": {
+        "nome": "Access",
+        "snodo": "Access",
+        "corto": "access",
+        "chiave": "access",
+        "cosa": "Who you are, and what you are allowed to do."
+      },
+      "dati": {
+        "nome": "Data",
+        "snodo": "Data",
+        "corto": "data",
+        "chiave": "data",
+        "cosa": "Where the things that must not be lost are kept."
+      },
+      "casa": {
+        "nome": "Where it runs",
+        "snodo": "Where it runs",
+        "corto": "hosting",
+        "chiave": "hosting",
+        "cosa": "The machines, real or not, that all of this runs on."
+      },
+      "ai": {
+        "nome": "AI",
+        "snodo": "AI",
+        "corto": "ai",
+        "chiave": "ai",
+        "cosa": "Assistants and automations wired to real data."
+      },
+      "ovunque": {
+        "nome": "Everywhere",
+        "snodo": "Everywhere",
+        "corto": "everywhere",
+        "chiave": "everywhere",
+        "cosa": "What runs through every zone."
+      }
+    },
+    "attrezzi": {
+      "nextjs": {
+        "cosa": "The framework: pages rendered on the server or on demand, routing, server actions.",
+        "breve": "the framework"
+      },
+      "react": {
+        "cosa": "The pieces of the interface, and their state.",
+        "breve": "the interface pieces"
+      },
+      "tailwind": {
+        "cosa": "Styles written next to the markup, on one scale of sizes.",
+        "breve": "styles next to the markup"
+      },
+      "shadcn-ui": {
+        "cosa": "Accessible components copied into the project, not a library to keep updating.",
+        "breve": "accessible components"
+      },
+      "gsap": {
+        "cosa": "Scroll-driven animation, accurate to the frame.",
+        "breve": "scroll-driven animation"
+      },
+      "framer-motion": {
+        "cosa": "Animation for React components: entrances and exits.",
+        "breve": "component animation"
+      },
+      "radix": {
+        "cosa": "The accessible behaviour under shadcn: focus, keyboard, ARIA.",
+        "breve": "accessible behaviour"
+      },
+      "graphql": {
+        "cosa": "Ask only for the data you need, all at once.",
+        "breve": "only the data you need"
+      },
+      "rest": {
+        "cosa": "The simplest APIs: one address per resource.",
+        "breve": "the simplest APIs"
+      },
+      "trpc": {
+        "cosa": "Call the back end like a function, with shared types.",
+        "breve": "the back end as a function"
+      },
+      "redis": {
+        "cosa": "Fast memory: cache, queues, sessions, rate limits.",
+        "breve": "fast memory"
+      },
+      "websocket": {
+        "cosa": "A line that stays open, for what changes in real time.",
+        "breve": "an always-open line"
+      },
+      "nodejs": {
+        "cosa": "JavaScript outside the browser: the engine under the whole back end.",
+        "breve": "JavaScript outside the browser"
+      },
+      "express": {
+        "cosa": "The minimal back end: routes and middleware, nothing more.",
+        "breve": "the minimal back end"
+      },
+      "nestjs": {
+        "cosa": "The structured back end: modules, dependency injection, decorators.",
+        "breve": "the structured back end"
+      },
+      "clerk": {
+        "cosa": "Ready-made sign-in: sign-up, login, organisations.",
+        "breve": "ready-made sign-in"
+      },
+      "authjs": {
+        "cosa": "NextAuth: sign-in inside the Next app, with the providers you want.",
+        "breve": "sign-in inside the Next app"
+      },
+      "supabase-auth": {
+        "cosa": "Sign-in next to the database, with row-level policies.",
+        "breve": "sign-in next to the database"
+      },
+      "better-auth": {
+        "cosa": "Sign-in written in your own code, with no external service.",
+        "breve": "sign-in in your own code"
+      },
+      "jwt": {
+        "cosa": "The signed token that says who you are on every request.",
+        "breve": "the signed token"
+      },
+      "postgresql": {
+        "cosa": "The reference relational database: transactions, constraints, extensions.",
+        "breve": "the relational database"
+      },
+      "mysql": {
+        "cosa": "Relational too, and used everywhere.",
+        "breve": "relational too"
+      },
+      "mongodb": {
+        "cosa": "Documents instead of tables, when the schema changes often.",
+        "breve": "documents instead of tables"
+      },
+      "prisma": {
+        "cosa": "The ORM: the schema in one file, typed queries.",
+        "breve": "the ORM"
+      },
+      "drizzle": {
+        "cosa": "The lightweight ORM, close to SQL.",
+        "breve": "the lightweight ORM"
+      },
+      "vercel": {
+        "cosa": "The front end at the edge, close to whoever opens it.",
+        "breve": "the front end at the edge"
+      },
+      "railway": {
+        "cosa": "Servers, databases and Redis without managing machines.",
+        "breve": "servers without machines"
+      },
+      "docker": {
+        "cosa": "The same environment from my computer to production.",
+        "breve": "the same environment everywhere"
+      },
+      "typescript": {
+        "cosa": "Types, from the browser to the database: if data changes shape, I find out first.",
+        "breve": "the types"
+      },
+      "git": {
+        "cosa": "The history of every line.",
+        "breve": "the history of every line"
+      },
+      "vitest": {
+        "cosa": "Tests: what has to keep working, written down.",
+        "breve": "the tests"
+      },
+      "zod": {
+        "cosa": "Validation: the same schema checks the form and the API.",
+        "breve": "validation"
+      },
+      "langchain": {
+        "cosa": "Connects the model to documents and tools.",
+        "breve": "the model wired to documents"
+      },
+      "vercel-ai-sdk": {
+        "cosa": "Streamed answers inside the interface.",
+        "breve": "streamed answers"
+      },
+      "pgvector": {
+        "cosa": "Search by meaning, inside PostgreSQL.",
+        "breve": "search by meaning"
+      }
+    },
+    "capi": {
+      "vetrina": {
+        "nome": "A showcase site",
+        "slug": "showcase",
+        "perche": "Fast, findable, a pleasure to scroll. No back end: it doesn't need one.",
+        "alt": {
+          "gsap": "if the animation is only components coming and going"
+        }
+      },
+      "ecommerce": {
+        "nome": "An online shop",
+        "slug": "shop",
+        "perche": "Catalogue, cart, orders: the data matters, and queues keep the orders safe.",
+        "alt": {
+          "postgresql": "if your management software already uses it",
+          "express": "if the shop grows and the back end gets big"
+        }
+      },
+      "piattaforma": {
+        "nome": "A platform",
+        "slug": "platform",
+        "perche": "Many users, roles and permissions, things that change in real time.",
+        "alt": {
+          "clerk": "if user data has to stay entirely on your side",
+          "trpc": "if other apps need to read the same data"
+        }
+      },
+      "assistente": {
+        "nome": "An AI assistant",
+        "slug": "assistant",
+        "perche": "Answers from your real documents, and hands over to a person when it doesn't know.",
+        "alt": {
+          "supabase-auth": "if the assistant lives inside a platform that already has its own sign-in"
         }
       }
     }

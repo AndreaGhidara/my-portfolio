@@ -3,6 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import { ServicesView } from "../ServicesView";
 import type { ServicesViewProps } from "../ServicesView";
 import { LABEL, drawWidth } from "../layers";
+import { testi } from "../cassetta/__tests__/fixture";
 
 /** Il quarto, come nel tavolo vero: il mondo verticale disegna i primi quattro
  *  oggetti di ogni strato, e il post-it bianco deve stare fra quelli. */
@@ -36,6 +37,12 @@ const props: ServicesViewProps = {
   blank: "E la tua, qual è?",
   note: "23.777 caffè",
   layers: [layer("site", 6), layer("logic", 6), layer("infra", 6), layer("growth", 6, true)],
+  cassetta: {
+    eyebrow: "Gli attrezzi",
+    title: "Tutto quello che so usare.",
+    lead: "La mia cassetta.",
+    testi: testi("it"),
+  },
 };
 
 describe("la sezione del tavolo", () => {
@@ -46,7 +53,18 @@ describe("la sezione del tavolo", () => {
 
   it("ha un titolo vero, non un titolo disegnato", () => {
     render(<ServicesView {...props} />);
-    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(props.stageTitle);
+    expect(screen.getByRole("heading", { level: 2, name: props.stageTitle })).toBeInTheDocument();
+  });
+
+  it("dopo il tavolo viene la cassetta degli attrezzi, dentro la stessa sezione", () => {
+    const { container } = render(<ServicesView {...props} />);
+    const sezione = container.querySelector("section#services") as HTMLElement;
+    const figli = [...sezione.children];
+    expect(figli[0]).toHaveAttribute("data-desk");
+    expect(figli[1]).toHaveAttribute("data-cassetta-sezione");
+    expect(within(figli[1] as HTMLElement).getByRole("heading", { level: 2 })).toHaveTextContent(
+      props.cassetta.title,
+    );
   });
 
   it("dice la sua tesi: è quella la ragione per cui la sezione esiste", () => {
