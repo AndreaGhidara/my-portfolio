@@ -448,7 +448,22 @@
       "close": "Chiudi",
       "riporta": "riporta davanti la cartella",
       "screenshotAlt": "{name}: schermata del progetto",
-      "riservato": "Coperto da accordo di riservatezza"
+      "riservato": "Coperto da accordo di riservatezza",
+      "archivio": "Archivio lavori",
+      "pratica": "Pratica n.",
+      "comEra": "Com'era, quando sono arrivato",
+      "cliente": "Cliente",
+      "anno": "Anno",
+      "stato": "Stato",
+      "online": "Online",
+      "allegato": "Allegato A · la piattaforma oggi",
+      "rilevato": "Rilevato a fine lavoro",
+      "rilevatoFinora": "Rilevato finora",
+      "stima": "stima",
+      "consegnato": "Consegnato",
+      "inCorso": "In corso",
+      "firmaNome": "A. Ghidara",
+      "firmaRuolo": "sviluppatore"
     },
     "list": {
       "riservato": {

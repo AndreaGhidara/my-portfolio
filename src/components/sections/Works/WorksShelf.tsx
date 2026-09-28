@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { MEDIA } from "@/animations/motionPolicy";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { MEDIA, useMotionLevel } from "@/animations/motionPolicy";
 import { senzaSpostare } from "@/animations/senzaSpostare";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import { lenisAttiva } from "@/components/shell/SmoothScroll";
@@ -9,9 +9,90 @@ import { LINGUETTA, PARAMETRI, ciSta, profondita, ridecidere, ritorno, tonoLingu
 import { WorkFolder } from "./WorkFolder";
 import { WorkDialog } from "./WorkDialog";
 import { preloadShot } from "./preloadShot";
+import { scivola, type Cartella, type Moto, type Scivolata } from "./scivola";
 import type { WorkCaseData, WorkCaseLabels } from "./types";
 
-type Active = { data: WorkCaseData; origin: DOMRect };
+/**
+ * Una pratica in corso, dal clic a quando la cartella e' di nuovo ferma.
+ * `apre`: la cartella cade e la pratica si allarga; `aperta`; `chiude`: la
+ * pratica si stringe; `risale`: il dialog e' chiuso e la cartella torna su.
+ */
+type Corso = {
+  fase: "apre" | "aperta" | "chiude" | "risale";
+  cartella: Cartella;
+  moto: Moto;
+  /** Null finche' la cartella non e' davanti e in vista: poi cade. */
+  scivolata: Scivolata | null;
+  /** Il contenuto e' nel DOM (l'effetto dopo il commit e' passato). */
+  montata: boolean;
+  /** I tempi 3 e 4 sono partiti. */
+  avviata: boolean;
+  /** Esc o × durante l'apertura: si chiude appena aperta. */
+  chiudiDopo: boolean;
+  /** Un clic durante la risalita: QUALE cartella, da aprire appena ferma. */
+  apriDopo: { i: number; cartella: Cartella } | null;
+};
+
+/** Una pratica aperta ferma tutto quello che misura la pagina sotto. */
+const praticaAperta = () => document.documentElement.hasAttribute("data-dialog-open");
+
+/** Ms: quanto dura lo scroll che porta davanti la cartella prima che cada. */
+const SVELTO = 350;
+
+/**
+ * Porta la pagina a `y`. "subito" salta; "svelto" scorre in SVELTO ms, prima
+ * che la cartella cada; "morbido" e' il ritorno della linguetta. Con Lenis
+ * acceso lo chiede a lui (vedi vaiA). La promessa si risolve a scroll finito:
+ * con Lenis da onComplete, senza da scrollend, e comunque entro una scadenza,
+ * perche' scrollend non arriva se la pagina e' gia' li' e onComplete non
+ * arriva se lo scroll viene interrotto.
+ */
+function scorri(y: number, modo: "subito" | "svelto" | "morbido"): Promise<void> {
+  const lenis = lenisAttiva();
+  if (modo === "subito") {
+    if (lenis) lenis.scrollTo(y, { immediate: true });
+    else window.scrollTo({ top: y, behavior: "instant" });
+    return Promise.resolve();
+  }
+  return new Promise((risolvi) => {
+    let fatto = false;
+    const fine = () => {
+      if (fatto) return;
+      fatto = true;
+      window.clearTimeout(scadenza);
+      window.removeEventListener("scrollend", fine);
+      risolvi();
+    };
+    const scadenza = window.setTimeout(fine, (modo === "svelto" ? SVELTO : 1100) + 400);
+    if (lenis) {
+      // lock: la rotellina non si mette in mezzo mentre la cartella arriva.
+      lenis.scrollTo(y, modo === "svelto" ? { duration: SVELTO / 1000, lock: true, onComplete: fine } : { onComplete: fine });
+      return;
+    }
+    if (Math.abs(window.scrollY - y) < 1) {
+      fine();
+      return;
+    }
+    window.addEventListener("scrollend", fine);
+    window.scrollTo({ top: y, behavior: "smooth" });
+  });
+}
+
+/**
+ * In colonna: la cartella puo' essere cliccata dal fondo della faccia, col
+ * foglio sopra lo schermo. Il foglio e' da dove parte la pratica, e deve
+ * vedersi sotto la testata del sito: si scorre quel tanto, svelti. Null se
+ * c'e' gia' (o se non c'e' layout da misurare).
+ */
+function portaInVista(cartella: Cartella): Promise<void> | null {
+  const foglio = cartella.foglio.getBoundingClientRect();
+  if (foglio.height === 0) return null;
+  const testata = document.querySelector<HTMLElement>("[data-site-header]")?.offsetHeight ?? 0;
+  // 40px: i 22 di cui il foglio sale sfilando, e un respiro.
+  const margine = testata + 40;
+  if (foglio.top >= margine) return null;
+  return scorri(Math.max(0, window.scrollY + foglio.top - margine), "svelto");
+}
 
 /**
  * Le misure dell'archivio arrivano al CSS da qui, scritte nel markup del
@@ -78,7 +159,9 @@ function facceNellaSonda(lista: HTMLElement) {
  *
  * Lo stato del dossier sta qui e non nelle singole cartelle perche' il dialog e'
  * uno solo: uno per cartella significherebbe quattro <dialog> nel DOM, quattro
- * trappole di focus e la certezza che prima o poi se ne aprano due.
+ * trappole di focus e la certezza che prima o poi se ne aprano due. Qui sta
+ * anche la coda: aprire e chiudere durano un secondo e mezzo ciascuno, e un
+ * clic o un Esc nel mezzo non si perde ne' si accavalla.
  */
 export function WorksShelf({
   items,
@@ -87,11 +170,22 @@ export function WorksShelf({
   items: WorkCaseData[];
   labels: WorkCaseLabels;
 }) {
-  const [active, setActive] = useState<Active | null>(null);
+  const [active, setActive] = useState<number | null>(null);
   const [ciStanno, setCiStanno] = useState(false);
+  const level = useMotionLevel();
+  const livello = useRef(level);
   const schedario = useRef<HTMLOListElement | null>(null);
+  const dialogo = useRef<HTMLDialogElement | null>(null);
+  const corso = useRef<Corso | null>(null);
   /** Ad archivio acceso: riporta davanti la cartella `i`. Null in colonna. */
   const riportaDavanti = useRef<((i: number) => void) | null>(null);
+  /** Ad archivio acceso: la cartella `i` davanti del tutto, prima che cada.
+   *  Una promessa se deve scorrere, null se e' gia' pronta. */
+  const preparaCaduta = useRef<((i: number) => Promise<void> | null) | null>(null);
+
+  useEffect(() => {
+    livello.current = level;
+  }, [level]);
 
   /* Si decide al montaggio, quando arrivano i caratteri (cambiano la riga), e
      poi al resize secondo ridecidere(): una larghezza nuova subito, una sola
@@ -105,6 +199,8 @@ export function WorksShelf({
     let larghezza = window.innerWidth;
     let inVista = false;
     let inSospeso = false;
+    /** Un resize arrivato a pratica aperta: si pesa alla chiusura. */
+    let resizeSospeso = false;
     const fine = window.matchMedia(MEDIA.finePointer);
     // Solo in sviluppo e solo con ?righelli: un archivio che resta in colonna
     // senza dire perche' non si diagnostica.
@@ -113,6 +209,13 @@ export function WorksShelf({
       new URLSearchParams(window.location.search).has("righelli");
     const decidi = () => {
       if (!vivo) return;
+      // A pratica aperta l'archivio sotto non si spegne: una rotazione del
+      // telefono misurerebbe una lista con la cartella caduta. Si decide alla
+      // chiusura.
+      if (praticaAperta()) {
+        inSospeso = true;
+        return;
+      }
       inSospeso = false;
       const facce = facceNellaSonda(lista);
       const esito = ciSta(facce);
@@ -125,6 +228,12 @@ export function WorksShelf({
       setCiStanno(esito);
     };
     const alResize = () => {
+      // A pratica aperta si segna e basta, senza toccare `larghezza`: alla
+      // chiusura si confronta con quella di prima dell'apertura.
+      if (praticaAperta()) {
+        resizeSospeso = true;
+        return;
+      }
       const cambiata = window.innerWidth !== larghezza;
       larghezza = window.innerWidth;
       const quando = ridecidere({ larghezzaCambiata: cambiata, puntatoreFine: fine.matches, inVista });
@@ -135,13 +244,27 @@ export function WorksShelf({
       inVista = voce.isIntersecting;
       if (!inVista && inSospeso) decidi();
     });
+    /* Chiusa la pratica, quello che e' rimasto sospeso passa dalle stesse
+       regole di sempre: un resize da ridecidere(), cosi' una sola altezza non
+       rimodella l'archivio sotto gli occhi; il resto solo se l'archivio non e'
+       sullo schermo, come fa l'IntersectionObserver. */
+    const dossier = new MutationObserver(() => {
+      if (praticaAperta()) return;
+      if (resizeSospeso) {
+        resizeSospeso = false;
+        alResize();
+      }
+      if (inSospeso && !inVista) decidi();
+    });
     osservatore.observe(lista.closest("section") ?? lista);
+    dossier.observe(document.documentElement, { attributeFilter: ["data-dialog-open"] });
     decidi();
     void document.fonts?.ready.then(decidi);
     window.addEventListener("resize", alResize);
     return () => {
       vivo = false;
       osservatore.disconnect();
+      dossier.disconnect();
       window.removeEventListener("resize", alResize);
     };
   }, []);
@@ -196,6 +319,9 @@ export function WorksShelf({
         );
 
       const muovi = () => {
+        // A pratica aperta la cartella e' caduta, e Lenis e' fermo: niente da
+        // riscrivere. Si rifa' alla chiusura (vedi `dossier` sotto).
+        if (praticaAperta()) return;
         // Tre decimali bastano all'occhio, e risparmiano le scritture (e il
         // ricalcolo degli stili della cartella) quando lo scroll non cambia
         // niente.
@@ -222,9 +348,15 @@ export function WorksShelf({
         });
       };
       const alResize = () => {
+        if (praticaAperta()) return;
         misura();
         muovi();
       };
+      // Come in SottoIlFoglio: chiusa la pratica, si rimisura quello che un
+      // resize nel frattempo ha cambiato.
+      const dossier = new MutationObserver(() => {
+        if (!praticaAperta()) alResize();
+      });
 
       /* Il ritorno: la pagina risale fin dove la cartella si e' appena fermata.
          Morbido per la linguetta a "full", istantaneo altrove e per il fuoco.
@@ -233,16 +365,13 @@ export function WorksShelf({
          fotogramma dopo. Senza, "instant" e non "auto", che obbedisce a
          scroll-behavior. Le misure si rifanno qui: costano poco, e un
          carattere arrivato tardi puo' averle spostate. */
-      const vaiA = (i: number, morbido: boolean) => {
+      const vaiA = (i: number, modo: "subito" | "svelto" | "morbido") => {
         misura();
         const y = Math.max(0, ritorno({ inizio, passo, fermi, i, schermo }));
-        const lenis = lenisAttiva();
-        if (lenis) {
-          lenis.scrollTo(y, { immediate: !morbido });
-          return;
-        }
-        window.scrollTo({ top: y, behavior: morbido && level === "full" ? "smooth" : "instant" });
+        return scorri(y, modo === "morbido" && !lenisAttiva() && level !== "full" ? "subito" : modo);
       };
+      /** Il ritorno morbido della linguetta in corsa, se ce n'e' uno. */
+      let ritornoInCorsa: object | null = null;
 
       /* Il fuoco svela, come in SottoIlFoglio e nel tavolo. Le cartelle
          coperte restano raggiungibili da tastiera, e un fuoco su una cartella
@@ -255,7 +384,7 @@ export function WorksShelf({
         const cartella = preso.closest<HTMLElement>("[data-cartella]");
         const i = cartella ? cartelle.indexOf(cartella) : -1;
         if (i < 0 || quanto()[i] <= 0) return;
-        vaiA(i, false);
+        void vaiA(i, "subito");
       };
 
       const sezione = lista.closest("section") ?? lista;
@@ -268,18 +397,43 @@ export function WorksShelf({
       // Dopo l'accensione: i `top` sticky e i rettangoli valgono solo da qui.
       misura();
       muovi();
-      riportaDavanti.current = (i) => vaiA(i, true);
+      riportaDavanti.current = (i) => {
+        const questo = {};
+        ritornoInCorsa = questo;
+        void vaiA(i, "morbido").then(() => {
+          if (ritornoInCorsa === questo) ritornoInCorsa = null;
+        });
+      };
+      /* La cartella che si apre e' sempre davanti, o la pratica ferma Lenis a
+         meta' e la cartella cade mezza coperta. Riportata con la linguetta e
+         cliccata a ritorno in corsa: il ritorno si completa subito, e' gia'
+         quasi finito. Solo in parte coperta: si torna indietro svelti e
+         morbidi, e cade quando e' ferma. La profondita' si riscrive prima che
+         data-dialog-open fermi muovi(). */
+      preparaCaduta.current = (i) => {
+        if (ritornoInCorsa) {
+          ritornoInCorsa = null;
+          void vaiA(i, "subito");
+        } else if (quanto()[i] > 0.001) {
+          return vaiA(i, "svelto").then(muovi);
+        }
+        muovi();
+        return null;
+      };
 
       window.addEventListener("scroll", alloScroll, { passive: true });
       window.addEventListener("resize", alResize);
       lista.addEventListener("focusin", alFuoco);
+      dossier.observe(document.documentElement, { attributeFilter: ["data-dialog-open"] });
 
       return () => {
         cancelAnimationFrame(fotogramma);
         window.removeEventListener("scroll", alloScroll);
         window.removeEventListener("resize", alResize);
         lista.removeEventListener("focusin", alFuoco);
+        dossier.disconnect();
         riportaDavanti.current = null;
+        preparaCaduta.current = null;
         for (const c of cartelle) {
           c.style.removeProperty("--profondita");
           c.removeAttribute("data-tono-linguetta");
@@ -295,6 +449,150 @@ export function WorksShelf({
     schedario,
     [ciStanno],
   );
+
+  const chiudi = useCallback(() => {
+    const c = corso.current;
+    const dialog = dialogo.current;
+    if (!c || !dialog) return;
+    if (c.fase === "apre") {
+      c.chiudiDopo = true;
+      return;
+    }
+    if (c.fase !== "aperta" || !c.scivolata) return;
+    c.fase = "chiude";
+    void c.scivolata.chiudi(dialog);
+  }, []);
+  /* Tempi 3 e 4: partono quando ci sono tutti e due, la cartella che cade
+     e il contenuto nel DOM (l'effetto dopo il commit). */
+  const avanti = useCallback(
+    (c: Corso) => {
+      const dialog = dialogo.current;
+      if (corso.current !== c || !c.scivolata || !c.montata || c.avviata || !dialog) return;
+      c.avviata = true;
+      void c.scivolata.apri(dialog).then(() => {
+        if (corso.current !== c || c.fase !== "apre") return;
+        c.fase = "aperta";
+        if (c.chiudiDopo) chiudi();
+      });
+    },
+    [chiudi],
+  );
+
+  /* Tempo 1, con la cartella davanti e in vista. data-dialog-open da qui:
+     Lenis si ferma prima che la cartella cada, e lo scroll non riscrive
+     `--profondita` mentre cade. */
+  const cade = useCallback(
+    (c: Corso) => {
+      if (corso.current !== c) return;
+      document.documentElement.setAttribute("data-dialog-open", "");
+      c.scivolata = scivola(c.cartella, c.moto);
+      avanti(c);
+    },
+    [avanti],
+  );
+
+  /* Il clic. L'archivio inerte da subito, perche' sotto la cartella caduta
+     c'e' la faccia della precedente, e il contenuto nel DOM da subito. Se la
+     cartella non e' davanti o non e' in vista la pagina scorre prima, svelta,
+     e la cartella cade quando e' ferma. */
+  const apri = useCallback(
+    (i: number, cartella: Cartella) => {
+      const c = corso.current;
+      if (c) {
+        if (c.fase === "risale") c.apriDopo = { i, cartella };
+        return;
+      }
+      const moto: Moto = livello.current === "none" ? "dissolvenza" : "quattro-tempi";
+      const nuovo: Corso = {
+        fase: "apre",
+        cartella,
+        moto,
+        scivolata: null,
+        montata: false,
+        avviata: false,
+        chiudiDopo: false,
+        apriDopo: null,
+      };
+      corso.current = nuovo;
+      schedario.current?.setAttribute("inert", "");
+      // La barra in basso resta finche' non arriva il velo (vedi tokens.css).
+      document.documentElement.setAttribute("data-pratica-in-corso", "");
+      setActive(i);
+      const attesa =
+        moto === "quattro-tempi" ? (preparaCaduta.current ? preparaCaduta.current(i) : portaInVista(cartella)) : null;
+      if (attesa) void attesa.then(() => cade(nuovo));
+      else cade(nuovo);
+    },
+    [cade],
+  );
+
+
+  /* Esc fra il clic e showModal(): la cartella cade e il dialog non c'e'
+     ancora, quindi niente cancel. Non si perde: si chiude appena aperta. */
+  useEffect(() => {
+    const alTasto = (event: KeyboardEvent) => {
+      const c = corso.current;
+      if (event.key !== "Escape" || !c || c.fase !== "apre" || dialogo.current?.open) return;
+      c.chiudiDopo = true;
+    };
+    document.addEventListener("keydown", alTasto);
+    return () => document.removeEventListener("keydown", alTasto);
+  }, []);
+
+  /* La cartella e' di nuovo ferma: la pagina torna libera. Il fuoco torna
+     esplicito su «Apri il caso»: la faccia cliccata non lo prende, e il
+     ritorno nativo del dialog finirebbe su body. */
+  const ferma = useCallback(
+    (c: Corso) => {
+      if (corso.current !== c) return;
+      c.scivolata?.ferma();
+      corso.current = null;
+      schedario.current?.removeAttribute("inert");
+      document.documentElement.removeAttribute("data-dialog-open");
+      document.documentElement.removeAttribute("data-pratica-in-corso");
+      c.cartella.apri.focus({ preventScroll: true });
+      if (c.apriDopo) apri(c.apriDopo.i, c.apriDopo.cartella);
+    },
+    [apri],
+  );
+
+  /* Il close del dialog, da qualunque parte arrivi. Il close watcher (al
+     secondo Esc, o col gesto indietro di Android) chiude il dialog da solo,
+     anche a chiusura orchestrata gia' partita: quello che resta del foglio si
+     salta sempre, e si passa alla risalita. Chiusa da chiudi(), il foglio e'
+     gia' lasciato e rifarlo non cambia niente. */
+  const alClose = useCallback(() => {
+    setActive(null);
+    const c = corso.current;
+    const dialog = dialogo.current;
+    if (!c || c.fase === "risale") return;
+    if (dialog) c.scivolata?.lasciaIlFoglio(dialog);
+    c.fase = "risale";
+    void (c.scivolata?.risali() ?? Promise.resolve()).then(() => ferma(c));
+  }, [ferma]);
+
+  useEffect(() => {
+    const c = corso.current;
+    if (active === null || !c || c.fase !== "apre") return;
+    c.montata = true;
+    avanti(c);
+  }, [active, avanti]);
+
+  /* Smontato a meta': niente pagina bloccata ne' archivio inerte. */
+  useEffect(() => {
+    const lista = schedario.current;
+    const dialog = dialogo.current;
+    return () => {
+      const c = corso.current;
+      if (!c) return;
+      corso.current = null;
+      c.scivolata?.ferma();
+      if (dialog?.open) dialog.close();
+      lista?.removeAttribute("inert");
+      document.documentElement.removeAttribute("data-dialog-open");
+      document.documentElement.removeAttribute("data-pratica-in-corso");
+    };
+  }, []);
 
   /** In colonna la linguetta porta la sua cartella in cima, sotto la testata. */
   const riporta = (i: number) => {
@@ -332,7 +630,7 @@ export function WorksShelf({
             openLabel={labels.open}
             riservatoLabel={labels.riservato}
             riportaLabel={labels.riporta}
-            onOpen={(data, origin) => setActive({ data, origin })}
+            onOpen={(cartella) => apri(index, cartella)}
             onPreload={() => preloadShot(item.screenshot)}
             onRiporta={() => riporta(index)}
           />
@@ -340,10 +638,13 @@ export function WorksShelf({
       </ol>
 
       <WorkDialog
-        data={active?.data ?? null}
-        origin={active?.origin ?? null}
+        dialogo={dialogo}
+        data={active === null ? null : (items[active] ?? null)}
+        numero={(active ?? 0) + 1}
+        totale={items.length}
         labels={labels}
-        onClose={() => setActive(null)}
+        onChiudi={chiudi}
+        onClose={alClose}
       />
     </>
   );

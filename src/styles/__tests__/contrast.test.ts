@@ -174,6 +174,24 @@ describe("l'archivio dei Lavori", () => {
   });
 });
 
+describe("la pratica dei Lavori, carta in tutti e due i temi", () => {
+  // Il foglio non segue il tema: --carta, --tenue e --arancio valgono uguali
+  // sul chiaro e sullo scuro, e le coppie qui sotto valgono per tutti e due.
+  // Valori risolti da Chrome (disegnati su una tela e letti dal pixel).
+  const arancio = "#A44428"; // --accento-su-carta: arancio al 72% nell'inchiostro
+  const allegato = "#EBE7DE"; // il fondo dell'allegato: inchiostro al 4% nella carta
+
+  it("il tenue supera AA sulla carta e sul fondo dell'allegato", () => {
+    expect(contrastRatio(palette.muted, palette.paper)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(palette.muted, allegato)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("l'arancio del timbro e dei numeri supera AA sulla carta, dove l'arancio pieno no", () => {
+    expect(contrastRatio(arancio, palette.paper)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(palette.orange, palette.paper)).toBeLessThan(4.5);
+  });
+});
+
 describe("l'editor della cassetta, scuro in tutti e due i temi", () => {
   // I fondi sono quelli risolti da Chrome (disegnati su una tela e letti dal
   // pixel): la riga nuova e' l'arancio al 10% nell'inchiostro, le barre la

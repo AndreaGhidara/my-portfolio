@@ -2,9 +2,11 @@
 
 import { useRef, type CSSProperties } from "react";
 import { WorkShot } from "./WorkShot";
+import type { Cartella } from "./scivola";
 import type { WorkCaseData } from "./types";
 
-const due = (n: number) => String(n).padStart(2, "0");
+/** Il numero della cartella a due cifre: sulla faccia e sulla pratica. */
+export const due = (n: number) => String(n).padStart(2, "0");
 
 /**
  * Una cartella dell'archivio: la linguetta col nome, il dorso con un foglio
@@ -18,7 +20,9 @@ const due = (n: number) => String(n).padStart(2, "0");
  * La linguetta e' un bottone suo, fratello della faccia e non annidato: quando
  * la cartella e' archiviata e' l'unica parte che si vede, e deve prendere il
  * click per intero. Riporta davanti la sua cartella. La faccia apre il dossier,
- * dal bottone «Apri il caso» o da un click qualunque sopra.
+ * dal bottone «Apri il caso» o da un click qualunque sopra: la cartella scivola
+ * via e ne esce la pratica (vedi scivola.ts), quindi al dossier passano i
+ * pezzi della cartella e non un rettangolo.
  */
 export function WorkFolder({
   data,
@@ -39,25 +43,36 @@ export function WorkFolder({
   riservatoLabel: string;
   /** Per chi legge a voce: la linguetta non apre il caso, lo riporta davanti. */
   riportaLabel: string;
-  onOpen: (data: WorkCaseData, origin: DOMRect) => void;
+  onOpen: (cartella: Cartella) => void;
   /** Chiesto appena si capisce che questa cartella sta per aprirsi. */
   onPreload: () => void;
   /** La linguetta: questa cartella torna davanti. */
   onRiporta: () => void;
 }) {
-  const riquadro = useRef<HTMLDivElement | null>(null);
+  const li = useRef<HTMLLIElement | null>(null);
+  const linguetta = useRef<HTMLButtonElement | null>(null);
+  const dorso = useRef<HTMLDivElement | null>(null);
+  const foglio = useRef<HTMLDivElement | null>(null);
+  const faccia = useRef<HTMLDivElement | null>(null);
+  const bottone = useRef<HTMLButtonElement | null>(null);
 
-  // Il dossier cresce dalla schermata, non dalla faccia intera: e' la cosa che
-  // si sta guardando, e una faccia a tutta pagina darebbe una partenza grande
-  // quasi quanto l'arrivo. Il rettangolo si legge al click, cioe' dopo un
-  // eventuale ritorno della cartella davanti.
   const apri = () => {
-    if (riquadro.current) onOpen(data, riquadro.current.getBoundingClientRect());
+    if (!li.current || !linguetta.current || !dorso.current || !foglio.current || !faccia.current || !bottone.current) {
+      return;
+    }
+    onOpen({
+      li: li.current,
+      linguetta: linguetta.current,
+      dorso: dorso.current,
+      faccia: faccia.current,
+      foglio: foglio.current,
+      apri: bottone.current,
+    });
   };
 
   return (
-    <li data-cartella style={{ "--i": index } as CSSProperties}>
-      <button type="button" data-linguetta onClick={onRiporta}>
+    <li ref={li} data-cartella style={{ "--i": index } as CSSProperties}>
+      <button ref={linguetta} type="button" data-linguetta onClick={onRiporta}>
         <b>{data.name}</b>
         {/* Sul telefono la linguetta porta solo il nome: quattro in fila non
             ci starebbero con l'anno, e l'anno lo dice la faccia. */}
@@ -68,13 +83,15 @@ export function WorkFolder({
       {/* Ad archivio acceso il dorso prende il puntatore (vedi tokens.css) e
           non fa niente: e' la fascia fra le linguette e la faccia, e un click
           li' non deve arrivare alla faccia di una cartella coperta. */}
-      <div data-dorso aria-hidden="true" />
-      <div data-foglio aria-hidden="true" />
+      <div ref={dorso} data-dorso aria-hidden="true" />
+      {/* Il foglio che spunta: e' lui che sfila quando la cartella si apre. */}
+      <div ref={foglio} data-foglio aria-hidden="true" />
 
       {/* Un click sulla faccia apre il caso come il suo bottone: sono la
           stessa cosa. Il bottone c'e' per la tastiera e per chi legge a voce,
           e la faccia gli delega il puntatore. */}
       <div
+        ref={faccia}
         data-faccia
         onClick={(event) => {
           if ((event.target as Element).closest("button")) return;
@@ -101,9 +118,9 @@ export function WorkFolder({
 
         <div data-faccia-centro>
           <p data-faccia-riga>{data.riga}</p>
-          <div ref={riquadro} data-faccia-schermata>
+          <div data-faccia-schermata>
             {data.screenshot ? (
-              <WorkShot shot={data.screenshot} alt={data.screenshotAlt} riempie />
+              <WorkShot shot={data.screenshot} alt={data.screenshotAlt} />
             ) : (
               <p data-faccia-riservato>{riservatoLabel}</p>
             )}
@@ -116,7 +133,7 @@ export function WorkFolder({
               <li key={voce}>{voce}</li>
             ))}
           </ul>
-          <button type="button" data-apri aria-haspopup="dialog" onClick={apri}>
+          <button ref={bottone} type="button" data-apri aria-haspopup="dialog" onClick={apri}>
             {openLabel} <span aria-hidden="true">+</span>
             <span className="sr-only">: {data.name}</span>
           </button>

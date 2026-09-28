@@ -448,7 +448,22 @@
       "close": "Close",
       "riporta": "bring this folder to the front",
       "screenshotAlt": "{name}: screenshot of the project",
-      "riservato": "Covered by a non-disclosure agreement"
+      "riservato": "Covered by a non-disclosure agreement",
+      "archivio": "Work archive",
+      "pratica": "Case no.",
+      "comEra": "How it was when I arrived",
+      "cliente": "Client",
+      "anno": "Year",
+      "stato": "Status",
+      "online": "Online",
+      "allegato": "Attachment A · the platform today",
+      "rilevato": "Recorded at handover",
+      "rilevatoFinora": "Recorded so far",
+      "stima": "estimate",
+      "consegnato": "Delivered",
+      "inCorso": "In progress",
+      "firmaNome": "A. Ghidara",
+      "firmaRuolo": "developer"
     },
     "list": {
       "riservato": {
