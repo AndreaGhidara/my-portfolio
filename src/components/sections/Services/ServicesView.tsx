@@ -1,5 +1,7 @@
 import { DeskStage } from "./DeskStage";
 import type { DeskLayerData } from "./DeskTable";
+import { CassettaView } from "./cassetta/CassettaView";
+import type { TestiCassetta } from "./cassetta/tipi";
 
 export type ServicesViewProps = {
   eyebrow: string;
@@ -18,6 +20,7 @@ export type ServicesViewProps = {
   note: string;
   punch: string;
   layers: DeskLayerData[];
+  cassetta: { eyebrow: string; title: string; lead: string; testi: TestiCassetta };
 };
 
 /**
@@ -26,7 +29,8 @@ export type ServicesViewProps = {
  *
  * Sotto il tavolo c'era «E in pratica?», le quattro voci con i loro disegni e
  * una freccia che le attraversava. E' stata tolta: le quattro descrizioni
- * adesso si leggono sullo scontrino.
+ * adesso si leggono sullo scontrino. Al suo posto c'e' la cassetta degli
+ * attrezzi, cioe' con cosa lo costruisco.
  */
 export function ServicesView({
   eyebrow,
@@ -38,6 +42,7 @@ export function ServicesView({
   note,
   punch,
   layers,
+  cassetta,
 }: ServicesViewProps) {
   return (
     <section id="services" className="relative">
@@ -52,6 +57,7 @@ export function ServicesView({
         punch={punch}
         layers={layers}
       />
+      <CassettaView {...cassetta} />
     </section>
   );
 }

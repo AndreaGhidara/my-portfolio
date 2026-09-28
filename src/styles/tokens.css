@@ -3631,6 +3631,588 @@ textarea[data-contact-campo] {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
+   LA CASSETTA DEGLI ATTREZZI
+
+   Dentro i Servizi, subito dopo il tavolo. Due viste nella stessa sezione,
+   tutte e due nel markup del server: la mappa con il mouse da 1280px in su,
+   l'editor altrove. Le sceglie questo foglio, con la stessa condizione che
+   Cassetta.tsx usa per sapere quale animare: nessuno scambio dopo il
+   montaggio, e la sezione ha la stessa altezza prima e dopo il JavaScript.
+
+   I colori sono quelli della famiglia, e basta: le nove zone si distinguono
+   per tono (quanto arancio o quanto inchiostro dentro il fondo), per trama
+   (vuota, a righe, a punti, a quadretti) e per il passo dell'orlo cucito.
+   Il verde e il giallo della tavolozza restano ai loro due usi.
+
+   I numeri sono quelli del prototipo (docs/prototipi/2026-09-27-cassetta-
+   sarto.html per la mappa e l'etichetta, 2026-09-27-cassetta-tech.html,
+   proposta T3, per l'editor).
+   ══════════════════════════════════════════════════════════════════════════ */
+[data-cassetta-sezione] {
+  position: relative;
+  max-width: 90rem;
+  margin-inline: auto;
+  /* Sopra non si aggiunge niente: il tavolo fermo chiude gia' con il suo
+     --section-y, e sommarne un altro faceva sedici rem di vuoto. A "full" il
+     tavolo chiude sulla tesi con 9vh sotto, e la cassetta ne aggiunge meta'
+     (vedi sotto, dentro no-preference). */
+  padding: 0 var(--gutter) var(--section-y);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-desk][data-motion="full"] + [data-cassetta-sezione] {
+    padding-block-start: calc(var(--section-y) / 2);
+  }
+}
+
+[data-cassetta-testa] h2 { margin-top: 0.75rem; font-size: clamp(1.9rem, 4vw, 3rem); text-wrap: balance; }
+[data-cassetta-testa] p:not(.eyebrow) { margin-top: 1rem; line-height: 1.6; color: var(--fg-muted); }
+
+/* La barra alta del sito, 60px misurati come nel percorso e nell'archivio. */
+[data-cassetta] { --testata: 3.75rem; margin-top: 1.75rem; }
+
+/* I toni delle zone. `--c` e' il colore della zona (i bordi a punti, le barre
+   della composizione, lo snodo), `--f` il fondo della pezza, `--su` il testo
+   sopra lo snodo pieno, `--orlo` il passo della cucitura. Tutto misto con
+   --bg e --fg, cosi' nel tema scuro le pezze restano pezze e non macchie. */
+[data-cassetta] [data-zona="front"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 22%, var(--bg)); --su: var(--on-accent); --orlo: 7 5; }
+[data-cassetta] [data-zona="stili"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 11%, var(--bg)); --su: var(--on-accent); --orlo: 3 3; }
+[data-cassetta] [data-zona="mezzo"] { --c: var(--fg-muted); --f: color-mix(in oklab, var(--fg) 7%, var(--bg)); --su: var(--bg); --orlo: 7 5; }
+[data-cassetta] [data-zona="back"] { --c: var(--fg); --f: color-mix(in oklab, var(--fg) 13%, var(--bg)); --su: var(--bg); --orlo: 10 4; }
+[data-cassetta] [data-zona="auth"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 13%, var(--bg)); --su: var(--on-accent); --orlo: 7 5; }
+[data-cassetta] [data-zona="dati"] { --c: var(--fg); --f: color-mix(in oklab, var(--fg) 9%, var(--bg)); --su: var(--bg); --orlo: 2 4; }
+[data-cassetta] [data-zona="casa"] { --c: var(--fg-muted); --f: color-mix(in oklab, var(--fg) 4%, var(--bg)); --su: var(--bg); --orlo: 7 5; }
+[data-cassetta] [data-zona="ai"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 6%, var(--bg)); --su: var(--on-accent); --orlo: 12 4; }
+[data-cassetta] [data-zona="ovunque"] { --c: var(--fg-muted); --f: var(--bg); --su: var(--bg); --orlo: 4 3; }
+
+/* ── Cuci per ── */
+[data-cassetta-cuci] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+[data-cassetta-cuci] > span {
+  flex: none;
+  margin-right: 0.3rem;
+  white-space: nowrap;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+[data-cassetta-cuci] button {
+  flex: none;
+  min-height: 2.75rem;
+  padding: 0.55rem 1rem;
+  border: 1.5px dashed color-mix(in oklab, var(--fg) 40%, transparent);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+[data-cassetta-cuci] button:hover { border-color: var(--accent); }
+[data-cassetta-cuci] button[aria-pressed="true"] {
+  border-style: solid;
+  border-color: var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+[data-cassetta-cuci] [data-tutta] { font-family: var(--font-mono), ui-monospace, monospace; font-size: 0.7rem; font-weight: 500; }
+
+[data-cassetta-partenza] {
+  margin-top: 0.75rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
+/* Sul telefono i cinque bottoni stanno su una riga che scorre di lato, come
+   nell'editor del prototipo: a capo diventavano tre righe di bottoni sopra la
+   cosa che comandano. */
+@media (max-width: 767px) {
+  [data-cassetta-cuci] {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    padding-block-end: 0.2rem;
+    scrollbar-width: none;
+  }
+  [data-cassetta-cuci]::-webkit-scrollbar { display: none; }
+}
+
+/* ── Le due viste ── */
+[data-cassetta-scena] { margin-top: 1.5rem; }
+[data-cassetta-mappa] { display: none; }
+
+@media (pointer: fine) and (min-width: 1280px) {
+  [data-cassetta-mappa] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    gap: 1rem;
+  }
+  [data-cassetta-vista-editor] { display: none; }
+}
+
+/* ── La mappa ── */
+[data-cassetta-banco] {
+  position: relative;
+  aspect-ratio: 1200 / 820;
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--bg) 92%, var(--graph));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--fg) 15%, transparent),
+    0 20px 40px -26px color-mix(in oklab, var(--ink) 40%, transparent);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+[data-cassetta-banco] svg { display: block; width: 100%; height: 100%; }
+
+[data-pezza] [data-stoffa] { fill: var(--f); }
+[data-pezza] [data-orlo] {
+  fill: none;
+  stroke: color-mix(in oklab, var(--c) 70%, transparent);
+  stroke-width: 1.4;
+  stroke-dasharray: var(--orlo);
+}
+[data-pezza] [data-conta] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  /* Non --fg-muted: sulle pezze piu' cariche (front-end, back-end) scendeva
+     sotto il 4,5:1. Le misure stanno in contrast.test.ts. */
+  fill: color-mix(in oklab, var(--fg) 80%, var(--bg));
+}
+[data-cassetta-banco] [data-trama] { fill: none; stroke: color-mix(in oklab, var(--fg) 12%, transparent); stroke-width: 1.2; }
+[data-cassetta-banco] [data-trama-punto] { fill: color-mix(in oklab, var(--fg) 28%, transparent); }
+
+[data-filo] {
+  fill: none;
+  stroke: color-mix(in oklab, var(--fg) 30%, transparent);
+  stroke-width: 1.2;
+}
+[data-filo="incrocio"] { stroke-dasharray: 2 5; }
+[data-filo][data-acceso] { stroke: var(--accent); stroke-width: 2; }
+
+[data-cucitura] {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-dasharray: 9 6;
+}
+[data-ago] { pointer-events: none; }
+[data-ago] path { fill: var(--fg-muted); stroke: var(--fg); stroke-width: 0.6; }
+[data-ago] ellipse { fill: var(--bg); }
+
+[data-nodo] { cursor: pointer; }
+[data-cassetta][data-motion="full"] [data-nodo] { cursor: grab; }
+[data-nodo] [data-fondo] {
+  fill: var(--bg);
+  stroke: color-mix(in oklab, var(--fg) 35%, transparent);
+  stroke-width: 1;
+}
+[data-nodo] [data-punti] {
+  fill: none;
+  stroke: color-mix(in oklab, var(--c, var(--fg)) 70%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+[data-nodo] text {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  fill: var(--fg);
+  pointer-events: none;
+}
+[data-nodo="snodo"] [data-fondo] { fill: var(--c); stroke: none; }
+[data-nodo="snodo"] [data-punti] { stroke: var(--su); }
+[data-nodo="snodo"] text {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--su);
+}
+[data-nodo="radice"] [data-fondo] { fill: var(--fg); stroke: none; }
+[data-nodo="radice"] [data-punti] { stroke: var(--bg); }
+[data-nodo="radice"] text {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  fill: var(--bg);
+}
+[data-nodo][data-acceso] [data-fondo] { stroke: var(--accent); stroke-width: 2; }
+[data-nodo][data-scelto] [data-fondo] { fill: var(--accent); stroke: var(--accent); }
+[data-nodo][data-scelto] [data-punti] { stroke: var(--on-accent); }
+[data-nodo][data-scelto] text { fill: var(--on-accent); }
+[data-nodo][data-cucito] [data-fondo] {
+  fill: color-mix(in oklab, var(--accent) 10%, var(--bg));
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+[data-nodo][data-cucito] [data-punti] { stroke: var(--accent); }
+[data-nodo="radice"][data-cucito] [data-fondo] { fill: var(--fg); }
+[data-nodo="radice"][data-cucito] text { fill: var(--bg); }
+
+/* Con un capo scelto la cassetta sbiadisce e resta quello che si cuce; col
+   mouse sopra un attrezzo resta la sua strada. */
+svg[data-stato="scelta"] [data-pezza]:not([data-usata]) :is([data-stoffa], [data-trama-fondo]) { opacity: 0.35; }
+svg[data-stato="scelta"] [data-filo],
+svg[data-stato="spento"] [data-filo]:not([data-acceso]) { opacity: 0.18; }
+svg[data-stato="spento"] [data-nodo]:not([data-acceso]):not([data-scelto]):not([data-nodo="radice"]) { opacity: 0.3; }
+svg[data-stato="scelta"] [data-nodo="attrezzo"]:not([data-cucito]) { opacity: 0.3; }
+svg[data-stato="scelta"] [data-nodo="snodo"] { opacity: 0.45; }
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-pezza] :is([data-stoffa], [data-trama-fondo]),
+  [data-nodo] { transition: opacity 0.3s; }
+  [data-filo] { transition: opacity 0.3s, stroke 0.2s; }
+
+  /* L'entrata: ogni etichetta sboccia dal punto in cui sta suo padre, in
+     ordine di rami. Solo a "full", e solo se la mappa non era gia' in vista. */
+  svg[data-entrata="attesa"] [data-corpo] { opacity: 0; }
+  svg[data-entrata="entra"] [data-corpo] {
+    animation: cassetta-sboccia 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+    animation-delay: calc(var(--i) * 35ms);
+  }
+}
+@keyframes cassetta-sboccia {
+  from { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); }
+}
+
+/* La colonna dell'etichetta non conta nell'altezza della riga: la riga e'
+   alta quanto il banco, e il pannello ci sta dentro con il suo scorrimento.
+   Cliccare un capo con quattordici fibre non allunga la sezione. */
+[data-cassetta-colonna] { contain: size; }
+[data-cassetta-pannello] {
+  position: sticky;
+  top: calc(var(--testata) + 1rem);
+  max-height: min(100%, calc(100vh - var(--testata) - 2rem));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+/* ── L'etichetta: quella cucita dentro un vestito ── */
+[data-etichetta] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 2.4rem 1.3rem 1.2rem;
+  border-radius: 2px;
+  text-align: center;
+  background-color: var(--superficie);
+  background-image: repeating-linear-gradient(90deg, color-mix(in oklab, var(--fg) 3%, transparent) 0 1px, transparent 1px 2px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--fg) 8%, transparent),
+    0 10px 22px -14px color-mix(in oklab, var(--ink) 50%, transparent);
+}
+[data-etichetta-orlo] {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 0.35rem;
+  background: color-mix(in oklab, var(--bg) 80%, var(--graph));
+  border-bottom: 1.5px dashed color-mix(in oklab, var(--fg) 35%, transparent);
+}
+[data-etichetta-orlo] button {
+  padding: 0.2rem 0.35rem;
+  border: 0;
+  background: transparent;
+  color: var(--fg-muted);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+[data-etichetta-orlo] button:hover { color: var(--fg); }
+[data-etichetta-chiudi] { margin-inline-start: auto; }
+[data-etichetta-marca] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--fg-muted);
+}
+[data-etichetta] h3 { font-size: 1.25rem; line-height: 1.1; }
+[data-etichetta-riga] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+[data-etichetta-riga][data-provato="conosciuto"] { color: var(--fg-muted); }
+[data-etichetta-voce] {
+  margin-top: 0.5rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid color-mix(in oklab, var(--fg) 15%, transparent);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+}
+[data-etichetta-stima] { font-weight: 500; letter-spacing: 0.1em; color: var(--fg-muted); }
+[data-etichetta-chips] { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+[data-cassetta-chip] {
+  padding: 0.3rem 0.5rem;
+  border: 1px dashed color-mix(in oklab, var(--c, var(--fg)) 55%, transparent);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+[data-cassetta-chip]:hover { border-color: var(--accent); border-style: solid; }
+[data-etichetta-comp] { display: grid; gap: 0.3rem; margin: 0; padding: 0; list-style: none; text-align: left; }
+[data-etichetta-comp] li { display: flex; align-items: center; gap: 0.5rem; }
+[data-etichetta-comp] span {
+  display: block;
+  flex: none;
+  height: 6px;
+  min-width: 6px;
+  max-width: 55%;
+  border-radius: 3px;
+  background: var(--c);
+}
+[data-etichetta-comp] em {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-style: normal;
+  text-transform: lowercase;
+}
+[data-etichetta-cura] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  line-height: 1.5;
+  text-align: left;
+}
+[data-etichetta-cura] i { font-style: normal; color: var(--accento-testo); }
+[data-etichetta-taglia] {
+  margin-top: 0.6rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--fg-muted);
+}
+
+/* ── L'editor: scuro in tutti e due i temi, perche' e' una finestra di codice.
+   Le variabili del tema si ridichiarano qui dentro, cosi' i toni delle zone
+   (le cartelle, la composizione in basso) si risolvono sul fondo scuro. Il
+   foglio che sale sta fuori da questa scatola e segue il tema della pagina.
+   I commenti che portano contenuto (il perche', le alternative) sono in
+   mutedDark, mai in muted: sull'inchiostro muted fa 3,34:1. ── */
+[data-cassetta-editor] {
+  --bg: var(--ink);
+  --fg: var(--paper);
+  --fg-muted: #A79E8C; /* from palette.mutedDark */
+  --accento-testo: var(--accent);
+  --ed-barra: color-mix(in oklab, var(--paper) 6%, var(--ink));
+  display: flex;
+  flex-direction: column;
+  max-width: 46rem;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--graph);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--paper) 14%, var(--ink)),
+    0 14px 26px -14px color-mix(in oklab, var(--ink) 60%, transparent);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.74rem;
+  line-height: 1.6;
+}
+[data-editor-titolo] {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.5rem 0.7rem;
+  background: var(--ed-barra);
+  color: var(--fg-muted);
+  font-size: 0.66rem;
+}
+[data-editor-titolo] i { width: 8px; height: 8px; border-radius: 50%; background: color-mix(in oklab, var(--paper) 25%, var(--ink)); }
+[data-editor-titolo] i:first-child { background: var(--accent); }
+[data-editor-titolo] span { margin-left: 0.5rem; }
+[data-editor-albero] {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  padding: 0.3rem 0.4rem;
+  background: var(--ed-barra);
+  border-bottom: 1px solid color-mix(in oklab, var(--paper) 12%, var(--ink));
+  scrollbar-width: none;
+}
+[data-editor-albero]::-webkit-scrollbar { display: none; }
+[data-editor-albero] button {
+  flex: none;
+  min-height: 2.5rem;
+  padding: 0.3rem 0.6rem;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--fg-muted);
+  font: inherit;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+[data-editor-albero] button::before { content: "▸ "; color: var(--c); }
+[data-editor-albero] [data-file]::before { content: "◆ "; color: var(--accent); }
+[data-editor-albero] button[aria-pressed="true"] { background: color-mix(in oklab, var(--paper) 14%, var(--ink)); color: var(--paper); }
+[data-cassetta-editor][data-capo] [data-editor-albero] button[data-zona]:not([data-serve]) { opacity: 0.45; }
+[data-editor-codice] {
+  height: 21rem;
+  padding: 0.5rem 0;
+  overflow-y: auto;
+  counter-reset: riga;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+[data-codice-riga] {
+  position: relative;
+  display: block;
+  min-height: 1.6em;
+  padding: 0 0.8rem 0 2.9rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+[data-codice-riga]::before {
+  counter-increment: riga;
+  content: counter(riga);
+  position: absolute;
+  left: 0;
+  width: 2rem;
+  text-align: right;
+  color: var(--fg-muted); /* mutedDark qui dentro: muted sull'inchiostro fa 3,34:1 */
+}
+[data-codice-riga][data-nuova] { background: color-mix(in oklab, var(--accent) 10%, var(--ink)); }
+[data-codice-riga][data-nuova]::after { content: "+"; position: absolute; left: 2.25rem; color: var(--accent); }
+[data-sintassi="t"] { color: #A79E8C; /* from palette.mutedDark */ }
+[data-sintassi="k"] { color: var(--accent); }
+[data-sintassi="p"] { color: var(--graph); font-weight: 700; }
+[data-sintassi="s"] { color: var(--paper); }
+[data-sintassi="c"] { color: #A79E8C; /* from palette.mutedDark */ font-style: italic; }
+[data-sintassi="n"] { color: var(--accent); }
+[data-editor-codice] button[data-attrezzo] {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+[data-editor-stato] {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.7rem;
+  background: var(--ed-barra);
+  border-top: 1px solid color-mix(in oklab, var(--paper) 12%, var(--ink));
+  color: var(--graph);
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+[data-editor-mix] {
+  flex: 1;
+  display: flex;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--paper) 10%, var(--ink));
+}
+[data-editor-mix] i { height: 100%; background: var(--c); box-shadow: inset -1px 0 0 var(--ink); }
+
+/* ── Il foglio del telefono: l'etichetta che sale dal basso ──
+   Niente `display` sul selettore nudo: toglierebbe al <dialog> chiuso il suo
+   display:none, come e' successo al dossier dei Lavori. */
+[data-cassetta-foglio]:not([open]) { display: none; }
+[data-cassetta-foglio] {
+  position: fixed;
+  inset: auto 0 0;
+  width: 100%;
+  max-width: 34rem;
+  max-height: 82vh;
+  max-height: 82svh;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 14px 14px 0 0;
+  background: transparent;
+  color: var(--fg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+[data-cassetta-foglio]::backdrop { background: color-mix(in oklab, var(--ink) 40%, transparent); }
+[data-cassetta-foglio] [data-etichetta] {
+  min-height: 100%;
+  padding: 3.6rem 1.2rem 1.6rem;
+  border-radius: 14px 14px 0 0;
+}
+[data-cassetta-foglio] [data-etichetta-orlo] { height: 3rem; border-radius: 14px 14px 0 0; }
+[data-cassetta-foglio] [data-etichetta-orlo] button { min-height: 2.75rem; padding: 0 0.8rem; font-size: 0.72rem; }
+@media (prefers-reduced-motion: no-preference) {
+  [data-cassetta]:not([data-motion="none"]) [data-cassetta-foglio][open] {
+    animation: cassetta-sale 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+@keyframes cassetta-sale {
+  from { transform: translateY(100%); }
+}
+
+/* ── L'elenco per scomparti: quello che legge uno screen reader, e quello che
+   si vede senza JavaScript, quando la mappa e l'editor non farebbero niente. ── */
+[data-cassetta-elenco] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (scripting: none) {
+  [data-cassetta-scena],
+  [data-cassetta-cuci],
+  [data-cassetta-partenza] { display: none; }
+  [data-cassetta-elenco] {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: 1.5rem;
+    width: auto;
+    height: auto;
+    margin: 2rem 0 0;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+  }
+  [data-cassetta-elenco] h3 { grid-column: 1 / -1; font-size: 1.2rem; }
+  [data-cassetta-elenco] h4 { font-size: 1rem; }
+  [data-cassetta-elenco] p,
+  [data-cassetta-elenco] li { margin-top: 0.35rem; font-size: 0.85rem; line-height: 1.5; color: var(--fg-muted); }
+  [data-cassetta-elenco] ul { margin: 0.5rem 0 0; padding-left: 1rem; }
+  [data-cassetta-elenco] b { color: var(--fg); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
    LA SECONDA SEZIONE PASSA SOPRA LA PRIMA
 
    Hero si ferma sotto la testata e la stampante gli sale sopra come un foglio, con

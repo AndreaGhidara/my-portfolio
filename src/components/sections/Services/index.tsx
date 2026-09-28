@@ -3,10 +3,12 @@ import { deskLayers } from "@/content/desk";
 import { metricById } from "@/content/metrics";
 import { ServicesView } from "./ServicesView";
 import type { DeskLayerData } from "./DeskTable";
+import { testiCassetta } from "./cassetta/testi";
 
 export async function Services() {
   const t = await getTranslations("services");
   const tMetrics = await getTranslations("metrics");
+  const tc = await getTranslations("cassetta");
 
   // Il numero sta in content/metrics.ts come tutti gli altri numeri inventati
   // del sito, l'unita' nelle traduzioni come tutte le altre etichette di
@@ -28,6 +30,8 @@ export async function Services() {
     })),
   }));
 
+  const cassetta = testiCassetta(tc);
+
   return (
     <ServicesView
       eyebrow={t("eyebrow")}
@@ -39,6 +43,12 @@ export async function Services() {
       note={`${caffe.value} ${tMetrics(caffe.id)}`}
       punch={t("punch")}
       layers={layers}
+      cassetta={{
+        eyebrow: tc("eyebrow"),
+        title: tc("title"),
+        lead: tc("lead"),
+        testi: cassetta,
+      }}
     />
   );
 }
