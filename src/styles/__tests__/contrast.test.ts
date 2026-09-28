@@ -242,3 +242,47 @@ describe("la mappa della cassetta: i conti degli scomparti", () => {
     expect(contrastRatio(palette.mutedDark, palette.ink)).toBeGreaterThanOrEqual(4.5);
   });
 });
+
+describe("il bancone delle notizie: le tre categorie, fisse nei due temi", () => {
+  // Il corpo della macchina prende il colore della categoria scelta, e sopra
+  // ci sono le scritte dei pulsanti (0,62rem) e l'anello di fuoco della
+  // manopola e dei pulsanti: tutti nel colore --on-… della categoria.
+  const categorie = [
+    { nome: "I.A.", fondo: palette.orange, testo: palette.ink },
+    { nome: "Design", fondo: palette.bulb, testo: palette.ink },
+    { nome: "Codice", fondo: palette.green, testo: palette.paper },
+  ];
+
+  it("le scritte e l'anello si leggono sul corpo di ogni categoria", () => {
+    for (const c of categorie) {
+      expect(contrastRatio(c.testo, c.fondo), c.nome).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("sull'arancio la carta non basta: per questo il testo della I.A. e' inchiostro", () => {
+    expect(contrastRatio(palette.paper, palette.orange)).toBeLessThan(4.5);
+  });
+
+  it("il giallo sulla carta non si vede: per questo porta il contorno d'inchiostro", () => {
+    expect(contrastRatio(palette.bulb, palette.paper)).toBeLessThan(1.5);
+    expect(contrastRatio(palette.ink, palette.paper)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("il verde e' quello di carta anche nel tema scuro: col verde schiarito la carta sopra non si leggerebbe", () => {
+    expect(contrastRatio(palette.paper, palette.greenDark)).toBeLessThan(4.5);
+  });
+
+  it("la targa e' inchiostro su carta", () => {
+    expect(contrastRatio(palette.ink, palette.paper)).toBeGreaterThanOrEqual(7);
+  });
+});
+
+describe("il ritaglio delle notizie, carta in tutti e due i temi", () => {
+  // Come la pratica dei Lavori: --carta, --tenue e --arancio non seguono il tema.
+  const arancio = "#A44428"; // --accento-su-carta: arancio al 72% nell'inchiostro
+
+  it("la riga della fonte, i dati e il timbro superano AA sulla carta", () => {
+    expect(contrastRatio(palette.muted, palette.paper)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(arancio, palette.paper)).toBeGreaterThanOrEqual(4.5);
+  });
+});

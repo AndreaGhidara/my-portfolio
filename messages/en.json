@@ -593,6 +593,46 @@
     "years": "years building for the web",
     "responseTime": "response time"
   },
+  "notizie": {
+    "eyebrow": "This week's news",
+    "title": "Pick what you like, turn the knob",
+    "intro": "Three worlds I follow closely: artificial intelligence, design and the code I work with. Press the button for the one you're curious about, turn, and out comes a story from the last few days.",
+    "categorie": {
+      "ia": { "nome": "A.I.", "testata": "The A.I. Gazette" },
+      "design": { "nome": "Design", "testata": "The Design Sheet" },
+      "codice": { "nome": "Code", "testata": "The Code Courier" }
+    },
+    "timbri": {
+      "primaPagina": "front page",
+      "paper": "paper of the day",
+      "piuLetto": "most read",
+      "release": "new release"
+    },
+    "dati": {
+      "punti": "points",
+      "commenti": "comments",
+      "voti": "votes",
+      "autori": "authors",
+      "reazioni": "reactions",
+      "lettura": "read",
+      "versione": "version"
+    },
+    "minuti": "{n} min",
+    "rilascio": "{titolo} is out",
+    "leggiSu": "Read on {sito}",
+    "targa": "{categoria} · {n} balls",
+    "targaUna": "{categoria} · 1 ball",
+    "gruppo": "What news do you want",
+    "manopola": "Turn the knob: out comes a story",
+    "aiuto": "Pick the kind, then turn the knob: a click, or drag it round.",
+    "attesa": "Filling the machine with this week's news…",
+    "vuota": "Pick A.I., Design or Code, then turn the knob: the story prints here.",
+    "errore": "The news didn't arrive. Turn the knob to try again.",
+    "finite": "Today's {categoria} news has run out: try another button, or come back tomorrow.",
+    "giaUscite": "already out",
+    "raccolteOggi": "News gathered at {ora} today: tomorrow there'll be more.",
+    "raccolteIl": "News gathered on {giorno} at {ora}."
+  },
   "contact": {
     "eyebrow": "Contact",
     "title": "Your turn",

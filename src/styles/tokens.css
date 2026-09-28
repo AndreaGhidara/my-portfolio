@@ -4185,7 +4185,7 @@ textarea[data-contact-campo] {
    I colori sono quelli della famiglia, e basta: le nove zone si distinguono
    per tono (quanto arancio o quanto inchiostro dentro il fondo), per trama
    (vuota, a righe, a punti, a quadretti) e per il passo dell'orlo cucito.
-   Il verde e il giallo della tavolozza restano ai loro due usi.
+   Il verde e il giallo della tavolozza qui non entrano.
 
    I numeri sono quelli del prototipo (docs/prototipi/2026-09-27-cassetta-
    sarto.html per la mappa e l'etichetta, 2026-09-27-cassetta-tech.html,
@@ -4844,4 +4844,570 @@ svg[data-stato="scelta"] [data-nodo="snodo"] { opacity: 0.45; }
   z-index: 2;
   border-radius: var(--raggio) var(--raggio) 0 0;
   box-shadow: 0 -18px 40px -12px color-mix(in oklab, var(--ink) 55%, transparent);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LE NOTIZIE: IL BANCONE CON TRE PULSANTI
+
+   Prima dei Contatti. A sinistra il distributore (globo, tappo, collo, corpo
+   col colore della categoria scelta, targa, tre pulsanti da sala giochi,
+   manopola, sportello, piede), a destra il ritaglio di giornale; sotto gli
+   860px la macchina sopra e il giornale sotto. La stessa soglia sta in
+   Bancone.tsx (TELEFONO), che sul telefono porta il giornale in vista.
+
+   I colori delle tre categorie sono fissi nei due temi, ciascuno col suo
+   testo leggibile (--on-…), misurato in contrast.test.ts:
+   - I.A. e' l'arancio, con l'inchiostro sopra (la carta fa 3,27:1, e le
+     scritte dei pulsanti sono piccole);
+   - Design e' il giallo della lampadina, con l'inchiostro sopra; sulla carta
+     il giallo non si vede (1,1:1), per questo palline, pulsante e corpo hanno
+     un contorno d'inchiostro, come il pallino della testata;
+   - Codice e' il verde della tavolozza, quello di carta e fisso: --verde nel
+     tema scuro diventa il verde schiarito, e la carta sopra non si leggerebbe.
+   I grigi della macchina sono miscele di carta e inchiostro: nessun colore
+   nuovo.
+
+   Il movimento sta sotto [data-motion] (lo scrive Bancone da useMotionLevel)
+   e sotto prefers-reduced-motion: a "none" niente mescola, niente giro
+   animato, il ritaglio compare.
+
+   I numeri sono quelli del prototipo
+   (docs/prototipi/2026-09-28-bancone-tre-pulsanti.html, variante A).
+   ══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --notizie-ia: var(--orange);
+  --on-notizie-ia: var(--ink);
+  --notizie-design: var(--bulb);
+  --on-notizie-design: var(--ink);
+  --notizie-codice: #2F6F4E; /* palette.green, fisso: --verde cambia col tema */
+  --on-notizie-codice: var(--paper);
+  --notizie-ghisa: color-mix(in oklab, var(--ink) 88%, var(--paper));
+  --notizie-acciaio: color-mix(in oklab, var(--ink) 38%, var(--paper));
+  --notizie-acciaio-scuro: color-mix(in oklab, var(--ink) 50%, var(--paper));
+}
+
+/* `--c` e' il colore di chi porta data-cat, `--su` il testo e l'anello sopra.
+   La pallina che vola vive in <body>, fuori dalla sezione. */
+[data-notizie] [data-cat="ia"],
+[data-notizie-volante][data-cat="ia"] { --c: var(--notizie-ia); --su: var(--on-notizie-ia); }
+[data-notizie] [data-cat="design"],
+[data-notizie-volante][data-cat="design"] { --c: var(--notizie-design); --su: var(--on-notizie-design); }
+[data-notizie] [data-cat="codice"],
+[data-notizie-volante][data-cat="codice"] { --c: var(--notizie-codice); --su: var(--on-notizie-codice); }
+
+[data-notizie-testa] { max-width: 76rem; margin-inline: auto; }
+[data-notizie-testa] h2 { text-wrap: balance; }
+[data-notizie-testa] p:not(.eyebrow) { margin-top: 1.1rem; max-width: 40rem; line-height: 1.6; color: var(--fg-muted); }
+
+[data-notizie-scena] {
+  max-width: 76rem;
+  margin: 3rem auto 0;
+  display: grid;
+  grid-template-columns: 19rem minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+
+@media (max-width: 859px) {
+  [data-notizie-scena] { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+}
+
+/* ── La macchina ── */
+/* --tema e --su-tema sono quelli della categoria scelta, risolti qui: i
+   pulsanti dentro ridefiniscono --c e --su per se', non per il corpo. */
+[data-notizie-macchina] {
+  --tema: var(--c);
+  --su-tema: var(--su);
+  position: relative;
+  width: 17rem;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+[data-notizie-tappo] {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 4.4rem;
+  height: 1.4rem;
+  margin: 0 auto -0.3rem;
+  border-radius: 8px 8px 2px 2px;
+  background: var(--notizie-ghisa);
+  box-shadow: inset 0 -3px 0 color-mix(in oklab, var(--ink) 25%, transparent);
+}
+
+[data-notizie-globo] {
+  position: relative;
+  width: 15rem;
+  height: 15rem;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(
+    circle at 30% 22%,
+    color-mix(in oklab, var(--paper) 95%, transparent) 0 6%,
+    color-mix(in oklab, var(--paper) 35%, transparent) 18%,
+    color-mix(in oklab, var(--paper) 8%, transparent) 45%,
+    color-mix(in oklab, var(--ink) 6%, transparent) 80%
+  );
+  box-shadow:
+    inset 0 0 0 3px color-mix(in oklab, var(--ink) 12%, transparent),
+    inset -10px -14px 30px color-mix(in oklab, var(--ink) 12%, transparent);
+}
+
+[data-theme="dark"] [data-notizie-globo] {
+  background: radial-gradient(
+    circle at 30% 22%,
+    color-mix(in oklab, var(--paper) 55%, transparent) 0 6%,
+    color-mix(in oklab, var(--paper) 14%, transparent) 20%,
+    color-mix(in oklab, var(--paper) 4%, transparent) 50%
+  );
+  box-shadow: inset 0 0 0 3px color-mix(in oklab, var(--paper) 20%, transparent);
+}
+
+[data-notizie-globo] > span {
+  position: absolute;
+  width: 16.5%;
+  height: 16.5%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, color-mix(in oklab, var(--paper) 75%, transparent) 0 12%, transparent 13%),
+    var(--c);
+  box-shadow: inset 0 -3px 5px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+[data-notizie-globo] > [data-cat="design"] {
+  box-shadow:
+    inset 0 0 0 1.5px var(--ink),
+    inset 0 -3px 5px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+[data-notizie-globo] > [data-spenta] { opacity: 0.38; filter: saturate(0.4); }
+[data-notizie-globo] > [data-via] { opacity: 0; scale: 0.2; }
+
+[data-notizie-collo] {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 11rem;
+  height: 1.3rem;
+  margin: -0.6rem auto 0;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--graph), var(--notizie-acciaio));
+}
+
+[data-notizie-corpo] {
+  position: relative;
+  width: 13.5rem;
+  margin: 0 auto;
+  padding: 0.8rem 0.9rem 1rem;
+  border-radius: 14px 14px 4px 4px;
+  /* Le ombre dei fianchi finiscono al 10%: le scritte dei pulsanti stanno sul
+     colore pieno, dove il contrasto e' quello misurato. */
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--ink) 14%, transparent),
+      transparent 10%,
+      transparent 90%,
+      color-mix(in oklab, var(--ink) 16%, transparent)
+    ),
+    var(--tema);
+  box-shadow: 0 18px 26px -14px color-mix(in oklab, var(--ink) 55%, transparent);
+}
+[data-notizie-macchina][data-cat="design"] [data-notizie-corpo] {
+  box-shadow:
+    inset 0 0 0 2px var(--ink),
+    0 18px 26px -14px color-mix(in oklab, var(--ink) 55%, transparent);
+}
+
+[data-notizie-targa] {
+  width: max-content;
+  margin: 0 auto;
+  padding: 0.15rem 0.55rem;
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+[data-notizie-pulsanti] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+  padding: 0.5rem 0.45rem 0.45rem;
+  border-radius: 10px;
+  box-shadow: inset 0 2px 5px color-mix(in oklab, var(--ink) 30%, transparent);
+}
+[data-notizie-pulsanti] button {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0 0.15rem;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  color: var(--su-tema);
+}
+[data-notizie-pulsanti] i {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, color-mix(in oklab, var(--paper) 70%, transparent) 0 14%, transparent 15%),
+    var(--c);
+  box-shadow:
+    0 5px 0 color-mix(in oklab, var(--c) 55%, var(--ink)),
+    0 6px 8px color-mix(in oklab, var(--ink) 35%, transparent);
+}
+[data-notizie-pulsanti] [data-cat="design"] i {
+  box-shadow:
+    inset 0 0 0 1.5px var(--ink),
+    0 5px 0 var(--ink),
+    0 6px 8px color-mix(in oklab, var(--ink) 35%, transparent);
+}
+[data-notizie-pulsanti] span {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+[data-notizie-pulsanti] [aria-pressed="true"] i {
+  translate: 0 4px;
+  box-shadow:
+    0 1px 0 color-mix(in oklab, var(--c) 55%, var(--ink)),
+    0 0 14px 2px color-mix(in oklab, var(--c) 70%, var(--paper));
+}
+[data-notizie-pulsanti] [data-cat="design"][aria-pressed="true"] i {
+  box-shadow:
+    inset 0 0 0 1.5px var(--ink),
+    0 1px 0 var(--ink),
+    0 0 14px 2px color-mix(in oklab, var(--c) 70%, var(--paper));
+}
+
+/* L'anello di fuoco globale e' arancio, e sull'arancio sparisce: qui e' il
+   testo della categoria scelta, cioe' il colore che su quel corpo si legge. */
+[data-notizie-pulsanti] button:focus-visible,
+[data-notizie-manopola]:focus-visible {
+  outline: 3px solid var(--su-tema);
+  outline-offset: 2px;
+}
+
+[data-notizie-comandi] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.8rem;
+}
+
+[data-notizie-manopola] {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  border: 0;
+  border-radius: 50%;
+  cursor: grab;
+  /* Il dito che la gira non deve far scorrere la pagina. */
+  touch-action: none;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--paper) 0 10%,
+    var(--graph) 30%,
+    var(--notizie-acciaio-scuro) 75%
+  );
+  box-shadow: 0 3px 0 color-mix(in oklab, var(--ink) 30%, transparent);
+  rotate: calc(var(--giri, 0) * 1turn + var(--angolo, 0deg));
+}
+[data-notizie-manopola]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 76%;
+  height: 22%;
+  border-radius: 99px;
+  background: var(--ink);
+  transform: translate(-50%, -50%);
+}
+[data-notizie-manopola][data-trascina] { cursor: grabbing; }
+
+[data-notizie-sportello] {
+  width: 4.2rem;
+  height: 2.3rem;
+  margin: 0.8rem auto 0;
+  border-radius: 6px 6px 14px 14px;
+  background: var(--ink);
+  box-shadow: inset 0 4px 6px color-mix(in oklab, var(--ink) 60%, var(--notizie-ghisa));
+}
+
+[data-notizie-piede] {
+  display: block;
+  width: 15rem;
+  height: 0.9rem;
+  margin: 0 auto;
+  border-radius: 0 0 8px 8px;
+  background: var(--notizie-ghisa);
+}
+
+[data-notizie-aiuto] {
+  max-width: 17rem;
+  margin: 1.1rem auto 0;
+  text-align: center;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+
+/* ── Il movimento ── */
+@media (prefers-reduced-motion: no-preference) {
+  [data-notizie-scena]:not([data-motion="none"]) [data-notizie-globo] > span {
+    transition: opacity 0.35s, filter 0.35s, scale 0.35s;
+  }
+  [data-notizie-scena]:not([data-motion="none"]) [data-notizie-macchina][data-gira] [data-notizie-globo] > span {
+    animation: notizie-mescola 0.42s ease-in-out 2;
+  }
+  [data-notizie-scena][data-motion="reduced"] [data-notizie-macchina][data-gira] [data-notizie-globo] > span {
+    animation-iteration-count: 1;
+  }
+  [data-notizie-scena]:not([data-motion="none"]) [data-notizie-manopola] {
+    transition: rotate 0.8s cubic-bezier(0.3, 1.3, 0.5, 1);
+  }
+  [data-notizie-scena]:not([data-motion="none"]) [data-notizie-manopola][data-trascina] { transition: none; }
+  [data-notizie-scena]:not([data-motion="none"]) [data-notizie-pulsanti] i { transition: translate 0.12s, box-shadow 0.12s; }
+  [data-notizie-scena]:not([data-motion="none"]) [data-notizie-ritaglio] {
+    animation: notizie-posa 0.6s cubic-bezier(0.2, 0.9, 0.25, 1.12) both;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  [data-notizie-scena]:not([data-motion="none"]) [data-notizie-manopola]:not([data-trascina]):hover {
+    rotate: calc(var(--giri, 0) * 1turn + 25deg);
+  }
+}
+
+@keyframes notizie-mescola {
+  50% { translate: 7px -14px; rotate: 60deg; }
+}
+
+@keyframes notizie-posa {
+  from { transform: translate(-30px, 20px) rotate(-4deg) scale(0.94); opacity: 0; }
+}
+
+[data-notizie-volante] {
+  position: fixed;
+  z-index: 40;
+  width: 1.8rem;
+  height: 1.8rem;
+  margin: -0.9rem 0 0 -0.9rem;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 32% 28%, color-mix(in oklab, var(--paper) 80%, transparent) 0 12%, transparent 13%),
+    var(--c);
+  box-shadow:
+    inset 0 -3px 5px color-mix(in oklab, var(--ink) 25%, transparent),
+    0 6px 10px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+[data-notizie-volante][data-cat="design"] {
+  box-shadow:
+    inset 0 0 0 1.5px var(--ink),
+    0 6px 10px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+
+/* ── Il giornale ── */
+[data-notizie-giornale] {
+  width: 100%;
+  min-height: 24rem;
+  /* La barra alta del sito, quando il telefono lo porta in vista. */
+  scroll-margin-top: 4.5rem;
+}
+
+[data-notizie-messaggio],
+[data-notizie-avviso] {
+  padding: 2rem 1.4rem;
+  border: 1px dashed color-mix(in oklab, var(--fg) 30%, var(--bg));
+  border-radius: 12px;
+  color: var(--fg-muted);
+  line-height: 1.6;
+}
+[data-notizie-avviso] { margin-bottom: 1.4rem; padding-block: 1rem; color: var(--fg); }
+/* Vuoto resta nel documento (e' la regione che annuncia), ma senza scatola. */
+[data-notizie-avviso]:empty { margin: 0; padding: 0; border: 0; }
+
+/* Il ritaglio e' carta in tutti e due i temi, come la pratica dei Lavori:
+   dentro non entra niente di quello che si ribalta col tema. */
+[data-notizie-ritaglio] {
+  --carta: var(--paper);
+  --inchiostro: var(--ink);
+  --tenue: var(--muted);
+  --accento-su-carta: color-mix(in oklab, var(--accent) 72%, var(--ink));
+  --arancio: var(--accento-su-carta);
+  --bordo: color-mix(in oklab, var(--inchiostro) 22%, var(--carta));
+  --ombra: color-mix(in oklab, var(--ink) 65%, transparent);
+  position: relative;
+  padding: 1.6rem clamp(1.2rem, 3vw, 2.4rem) 1.8rem;
+  background: var(--carta);
+  color: var(--inchiostro);
+  rotate: var(--storto, -0.6deg);
+  box-shadow: 0 26px 50px -30px var(--ombra);
+  clip-path: polygon(0 1.5%, 4% 0, 9% 1.2%, 15% 0.2%, 22% 1.4%, 30% 0.3%, 38% 1.1%, 47% 0, 55% 1.3%, 63% 0.2%, 71% 1.2%, 79% 0, 88% 1.1%, 95% 0.1%, 100% 1%, 100% 98.6%, 96% 100%, 89% 98.8%, 82% 99.9%, 74% 98.7%, 66% 99.8%, 57% 98.9%, 49% 100%, 41% 98.8%, 33% 99.9%, 25% 98.6%, 17% 99.8%, 9% 98.8%, 3% 100%, 0 98.9%);
+}
+
+[data-notizie-ritaglio] [data-ritaglio-testata] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.3rem 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 3px double var(--inchiostro);
+}
+[data-notizie-ritaglio] [data-ritaglio-testata] b {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-weight: 400;
+  font-size: 1.15rem;
+}
+[data-notizie-ritaglio] [data-ritaglio-testata] i {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-right: 0.45rem;
+  border: 1.5px solid var(--inchiostro);
+  border-radius: 50%;
+  background: var(--c);
+  translate: 0 0.05rem;
+}
+[data-notizie-ritaglio] [data-ritaglio-riga] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tenue);
+}
+[data-notizie-ritaglio] [data-ritaglio-sotto] {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--inchiostro);
+}
+[data-notizie-ritaglio] [data-ritaglio-timbro] {
+  margin-left: auto;
+  padding: 0.15rem 0.5rem;
+  border: 2px solid var(--arancio);
+  border-radius: 4px;
+  color: var(--arancio);
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  rotate: 4deg;
+}
+[data-notizie-ritaglio] h3 {
+  margin-top: 1rem;
+  font-size: clamp(1.45rem, 2.6vw, 2.2rem);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+[data-notizie-ritaglio] [data-ritaglio-riassunto] {
+  margin-top: 0.9rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+[data-notizie-ritaglio] [data-ritaglio-riassunto][data-colonne="2"] {
+  columns: 2 15rem;
+  column-gap: 1.6rem;
+  column-rule: 1px solid var(--bordo);
+}
+[data-notizie-ritaglio] [data-ritaglio-riassunto]::first-letter {
+  float: left;
+  margin: 0.2rem 0.45rem 0 0;
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 3.1rem;
+  line-height: 0.85;
+  color: var(--arancio);
+}
+[data-notizie-ritaglio] [data-ritaglio-piede] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.1rem;
+}
+[data-notizie-ritaglio] [data-ritaglio-dati] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  color: var(--tenue);
+}
+[data-notizie-ritaglio] [data-ritaglio-dati] b { color: var(--inchiostro); font-weight: 500; }
+[data-notizie-ritaglio] a {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--inchiostro);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+[data-notizie-ritaglio] a:focus-visible {
+  outline: 2px solid var(--arancio);
+  outline-offset: 3px;
+}
+
+/* ── I pallini gia' usciti, e l'ora della raccolta ── */
+[data-notizie-mazzetta] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.4rem;
+}
+[data-notizie-mazzetta] span {
+  margin-right: 0.3rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+[data-notizie-mazzetta] button {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  background:
+    radial-gradient(circle at 32% 28%, color-mix(in oklab, var(--paper) 75%, transparent) 0 12%, transparent 13%),
+    var(--c);
+  box-shadow:
+    inset 0 -2px 3px color-mix(in oklab, var(--ink) 25%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--fg) 20%, transparent);
+}
+[data-notizie-mazzetta] button[data-cat="design"] {
+  box-shadow:
+    inset 0 0 0 1.5px var(--ink),
+    inset 0 -2px 3px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+[data-notizie-mazzetta] button[aria-current="true"] {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+[data-notizie-raccolte] {
+  margin-top: 1rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
 }
