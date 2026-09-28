@@ -3667,6 +3667,9 @@ textarea[data-contact-campo] {
   }
 }
 
+/* La testa sta nella colonna dei Lavori e dei Contatti (56rem al centro), la
+   mappa e l'editor sotto ne escono, come l'archivio dei lavori. */
+[data-cassetta-testa] { max-width: 56rem; margin-inline: auto; }
 [data-cassetta-testa] h2 { text-wrap: balance; }
 [data-cassetta-testa] p:not(.eyebrow) { margin-top: 1rem; line-height: 1.6; color: var(--fg-muted); }
 
