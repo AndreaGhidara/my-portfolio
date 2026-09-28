@@ -102,6 +102,17 @@ h1, h2, h3, h4, .display {
   color: var(--fg-muted);
 }
 
+/* Il titolo di ogni sezione, sotto il suo occhiello: una misura sola per
+   tutta la pagina, cosi' nessuna sezione sembra piu' importante delle altre
+   solo perche' qualcuno le ha dato un rem in piu'. L'interlinea resta quella
+   di h2. Le regole delle sezioni scritte come `[data-x] h2` (0,1,1) battono
+   questa classe (0,1,0): li' si mette il colore o l'a capo, mai font-size o
+   margin-top, o la sezione torna ad avere la sua misura. */
+.titolo-sezione {
+  margin-top: 0.75rem;
+  font-size: clamp(1.9rem, 4.2vw, 3rem);
+}
+
 /* L'header ha fondo pieno per default: e' lo stato sicuro, quello che vale
    anche senza JavaScript, quando la nav ha del contenuto che le scorre sotto.
    In cima alla pagina non ha niente sotto tranne la ragnatela, e il fondo
@@ -361,8 +372,11 @@ h1, h2, h3, h4, .display {
 }
 
 /* Il cliente si legge anche qui, non solo sulla linguetta. */
+/* E' l'h3 della cartella: l'interlinea torna quella del testo, non quella
+   stretta dei titoli. Famiglia e spaziatura le riscrive gia' questa regola. */
 [data-faccia-chi] {
   margin-top: 0.5rem;
+  line-height: inherit;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.72rem;
   letter-spacing: 0.16em;
@@ -781,7 +795,6 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
 }
 
 [data-desk-title] { max-width: 34rem; text-align: center; }
-[data-desk-title] h2 { margin-top: 0.75rem; font-size: clamp(1.9rem, 5vw, 3rem); }
 [data-desk-title] p:last-child { margin-top: 1rem; color: var(--fg-muted); }
 
 /* La tesi che chiude la scena. Prima era un paragrafo centrato appoggiato
@@ -2113,12 +2126,7 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
   padding-top: clamp(1.2rem, 4vh, 2.5rem);
 }
 /* Carta sull'arancio fa 3,27:1: regge solo perche' il titolo e' grande. */
-[data-scontrino-testa] h2 {
-  margin-top: 0.75rem;
-  font-size: clamp(1.9rem, 4.2vw, 3.2rem);
-  line-height: 1;
-  color: var(--paper);
-}
+[data-scontrino-testa] h2 { color: var(--paper); }
 [data-scontrino-lead] {
   margin-top: 0.8rem;
   max-width: 30rem;
@@ -2632,12 +2640,7 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
 }
 
 [data-journey-testata] { max-width: 34rem; margin-inline: auto; }
-[data-journey-testata] h2 {
-  margin-top: 0.75rem;
-  font-size: clamp(1.9rem, 4.5vw, 3rem);
-  line-height: 1;
-  color: var(--paper);
-}
+[data-journey-testata] h2 { color: var(--paper); }
 
 /* L'anno in cui ci si trova, grande in un angolo: e' il contachilometri del
    viaggio, quindi in colonna non c'e'. */
@@ -2978,7 +2981,6 @@ html[data-dialog-open] [data-nav-basso] { display: none; }
     padding-top: calc(3.75rem + 0.5rem);
     padding-bottom: calc(var(--barra-bassa) + 2.75rem);
   }
-  [data-journey][data-scena="orizzontale"] [data-journey-testata] h2 { font-size: 1.6rem; }
   /* In cima si lascia il respiro pieno: e' il posto del tesserino, e a 4,5rem
      l'occhiello della lezione finiva sotto il suo bordo. */
   [data-journey][data-scena="orizzontale"] [data-journey-sheet] { padding: 5.25rem 1.1rem 1.1rem; }
@@ -3665,7 +3667,7 @@ textarea[data-contact-campo] {
   }
 }
 
-[data-cassetta-testa] h2 { margin-top: 0.75rem; font-size: clamp(1.9rem, 4vw, 3rem); text-wrap: balance; }
+[data-cassetta-testa] h2 { text-wrap: balance; }
 [data-cassetta-testa] p:not(.eyebrow) { margin-top: 1rem; line-height: 1.6; color: var(--fg-muted); }
 
 /* La barra alta del sito, 60px misurati come nel percorso e nell'archivio. */

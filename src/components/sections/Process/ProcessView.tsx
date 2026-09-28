@@ -23,14 +23,14 @@ export type ProcessViewProps = {
 
 export function ProcessView({ eyebrow, title, intro, deliveries }: ProcessViewProps) {
   return (
-    <section id="process" className="relative px-[var(--gutter)] py-[var(--section-y)]">
+    <section id="process" aria-labelledby="titolo-process" className="relative px-[var(--gutter)] py-[var(--section-y)]">
       <div className="mx-auto max-w-[64rem]">
         <Reveal data-process-testata moto="dietro" stagger={0.08}>
         <p className="eyebrow">{eyebrow}</p>
         {/* L'intestazione si ferma prima di meta' pagina: e' la misura con cui
             la sezione e' stata impaginata, e sotto i 1024px le regole in
             tokens.css la centrano. */}
-        <h2 className="mt-3 max-w-[30rem] text-3xl lg:text-5xl">{title}</h2>
+        <h2 id="titolo-process" className="titolo-sezione max-w-[30rem]">{title}</h2>
         <p className="mt-5 max-w-[30rem] leading-relaxed text-[var(--fg-muted)]">{intro}</p>
         </Reveal>
 

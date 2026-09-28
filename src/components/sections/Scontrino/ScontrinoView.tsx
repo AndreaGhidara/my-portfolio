@@ -31,12 +31,13 @@ export function ScontrinoView({ eyebrow, title, lead, locale, servizi, testi }: 
   return (
     <section
       id="scontrino"
+      aria-labelledby="titolo-scontrino"
       data-scontrino
       className="relative bg-[var(--accent)]"
     >
       <Reveal moto="dietro" stagger={0.08} data-scontrino-testa>
         <p className="eyebrow">{eyebrow}</p>
-        <h2>{title}</h2>
+        <h2 id="titolo-scontrino" className="titolo-sezione">{title}</h2>
         <p data-scontrino-lead>{lead}</p>
       </Reveal>
 

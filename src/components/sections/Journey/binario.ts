@@ -71,17 +71,19 @@ export const POSE: readonly Posa[] = [
  * fila: la fila e' centrata, quindi le chiede il doppio della piu' grande.
  * Il caso peggiore e' 360px di larghezza (foglio 82vw = 295px), in italiano:
  *   68  sopra: la barra alta del sito (60) e il respiro
- *   80  la testata: accanto all'anno grande il titolo va su due righe
+ *   91  la testata: accanto all'anno grande il titolo, alla misura di tutti
+ *       i titoli di sezione (30,4px), va su due righe
  *  338  la fila: 2 x 169, il 2023 che col tesserino sale piu' di tutti
  *   96  sotto: la barra bassa del sito (52) e il posto del suggerimento
- * = 582. A 390px ne servono 575 in italiano e 537 in inglese, il cui titolo
- * sta su una riga. Arrotondato a 590 per un carattere di ripiego piu' largo.
+ * = 593. A 390px ne servono 586 in italiano e 574 in inglese, dove adesso
+ * anche «Where I learned» va su due righe. Arrotondato a 600 per un
+ * carattere di ripiego piu' largo.
  *
  * Si confronta con l'altezza vera del palco, 100svh, e non con una media
  * query: `min-height` sul telefono segue il viewport grande, quello a barre
  * nascoste. Un iPhone SE ha un palco di circa 548px e resta in colonna.
  */
-export const ALTEZZA_MINIMA = 590;
+export const ALTEZZA_MINIMA = 600;
 
 /** Il foglio dei numeri sta sulla riga: e' li' che l'onda finisce. */
 export const POSA_ARRIVO: Posa = { rotazione: -0.8, scostamento: 0 };

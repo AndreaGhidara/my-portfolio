@@ -21,7 +21,7 @@ export function CassettaView({
     <div data-cassetta-sezione>
       <Reveal data-cassetta-testa moto="dietro" stagger={0.08}>
         <p className="eyebrow">{eyebrow}</p>
-        <h2>{title}</h2>
+        <h2 className="titolo-sezione">{title}</h2>
         <p>{lead}</p>
       </Reveal>
       <Cassetta testi={testi} />

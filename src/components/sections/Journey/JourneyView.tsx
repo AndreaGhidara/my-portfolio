@@ -53,7 +53,7 @@ export function JourneyView({
     // migliaia di pixel e in y il foglio dei numeri che cade deve sparire sul
     // bordo della sezione, non finire sopra «Il tuo turno». clip non crea un
     // contenitore di scorrimento, quindi lo sticky regge.
-    <section id="journey" className="relative overflow-clip bg-[var(--accent)]">
+    <section id="journey" aria-labelledby="titolo-journey" className="relative overflow-clip bg-[var(--accent)]">
       <JourneyBinario
         n={entries.length}
         annoIniziale={entries[0]?.year ?? 0}
@@ -64,7 +64,7 @@ export function JourneyView({
           // non si ribalta col tema mentre --fg-muted si'.
           <Reveal moto="dietro" stagger={0.08}>
             <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
-            <h2>{title}</h2>
+            <h2 id="titolo-journey" className="titolo-sezione">{title}</h2>
           </Reveal>
         }
       >

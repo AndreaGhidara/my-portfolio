@@ -91,9 +91,12 @@ export function WorkFolder({
           <p data-faccia-numero>
             {due(index + 1)} / {due(totale)}
           </p>
-          <p data-faccia-chi>
+          {/* Il titolo della cartella e' chi, non la frase: e' quello che
+              distingue una cartella dall'altra nell'elenco dei titoli, ed e'
+              lo stesso titolo del dossier che la faccia apre. */}
+          <h3 data-faccia-chi>
             {data.name} · {data.year}
-          </p>
+          </h3>
         </div>
 
         <div data-faccia-centro>

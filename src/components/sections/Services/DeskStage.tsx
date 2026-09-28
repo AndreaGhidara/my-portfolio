@@ -388,7 +388,7 @@ export function DeskStage({
         <div ref={stage} data-desk-stage>
           <header data-desk-title>
             <p className="eyebrow">{eyebrow}</p>
-            <h2>{title}</h2>
+            <h2 id="titolo-services" className="titolo-sezione">{title}</h2>
             <p>{lead}</p>
           </header>
 

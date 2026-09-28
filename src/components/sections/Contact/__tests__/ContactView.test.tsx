@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactView, type ContactViewProps } from "../ContactView";
 import { sendEmail } from "@/actions/sendEmail";
@@ -67,6 +67,14 @@ const props: ContactViewProps = {
 };
 
 describe("ContactView", () => {
+
+  it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
+    render(<ContactView {...props} />);
+    const sezione = screen.getByRole("region", { name: props.title });
+    const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
+    expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
+    expect(titolo).toHaveClass("titolo-sezione");
+  });
   it("i due pubblici restano distinti, ma non sono più due colonne pari", () => {
     // Il cliente ha metà pagina e un foglio su cui scrivere; chi assume ha una
     // riga sola e un tesserino. Erano due colonne uguali fra cui scegliere:

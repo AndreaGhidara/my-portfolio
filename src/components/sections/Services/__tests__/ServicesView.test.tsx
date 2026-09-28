@@ -46,6 +46,14 @@ const props: ServicesViewProps = {
 };
 
 describe("la sezione del tavolo", () => {
+
+  it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
+    render(<ServicesView {...props} />);
+    const sezione = screen.getByRole("region", { name: props.stageTitle });
+    const titolo = within(sezione).getByRole("heading", { level: 2, name: props.stageTitle });
+    expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
+    expect(titolo).toHaveClass("titolo-sezione");
+  });
   it("è ancorabile dalla navbar", () => {
     const { container } = render(<ServicesView {...props} />);
     expect(container.querySelector("section#services")).not.toBeNull();
