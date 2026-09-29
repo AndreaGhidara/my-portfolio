@@ -21,12 +21,12 @@ export const metrics: Metric[] = [
     /**
      * Il caso riservato non aveva numeri, ed era l'unico: senza, il dossier
      * del lavoro di adesso raccontava una scelta senza dire cosa ha prodotto.
-     * Il numero arriva dal CV, dov'era scritto e basta: qui dentro almeno
-     * porta con se' come si verifica.
+     * Il numero arriva dal CV. Il 2026-09-29 l'utente l'ha confermato come
+     * vero («convertito in meno di 15 minuti»): non e' piu' una stima.
      */
     id: "riservatoCycleTime",
-    value: "15 min",
-    estimated: true,
+    value: "< 15 min",
+    estimated: false,
     howToVerify:
       "Cronometrare il passaggio dentro la piattaforma con chi lo esegue davvero, e confrontarlo con quanto durava sui vecchi strumenti. Finche' non e' misurato, in call si dice \"si e' passati da ore a minuti\" senza dare il numero.",
   },

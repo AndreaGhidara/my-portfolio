@@ -471,7 +471,7 @@
         "riga": "A fitness business working with several outside tools, each with its own subscription.",
         "lavoro": "Several clients, in different markets. The biggest project is a platform for fitness: with a small team we brought the tools the business already used into one place.",
         "scelta": "Bring what came from the outside subscriptions into the platform, so that clients, contracts and commissions all sit in the same place.",
-        "conduzione": "Gradually: we moved one part at a time into the platform, and removed the outside tools as they were no longer needed."
+        "conduzione": "We took the tools the business was using, looked at which features the client actually needed, and brought them onto our platform, tuned more closely to their needs."
       },
       "bdroppy": {
         "name": "BDroppy",
@@ -583,7 +583,7 @@
     }
   },
   "metrics": {
-    "riservatoCycleTime": "for a step that used to take hours",
+    "riservatoCycleTime": "for a step that used to take hours, now done in under 15 minutes",
     "bdroppyPagina": "to open a product page, down from over 4 s",
     "bdroppyTypescript": "of the code moved to TypeScript",
     "bdroppyDowntime": "hours of downtime",
