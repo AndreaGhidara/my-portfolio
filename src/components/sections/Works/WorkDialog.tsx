@@ -45,6 +45,10 @@ export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, on
     <dialog
       ref={dialogo}
       data-work-dialog
+      // A dossier aperto Lenis e' fermo, e da fermo annulla ogni rotella che
+      // non trova questo attributo: il foglio, che scorre dentro di se' quando
+      // non ci sta nello schermo, restava con il fondo irraggiungibile.
+      data-lenis-prevent
       aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault();
