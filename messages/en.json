@@ -630,7 +630,10 @@
     "vuota": "Pick A.I., Design or Code, then turn the knob: the story prints here.",
     "errore": "The news didn't arrive. Turn the knob to try again.",
     "finite": "Today's {categoria} news has run out: try another button, or come back tomorrow.",
-    "giaUscite": "already out",
+    "giaUscite": "Already out",
+    "testata": "The News",
+    "nessunaUscita": "The other stories you draw line up here.",
+    "senzaRiassunto": "The whole story is on the other side of the link: here you get the headline, and where to read it.",
     "raccolteOggi": "News gathered at {ora} today: tomorrow there'll be more.",
     "raccolteIl": "News gathered on {giorno} at {ora}."
   },

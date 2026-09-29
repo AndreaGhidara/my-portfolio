@@ -12,8 +12,10 @@ export type NotizieViewProps = {
 
 /**
  * Le notizie della settimana, prima dei Contatti: un distributore di palline
- * con tre pulsanti, I.A., Design e Codice, e accanto il giornale. Il prototipo
- * e' docs/prototipi/2026-09-28-bancone-tre-pulsanti.html, variante A.
+ * con tre pulsanti, I.A., Design e Codice, e accanto la prima pagina di un
+ * giornale. I prototipi sono docs/prototipi/2026-09-28-bancone-tre-pulsanti.html,
+ * variante A (la macchina), e docs/prototipi/2026-09-29-notizie-impaginate.html,
+ * variante B (il foglio).
  */
 export function NotizieView({ eyebrow, title, intro, locale, testi }: NotizieViewProps) {
   return (

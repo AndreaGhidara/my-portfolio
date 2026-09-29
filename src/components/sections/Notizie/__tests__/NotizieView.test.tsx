@@ -128,13 +128,14 @@ describe("le notizie: il giro", () => {
     expect(container.querySelector("[data-notizie-targa]")).toHaveTextContent("Codice · 1 pallina");
   });
 
-  it("un giro stampa il ritaglio con la testata della categoria, e annuncia solo testata e titolo", async () => {
+  it("un giro stampa la notizia sotto la testata della categoria, e annuncia solo testata e titolo", async () => {
     rispondi();
     const { container } = render(<NotizieView {...props()} />);
     await pronta(container);
+    expect(container.querySelector("[data-foglio-testa] b")).toHaveTextContent(it0.testata);
     await userEvent.click(manopola());
     const articolo = await screen.findByRole("article");
-    expect(articolo).toHaveTextContent("La Gazzetta dell'I.A.");
+    expect(container.querySelector("[data-foglio-testa] b")).toHaveTextContent("La Gazzetta dell'I.A.");
     expect(within(articolo).getByRole("heading", { level: 3 })).toHaveTextContent("Agents are here");
     expect(articolo).toHaveTextContent("Hacker News · ieri");
     expect(articolo).toHaveTextContent("in prima pagina");
@@ -185,20 +186,19 @@ describe("le notizie: il giro", () => {
     expect(container.querySelector("[data-notizie-targa]")).toHaveTextContent("I.A. · 1 pallina");
   });
 
-  it("un riassunto corto sta su una colonna, uno lungo su due", async () => {
-    const lungo = "word ".repeat(60).trim();
+  it("senza riassunto il posto resta: il dominio in grande e una riga", async () => {
     rispondi({
       ...raccolta,
-      categorie: { ...raccolta.categorie, ia: [notizia("https://example.com/l", "Long one", { riassunto: lungo }), ...raccolta.categorie.ia] },
+      categorie: { ...raccolta.categorie, ia: [notizia("https://example.com/s", "No summary", { riassunto: undefined })] },
     });
     const { container } = render(<NotizieView {...props()} />);
     await pronta(container);
     await userEvent.click(manopola());
-    const riassunto = () => container.querySelector("[data-ritaglio-riassunto]");
-    await waitFor(() => expect(riassunto()).toHaveAttribute("data-colonne", "2"));
-    await userEvent.click(manopola());
-    await waitFor(() => expect(screen.getByRole("article")).toHaveTextContent("Agents are here"));
-    expect(riassunto()).toHaveAttribute("data-colonne", "1");
+    const articolo = await screen.findByRole("article");
+    expect(articolo.querySelector("[data-ritaglio-riassunto]")).toBeNull();
+    const vuoto = articolo.querySelector("[data-ritaglio-corpo] [data-ritaglio-vuoto]");
+    expect(vuoto).toHaveTextContent("example.com");
+    expect(vuoto).toHaveTextContent(it0.senzaRiassunto);
   });
 
   it("la manopola gira anche da tastiera", async () => {
@@ -238,32 +238,54 @@ describe("le notizie: il giro", () => {
     await userEvent.click(pulsante("Codice"));
     await userEvent.click(manopola());
     const articolo = await screen.findByRole("article");
-    expect(articolo).toHaveTextContent("Il Corriere del Codice");
+    expect(container.querySelector("[data-foglio-testa] b")).toHaveTextContent("Il Corriere del Codice");
     expect(within(articolo).getByRole("heading", { level: 3 })).toHaveTextContent("Next.js 15.5.0 è uscito");
     expect(articolo).toHaveTextContent("GitHub · vercel/next.js");
     expect(articolo).toHaveTextContent("nuova versione");
   });
 
-  it("finita una categoria lo dice accanto al ritaglio, e i pallini gia' usciti restano", async () => {
+  it("«Gia' uscite» mette in fila i titoli, l'ultima in cima, e cliccarne uno la riporta sulla pagina", async () => {
+    rispondi();
+    const { container } = render(<NotizieView {...props()} />);
+    await pronta(container);
+    const uscite = () => container.querySelector("[data-foglio-uscite]") as HTMLElement;
+    expect(uscite()).toHaveTextContent(it0.nessunaUscita);
+    await userEvent.click(manopola());
+    await screen.findByRole("article");
+    // Una sola e' gia' sulla pagina: la fila comincia dalla seconda.
+    expect(uscite()).toHaveTextContent(it0.nessunaUscita);
+    await userEvent.click(manopola());
+    await waitFor(() => expect(screen.getByRole("article")).toHaveTextContent("A second AI story"));
+    const voci = within(uscite()).getAllByRole("button");
+    expect(voci.map((b) => b.textContent)).toEqual(["A second AI story", "Agents are here"]);
+    expect(voci.map((b) => b.getAttribute("aria-current"))).toEqual(["true", null]);
+    await userEvent.click(voci[1]);
+    expect(within(screen.getByRole("article")).getByRole("heading", { level: 3 })).toHaveTextContent("Agents are here");
+    expect(voci[1]).toHaveAttribute("aria-current", "true");
+    expect(voci[0]).not.toHaveAttribute("aria-current");
+  });
+
+  it("finita una categoria lo dice al posto della notizia, e le gia' uscite restano", async () => {
     rispondi();
     const { container } = render(<NotizieView {...props()} />);
     await pronta(container);
     await userEvent.click(manopola());
     await userEvent.click(pulsante("Design"));
     await userEvent.click(manopola());
-    expect(await screen.findByRole("article")).toHaveTextContent("Il Foglio del Design");
+    expect(await screen.findByRole("article")).toHaveTextContent("Fonts again");
     await userEvent.click(manopola());
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Le notizie Design di oggi sono finite: prova un altro pulsante, o torna domani.",
-    );
-    expect(screen.getByRole("article")).toHaveTextContent("Fonts again");
-    const mazzetta = container.querySelector("[data-notizie-mazzetta]") as HTMLElement;
-    const usciti = within(mazzetta).getAllByRole("button");
-    expect(usciti.map((b) => b.getAttribute("aria-label"))).toEqual(["I.A.: Agents are here", "Design: Fonts again"]);
-    // Si torna a una notizia gia' uscita.
-    await userEvent.click(usciti[0]);
+    const finite = "Le notizie Design di oggi sono finite: prova un altro pulsante, o torna domani.";
+    expect(screen.getByRole("status")).toHaveTextContent(finite);
+    // Il pannello sta nella stessa scatola della notizia.
+    const scatola = container.querySelector("[data-foglio-notizia]") as HTMLElement;
+    expect(scatola).toContainElement(screen.getByRole("status"));
+    expect(screen.queryByRole("article")).toBeNull();
+    const voci = within(container.querySelector("[data-foglio-uscite]") as HTMLElement).getAllByRole("button");
+    expect(voci.map((b) => b.getAttribute("aria-label"))).toEqual(["Design: Fonts again", "I.A.: Agents are here"]);
+    // Si torna a una notizia gia' uscita, e l'avviso tace.
+    await userEvent.click(voci[1]);
     expect(screen.getByRole("article")).toHaveTextContent("Agents are here");
-    expect(usciti[0]).toHaveAttribute("aria-current", "true");
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 
   it("dice a che ora sono state raccolte, oggi", async () => {
@@ -312,7 +334,7 @@ describe("le notizie in inglese", () => {
     expect(container.querySelector("[data-notizie-targa]")).toHaveTextContent("A.I. · 2 balls");
     await userEvent.click(screen.getByRole("button", { name: en.manopola }));
     const articolo = await screen.findByRole("article");
-    expect(articolo).toHaveTextContent("The A.I. Gazette");
+    expect(container.querySelector("[data-foglio-testa] b")).toHaveTextContent("The A.I. Gazette");
     expect(articolo).toHaveTextContent("Hacker News · yesterday");
     expect(articolo).toHaveTextContent("front page");
     expect(within(articolo).getByRole("link", { name: /Read on example\.com/ })).toBeInTheDocument();
@@ -320,15 +342,35 @@ describe("le notizie in inglese", () => {
 });
 
 const css = readFileSync("src/styles/tokens.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
-const regoleDelRitaglio = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-  .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }))
-  .filter((r) => r.selettore.includes("[data-notizie-ritaglio]"));
+const regole = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selettore, corpo]) => ({
+  selettore: selettore.trim(),
+  corpo,
+}));
+const regoleDelRitaglio = regole.filter((r) => r.selettore.includes("[data-notizie-ritaglio]"));
+const regoleDelFoglio = regole.filter((r) => r.selettore.includes("[data-notizie-foglio]"));
+/** Il corpo della regola col selettore esatto, fuori o dentro una media query (la prima che c'e'). */
+const regola = (selettore: string, dove: string = css) =>
+  [...dove.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find(([, s]) => s.trim() === selettore)?.[2] ?? "";
+const telefono = css.split("@media (max-width: 959px)").slice(1).map((pezzo) => {
+  // Il blocco della media query, fino alla sua graffa chiusa.
+  let profondo = 0;
+  for (let k = pezzo.indexOf("{"); k < pezzo.length; k++) {
+    if (pezzo[k] === "{") profondo++;
+    if (pezzo[k] === "}" && --profondo === 0) return pezzo.slice(pezzo.indexOf("{") + 1, k);
+  }
+  return "";
+}).join("\n");
 
 describe("i colori delle notizie", () => {
-  it("il ritaglio e' carta nei due temi: dentro mai i colori che seguono il tema", () => {
+  it("il foglio e il ritaglio sono carta nei due temi: dentro mai i colori che seguono il tema", () => {
     expect(regoleDelRitaglio.length).toBeGreaterThan(10);
+    expect(regoleDelFoglio.length).toBeGreaterThan(8);
     const vietati = /var\(--(fg|bg|fg-muted|line|accento-testo|verde)\)/;
     expect(regoleDelRitaglio.filter((r) => vietati.test(r.corpo)).map((r) => r.selettore)).toEqual([]);
+    expect(regoleDelFoglio.filter((r) => vietati.test(r.corpo)).map((r) => r.selettore)).toEqual([]);
+    const foglio = regoleDelFoglio.find((r) => r.selettore === "[data-notizie-foglio]")?.corpo ?? "";
+    expect(foglio).toMatch(/--carta:\s*var\(--paper\)/);
+    expect(foglio).toMatch(/background:\s*var\(--carta\)/);
     const radice = regoleDelRitaglio.find((r) => r.selettore === "[data-notizie-ritaglio]")?.corpo ?? "";
     expect(radice).toMatch(/--carta:\s*var\(--paper\)/);
     expect(radice).toMatch(/--inchiostro:\s*var\(--ink\)/);
@@ -363,5 +405,48 @@ describe("i colori delle notizie", () => {
   it("la rotella non si intercetta: la pagina scorre anche sopra la macchina", () => {
     const bancone = readFileSync("src/components/sections/Notizie/Bancone.tsx", "utf8");
     expect(bancone).not.toMatch(/onWheel|"wheel"/);
+  });
+});
+
+/**
+ * In jsdom l'impaginazione non si misura: si leggono le regole che la tengono
+ * ferma. Le altezze misurate nel browser stanno nel prototipo e nel suo README.
+ */
+describe("il foglio non cambia misura da una notizia all'altra", () => {
+  it("sul desktop il foglio ha un'altezza fissa, e la notizia la riempie", () => {
+    expect(regola("[data-notizie-foglio]")).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
+    expect(regola("[data-foglio-notizia]")).toMatch(/min-height:\s*0/);
+    expect(regola("[data-notizie-foglio] [data-notizie-ritaglio]")).toMatch(/height:\s*100%/);
+  });
+
+  it("titolo a tre righe, riassunto a un numero fisso di righe, il resto si taglia", () => {
+    const titolo = regola("[data-notizie-foglio] [data-notizie-ritaglio] h3");
+    expect(titolo).toMatch(/-webkit-line-clamp:\s*3/);
+    expect(titolo).toMatch(/overflow:\s*hidden/);
+    const riassunto = regola("[data-notizie-ritaglio] [data-ritaglio-riassunto]");
+    expect(riassunto).toMatch(/-webkit-line-clamp:\s*\d+/);
+    expect(riassunto).toMatch(/overflow:\s*hidden/);
+    expect(regola("[data-notizie-ritaglio] [data-ritaglio-corpo]")).toMatch(/overflow:\s*hidden/);
+  });
+
+  it("la fila delle gia' uscite scorre dentro, e ogni titolo sta in due righe", () => {
+    expect(regola("[data-foglio-uscite]")).toMatch(/overflow-y:\s*auto/);
+    expect(regola("[data-foglio-uscite] button span")).toMatch(/-webkit-line-clamp:\s*2/);
+  });
+
+  it("sul telefono la notizia e la fila hanno misure fisse, e la testata non va a capo", () => {
+    expect(telefono).not.toBe("");
+    expect(regola("[data-foglio-notizia]", telefono)).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
+    expect(regola("[data-foglio-uscite]", telefono)).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
+    expect(regola("[data-foglio-testa]", telefono)).toMatch(/flex-direction:\s*column/);
+    expect(regola("[data-foglio-testa] b")).toMatch(/white-space:\s*nowrap/);
+  });
+
+  it("i pallini gia' usciti non ci sono piu': c'e' la colonna coi titoli", async () => {
+    rispondi();
+    const { container } = render(<NotizieView {...props()} />);
+    await pronta(container);
+    expect(container.querySelector("[data-notizie-mazzetta]")).toBeNull();
+    expect(container.querySelector("[data-foglio-colonna]")).toHaveTextContent(it0.giaUscite);
   });
 });

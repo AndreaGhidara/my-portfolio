@@ -3,13 +3,13 @@ import type { CategoriaId, Dato, Notizia } from "@/lib/notizie/tipi";
 import { nomeFonte, quantoFa, riempi, titoloDi } from "./formato";
 import type { TestiNotizie } from "./tipi";
 
-/** Sotto questa lunghezza un riassunto su due colonne lascia una parola sola nella seconda. */
-const DUE_COLONNE = 240;
-
 /**
- * Il ritaglio di giornale: la testata della categoria, la data di oggi, la
- * fonte, il timbro, il titolo, il riassunto su due colonne e i numeri. Carta
- * in tutti e due i temi, come la pratica dei lavori. Niente immagini: la
+ * La notizia grande della prima pagina: la fonte, il timbro, il titolo, il
+ * riassunto e i numeri. La testata e la data stanno sopra, sul foglio. La
+ * misura la decide il foglio, qualunque notizia esca: il titolo si ferma a tre
+ * righe, il riassunto a un numero fisso di righe coi puntini, e senza riassunto
+ * il suo posto resta (il dominio in grande e una riga). Dati e link sul fondo.
+ * Carta in tutti e due i temi, come la pratica dei lavori. Niente immagini: la
  * pagina non apre connessioni verso terzi, e il link si apre solo se lo premi.
  */
 export function Ritaglio({
@@ -35,18 +35,10 @@ export function Ritaglio({
       : d.codice === "lettura"
         ? riempi(testi.minuti, { n: numero.format(d.valore) })
         : numero.format(d.valore);
-  const oggi = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }).format(adesso);
   const titolo = titoloDi(notizia, testi);
 
   return (
     <article data-notizie-ritaglio data-cat={cat} style={{ "--storto": `${storto}deg` } as CSSProperties}>
-      <div data-ritaglio-testata>
-        <b>
-          <i aria-hidden="true" />
-          {testi.categorie[cat].testata}
-        </b>
-        <span data-ritaglio-riga>{oggi}</span>
-      </div>
       <div data-ritaglio-sotto data-ritaglio-riga>
         <span>
           {nomeFonte(notizia.fonte)} · {quantoFa(notizia.quando, locale, adesso)}
@@ -56,11 +48,18 @@ export function Ritaglio({
       {/* La notizia resta nella sua lingua, che e' l'inglese. Il titolo di una
           release no: «e' uscito» lo scrive la pagina, nella sua. */}
       <h3 lang={notizia.timbro === "release" ? undefined : "en"}>{titolo}</h3>
-      {notizia.riassunto ? (
-        <p data-ritaglio-riassunto data-colonne={notizia.riassunto.length > DUE_COLONNE ? "2" : "1"} lang="en">
-          {notizia.riassunto}
-        </p>
-      ) : null}
+      <div data-ritaglio-corpo>
+        {notizia.riassunto ? (
+          <p data-ritaglio-riassunto lang="en">
+            {notizia.riassunto}
+          </p>
+        ) : (
+          <div data-ritaglio-vuoto>
+            <b>{notizia.hostname}</b>
+            <span>{testi.senzaRiassunto}</span>
+          </div>
+        )}
+      </div>
       <div data-ritaglio-piede>
         <p data-ritaglio-dati>
           {notizia.dati.map((d) => (

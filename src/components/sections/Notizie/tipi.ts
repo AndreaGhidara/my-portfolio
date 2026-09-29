@@ -22,6 +22,9 @@ export type TestiNotizie = {
   errore: string;
   finite: string;
   giaUscite: string;
+  testata: string;
+  nessunaUscita: string;
+  senzaRiassunto: string;
   raccolteOggi: string;
   raccolteIl: string;
 };
