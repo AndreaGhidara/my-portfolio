@@ -468,10 +468,10 @@
     "list": {
       "riservato": {
         "name": "Under NDA",
-        "riga": "A business running on several tools and several platforms, with the same data sitting in different places and nobody able to say which version was the right one.",
-        "lavoro": "One platform in place of the scattered tools. Video streaming, documents and client contracts live inside it, along with many operators writing on the same things at the same time.",
-        "scelta": "Replace the tools rather than wire them to each other. Integrations don't remove the copies, they multiply them: each tool stays the owner of its own data, and the day one of the two changes you rebuild the connection from scratch.",
-        "conduzione": "In phases, and the first one had to actually replace something instead of being added to what was already there: as long as the old tool stays on next to the new one, the data keeps living in two places."
+        "riga": "A fitness business running on many tools scattered across the web: the same data in different places, a subscription for each, and nowhere the numbers added up.",
+        "lavoro": "Several clients, in different markets. The biggest project is a platform for fitness: one management system instead of the scattered tools, holding clients, contracts, commissions and everything else.",
+        "scelta": "Bring inside the system what used to be paid for outside, instead of wiring the external services together. Fewer subscriptions, and a single source of truth that every piece of information goes through.",
+        "conduzione": "One piece at a time: each external tool was switched off once its part was already in the system, so the business never ran on two systems at once and every figure goes through one place."
       },
       "bdroppy": {
         "name": "BDroppy",
