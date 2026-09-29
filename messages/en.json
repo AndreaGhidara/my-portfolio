@@ -475,7 +475,7 @@
       },
       "bdroppy": {
         "name": "BDroppy",
-        "riga": "The platform was stuck on Next 14, with much of the code still in JavaScript and slow pages right where people choose and buy.",
+        "riga": "The platform was on Next 14, with much of the code still in JavaScript, and the shipping pages were slow because they weren't well optimised: that's where we started, optimising them.",
         "lavoro": "Upgrade the platform from Next 14 to Next 15, improve its performance and fix the bugs it had been carrying.",
         "scelta": "Move the code towards TypeScript wherever possible, instead of rewriting it all. Legacy JavaScript stays where it works, and new or touched parts are typed from the start.",
         "conduzione": "Upgrade, performance and interface in the same job: we reworked the product selection and checkout screens, to make finding a product and buying it simpler."

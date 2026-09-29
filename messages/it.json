@@ -475,7 +475,7 @@
       },
       "bdroppy": {
         "name": "BDroppy",
-        "riga": "La piattaforma era ferma a Next 14, con buona parte del codice ancora in JavaScript e le pagine lente proprio dove si sceglie e si compra.",
+        "riga": "La piattaforma era su Next 14, con buona parte del codice ancora in JavaScript, e le pagine di spedizione rallentavano perché poco ottimizzate: siamo partiti da lì, ottimizzandole.",
         "lavoro": "Aggiornare la piattaforma da Next 14 a Next 15, migliorarne le prestazioni e correggere i bug che si portava dietro.",
         "scelta": "Portare il codice verso TypeScript dove si poteva, invece di riscriverlo tutto. Il JavaScript legacy resta dove funziona, e le parti nuove o toccate nascono tipizzate.",
         "conduzione": "Aggiornamento, prestazioni e interfaccia nello stesso lavoro: abbiamo rivisto le schermate di scelta e di acquisto, per rendere più semplice trovare un prodotto e comprarlo."
