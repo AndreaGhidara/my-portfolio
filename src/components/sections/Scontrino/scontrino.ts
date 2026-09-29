@@ -22,7 +22,14 @@ export const INTERVALLO = 16;
 /** Millisecondi che lo scontrino strappato impiega a cadere prima del prossimo. */
 export const CADUTA = 420;
 
-export type TipoRiga = "riga" | "grosso" | "voce";
+/**
+ * Millisecondi in cui la carta esce sopra la figura stampata, sul telefono: la
+ * stampa del testo aspetta, come in una stampante vera.
+ */
+export const FIGURA = 650;
+
+/** «figura»: il disegno della tavola stampato sulla carta, solo sul telefono. */
+export type TipoRiga = "riga" | "grosso" | "voce" | "figura";
 export type Riga = { testo: string; tipo: TipoRiga };
 
 export type DatiScontrino = {
@@ -68,6 +75,8 @@ export function righeScontrino(d: DatiScontrino): Riga[] {
     riga(d.titolo.toUpperCase(), "grosso"),
     riga(d.testo),
     taglio,
+    // Senza testo: costa un colpo, e sul desktop non si vede.
+    riga("", "figura"),
     // Le stesse voci dei richiami sulla tavola, nello stesso ordine.
     ...d.pezzi.map((p, k) => riga(`${k + 1} ${p}`, "voce")),
     taglio,
@@ -80,6 +89,12 @@ const colpi = (r: Riga) => Math.max(1, Math.ceil(r.testo.length / PASSO[r.tipo =
 
 export function scattiTotali(righe: Riga[]): number {
   return righe.reduce((somma, r) => somma + colpi(r), 0);
+}
+
+/** Il colpo con cui esce la figura: da li' la stampa aspetta la carta. -1 se non c'e'. */
+export function scattiAllaFigura(righe: Riga[]): number {
+  const dove = righe.findIndex((r) => r.tipo === "figura");
+  return dove < 0 ? -1 : scattiTotali(righe.slice(0, dove + 1));
 }
 
 /** Lo scontrino dopo `scatti` colpi: le righe finite e quella a meta'. */
@@ -214,8 +229,9 @@ export function stampante(s: Stampante, e: Evento, totali: readonly number[]): S
 
     case "svuota":
       if (s.toccata) return s;
-      // Via anche il disegno: la tavola si ritraccia con la stampa, e sul
-      // telefono sta sopra i tasti, quindi la si vedrebbe cancellarsi.
+      // Via anche il disegno: la tavola si ritraccia con la stampa, e
+      // tracciata dal server per poi cancellarsi all'autostampa sarebbe un
+      // salto. Sul telefono la tavola non c'e': il disegno esce sulla carta.
       return {
         ...s,
         fase: "ferma",
@@ -283,7 +299,7 @@ export const FORME: Record<string, readonly string[]> = {
   ],
 };
 
-/** La cornice della tavola e il cartiglio, divisi: sul telefono il divisorio va via. */
+/** La cornice della tavola, il cartiglio e il suo divisorio, tre tratti. */
 export const CORNICE = "M20 20 H580 V440 H20 Z";
 export const CARTIGLIO = "M290 390 H580 M290 390 V440";
 export const DIVISORIO = "M500 390 V440";

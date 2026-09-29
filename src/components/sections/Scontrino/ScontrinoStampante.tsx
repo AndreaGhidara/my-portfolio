@@ -2,12 +2,14 @@
 
 import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useMotionLevel } from "@/animations/motionPolicy";
-import { ScontrinoSchema } from "./ScontrinoSchema";
+import { ScontrinoFigura, ScontrinoSchema } from "./ScontrinoSchema";
 import {
   CADUTA,
+  FIGURA,
   INTERVALLO,
   aScatti,
   righeScontrino,
+  scattiAllaFigura,
   scattiTotali,
   stampante,
   statoIniziale,
@@ -45,13 +47,21 @@ export type TestiStampante = {
 
 const due = (n: number) => String(n).padStart(2, "0");
 
-/** Le righe dello scontrino, una per elemento. Il titolo grande ha la sua classe. */
-function Corpo({ righe }: { righe: Riga[] }) {
+/**
+ * Le righe dello scontrino, una per elemento. Il titolo grande ha la sua
+ * classe; la figura e' il disegno del servizio, che il CSS mostra solo sul
+ * telefono.
+ */
+function Corpo({ righe, servizio }: { righe: Riga[]; servizio: ServizioStampabile }) {
   return (
     <div data-scontrino-corpo aria-hidden="true">
       {righe.map((r, k) => (
         <div key={k} data-riga={r.tipo}>
-          {r.testo}
+          {r.tipo === "figura" ? (
+            <ScontrinoFigura forma={servizio.id} quanti={servizio.pezzi.length} />
+          ) : (
+            r.testo
+          )}
         </div>
       ))}
     </div>
@@ -86,6 +96,7 @@ export function ScontrinoStampante({
   const fermo = level === "none";
   const macchina = useRef<HTMLDivElement | null>(null);
   const carta = useRef<HTMLDivElement | null>(null);
+  const uscita = useRef<HTMLDivElement | null>(null);
   const tasti = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Vuota sul server e al primo render: la pagina e' statica, e la data del
@@ -119,6 +130,7 @@ export function ScontrinoStampante({
     [servizi, testi, data],
   );
   const totali = useMemo(() => righe.map(scattiTotali), [righe]);
+  const soglie = useMemo(() => righe.map(scattiAllaFigura), [righe]);
 
   const [stato, manda] = useReducer(
     (s: Stampante, e: Evento) => stampante(s, e, totali),
@@ -163,14 +175,50 @@ export function ScontrinoStampante({
     return () => osservatore.disconnect();
   }, [fermo]);
 
+  // Il colpo che ha appena stampato la figura: la carta deve uscire sopra il disegno.
+  const allaFigura =
+    stato.fase === "stampa" && stato.servizio !== null && stato.scatti === soglie[stato.servizio];
+
+  // I colpi gia' stampati, per il timer che riparte: letti al suo avvio, non
+  // un motivo per rilanciarlo a ogni colpo.
+  const scattiOra = useRef(stato.scatti);
+  useLayoutEffect(() => {
+    scattiOra.current = stato.scatti;
+  }, [stato.scatti]);
+
   // I due tempi della stampante. Ognuno porta la generazione in cui e' nato:
   // se nel frattempo e' cambiata, il riduttore lo ignora.
   useEffect(() => {
-    if (stato.fase !== "stampa") return;
+    if (stato.fase !== "stampa" || stato.servizio === null) return;
     const gen = stato.gen;
-    const colpo = window.setInterval(() => manda({ tipo: "scatto", gen }), INTERVALLO);
-    return () => window.clearInterval(colpo);
-  }, [stato.fase, stato.gen]);
+    /* Sulla figura la stampa aspetta che la carta sia uscita. Solo se la
+       figura si vede (il telefono): e' il CSS a deciderlo, e chiederlo al
+       DOM evita di ripetere qui il suo breakpoint. Si guarda quella di un
+       fantasma, che c'e' sempre: sulla carta vera arriva solo con il suo colpo. */
+    const figura = uscita.current?.querySelector<HTMLElement>('[data-fantasma] [data-riga="figura"]');
+    const siVede = !!figura?.offsetHeight;
+    const soglia = soglie[stato.servizio];
+    let fatti = scattiOra.current;
+    let colpo = 0;
+    /* I colpi si contano qui, e il timer si ferma da solo nel colpo che
+       stampa la figura: su un telefono lento piu' colpi possono arrivare
+       prima che React ridisegni e pulisca l'effetto, e il colpo dopo
+       farebbe saltare l'attesa. */
+    const batti = () => {
+      colpo = window.setInterval(() => {
+        fatti += 1;
+        manda({ tipo: "scatto", gen });
+        if (siVede && fatti === soglia) window.clearInterval(colpo);
+      }, INTERVALLO);
+    };
+    const aspetta = allaFigura && siVede;
+    const attesa = aspetta ? window.setTimeout(batti, FIGURA) : 0;
+    if (!aspetta) batti();
+    return () => {
+      window.clearTimeout(attesa);
+      window.clearInterval(colpo);
+    };
+  }, [stato.fase, stato.gen, stato.servizio, soglie, allaFigura]);
 
   useEffect(() => {
     if (stato.fase !== "strappo") return;
@@ -269,13 +317,13 @@ export function ScontrinoStampante({
           <span data-fessura />
         </div>
 
-        <div data-scontrino-uscita>
+        <div ref={uscita} data-scontrino-uscita>
           {/* I fantasmi: i quattro scontrini interi, invisibili, uno sopra
               l'altro nella stessa cella. Tengono l'uscita alta quanto il piu'
               lungo, qualunque sia la lingua e la larghezza. */}
           {righe.map((r, i) => (
             <div key={servizi[i].id} data-scontrino-carta data-fantasma aria-hidden="true">
-              <Corpo righe={r} />
+              <Corpo righe={r} servizio={servizi[i]} />
               <div data-scontrino-azioni>
                 <span>{testi.parliamone}</span>
                 <span>{testi.strappa}</span>
@@ -290,8 +338,15 @@ export function ScontrinoStampante({
               data-scontrino-carta
               data-fase={stato.fase}
               data-finito={finito ? "" : undefined}
+              // Sopra la figura la carta esce in tutto il tempo dell'attesa, a
+              // velocita' costante: e' cosi' che il disegno sembra stampato.
+              // Scritto qui e non nel CSS perche' resti uguale a FIGURA.
+              style={allaFigura ? { transitionDuration: `${FIGURA}ms` } : undefined}
             >
-              <Corpo righe={aScatti(righe[stato.servizio], stato.scatti)} />
+              <Corpo
+                righe={aScatti(righe[stato.servizio], stato.scatti)}
+                servizio={servizi[stato.servizio]}
+              />
               {/* Fuori portata finche' la stampa non e' finita: fino ad allora
                   sono fuori dal flusso (tokens.css), e un fuoco su un bottone
                   che non si vede non serve a nessuno. */}
