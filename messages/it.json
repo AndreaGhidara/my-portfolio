@@ -471,7 +471,7 @@
         "riga": "Un'attività di fitness che lavorava con diversi strumenti presi da fuori, ognuno con il suo abbonamento.",
         "lavoro": "Diversi clienti, in mercati diversi. Il progetto più grande è una piattaforma per il fitness: con un piccolo team abbiamo riunito in un posto solo gli strumenti che l'attività usava già.",
         "scelta": "Portare dentro la piattaforma quello che arrivava dagli abbonamenti esterni, così che clienti, contratti e provvigioni stiano tutti nello stesso posto.",
-        "conduzione": "Piano piano: abbiamo spostato nella piattaforma una parte alla volta, e tolto gli strumenti esterni man mano che non servivano più."
+        "conduzione": "Abbiamo preso gli strumenti che l'attività usava, visto quali funzioni servivano davvero al cliente e le abbiamo riportate sulla nostra piattaforma, tarandole meglio sulle sue esigenze."
       },
       "bdroppy": {
         "name": "BDroppy",
@@ -583,7 +583,7 @@
     }
   },
   "metrics": {
-    "riservatoCycleTime": "per un passaggio che prima chiedeva ore",
+    "riservatoCycleTime": "per un passaggio che prima chiedeva ore, convertito in meno di 15 minuti",
     "bdroppyPagina": "per aprire una pagina prodotto, da oltre 4 s",
     "bdroppyTypescript": "del codice portato a TypeScript",
     "bdroppyDowntime": "ore di servizio interrotto",
