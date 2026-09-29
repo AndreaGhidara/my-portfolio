@@ -468,10 +468,10 @@
     "list": {
       "riservato": {
         "name": "Under NDA",
-        "riga": "A fitness business running on many tools scattered across the web: the same data in different places, a subscription for each, and nowhere the numbers added up.",
-        "lavoro": "Several clients, in different markets. The biggest project is a platform for fitness: one management system instead of the scattered tools, holding clients, contracts, commissions and everything else.",
-        "scelta": "Bring inside the system what used to be paid for outside, instead of wiring the external services together. Fewer subscriptions, and a single source of truth that every piece of information goes through.",
-        "conduzione": "One piece at a time: each external tool was switched off once its part was already in the system, so the business never ran on two systems at once and every figure goes through one place."
+        "riga": "A fitness business working with several outside tools, each with its own subscription.",
+        "lavoro": "Several clients, in different markets. The biggest project is a platform for fitness: with a small team we brought the tools the business already used into one place.",
+        "scelta": "Bring what came from the outside subscriptions into the platform, so that clients, contracts and commissions all sit in the same place.",
+        "conduzione": "Gradually: we moved one part at a time into the platform, and removed the outside tools as they were no longer needed."
       },
       "bdroppy": {
         "name": "BDroppy",

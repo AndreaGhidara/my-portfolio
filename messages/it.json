@@ -468,10 +468,10 @@
     "list": {
       "riservato": {
         "name": "Riservato",
-        "riga": "Un'attività di fitness che lavorava su tanti strumenti sparsi per il web: gli stessi dati in posti diversi, un abbonamento per ognuno e nessun posto dove i conti tornassero.",
-        "lavoro": "Diversi clienti, in mercati diversi. Il progetto più grande è una piattaforma per il fitness: un gestionale solo al posto degli strumenti sparsi, con dentro clienti, contratti, provvigioni e tutto il resto.",
-        "scelta": "Portare dentro il gestionale quello che prima si pagava fuori, invece di collegare fra loro i servizi esterni. Meno abbonamenti, e un unico centro di verità da cui passano tutte le informazioni.",
-        "conduzione": "Un pezzo alla volta: ogni strumento esterno si spegneva quando la sua parte era già nel gestionale, così l'attività non ha mai lavorato su due sistemi insieme e ogni conto passa da un posto solo."
+        "riga": "Un'attività di fitness che lavorava con diversi strumenti presi da fuori, ognuno con il suo abbonamento.",
+        "lavoro": "Diversi clienti, in mercati diversi. Il progetto più grande è una piattaforma per il fitness: con un piccolo team abbiamo riunito in un posto solo gli strumenti che l'attività usava già.",
+        "scelta": "Portare dentro la piattaforma quello che arrivava dagli abbonamenti esterni, così che clienti, contratti e provvigioni stiano tutti nello stesso posto.",
+        "conduzione": "Piano piano: abbiamo spostato nella piattaforma una parte alla volta, e tolto gli strumenti esterni man mano che non servivano più."
       },
       "bdroppy": {
         "name": "BDroppy",
