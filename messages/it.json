@@ -630,7 +630,10 @@
     "vuota": "Scegli fra I.A., Design e Codice, poi gira la manopola: la notizia si stampa qui.",
     "errore": "Le notizie non sono arrivate. Gira la manopola per riprovare.",
     "finite": "Le notizie {categoria} di oggi sono finite: prova un altro pulsante, o torna domani.",
-    "giaUscite": "già uscite",
+    "giaUscite": "Già uscite",
+    "testata": "Le notizie",
+    "nessunaUscita": "Le altre notizie che fai uscire si mettono in fila qui.",
+    "senzaRiassunto": "La notizia intera sta dall'altra parte del link: qui c'è il titolo, e il posto dove leggerla.",
     "raccolteOggi": "Notizie raccolte alle {ora} di oggi: domani sono altre.",
     "raccolteIl": "Notizie raccolte il {giorno} alle {ora}."
   },

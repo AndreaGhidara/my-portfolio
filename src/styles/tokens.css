@@ -4851,8 +4851,8 @@ svg[data-stato="scelta"] [data-nodo="snodo"] { opacity: 0.45; }
 
    Prima dei Contatti. A sinistra il distributore (globo, tappo, collo, corpo
    col colore della categoria scelta, targa, tre pulsanti da sala giochi,
-   manopola, sportello, piede), a destra il ritaglio di giornale; sotto gli
-   860px la macchina sopra e il giornale sotto. La stessa soglia sta in
+   manopola, sportello, piede), a destra il foglio di giornale a misura
+   fissa; sotto i 960px la macchina sopra e il foglio sotto (fra 860 e 960 la notizia aveva meno spazio che su un telefono). La stessa soglia sta in
    Bancone.tsx (TELEFONO), che sul telefono porta il giornale in vista.
 
    I colori delle tre categorie sono fissi nei due temi, ciascuno col suo
@@ -4908,7 +4908,7 @@ svg[data-stato="scelta"] [data-nodo="snodo"] { opacity: 0.45; }
   align-items: start;
 }
 
-@media (max-width: 859px) {
+@media (max-width: 959px) {
   [data-notizie-scena] { grid-template-columns: minmax(0, 1fr); justify-items: center; }
 }
 
@@ -5218,29 +5218,17 @@ svg[data-stato="scelta"] [data-nodo="snodo"] { opacity: 0.45; }
     0 6px 10px color-mix(in oklab, var(--ink) 25%, transparent);
 }
 
-/* ── Il giornale ── */
-[data-notizie-giornale] {
-  width: 100%;
-  min-height: 24rem;
-  /* La barra alta del sito, quando il telefono lo porta in vista. */
-  scroll-margin-top: 4.5rem;
-}
+/* ── La prima pagina ──
+   Un foglio di giornale a misura fissa: sopra la testata della categoria e la
+   data, sotto due colonne, la notizia grande e le gia' uscite. Qualunque cosa
+   esca (titoli da 14 a 118 caratteri, riassunti da 0 a quasi 400) il foglio
+   non cambia altezza, e la sezione con lui: le misure le decide il foglio, il
+   testo che non ci sta si ferma coi puntini. Il prototipo e'
+   docs/prototipi/2026-09-29-notizie-impaginate.html, variante B.
 
-[data-notizie-messaggio],
-[data-notizie-avviso] {
-  padding: 2rem 1.4rem;
-  border: 1px dashed color-mix(in oklab, var(--fg) 30%, var(--bg));
-  border-radius: 12px;
-  color: var(--fg-muted);
-  line-height: 1.6;
-}
-[data-notizie-avviso] { margin-bottom: 1.4rem; padding-block: 1rem; color: var(--fg); }
-/* Vuoto resta nel documento (e' la regione che annuncia), ma senza scatola. */
-[data-notizie-avviso]:empty { margin: 0; padding: 0; border: 0; }
-
-/* Il ritaglio e' carta in tutti e due i temi, come la pratica dei Lavori:
-   dentro non entra niente di quello che si ribalta col tema. */
-[data-notizie-ritaglio] {
+   Carta in tutti e due i temi, come la pratica dei Lavori: dentro non entra
+   niente di quello che si ribalta col tema. */
+[data-notizie-foglio] {
   --carta: var(--paper);
   --inchiostro: var(--ink);
   --tenue: var(--muted);
@@ -5248,30 +5236,40 @@ svg[data-stato="scelta"] [data-nodo="snodo"] { opacity: 0.45; }
   --arancio: var(--accento-su-carta);
   --bordo: color-mix(in oklab, var(--inchiostro) 22%, var(--carta));
   --ombra: color-mix(in oklab, var(--ink) 65%, transparent);
-  position: relative;
-  padding: 1.6rem clamp(1.2rem, 3vw, 2.4rem) 1.8rem;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 100%;
+  height: 33rem;
+  padding: 1.2rem clamp(1rem, 2vw, 1.4rem) 1.4rem;
   background: var(--carta);
   color: var(--inchiostro);
-  rotate: var(--storto, -0.6deg);
   box-shadow: 0 26px 50px -30px var(--ombra);
-  clip-path: polygon(0 1.5%, 4% 0, 9% 1.2%, 15% 0.2%, 22% 1.4%, 30% 0.3%, 38% 1.1%, 47% 0, 55% 1.3%, 63% 0.2%, 71% 1.2%, 79% 0, 88% 1.1%, 95% 0.1%, 100% 1%, 100% 98.6%, 96% 100%, 89% 98.8%, 82% 99.9%, 74% 98.7%, 66% 99.8%, 57% 98.9%, 49% 100%, 41% 98.8%, 33% 99.9%, 25% 98.6%, 17% 99.8%, 9% 98.8%, 3% 100%, 0 98.9%);
+  /* La barra alta del sito, quando il telefono lo porta in vista. */
+  scroll-margin-top: 4.5rem;
 }
 
-[data-notizie-ritaglio] [data-ritaglio-testata] {
+/* La testata non va mai a capo: un titolo lungo si ferma coi puntini. */
+[data-foglio-testa] {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  gap: 0.3rem 1rem;
-  padding-bottom: 0.6rem;
-  border-bottom: 3px double var(--inchiostro);
+  gap: 1rem;
+  min-width: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 4px double var(--inchiostro);
 }
-[data-notizie-ritaglio] [data-ritaglio-testata] b {
+[data-foglio-testa] b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--font-display), var(--font-body), sans-serif;
   font-weight: 400;
-  font-size: 1.15rem;
+  font-size: clamp(1.15rem, 1.9vw, 1.5rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
-[data-notizie-ritaglio] [data-ritaglio-testata] i {
+[data-notizie-foglio] [data-foglio-testa] i {
   display: inline-block;
   width: 0.75rem;
   height: 0.75rem;
@@ -5279,8 +5277,82 @@ svg[data-stato="scelta"] [data-nodo="snodo"] { opacity: 0.45; }
   border: 1.5px solid var(--inchiostro);
   border-radius: 50%;
   background: var(--c);
-  translate: 0 0.05rem;
+  translate: 0 -0.1rem;
 }
+[data-notizie-foglio] [data-foglio-testa] span,
+[data-notizie-foglio] [data-foglio-etichetta] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tenue);
+  white-space: nowrap;
+}
+[data-foglio-testa] span { flex: none; }
+
+[data-foglio-corpo] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(11rem, 30%, 15rem);
+  gap: 1.4rem;
+  min-height: 0;
+  margin-top: 1rem;
+}
+
+/* La notizia, il pannello vuoto e quello della categoria finita si
+   sovrappongono nella stessa cella: la scatola e' una, della stessa misura. */
+[data-foglio-notizia] {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  min-height: 0;
+  container-type: inline-size;
+}
+[data-foglio-notizia] > * { grid-area: 1 / 1; min-width: 0; min-height: 0; }
+
+[data-notizie-foglio] [data-notizie-messaggio],
+[data-notizie-foglio] [data-notizie-avviso] {
+  display: grid;
+  place-content: center;
+  padding: 2rem 1.4rem;
+  border: 1.5px dashed color-mix(in oklab, var(--inchiostro) 35%, var(--carta));
+  text-align: center;
+  line-height: 1.6;
+  color: var(--tenue);
+}
+[data-notizie-foglio] [data-notizie-avviso] {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 1.15rem;
+  line-height: 1.4;
+  color: var(--inchiostro);
+}
+/* Vuoto resta nel documento (e' la regione che annuncia), ma senza scatola e
+   senza altezza, sopra la notizia. */
+[data-notizie-foglio] [data-notizie-avviso]:empty {
+  align-self: start;
+  padding: 0;
+  border: 0;
+}
+
+/* ── La notizia grande ── */
+[data-notizie-ritaglio] {
+  --carta: var(--paper);
+  --inchiostro: var(--ink);
+  --tenue: var(--muted);
+  --accento-su-carta: color-mix(in oklab, var(--accent) 72%, var(--ink));
+  --arancio: var(--accento-su-carta);
+  --bordo: color-mix(in oklab, var(--inchiostro) 22%, var(--carta));
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  background: var(--carta);
+  color: var(--inchiostro);
+  rotate: var(--storto, 0deg);
+}
+[data-notizie-foglio] [data-notizie-ritaglio] {
+  height: 100%;
+  min-height: 0;
+}
+
 [data-notizie-ritaglio] [data-ritaglio-riga] {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.66rem;
@@ -5292,8 +5364,15 @@ svg[data-stato="scelta"] [data-nodo="snodo"] { opacity: 0.45; }
   display: flex;
   align-items: center;
   gap: 1rem;
+  min-width: 0;
   padding: 0.45rem 0;
   border-bottom: 1px solid var(--inchiostro);
+}
+[data-notizie-ritaglio] [data-ritaglio-sotto] > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 [data-notizie-ritaglio] [data-ritaglio-timbro] {
   margin-left: auto;
@@ -5302,58 +5381,95 @@ svg[data-stato="scelta"] [data-nodo="snodo"] { opacity: 0.45; }
   border-radius: 4px;
   color: var(--arancio);
   font-family: var(--font-display), var(--font-body), sans-serif;
-  font-size: 0.66rem;
+  font-size: 0.62rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
   rotate: 4deg;
 }
-[data-notizie-ritaglio] h3 {
-  margin-top: 1rem;
-  font-size: clamp(1.45rem, 2.6vw, 2.2rem);
-  line-height: 1.06;
+[data-notizie-foglio] [data-notizie-ritaglio] h3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  margin-top: 0.9rem;
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  line-height: 1.08;
   letter-spacing: -0.015em;
   overflow-wrap: anywhere;
 }
-[data-notizie-ritaglio] [data-ritaglio-riassunto] {
-  margin-top: 0.9rem;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
+[data-notizie-ritaglio] [data-ritaglio-corpo] {
+  min-height: 0;
+  margin-top: 0.8rem;
+  overflow: hidden;
 }
-[data-notizie-ritaglio] [data-ritaglio-riassunto][data-colonne="2"] {
-  columns: 2 15rem;
-  column-gap: 1.6rem;
-  column-rule: 1px solid var(--bordo);
+/* Sei righe ci stanno anche col titolo a tre righe e il piede a due, alla
+   misura del telefono: il corpo non taglia mai una riga a meta'. */
+[data-notizie-ritaglio] [data-ritaglio-riassunto] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 [data-notizie-ritaglio] [data-ritaglio-riassunto]::first-letter {
   float: left;
-  margin: 0.2rem 0.45rem 0 0;
+  margin: 0.15rem 0.4rem 0 0;
   font-family: var(--font-display), var(--font-body), sans-serif;
-  font-size: 3.1rem;
+  font-size: 2.6rem;
   line-height: 0.85;
   color: var(--arancio);
 }
+/* Senza riassunto il posto non si chiude: il dominio in grande e una riga. */
+[data-notizie-ritaglio] [data-ritaglio-vuoto] {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  padding-top: 0.2rem;
+  color: var(--tenue);
+}
+[data-notizie-ritaglio] [data-ritaglio-vuoto] b {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-weight: 400;
+  font-size: 1.2rem;
+  overflow-wrap: anywhere;
+}
+[data-notizie-ritaglio] [data-ritaglio-vuoto] span { font-size: 0.9rem; line-height: 1.5; }
 [data-notizie-ritaglio] [data-ritaglio-piede] {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin-top: 1.1rem;
+  min-width: 0;
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px dashed var(--bordo);
 }
+/* Con il testo molto ingrandito i dati non ci stanno: l'ultimo si chiude coi
+   puntini invece di tagliarsi a meta' lettera. */
+[data-notizie-ritaglio] [data-ritaglio-dati] > :last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 [data-notizie-ritaglio] [data-ritaglio-dati] {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem 1.2rem;
+  gap: 1rem;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
   font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   color: var(--tenue);
 }
 [data-notizie-ritaglio] [data-ritaglio-dati] b { color: var(--inchiostro); font-weight: 500; }
 [data-notizie-ritaglio] a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--inchiostro);
@@ -5362,52 +5478,105 @@ svg[data-stato="scelta"] [data-nodo="snodo"] { opacity: 0.45; }
 }
 [data-notizie-ritaglio] a:focus-visible {
   outline: 2px solid var(--arancio);
-  outline-offset: 3px;
+  outline-offset: -2px;
+}
+/* Quando la colonna della notizia e' stretta (il telefono, ma anche fra 860 e
+   1200px, dove il foglio divide lo spazio con la macchina) numeri e link non
+   stanno su una riga: vanno sempre su due, e la misura resta quella. */
+@container (max-width: 32rem) {
+  [data-notizie-ritaglio] [data-ritaglio-piede] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+  [data-notizie-ritaglio] [data-ritaglio-dati],
+  [data-notizie-ritaglio] a { max-width: 100%; }
 }
 
-/* ── I pallini gia' usciti, e l'ora della raccolta ── */
-[data-notizie-mazzetta] {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 1.4rem;
+/* ── Le gia' uscite, e l'ora della raccolta ── */
+[data-foglio-colonna] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
+  padding-left: 1.2rem;
+  border-left: 1px solid var(--bordo);
 }
-[data-notizie-mazzetta] span {
-  margin-right: 0.3rem;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.66rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--fg-muted);
+/* Alta quanto la colonna, e scorre dentro: la fila si allunga, il foglio no. */
+[data-foglio-uscite] {
+  min-height: 0;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
 }
-[data-notizie-mazzetta] button {
-  width: 1.5rem;
-  height: 1.5rem;
+[data-notizie-foglio] [data-foglio-uscite] li + li {
+  border-top: 1px solid color-mix(in oklab, var(--inchiostro) 18%, var(--carta));
+}
+[data-notizie-foglio] [data-foglio-uscite] button {
+  display: grid;
+  grid-template-columns: 0.7rem minmax(0, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.55rem 0.2rem 0.55rem 0;
   border: 0;
-  border-radius: 50%;
+  background: none;
   cursor: pointer;
-  background:
-    radial-gradient(circle at 32% 28%, color-mix(in oklab, var(--paper) 75%, transparent) 0 12%, transparent 13%),
-    var(--c);
-  box-shadow:
-    inset 0 -2px 3px color-mix(in oklab, var(--ink) 25%, transparent),
-    0 0 0 1px color-mix(in oklab, var(--fg) 20%, transparent);
+  text-align: left;
+  color: var(--inchiostro);
 }
-[data-notizie-mazzetta] button[data-cat="design"] {
-  box-shadow:
-    inset 0 0 0 1.5px var(--ink),
-    inset 0 -2px 3px color-mix(in oklab, var(--ink) 25%, transparent);
+[data-notizie-foglio] [data-foglio-uscite] button:focus-visible {
+  outline: 2px solid var(--arancio);
+  outline-offset: -2px;
 }
-[data-notizie-mazzetta] button[aria-current="true"] {
-  outline: 2px solid var(--fg);
-  outline-offset: 2px;
+[data-notizie-foglio] [data-foglio-uscite] i {
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-top: 0.25rem;
+  border: 1.2px solid var(--inchiostro);
+  border-radius: 50%;
+  background: var(--c);
+}
+[data-foglio-uscite] button span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+[data-foglio-uscite] button[aria-current="true"] span { font-weight: 700; }
+[data-notizie-foglio] [data-foglio-nessuna] {
+  padding-top: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--tenue);
+}
+[data-notizie-foglio] [data-notizie-raccolte] {
+  margin-top: 0.6rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.64rem;
+  line-height: 1.6;
+  color: var(--tenue);
 }
 
-[data-notizie-raccolte] {
-  margin-top: 1rem;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.66rem;
-  line-height: 1.6;
-  color: var(--fg-muted);
+/* ── Telefono: la macchina sopra, il foglio sotto a tutta larghezza. Le
+   misure fisse restano fisse: la notizia in una scatola, la fila in un'altra
+   che scorre, la testata sopra la data perche' non vada a capo a caso. ── */
+@media (max-width: 959px) {
+  /* «Notizie raccolte alle…» va su due righe sul telefono: riservate da subito,
+     o la sezione cresceva di una riga all'arrivo delle notizie. */
+  [data-notizie-foglio] [data-notizie-raccolte] { min-height: calc(2 * 1.6em); }
+  [data-notizie-foglio] { height: auto; }
+  [data-foglio-corpo] { grid-template-columns: minmax(0, 1fr); }
+  [data-foglio-notizia] { height: 25rem; }
+  [data-foglio-testa] { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+  [data-foglio-testa] b { max-width: 100%; font-size: clamp(1rem, 5vw, 1.25rem); }
+  [data-foglio-colonna] {
+    padding: 0.8rem 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--bordo);
+  }
+  [data-foglio-uscite] { height: 11rem; }
 }

@@ -8,7 +8,7 @@ import { Ritaglio } from "./Ritaglio";
 import type { TestiNotizie } from "./tipi";
 
 /** Sotto questa larghezza il giornale sta sotto la macchina: la stessa soglia e' in tokens.css. */
-export const TELEFONO = "(max-width: 859px)";
+export const TELEFONO = "(max-width: 959px)";
 
 type Stato = { tipo: "attesa" } | { tipo: "errore" } | { tipo: "pronto"; raccolta: Raccolta };
 type Uscita = { cat: CategoriaId; i: number; storto: number };
@@ -278,6 +278,14 @@ export function Bancone({ testi, locale }: { testi: TestiNotizie; locale: string
         ? riempi(testi.finite, { categoria: testi.categorie[finita].nome })
         : null;
   const messaggio = stato.tipo === "attesa" ? testi.attesa : stato.tipo === "pronto" ? testi.vuota : null;
+  const testata = finita ?? uscita?.cat;
+  // La data si scrive solo sul client (le notizie arrivano li'): il server
+  // potrebbe stare in un altro giorno, o in un altro fuso.
+  const oggi = pronta
+    ? new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }).format(adesso)
+    : "\u00a0";
+  // La fila parte dalla seconda: la prima e' gia' sulla pagina. L'ultima uscita in cima.
+  const fila = storia.length > 1 ? storia.map((u, k) => ({ ...u, k })).reverse() : [];
 
   return (
     <div ref={radice} data-notizie-scena data-motion={level}>
@@ -327,52 +335,74 @@ export function Bancone({ testi, locale }: { testi: TestiNotizie; locale: string
         <p data-notizie-aiuto>{testi.aiuto}</p>
       </div>
 
-      <div ref={giornale} data-notizie-giornale>
-        {/* Sempre montato, vuoto quando non c'e' niente da dire: una regione
-            che nasce insieme al suo testo spesso non viene letta. */}
-        <p data-notizie-avviso role="status">
-          {avviso ?? ""}
-        </p>
-        {/* Si annunciano solo testata e titolo: l'articolo intero, e i pallini
-            gia' usciti, si vanno a leggere. */}
+      <div ref={giornale} data-notizie-foglio>
+        <div data-foglio-testa>
+          <b>
+            {testata ? <i aria-hidden="true" data-cat={testata} /> : null}
+            {testata ? testi.categorie[testata].testata : testi.testata}
+          </b>
+          <span>{oggi}</span>
+        </div>
+        {/* Si annunciano solo testata e titolo: l'articolo intero, e la fila
+            delle gia' uscite, si vanno a leggere. */}
         <p className="sr-only" aria-live="polite" data-notizie-annuncio>
           {notizia && uscita ? `${testi.categorie[uscita.cat].testata}: ${titoloDi(notizia, testi)}` : ""}
         </p>
-        <div data-notizie-notizia>
-          {notizia && uscita ? (
-            <Ritaglio
-              key={mostrata}
-              notizia={notizia}
-              cat={uscita.cat}
-              storto={uscita.storto}
-              testi={testi}
-              locale={locale}
-              adesso={adesso}
-            />
-          ) : null}
-        </div>
-        {!notizia && messaggio ? <p data-notizie-messaggio>{messaggio}</p> : null}
-        {storia.length > 1 ? (
-          <div data-notizie-mazzetta>
-            <span>{testi.giaUscite}</span>
-            {storia.map((u, k) => {
-              const n = pronta?.categorie[u.cat][u.i];
-              if (!n) return null;
-              return (
-                <button
-                  key={k}
-                  type="button"
-                  data-cat={u.cat}
-                  aria-current={k === mostrata ? "true" : undefined}
-                  aria-label={`${testi.categorie[u.cat].nome}: ${n.titolo}`}
-                  title={n.titolo}
-                  onClick={() => setMostrata(k)}
-                />
-              );
-            })}
+        <div data-foglio-corpo>
+          {/* La notizia, il pannello vuoto e quello della categoria finita
+              stanno nella stessa scatola, della stessa misura. */}
+          <div data-foglio-notizia>
+            {/* Sempre montato, vuoto quando non c'e' niente da dire: una regione
+                che nasce insieme al suo testo spesso non viene letta. */}
+            <p data-notizie-avviso role="status">
+              {avviso ?? ""}
+            </p>
+            {avviso ? null : notizia && uscita ? (
+              <Ritaglio
+                key={mostrata}
+                notizia={notizia}
+                cat={uscita.cat}
+                storto={uscita.storto}
+                testi={testi}
+                locale={locale}
+                adesso={adesso}
+              />
+            ) : messaggio ? (
+              <p data-notizie-messaggio>{messaggio}</p>
+            ) : null}
           </div>
-        ) : null}
-        {pronta ? <p data-notizie-raccolte>{raccolte(pronta.raccolteAlle, locale, adesso, testi)}</p> : null}
+          <div data-foglio-colonna>
+            <p data-foglio-etichetta>{testi.giaUscite}</p>
+            {/* La colonna scorre dentro di se': senza, Lenis prende la rotella
+                e scorre la pagina anche col puntatore sulla lista. */}
+            <ol data-foglio-uscite data-lenis-prevent>
+              {fila.length === 0 ? <li data-foglio-nessuna>{testi.nessunaUscita}</li> : null}
+              {fila.map((u) => {
+                const n = pronta?.categorie[u.cat][u.i];
+                if (!n) return null;
+                const titolo = titoloDi(n, testi);
+                return (
+                  <li key={u.k}>
+                    <button
+                      type="button"
+                      data-cat={u.cat}
+                      aria-current={u.k === mostrata && !finita ? "true" : undefined}
+                      aria-label={`${testi.categorie[u.cat].nome}: ${titolo}`}
+                      onClick={() => {
+                        setFinita(null);
+                        setMostrata(u.k);
+                      }}
+                    >
+                      <i aria-hidden="true" />
+                      <span lang={n.timbro === "release" ? undefined : "en"}>{titolo}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+            <p data-notizie-raccolte>{pronta ? raccolte(pronta.raccolteAlle, locale, adesso, testi) : "\u00a0"}</p>
+          </div>
+        </div>
       </div>
     </div>
   );

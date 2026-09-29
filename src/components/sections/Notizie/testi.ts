@@ -48,5 +48,8 @@ export function testiNotizie(t: Traduci): TestiNotizie {
     vuota: t("vuota"),
     errore: t("errore"),
     giaUscite: t("giaUscite"),
+    testata: t("testata"),
+    nessunaUscita: t("nessunaUscita"),
+    senzaRiassunto: t("senzaRiassunto"),
   };
 }
