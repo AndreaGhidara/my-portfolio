@@ -475,24 +475,24 @@
       },
       "bdroppy": {
         "name": "BDroppy",
-        "riga": "The platform was stuck on Next 14. Every new feature took weeks, and the team was afraid to touch the code.",
-        "lavoro": "A platform that sells every day, and so could not afford a window of downtime: whatever we did had to happen with the shop open.",
-        "scelta": "Migrate one route at a time instead of rewriting from scratch. A rewrite ships all at once, and until that day the business stays on what it already has.",
-        "conduzione": "Old and new living side by side behind the same address: every migrated route went to production on its own, without waiting for the others. It runs on Next 15 and TypeScript today, and the service never went down."
+        "riga": "The platform was stuck on Next 14, with much of the code still in JavaScript and slow pages right where people choose and buy.",
+        "lavoro": "Upgrade the platform from Next 14 to Next 15, improve its performance and fix the bugs it had been carrying.",
+        "scelta": "Move the code towards TypeScript wherever possible, instead of rewriting it all. Legacy JavaScript stays where it works, and new or touched parts are typed from the start.",
+        "conduzione": "Upgrade, performance and interface in the same job: we reworked the product selection and checkout screens, to make finding a product and buying it simpler."
       },
       "aidify": {
         "name": "Aidify",
-        "riga": "A customer support team buried under the same ten questions, repeated across five different e-commerce platforms.",
-        "lavoro": "An assistant that answers in place of people on the questions that keep coming back, across the five e-commerce platforms they come from.",
-        "scelta": "Wire it into the real catalogue and real orders, instead of training a model on the most frequent questions. A model guesses, and when it guesses wrong it does so with the same confidence as when it gets it right: the customer finds out after buying.",
-        "conduzione": "The edge of what the assistant knows is not left to the model, it is written into the code: past that edge the conversation goes to an operator without the customer having to ask."
+        "riga": "Shopify stores that had to answer customers at any hour, even when nobody was in front of the screen.",
+        "lavoro": "An AI chatbot that handles customer support inside Shopify stores, and the landing page that brings stores to try it, then to stay.",
+        "scelta": "A single widget that adapts to each store: style and colours change to fit in, without touching the code.",
+        "conduzione": "By optimising the widget on Shopify so it wouldn't weigh down the store hosting it, and by looking after the landing page for acquiring and retaining customers and leads."
       },
       "visualboost": {
         "name": "VisualBoost",
-        "riga": "An editorial image library nobody could browse without sitting there waiting.",
-        "lavoro": "An editorial library to browse, where the content is made almost entirely of heavy images.",
-        "scelta": "Work on the images, not on the code laying them out. The code is the first place everyone looks, and it's almost never there: the weight was in the files.",
-        "conduzione": "Modern formats, right dimensions and progressive loading, before anything else. The public landing page was later rebuilt by others: what remains is the engine underneath."
+        "riga": "A service that creates AI images of a store's products: a showcase made almost entirely of images, which had to open instantly.",
+        "lavoro": "The service's landing page and the loading of the images, which here are the product itself.",
+        "scelta": "Work on the images before the code: the right formats and sizes, and loading only when they're needed.",
+        "conduzione": "Measuring with Lighthouse before and after, with an eye on conversion: a page that opens instantly is a page that gets read down to the button."
       }
     }
   },
@@ -584,7 +584,8 @@
   },
   "metrics": {
     "riservatoCycleTime": "for a step that used to take hours",
-    "bdroppyComponents": "components migrated",
+    "bdroppyPagina": "to open a product page, down from over 4 s",
+    "bdroppyTypescript": "of the code moved to TypeScript",
     "bdroppyDowntime": "hours of downtime",
     "aidifyConversations": "conversations handled per month",
     "visualboostCatalog": "images in the catalogue",
