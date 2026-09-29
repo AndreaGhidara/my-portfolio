@@ -31,10 +31,16 @@ export const metrics: Metric[] = [
       "Cronometrare il passaggio dentro la piattaforma con chi lo esegue davvero, e confrontarlo con quanto durava sui vecchi strumenti. Finche' non e' misurato, in call si dice \"si e' passati da ore a minuti\" senza dare il numero.",
   },
   {
-    id: "bdroppyComponents",
-    value: "120",
+    id: "bdroppyPagina",
+    value: "< 2 s",
     estimated: true,
-    howToVerify: "Contare i componenti migrati nel repo BDroppy fra il primo e l'ultimo commit della migrazione.",
+    howToVerify: "Misurare il caricamento del contenuto principale (LCP) di una pagina prodotto con PageSpeed Insights, prima e dopo l'aggiornamento, sulla stessa pagina.",
+  },
+  {
+    id: "bdroppyTypescript",
+    value: "40%",
+    estimated: true,
+    howToVerify: "Contare i file .ts/.tsx sul totale dei file sorgente nel repo BDroppy, prima e dopo l'aggiornamento.",
   },
   {
     id: "bdroppyDowntime",

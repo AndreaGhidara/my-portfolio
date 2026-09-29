@@ -47,7 +47,7 @@ export const works: Work[] = [
     year: 2025,
     stato: "consegnato",
     tech: ["Next.js", "TypeScript", "SEO"],
-    metricIds: ["bdroppyComponents", "bdroppyDowntime"],
+    metricIds: ["bdroppyPagina", "bdroppyTypescript", "bdroppyDowntime"],
   },
   {
     id: "aidify",

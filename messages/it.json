@@ -475,24 +475,24 @@
       },
       "bdroppy": {
         "name": "BDroppy",
-        "riga": "La piattaforma era ferma su Next 14. Ogni funzionalità nuova richiedeva settimane e il team aveva paura di toccare il codice.",
-        "lavoro": "Una piattaforma che vende ogni giorno, e che quindi non poteva avere una finestra di fermo: qualunque cosa si facesse, doveva succedere mentre il negozio era aperto.",
-        "scelta": "Migrare una rotta alla volta, invece di riscrivere da zero. Una riscrittura si consegna tutta insieme, e fino a quel giorno l'azienda resta su quello che ha.",
-        "conduzione": "Vecchia e nuova in convivenza dietro lo stesso indirizzo: ogni rotta migrata andava in produzione per conto suo, senza aspettare le altre. Oggi è su Next 15 e TypeScript, e il servizio non si è mai fermato."
+        "riga": "La piattaforma era ferma a Next 14, con buona parte del codice ancora in JavaScript e le pagine lente proprio dove si sceglie e si compra.",
+        "lavoro": "Aggiornare la piattaforma da Next 14 a Next 15, migliorarne le prestazioni e correggere i bug che si portava dietro.",
+        "scelta": "Portare il codice verso TypeScript dove si poteva, invece di riscriverlo tutto. Il JavaScript legacy resta dove funziona, e le parti nuove o toccate nascono tipizzate.",
+        "conduzione": "Aggiornamento, prestazioni e interfaccia nello stesso lavoro: abbiamo rivisto le schermate di scelta e di acquisto, per rendere più semplice trovare un prodotto e comprarlo."
       },
       "aidify": {
         "name": "Aidify",
-        "riga": "Un'assistenza clienti sommersa dalle stesse dieci domande, ripetute su cinque piattaforme e-commerce diverse.",
-        "lavoro": "Un assistente che risponde al posto delle persone sulle domande che tornano sempre, sulle cinque piattaforme e-commerce da cui arrivano.",
-        "scelta": "Legarlo al catalogo e agli ordini veri, invece di addestrare un modello sulle domande più frequenti. Un modello indovina, e quando indovina male lo fa con la stessa sicurezza di quando indovina bene: il cliente se ne accorge dopo aver comprato.",
-        "conduzione": "Il confine di quello che l'assistente sa non è affidato al modello, è scritto nel codice: oltre quel confine la conversazione passa a un operatore senza che il cliente debba chiederlo."
+        "riga": "Negozi Shopify che dovevano rispondere ai clienti a qualunque ora, anche quando nessuno era davanti allo schermo.",
+        "lavoro": "Un chatbot con l'intelligenza artificiale che fa assistenza dentro i negozi Shopify, e la landing che porta i negozi a conoscerlo, poi a restare.",
+        "scelta": "Un widget solo che si adatta a ogni negozio: stile e colori si cambiano per starci dentro, senza toccare il codice.",
+        "conduzione": "Ottimizzando il widget sulle piattaforme Shopify, perché non appesantisse il negozio che lo ospita, e curando la landing per l'arrivo e la fidelizzazione di clienti e lead."
       },
       "visualboost": {
         "name": "VisualBoost",
-        "riga": "Un archivio di immagini editoriali che nessuno riusciva a sfogliare senza restare ad aspettare.",
-        "lavoro": "Un archivio editoriale da sfogliare, dove il contenuto è fatto quasi solo di immagini pesanti.",
-        "scelta": "Lavorare sulle immagini, non sul codice che le impagina. Il codice è il primo posto dove si guarda, e quasi mai è lì: a pesare erano i file.",
-        "conduzione": "Formati moderni, dimensioni giuste e caricamento progressivo, prima di ogni altra cosa. La landing pubblica è stata poi rifatta da altri: quello che resta è l'impianto sotto."
+        "riga": "Un servizio che crea con l'IA le immagini dei prodotti di uno store: una vetrina fatta quasi solo di immagini, che doveva aprirsi subito.",
+        "lavoro": "La landing del servizio e il caricamento delle immagini, che qui sono il prodotto stesso.",
+        "scelta": "Lavorare sulle immagini prima che sul codice: formati e dimensioni giusti, e caricamento solo quando servono.",
+        "conduzione": "Misurando con Lighthouse prima e dopo, con un occhio alla conversione: una pagina che si apre subito è una pagina che si legge fino al pulsante."
       }
     }
   },
@@ -584,7 +584,8 @@
   },
   "metrics": {
     "riservatoCycleTime": "per un passaggio che prima chiedeva ore",
-    "bdroppyComponents": "componenti migrati",
+    "bdroppyPagina": "per aprire una pagina prodotto, da oltre 4 s",
+    "bdroppyTypescript": "del codice portato a TypeScript",
     "bdroppyDowntime": "ore di servizio interrotto",
     "aidifyConversations": "conversazioni gestite al mese",
     "visualboostCatalog": "immagini a catalogo",
