@@ -2816,6 +2816,8 @@ html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] 
   transition: max-height 0.12s linear;
 }
 [data-riga] { white-space: pre-wrap; }
+/* La tavola stampata sulla carta: solo sul telefono, dove la tavola va via. */
+[data-riga="figura"] { display: none; }
 [data-riga="grosso"] {
   margin: 0.3rem 0;
   font-family: var(--font-display), var(--font-body), sans-serif;
@@ -2927,12 +2929,6 @@ html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] 
   letter-spacing: 0;
 }
 [data-scontrino-tavola] [data-cartiglio="piccolo"] { font-size: 8.5px; }
-[data-scontrino-tavola] [data-nota-numero] {
-  display: none;
-  font-family: var(--font-display), var(--font-body), sans-serif;
-  font-size: 26px;
-  letter-spacing: 0;
-}
 [data-scontrino-tavola] svg[data-traccia] :is([data-tratto], [data-richiamo]) { stroke-dashoffset: 0; }
 [data-scontrino-tavola] svg[data-traccia] :is([data-punto], text) { opacity: 1; }
 
@@ -2948,19 +2944,41 @@ html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] 
     grid-column: 1;
     grid-row: auto;
   }
-  [data-scontrino-oggetto] { min-height: 19rem; margin-top: 1rem; }
   [data-scontrino-banco] { padding-top: 1rem; }
-  /* Il disegno scala a poco piu' di mezzo: il testo scenderebbe a 5 o 6
-     pixel e i tratti sotto il pixel. Restano i numeri, grandi, e la lista
-     numerata e' quella dello scontrino. */
-  [data-scontrino-tavola] [data-nota] { display: none; }
-  [data-scontrino-tavola] [data-nota-numero] { display: inline; }
-  [data-scontrino-tavola] :is([data-divisorio], [data-cartiglio="piccolo"]) { display: none; }
-  [data-scontrino-tavola] [data-cartiglio="titolo"] { font-size: 18px; }
-  [data-scontrino-tavola] [data-tratto] { stroke-width: 2.4; }
-  [data-scontrino-tavola] [data-tratto="fioco"] { stroke-width: 1.6; }
-  [data-scontrino-tavola] [data-richiamo] { stroke-width: 2; }
-  [data-scontrino-tavola] [data-punto] { r: 5px; }
+  /* Sul telefono la tavola non sta sopra i tasti: si stampa sullo scontrino,
+     subito prima della lista numerata che spiega. Esce con la carta, e i
+     fantasmi la contano nell'altezza. */
+  [data-scontrino-oggetto] { display: none; }
+  [data-riga="figura"] {
+    display: block;
+    margin: 0.5rem 0 0.35rem;
+  }
+  [data-riga="figura"] svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  /* Inchiostro termico: tratti pieni, i dettagli a meta', i richiami sottili. */
+  [data-riga="figura"] :is([data-tratto], [data-richiamo]) {
+    fill: none;
+    stroke: var(--ink);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  [data-riga="figura"] [data-tratto] { stroke-width: 2.6; }
+  [data-riga="figura"] [data-tratto="fioco"] {
+    stroke: var(--tratto-fioco);
+    stroke-width: 1.8;
+  }
+  [data-riga="figura"] [data-richiamo] { stroke-width: 1.6; }
+  [data-riga="figura"] [data-punto] { fill: var(--ink); }
+  [data-riga="figura"] text {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 26px;
+    font-weight: 600;
+    fill: var(--ink);
+  }
 }
 /* Sugli schermi bassi (1366 x 768) lo scontrino piu' lungo, in inglese,
    finiva una quarantina di pixel sotto il bordo: si stringe l'aria sopra i

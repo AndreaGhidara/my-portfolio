@@ -148,6 +148,33 @@ describe("la stampante dei servizi", () => {
       expect(f.querySelector("a, button")).toBeNull();
     });
   });
+
+  it("il disegno e' stampato anche sulla carta, subito prima della lista che spiega", () => {
+    const { container } = render(<ScontrinoView {...props} />);
+    const figura = vero(container)!.querySelector('[data-riga="figura"]');
+    expect(figura?.querySelector("svg path")).not.toBeNull();
+    expect(figura?.nextElementSibling).toHaveTextContent(`1 ${props.servizi[0].pezzi[0]}`);
+    // Solo i numeri: le parole sono quelle della lista, e il corpo non si legge.
+    const numeri = [...figura!.querySelectorAll("text")].map((t) => t.textContent);
+    expect(numeri).toEqual(props.servizi[0].pezzi.map((_, k) => String(k + 1)));
+    expect(figura?.closest('[aria-hidden="true"]')).not.toBeNull();
+  });
+
+  it("un tasto stampa sulla carta il disegno del suo servizio", () => {
+    const { container } = render(<ScontrinoView {...props} />);
+    fireEvent.click(screen.getByRole("button", { name: /Titolo 3/ }));
+    const numeri = vero(container)!.querySelectorAll('[data-riga="figura"] text');
+    expect(numeri).toHaveLength(props.servizi[3].pezzi.length);
+  });
+
+  it("anche i fantasmi hanno la figura: sul telefono l'altezza la conta", () => {
+    const { container } = render(<ScontrinoView {...props} />);
+    container.querySelectorAll("[data-fantasma]").forEach((f, i) => {
+      expect(f.querySelectorAll('[data-riga="figura"] text'), `fantasma ${i}`).toHaveLength(
+        props.servizi[i].pezzi.length,
+      );
+    });
+  });
 });
 
 const css = readFileSync("src/styles/tokens.css", "utf8");
@@ -198,6 +225,17 @@ describe("i colori della stampante", () => {
   it("lo scontrino vero non entra nel flusso: la pagina non cambia altezza a ogni stampa", () => {
     expect(css).toMatch(/\[data-scontrino-carta\]:not\(\[data-fantasma\]\)\s*\{[^}]*position:\s*absolute/);
     expect(css).toMatch(/\[data-scontrino-carta\]\[data-fantasma\]\s*\{[^}]*visibility:\s*hidden/);
+  });
+
+  it("sul telefono la tavola va via e il disegno si stampa sulla carta; sul desktop il contrario", () => {
+    // Il blocco del telefono della stampante, non il primo a 860 del file.
+    const sezione = css.slice(css.indexOf("\n[data-scontrino] {"));
+    const telefono = sezione.slice(sezione.indexOf("@media (max-width: 860px) {"));
+    const bloccoTelefono = telefono.slice(0, telefono.indexOf("\n}\n"));
+    expect(bloccoTelefono).toMatch(/\[data-scontrino-oggetto\][^{]*\{[^}]*display:\s*none/);
+    expect(bloccoTelefono).toMatch(/\[data-riga="figura"\]\s*\{[^}]*display:\s*block/);
+    const fuori = css.replace(bloccoTelefono, "");
+    expect(fuori).toMatch(/\[data-riga="figura"\]\s*\{[^}]*display:\s*none/);
   });
 
   it("lo scontrino non sta sotto zero: li' uscita e banco gli rubano i clic", () => {

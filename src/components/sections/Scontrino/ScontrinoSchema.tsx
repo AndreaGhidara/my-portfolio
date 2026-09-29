@@ -94,18 +94,6 @@ export function ScontrinoSchema({
               <text data-nota x={r.x} y={r.y} textAnchor={r.ancora} style={ritardo(r.ritardoTesto)}>
                 {`${k + 1} · ${pezzo.toUpperCase()}`}
               </text>
-              {/* Sul telefono il testo nel disegno scenderebbe a 5 o 6 pixel:
-                  li' resta il numero, grande, e la lista e' quella dello
-                  scontrino. Il CSS sceglie quale dei due si vede. */}
-              <text
-                data-nota-numero
-                x={r.x}
-                y={r.y + 6}
-                textAnchor={r.ancora}
-                style={ritardo(r.ritardoTesto)}
-              >
-                {k + 1}
-              </text>
             </g>
           );
         })}
@@ -124,5 +112,36 @@ export function ScontrinoSchema({
         </text>
       </svg>
     </div>
+  );
+}
+
+/**
+ * La stessa tavola stampata sullo scontrino, sul telefono: il disegno e i
+ * richiami con i soli numeri, a inchiostro sulla carta. Niente cornice ne'
+ * cartiglio (il titolo e' gia' stampato sopra), e il viewBox taglia via il
+ * bianco attorno, perche' la carta e' stretta.
+ *
+ * Non si traccia: esce intera, e la scopre la carta che esce dalla fessura.
+ * Sta nel corpo dello scontrino, che non si legge: il contenuto e' la lista.
+ */
+export function ScontrinoFigura({ forma, quanti }: { forma: string; quanti: number }) {
+  return (
+    <svg viewBox="124 60 352 304" aria-hidden="true" focusable="false">
+      {(FORME[forma] ?? []).map((d, k) => (
+        <path key={k} data-tratto={k === 0 ? "pieno" : "fioco"} d={d} />
+      ))}
+      {Array.from({ length: quanti }, (_, k) => {
+        const r = richiamo(k);
+        return (
+          <g key={k}>
+            <path data-richiamo d={r.d} />
+            <circle data-punto cx={r.punto[0]} cy={r.punto[1]} r={4} />
+            <text x={r.x} y={r.y + 7} textAnchor={r.ancora}>
+              {k + 1}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
   );
 }

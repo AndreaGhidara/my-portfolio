@@ -11,6 +11,7 @@ import {
   conPuntini,
   richiamo,
   righeScontrino,
+  scattiAllaFigura,
   scattiTotali,
   stampante,
   statoIniziale,
@@ -34,7 +35,7 @@ const dati = (indice: number, data = ""): DatiScontrino => ({
 });
 
 describe("le righe dello scontrino", () => {
-  it("intestazione, titolo, testo, pezzi numerati e il totale, in quest'ordine", () => {
+  it("intestazione, titolo, testo, figura, pezzi numerati e il totale, in quest'ordine", () => {
     const righe = righeScontrino(dati(0));
     expect(righe.map((r) => r.testo)).toEqual([
       "ANDREA GHIDARA",
@@ -44,6 +45,7 @@ describe("le righe dello scontrino", () => {
       "SITI E LANDING",
       "Niente temi comprati.",
       "-".repeat(LARGHEZZA),
+      "",
       "1 struttura",
       "2 parole",
       "3 immagini",
@@ -52,6 +54,17 @@ describe("le righe dello scontrino", () => {
     ]);
     expect(righe.find((r) => r.tipo === "grosso")?.testo).toBe("SITI E LANDING");
     expect(righe.filter((r) => r.tipo === "voce")).toHaveLength(3);
+  });
+
+  it("la figura sta subito prima della lista che spiega, e non ha testo", () => {
+    // Sul telefono e' il disegno della tavola stampato sulla carta; sul
+    // desktop non si vede. Senza testo costa un colpo solo: il desktop non
+    // se ne accorge.
+    const righe = righeScontrino(dati(0));
+    const figura = righe.findIndex((r) => r.tipo === "figura");
+    expect(righe.filter((r) => r.tipo === "figura")).toHaveLength(1);
+    expect(righe[figura + 1]).toEqual({ testo: "1 struttura", tipo: "voce" });
+    expect(righe[figura].testo).toBe("");
   });
 
   it("il numero e il totale vengono dall'elenco, non da un 04 scritto a mano", () => {
@@ -92,6 +105,13 @@ describe("la stampa carattere per carattere", () => {
     // «ANDREA GHIDARA» e' lunga 14: cinque colpi.
     expect(aScatti(righe, 5).map((r) => r.testo)).toEqual(["ANDREA GHIDARA"]);
     expect(aScatti(righe, 6).map((r) => r.testo)).toEqual(["ANDREA GHIDARA", "svi"]);
+  });
+
+  it("sa a quale colpo esce la figura: e' l'ultima riga stampata", () => {
+    const soglia = scattiAllaFigura(righe);
+    expect(aScatti(righe, soglia).at(-1)?.tipo).toBe("figura");
+    expect(aScatti(righe, soglia - 1).some((r) => r.tipo === "figura")).toBe(false);
+    expect(scattiAllaFigura(righe.filter((r) => r.tipo !== "figura"))).toBe(-1);
   });
 
   it("a colpi finiti lo scontrino e' intero", () => {
@@ -197,8 +217,9 @@ describe("la stampante", () => {
   });
 
   it("svuota toglie anche il disegno, e la tavola resta bianca fino alla stampa", () => {
-    // Sul telefono la tavola sta sopra i tasti: tracciata dal server e poi
-    // cancellata e ridisegnata sotto gli occhi all'autostampa, era un salto.
+    // Tracciata dal server e poi cancellata e ridisegnata sotto gli occhi
+    // all'autostampa, era un salto. Sul telefono la tavola non c'e' piu': il
+    // disegno si stampa sulla carta.
     const iniziale = statoIniziale(TOTALI);
     expect(iniziale.tavolaVuota).toBe(false);
     const s = fai(iniziale, { tipo: "svuota" });
