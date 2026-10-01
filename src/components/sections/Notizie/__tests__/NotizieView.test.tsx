@@ -9,6 +9,7 @@ import en_ from "../../../../../messages/en.json";
 import type { Notizia, Raccolta } from "@/lib/notizie/tipi";
 import { NotizieView } from "../NotizieView";
 import { testiNotizie } from "../testi";
+import { regole, type Opzioni } from "@/test/css";
 
 /** I testi veri, costruiti come li costruisce il server. */
 function testi(lingua: "it" | "en") {
@@ -341,25 +342,11 @@ describe("le notizie in inglese", () => {
   });
 });
 
-const css = readFileSync("src/styles/tokens.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
-const regole = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, selettore, corpo]) => ({
-  selettore: selettore.trim(),
-  corpo,
-}));
-const regoleDelRitaglio = regole.filter((r) => r.selettore.includes("[data-notizie-ritaglio]"));
-const regoleDelFoglio = regole.filter((r) => r.selettore.includes("[data-notizie-foglio]"));
-/** Il corpo della regola col selettore esatto, fuori o dentro una media query (la prima che c'e'). */
-const regola = (selettore: string, dove: string = css) =>
-  [...dove.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find(([, s]) => s.trim() === selettore)?.[2] ?? "";
-const telefono = css.split("@media (max-width: 959px)").slice(1).map((pezzo) => {
-  // Il blocco della media query, fino alla sua graffa chiusa.
-  let profondo = 0;
-  for (let k = pezzo.indexOf("{"); k < pezzo.length; k++) {
-    if (pezzo[k] === "{") profondo++;
-    if (pezzo[k] === "}" && --profondo === 0) return pezzo.slice(pezzo.indexOf("{") + 1, k);
-  }
-  return "";
-}).join("\n");
+const regoleDelRitaglio = regole(/\[data-notizie-ritaglio\]/);
+const regoleDelFoglio = regole(/\[data-notizie-foglio\]/);
+/** Il corpo della regola col selettore, fuori o dentro una media query (la prima che c'e'). */
+const regola = (selettore: string, dove?: Opzioni) => regole(selettore, dove)[0]?.corpo ?? "";
+const telefono: Opzioni = { media: "(max-width: 959px)" };
 
 describe("i colori delle notizie", () => {
   it("il foglio e il ritaglio sono carta nei due temi: dentro mai i colori che seguono il tema", () => {
@@ -378,16 +365,19 @@ describe("i colori delle notizie", () => {
   });
 
   it("le categorie sono fisse: il verde e' quello di carta, e nessun tema le ridefinisce", () => {
-    expect(css).toMatch(/--notizie-codice:\s*#2F6F4E/);
-    expect(css).toMatch(/--on-notizie-ia:\s*var\(--ink\)/);
-    expect(css).toMatch(/--on-notizie-design:\s*var\(--ink\)/);
-    expect(css).toMatch(/--on-notizie-codice:\s*var\(--paper\)/);
-    const scuro = [...css.matchAll(/\[data-theme="dark"\][^{]*\{([^}]*)\}/g)].map((m) => m[1]).join("");
+    const valori = (proprieta: string) => regole().map((r) => r.dichiarazioni[proprieta]);
+    expect(valori("--notizie-codice")).toContain("#2F6F4E");
+    expect(valori("--on-notizie-ia")).toContain("var(--ink)");
+    expect(valori("--on-notizie-design")).toContain("var(--ink)");
+    expect(valori("--on-notizie-codice")).toContain("var(--paper)");
+    const scuro = regole(/\[data-theme="dark"\]/).map((r) => r.corpo).join("");
     expect(scuro).not.toMatch(/--(on-)?notizie-/);
   });
 
   it("l'anello di fuoco dei pulsanti e della manopola e' il testo della categoria, non l'arancio", () => {
-    const fuoco = css.match(/\[data-notizie-pulsanti\] button:focus-visible,\s*\[data-notizie-manopola\]:focus-visible\s*\{([^}]*)\}/)?.[1];
+    const fuoco = regole("[data-notizie-pulsanti] button:focus-visible").find((r) =>
+      r.selettori.includes("[data-notizie-manopola]:focus-visible"),
+    )?.corpo;
     expect(fuoco).toMatch(/outline:\s*3px solid var\(--su-tema\)/);
   });
 
@@ -397,8 +387,7 @@ describe("i colori delle notizie", () => {
       '[data-notizie-pulsanti] [data-cat="design"] i',
       '[data-notizie-macchina][data-cat="design"] [data-notizie-corpo]',
     ]) {
-      const regola = css.split(selettore + " {")[1]?.split("}")[0];
-      expect(regola, selettore).toMatch(/inset 0 0 0 [\d.]+px var\(--ink\)/);
+      expect(regola(selettore), selettore).toMatch(/inset 0 0 0 [\d.]+px var\(--ink\)/);
     }
   });
 

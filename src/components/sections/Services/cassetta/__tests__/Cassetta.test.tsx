@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { readFileSync } from "node:fs";
 import { ATTREZZI, CAPI } from "@/content/cassetta";
 import { CassettaView } from "../CassettaView";
 import { VISTA_MAPPA, riduci } from "../Cassetta";
 import { testi } from "./fixture";
+import { regole } from "@/test/css";
 
 const t = testi("it");
 const props = { eyebrow: "Gli attrezzi", title: "Tutto quello che so usare.", lead: "La mia cassetta.", testi: t };
@@ -173,15 +173,13 @@ describe("la cassetta: senza JavaScript e per chi legge", () => {
   });
 
   it("il CSS mostra l'elenco quando lo scripting manca, e nasconde la scena", () => {
-    const css = readFileSync("src/styles/tokens.css", "utf8");
-    const blocco = css.match(/@media \(scripting: none\) \{[\s\S]*?\n\}/)?.[0] ?? "";
-    expect(blocco).toMatch(/\[data-cassetta-scena\][^{]*\{[^}]*display:\s*none/);
-    expect(blocco).toContain("[data-cassetta-elenco]");
+    const senza = { media: "(scripting: none)" };
+    expect(regole(/\[data-cassetta-scena\]/, senza).some((r) => /display:\s*none/.test(r.corpo))).toBe(true);
+    expect(regole(/\[data-cassetta-elenco\]/, senza).length).toBeGreaterThan(0);
   });
 
   it("mappa ed editor li sceglie il CSS con la stessa condizione del codice", () => {
-    const css = readFileSync("src/styles/tokens.css", "utf8");
-    expect(css).toContain(`@media ${VISTA_MAPPA}`);
+    expect(regole(undefined, { media: VISTA_MAPPA }).length).toBeGreaterThan(0);
   });
 });
 

@@ -1,11 +1,10 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import { deskLayers, type SampleId } from "@/content/desk";
 import { metricById } from "@/content/metrics";
 import { DeskTable, type DeskLayerData } from "../DeskTable";
 import { SPECIMENS } from "../DeskSpecimen";
+import { regole } from "@/test/css";
 
 /**
  * I due oggetti che un campione onesto non ce l'hanno, e perche'.
@@ -204,14 +203,10 @@ describe("di che colore sono", () => {
     // seguire il tema, e qui non ce n'e' nessuno: anche i tre campioni de
     // "I colori" sono i token del brand, che e' esattamente il motivo per cui
     // quel campione e' onesto.
-    const css = readFileSync(resolve(__dirname, "../../../../styles/tokens.css"), "utf8");
-    const regole = css.split("}");
     const colpevoli: string[] = [];
-    for (const regola of regole) {
-      const [selettore = "", corpo = ""] = regola.split("{");
-      if (!selettore.includes("data-desk-sample")) continue;
+    for (const { selettore, corpo } of regole(/data-desk-sample/)) {
       const hex = corpo.match(/#[0-9a-fA-F]{3,8}\b/g);
-      if (hex) colpevoli.push(`${selettore.trim()} → ${hex.join(", ")}`);
+      if (hex) colpevoli.push(`${selettore} → ${hex.join(", ")}`);
     }
     expect(colpevoli, `colori scritti a mano nei campioni:\n${colpevoli.join("\n")}`).toHaveLength(
       0,
@@ -225,13 +220,13 @@ describe("di che colore sono", () => {
     // uno <i data-m="qualcosa"> mai dichiarato e' un elemento largo zero, che si
     // disegna, non si vede, e che nessuna prova di rendering sa distinguere da
     // un elemento disegnato bene.
-    const css = readFileSync(resolve(__dirname, "../../../../styles/tokens.css"), "utf8");
+    const selettori = regole().map((r) => r.selettore);
     const orfane = new Set<string>();
     for (const [id, disegno] of Object.entries(SPECIMENS)) {
       const { container } = render(<span data-desk-sample={id}>{disegno}</span>);
       for (const marca of container.querySelectorAll("[data-m]")) {
         const nome = marca.getAttribute("data-m");
-        if (nome && !css.includes(`[data-m="${nome}"]`)) orfane.add(`${id} → ${nome}`);
+        if (nome && !selettori.some((s) => s.includes(`[data-m="${nome}"]`))) orfane.add(`${id} → ${nome}`);
       }
     }
     expect([...orfane], `marche senza regola:\n${[...orfane].join("\n")}`).toHaveLength(0);

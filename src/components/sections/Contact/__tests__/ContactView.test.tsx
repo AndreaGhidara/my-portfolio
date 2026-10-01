@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { readFileSync } from "node:fs";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactView, type ContactViewProps } from "../ContactView";
 import { sendEmail } from "@/actions/sendEmail";
+import { regole } from "@/test/css";
 
 /* La server action non parte davvero in una prova: qui si sta verificando
    cosa VEDE chi ha premuto invia, non se Resend consegna. */
@@ -145,16 +145,13 @@ describe("ContactView", () => {
 });
 
 describe("i campi sono righe, non riquadri", () => {
-  const css = readFileSync("src/styles/tokens.css", "utf8");
-  const regole = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-    .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }))
-    .filter((r) => /\[data-contact-campo\]/.test(r.selettore));
+  const campi = regole(/\[data-contact-campo\]/);
 
   it("un campo senza bordo ha comunque un fuoco che si vede", () => {
     // È il prezzo della riga al posto della scatola: tolto il contorno, il
     // fuoco della tastiera resta l'unica cosa che dice dove sei, e senza una
     // regola esplicita il browser non ne disegna nessuno su un campo così.
-    const fuoco = regole.find((r) => /:focus-visible/.test(r.selettore));
+    const fuoco = campi.find((r) => /:focus-visible/.test(r.selettore));
     expect(fuoco, "manca la regola di fuoco sui campi").toBeDefined();
     expect(fuoco!.corpo).toMatch(/outline:[^;]*var\(--accent\)/);
   });
@@ -163,17 +160,13 @@ describe("i campi sono righe, non riquadri", () => {
     // Una riga e' alta quanto il testo. Su un telefono si tocca con il pollice,
     // e sotto i 44px il bersaglio e' troppo piccolo: la min-height e' quello
     // che una scatola dava gratis e una riga no.
-    const base = regole.find((r) => r.selettore === "[data-contact-campo]");
+    const base = campi.find((r) => r.selettore === "[data-contact-campo]");
     expect(base, "manca la regola base dei campi").toBeDefined();
     expect(base!.corpo).toMatch(/min-height:\s*2\.75rem/);
   });
 });
 
 describe("le etichette arancioni si leggono", () => {
-  const css = readFileSync("src/styles/tokens.css", "utf8");
-  const regole = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-    .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }));
-
   // Sono le micro etichette in monospaziato sopra ogni blocco: "Ho un
   // progetto", "Entro 24 ore", "L'altra uscita". Stanno tutte sotto i 12px, e
   // l'arancio pieno su carta fa 3,27:1, sotto il 4,5:1 che WCAG chiede al
@@ -187,7 +180,7 @@ describe("le etichette arancioni si leggono", () => {
   ];
 
   it.each(etichette)("%s non usa l'arancio pieno come testo", (selettore) => {
-    const regola = regole.find((r) => r.selettore === selettore);
+    const regola = regole(selettore)[0];
     expect(regola, `manca la regola ${selettore}`).toBeDefined();
     expect(regola!.corpo).toMatch(/color:\s*var\(--accento-testo\)/);
   });
@@ -196,14 +189,14 @@ describe("le etichette arancioni si leggono", () => {
     // Il cartellino ha un fondo suo, piu' scuro della carta di pagina
     // (color-mix con --fg al 7%): li' --fg-muted scendeva sotto il 4,5:1
     // richiesto al testo piccolo. Il paragrafo passa a --fg.
-    const regola = regole.find((r) => r.selettore === "[data-contact-badge-testo]");
+    const regola = regole("[data-contact-badge-testo]")[0];
     expect(regola, "manca la regola del testo del cartellino").toBeDefined();
     expect(regola!.corpo).toMatch(/color:\s*var\(--fg\)/);
   });
 
   it("l'arancio da testo esiste in tutti e due i temi", () => {
-    const radice = regole.find((r) => r.selettore === ":root");
-    const scuro = regole.find((r) => r.selettore === '[data-theme="dark"]');
+    const radice = regole(":root")[0];
+    const scuro = regole('[data-theme="dark"]')[0];
     expect(radice!.corpo).toMatch(/--accento-testo:/);
     expect(scuro!.corpo).toMatch(/--accento-testo:/);
   });

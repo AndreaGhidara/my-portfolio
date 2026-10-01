@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
-import { readFileSync } from "node:fs";
 import { render, screen, fireEvent, act, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { WorksView } from "../WorksView";
 import { SHOT_SIZES } from "../WorkShot";
 import { LINGUETTA, PARAMETRI } from "../archivio";
+import { regole } from "@/test/css";
 
 const labels = {
   lavoro: "Il lavoro",
@@ -599,15 +599,8 @@ describe("aprire e chiudere la pratica", () => {
   });
 });
 
-// Senza commenti: quello che precede una regola finirebbe nel suo selettore.
-const css = readFileSync("src/styles/tokens.css", "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
-
 /** Le regole del foglio di stile che riguardano l'archivio, corpo compreso. */
-const regoleDellArchivio = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-  .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }))
-  .filter((r) =>
-    /\[data-(work-shelf|cartella|linguetta|dorso|foglio|faccia|apri)/.test(r.selettore),
-  );
+const regoleDellArchivio = regole(/\[data-(work-shelf|cartella|linguetta|dorso|foglio|faccia|apri)/);
 
 describe("i colori dell'archivio", () => {
   it("vengono dalla tavolozza: miscele dei token, niente colori scritti", () => {
@@ -630,13 +623,13 @@ describe("i colori dell'archivio", () => {
     // Correzione 4 della spec: sul chiaro faccia = --superficie, dorso
     // inchiostro al 10%, bordo al 24%, foglio carta. Sullo scuro i gradini del
     // prototipo: una cartella col fondo della pagina li' non avrebbe corpo.
-    const chiaro = css.match(/\[data-work-shelf\]\s*\{[^}]*\}/)?.[0] ?? "";
+    const chiaro = regole("[data-work-shelf]")[0]?.corpo ?? "";
     expect(chiaro).toMatch(/--cartella-faccia:\s*var\(--superficie\)/);
     expect(chiaro).toMatch(/--cartella-dorso:\s*color-mix\(in oklab, var\(--ink\) 10%, var\(--paper\)\)/);
     expect(chiaro).toMatch(/--cartella-bordo:\s*color-mix\(in oklab, var\(--ink\) 24%, var\(--paper\)\)/);
     expect(chiaro).toMatch(/--cartella-foglio:\s*var\(--paper\)/);
 
-    const scuro = css.match(/\[data-theme="dark"\] \[data-work-shelf\]\s*\{[^}]*\}/)?.[0];
+    const scuro = regole('[data-theme="dark"] [data-work-shelf]')[0]?.corpo;
     expect(scuro, "l'archivio non ha i suoi colori sul tema scuro").toBeTruthy();
     for (const token of ["faccia", "dorso", "bordo", "foglio"]) {
       expect(scuro).toMatch(new RegExp(`--cartella-${token}:`));
@@ -676,13 +669,17 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
     expect(fondo?.corpo).toMatch(/color-mix\(in srgb, var\(--cartella-dorso\), var\(--ink\) calc\(var\(--profondita, 0\) \* var\(--scurisce\) \* 100%\)\)/);
     // Dietro @supports: un color-mix con calc che il browser rifiuta diventa
     // trasparente, non torna al fondo di prima.
-    expect(css).toMatch(/@supports \(background-color: color-mix\(in srgb, red calc\(1 \* 10%\), blue\)\)/);
+    expect(fondo?.dentro).toContain("@supports (background-color: color-mix(in srgb, red calc(1 * 10%), blue))");
   });
 
   it("i tre toni della linguetta: sul chiaro cambiano il testo, sullo scuro no", () => {
-    expect(css).toMatch(/\[data-tono-linguetta="1"\] > \[data-linguetta\]\s*\{[^}]*color:\s*var\(--fg\)/);
-    expect(css).toMatch(/\[data-tono-linguetta="2"\] > \[data-linguetta\][^{]*\{[^}]*color:\s*var\(--paper\)/);
-    expect(css).toMatch(/\[data-theme="dark"\][^{]*\[data-tono-linguetta\] > \[data-linguetta\][^{]*\{[^}]*color:\s*var\(--cartella-tenue\)/);
+    const colore = (selettore: RegExp, valore: RegExp) =>
+      regole(selettore).some((r) => valore.test(r.corpo));
+    expect(colore(/\[data-tono-linguetta="1"\] > \[data-linguetta\]$/, /color:\s*var\(--fg\)/)).toBe(true);
+    expect(colore(/\[data-tono-linguetta="2"\] > \[data-linguetta\]/, /color:\s*var\(--paper\)/)).toBe(true);
+    expect(
+      colore(/\[data-theme="dark"\].*\[data-tono-linguetta\] > \[data-linguetta\]/, /color:\s*var\(--cartella-tenue\)/),
+    ).toBe(true);
   });
 
   it("il dorso della cartella davanti prende il click, e non lo passa a quelle coperte", () => {
@@ -696,9 +693,9 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
 
   it("dentro l'archivio i testi piccoli hanno un tenue piu' scuro, e l'arancio scuro e' schiarito", () => {
     // I rapporti sono in contrast.test.ts, misurati sui colori risolti.
-    const chiaro = css.match(/\[data-work-shelf\]\s*\{[^}]*\}/)?.[0] ?? "";
+    const chiaro = regole("[data-work-shelf]")[0]?.corpo ?? "";
     expect(chiaro).toMatch(/--cartella-tenue:\s*color-mix\(in oklab, var\(--fg-muted\) 80%, var\(--fg\)\)/);
-    const scuro = css.match(/\[data-theme="dark"\] \[data-work-shelf\]\s*\{[^}]*\}/)?.[0] ?? "";
+    const scuro = regole('[data-theme="dark"] [data-work-shelf]')[0]?.corpo ?? "";
     expect(scuro).toMatch(/--cartella-tenue:\s*var\(--fg-muted\)/);
     expect(scuro).toMatch(/--accento-testo:\s*color-mix\(in oklab, var\(--accent\) 90%, var\(--paper\)\)/);
     // Il tenue globale compare solo dentro la definizione del tenue suo.
@@ -719,11 +716,11 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
   });
 
   it("sotto i 600px la linguetta porta solo il nome e la faccia perde le tecnologie", () => {
-    const blocchi = [...css.matchAll(/@media \(max-width: 599px\) \{[\s\S]*?\n\}/g)].map((m) => m[0]);
-    const telefono = blocchi.find((b) => b.includes("[data-linguetta-anno]"));
-    expect(telefono, "manca il blocco del telefono dell'archivio").toBeTruthy();
-    expect(telefono).toMatch(/\[data-linguetta-anno\]\s*\{[^}]*display:\s*none/);
-    expect(telefono).toMatch(/\[data-faccia-tech\]\s*\{[^}]*display:\s*none/);
+    const telefono = { media: "(max-width: 599px)" };
+    const anno = regole(/\[data-linguetta-anno\]$/, telefono);
+    expect(anno.length, "manca il blocco del telefono dell'archivio").toBeGreaterThan(0);
+    expect(anno.map((r) => r.corpo).join("\n")).toMatch(/display:\s*none/);
+    expect(regole(/\[data-faccia-tech\]$/, telefono).map((r) => r.corpo).join("\n")).toMatch(/display:\s*none/);
   });
 
   it("il centro della faccia non si stringe sotto il suo contenuto, o la soglia non vede niente", () => {
@@ -755,9 +752,7 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
 });
 
 /** Le regole della pratica: tutte sotto il dialog, anche dentro le media query. */
-const regoleDellaPratica = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-  .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }))
-  .filter((r) => r.selettore.includes("[data-work-dialog]"));
+const regoleDellaPratica = regole(/\[data-work-dialog\]/);
 
 describe("i colori della pratica", () => {
   it("il foglio e' carta nei due temi: dentro mai i colori che seguono il tema", () => {
@@ -785,9 +780,9 @@ describe("i colori della pratica", () => {
   });
 
   it("sul computer il foglio si scorre invece di tagliare il testo", () => {
-    const computer = css.match(/@media \(min-width: 1024px\) and \(min-height: 700px\) \{[\s\S]*?\n\}/)?.[0];
-    expect(computer, "manca il blocco del computer della pratica").toBeTruthy();
-    expect(computer).toMatch(/\[data-pratica-foglio\]\s*\{[^}]*overflow-y:\s*auto/);
+    const computer = regole(/\[data-pratica-foglio\]$/, { media: "(min-width: 1024px) and (min-height: 700px)" });
+    expect(computer.length, "manca il blocco del computer della pratica").toBeGreaterThan(0);
+    expect(computer.map((r) => r.corpo).join("\n")).toMatch(/overflow-y:\s*auto/);
     const nascosti = regoleDellaPratica.filter(
       (r) => /\[data-pratica(-foglio)?\]$/.test(r.selettore) && /overflow(-y)?:\s*hidden/.test(r.corpo),
     );

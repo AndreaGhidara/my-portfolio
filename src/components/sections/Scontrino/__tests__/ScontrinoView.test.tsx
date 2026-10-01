@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { ScontrinoView, type ScontrinoViewProps } from "../ScontrinoView";
 import { services } from "@/content/services";
+import { regole, type Regola } from "@/test/css";
 
 /**
  * In jsdom il livello di movimento e' sempre "none" (vitest.setup.ts): e' il
@@ -177,12 +177,8 @@ describe("la stampante dei servizi", () => {
   });
 });
 
-const css = readFileSync("src/styles/tokens.css", "utf8");
-
 /** Le regole del foglio di stile che riguardano la stampante, corpo compreso. */
-const regoleDellaStampante = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-  .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }))
-  .filter((r) => /\[data-(scontrino|marca|spia|fessura|riga)/.test(r.selettore));
+const regoleDellaStampante = regole(/\[data-(scontrino|marca|spia|fessura|riga)/);
 
 describe("i colori della stampante", () => {
   it("non chiedono niente ai token che cambiano col tema", () => {
@@ -217,25 +213,23 @@ describe("i colori della stampante", () => {
   });
 
   it("il fuoco sta dentro il bordo, del colore del testo: l'anello arancio qui non si vede", () => {
-    expect(css).toMatch(
-      /\[data-scontrino\] :is\(button, a\):focus-visible\s*\{[^}]*outline:\s*2px solid currentColor;[^}]*outline-offset:\s*-/,
+    expect(regole("[data-scontrino] :is(button, a):focus-visible")[0]?.corpo).toMatch(
+      /outline:\s*2px solid currentColor;[^]*outline-offset:\s*-/,
     );
   });
 
   it("lo scontrino vero non entra nel flusso: la pagina non cambia altezza a ogni stampa", () => {
-    expect(css).toMatch(/\[data-scontrino-carta\]:not\(\[data-fantasma\]\)\s*\{[^}]*position:\s*absolute/);
-    expect(css).toMatch(/\[data-scontrino-carta\]\[data-fantasma\]\s*\{[^}]*visibility:\s*hidden/);
+    expect(regole("[data-scontrino-carta]:not([data-fantasma])")[0]?.corpo).toMatch(/position:\s*absolute/);
+    expect(regole("[data-scontrino-carta][data-fantasma]")[0]?.corpo).toMatch(/visibility:\s*hidden/);
   });
 
   it("sul telefono la tavola va via e il disegno si stampa sulla carta; sul desktop il contrario", () => {
-    // Il blocco del telefono della stampante, non il primo a 860 del file.
-    const sezione = css.slice(css.indexOf("\n[data-scontrino] {"));
-    const telefono = sezione.slice(sezione.indexOf("@media (max-width: 860px) {"));
-    const bloccoTelefono = telefono.slice(0, telefono.indexOf("\n}\n"));
-    expect(bloccoTelefono).toMatch(/\[data-scontrino-oggetto\][^{]*\{[^}]*display:\s*none/);
-    expect(bloccoTelefono).toMatch(/\[data-riga="figura"\]\s*\{[^}]*display:\s*block/);
-    const fuori = css.replace(bloccoTelefono, "");
-    expect(fuori).toMatch(/\[data-riga="figura"\]\s*\{[^}]*display:\s*none/);
+    const telefono = { media: "(max-width: 860px)" };
+    const nascosto = (r: Regola) => /display:\s*none/.test(r.corpo);
+    expect(regole(/\[data-scontrino-oggetto\]/, telefono).some(nascosto)).toBe(true);
+    expect(regole('[data-riga="figura"]', telefono).some((r) => /display:\s*block/.test(r.corpo))).toBe(true);
+    const fuori = regole('[data-riga="figura"]').filter((r) => !regole('[data-riga="figura"]', telefono).includes(r));
+    expect(fuori.some(nascosto)).toBe(true);
   });
 
   it("lo scontrino non sta sotto zero: li' uscita e banco gli rubano i clic", () => {
@@ -243,8 +237,8 @@ describe("i colori della stampante", () => {
     // «Parliamone» e «strappa» non si potevano premere: il browser da' il clic
     // all'uscita trasparente che gli sta sopra. Sotto la stampante ci va
     // perche' e' la stampante a salire.
-    const regola = css.match(/\[data-scontrino-carta\]:not\(\[data-fantasma\]\)\s*\{[^}]*\}/)?.[0];
+    const regola = regole("[data-scontrino-carta]:not([data-fantasma])")[0]?.corpo;
     expect(regola).not.toMatch(/z-index:\s*-/);
-    expect(css).toMatch(/\[data-scontrino-macchina\]\s*\{[^}]*z-index:\s*1/);
+    expect(regole("[data-scontrino-macchina]").some((r) => /z-index:\s*1/.test(r.corpo))).toBe(true);
   });
 });
