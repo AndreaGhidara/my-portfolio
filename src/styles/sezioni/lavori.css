@@ -13,7 +13,7 @@
      sono sfalsate, quindi quelle dietro restano a vista: a fine corsa c'e' il
      cassetto con quattro linguette e l'ultima cartella intera, e l'archivio se
      ne va con la pagina. Lo accende `data-archivio-acceso`, che scrive
-     WorksShelf; nessuna media query lo accende da sola.
+     useProfondita; nessuna media query lo accende da sola.
 
    Passo, distanza, scurisce, stringe e larghezza delle linguette arrivano in
    linea sulla lista da archivio.ts: qui si usano, non si scrivono.
@@ -322,7 +322,7 @@
 /* La linguetta si scurisce con la sua cartella ma col fondo, non col filtro:
    il fondo e il bordo si mischiano con l'inchiostro quanto il filtro scurisce
    il resto (in srgb un velo d'inchiostro e' la stessa cosa), e il testo
-   cambia tono a soglie di profondita' che scrive WorksShelf in
+   cambia tono a soglie di profondita' che scrive useProfondita in
    `data-tono-linguetta` (vedi LINGUETTA in archivio.ts). Nel tono chiaro il
    fondo non scende sotto --buio-minimo, o nel passaggio da due a tre ne'
    l'inchiostro ne' la carta arriverebbero a 4,5:1.
@@ -410,7 +410,7 @@
   [data-work-shelf][data-archivio-acceso] [data-faccia-centro] { gap: 0.75rem; }
 }
 
-/* La copia con cui WorksShelf misura se le facce ci stanno: fissa, invisibile,
+/* La copia con cui useArchivioAcceso misura se le facce ci stanno: fissa, invisibile,
    tolta nello stesso istante in cui e' stata messa. */
 [data-archivio-sonda] {
   position: fixed;

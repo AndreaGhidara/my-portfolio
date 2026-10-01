@@ -13,7 +13,7 @@ export type WorkDialogProps = {
   numero: number;
   totale: number;
   labels: WorkCaseLabels;
-  /** ×, Esc e clic sul velo: la chiusura la anima WorksShelf. */
+  /** ×, Esc e clic sul velo: la chiusura la anima usePratica. */
   onChiudi: () => void;
   /** Il dialog si e' chiuso, orchestrato o no. */
   onClose: () => void;
@@ -27,7 +27,7 @@ const dominio = (url: string) => new URL(url).hostname.replace(/^www\./, "");
  *
  * E' un <dialog> nativo aperto con showModal(): trappola del fuoco, strato
  * superiore e pagina inerte li fa il browser. Aprirlo e chiuderlo no: lo fa
- * WorksShelf, perche' in mezzo c'e' la cartella che scivola via (scivola.ts).
+ * usePratica, perche' in mezzo c'e' la cartella che scivola via (scivola.ts).
  * Per questo l'Esc si ferma qui e diventa una richiesta di chiusura, come il
  * × e il clic sul velo. Il contenuto c'e' da subito: l'entrata e' solo
  * opacita' e spostamento, mai un montaggio ritardato.
