@@ -349,7 +349,99 @@
         }
       },
       "pannello": {
-        "titolo": "After launch"
+        "testa": "3 · after launch",
+        "conta": {
+          "spento": "panel off",
+          "acceso": "on",
+          "avviso": "alert {n} of {totale}",
+          "fine": "end of month"
+        },
+        "salute": "site health · drops while a light stays on",
+        "servizi": {
+          "assistenza": "Support",
+          "automazioni": "Automation",
+          "numeri": "Numbers",
+          "trovare": "Being found",
+          "manutenzione": "Maintenance"
+        },
+        "coda": {
+          "attesa": "waiting",
+          "risolto": "{nome} · fixed",
+          "fine": "a month in a minute"
+        },
+        "eventi": [
+          {
+            "testo": "The security certificate expires in three days.",
+            "intervento": "renew",
+            "esito": "Renewed. The browser padlock stays locked."
+          },
+          {
+            "testo": "“I can't change my pickup day.” A customer, at 9 pm.",
+            "intervento": "reply",
+            "esito": "Answered, order moved to Sunday. She orders again."
+          },
+          {
+            "testo": "Half the visitors leave the cake page at step two.",
+            "intervento": "see the data",
+            "esito": "The phone field was required. Removed: the step now completes."
+          },
+          {
+            "testo": "Saturday morning: 40 orders to print for the kitchen.",
+            "intervento": "let the site do it",
+            "esito": "The sheet prints itself at 6, sorted by pickup time."
+          },
+          {
+            "testo": "On maps, Sunday's opening hours are still the old ones.",
+            "intervento": "fix it",
+            "esito": "Hours aligned everywhere: site, maps, profile."
+          },
+          {
+            "testo": "The catalogue page takes 4 seconds to load.",
+            "intervento": "lighten it",
+            "esito": "Smaller images and caching: now under a second."
+          }
+        ],
+        "spento": {
+          "occhiello": "the bakery's panel",
+          "titolo": "A month after launch, in one minute",
+          "spiega": "Five modules, one per service. Lights come on by themselves: tap the red one, read, act. The longer you wait, the lower the site's health.",
+          "calma": "the panel is off",
+          "accendi": "switch the panel on"
+        },
+        "acceso": {
+          "occhiello": "the panel is on",
+          "spia": {
+            "titolo": "A light just came on",
+            "spiega": "Tap the flashing module, up there.",
+            "calma": "the red module shows where to look"
+          },
+          "verde": {
+            "titolo": "All green",
+            "spiega": "Nothing yet. Wait: things arrive when they want to.",
+            "calma": "the site works alone"
+          }
+        },
+        "modulo": {
+          "occhiello": "module · {nome}",
+          "fatto": "Done.",
+          "cosa": "What's wrong",
+          "aPosto": "All fine here",
+          "altra": "Another light is on: look at the red module.",
+          "risolto": "fixed",
+          "avviso": "alert",
+          "nessuno": "no alerts on {nome}",
+          "aspetta": "wait for the next alert",
+          "niente": "nothing to do here"
+        },
+        "fine": {
+          "occhiello": "the month's report",
+          "bene": "Six alerts, and the site didn't notice",
+          "male": "Six alerts, and the site noticed a bit",
+          "spiega": "Health at month end: {salute}%. Every second with a light on counts: that's why someone checks the panel every day, not now and then.",
+          "avvisi": "{n, plural, one {# alert} other {# alerts}}",
+          "ricomincia": "start over",
+          "avanti": "level 4 · cloud"
+        }
       },
       "notte": {
         "titolo": "The bakery's night"

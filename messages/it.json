@@ -349,7 +349,99 @@
         }
       },
       "pannello": {
-        "titolo": "Dopo il lancio"
+        "testa": "3 · dopo il lancio",
+        "conta": {
+          "spento": "pannello spento",
+          "acceso": "acceso",
+          "avviso": "avviso {n} di {totale}",
+          "fine": "fine del mese"
+        },
+        "salute": "salute del sito · si abbassa finché una spia resta accesa",
+        "servizi": {
+          "assistenza": "Assistenza",
+          "automazioni": "Automazioni",
+          "numeri": "I numeri",
+          "trovare": "Farsi trovare",
+          "manutenzione": "Manutenzione"
+        },
+        "coda": {
+          "attesa": "in attesa",
+          "risolto": "{nome} · risolto",
+          "fine": "un mese, in un minuto"
+        },
+        "eventi": [
+          {
+            "testo": "Il certificato di sicurezza scade fra tre giorni.",
+            "intervento": "rinnova",
+            "esito": "Rinnovato. Il lucchetto nel browser resta chiuso."
+          },
+          {
+            "testo": "«Non riesco a cambiare il giorno del ritiro.» Una cliente, alle 21.",
+            "intervento": "rispondi",
+            "esito": "Risposta e ordine spostato a domenica. Lei torna a ordinare."
+          },
+          {
+            "testo": "Metà delle persone lascia la pagina della torta al secondo passaggio.",
+            "intervento": "guarda i dati",
+            "esito": "Il campo del telefono era obbligatorio. Tolto: il passaggio si chiude."
+          },
+          {
+            "testo": "Sabato mattina: 40 ordini da stampare per il laboratorio.",
+            "intervento": "fallo fare al sito",
+            "esito": "Il foglio si stampa da solo alle 6, già in ordine di ritiro."
+          },
+          {
+            "testo": "Sulle mappe l'orario della domenica è ancora quello vecchio.",
+            "intervento": "correggi",
+            "esito": "Orari allineati ovunque: sito, mappe, profilo."
+          },
+          {
+            "testo": "La pagina del catalogo ci mette 4 secondi a comparire.",
+            "intervento": "alleggerisci",
+            "esito": "Immagini ridotte e cache: ora meno di un secondo."
+          }
+        ],
+        "spento": {
+          "occhiello": "il pannello del forno",
+          "titolo": "Un mese dopo il lancio, in un minuto",
+          "spiega": "Cinque moduli, uno per servizio. Le spie si accendono da sole: tocca quella rossa, leggi, intervieni. Più aspetti, più la salute del sito scende.",
+          "calma": "il pannello è spento",
+          "accendi": "accendi il pannello"
+        },
+        "acceso": {
+          "occhiello": "il pannello è acceso",
+          "spia": {
+            "titolo": "Una spia si è accesa",
+            "spiega": "Tocca il modulo che lampeggia, lassù.",
+            "calma": "il modulo rosso ti dice dove guardare"
+          },
+          "verde": {
+            "titolo": "Tutto verde",
+            "spiega": "Per ora niente. Aspetta: le cose arrivano quando vogliono loro.",
+            "calma": "il sito lavora da solo"
+          }
+        },
+        "modulo": {
+          "occhiello": "modulo · {nome}",
+          "fatto": "Fatto.",
+          "cosa": "Cosa succede",
+          "aPosto": "Qui è tutto a posto",
+          "altra": "La spia accesa è un'altra: guarda il modulo rosso.",
+          "risolto": "risolto",
+          "avviso": "avviso",
+          "nessuno": "nessun avviso su {nome}",
+          "aspetta": "aspetta il prossimo avviso",
+          "niente": "niente da fare qui"
+        },
+        "fine": {
+          "occhiello": "il resoconto del mese",
+          "bene": "Sei avvisi, e il sito non se n'è accorto",
+          "male": "Sei avvisi, e il sito se n'è accorto un po'",
+          "spiega": "Salute a fine mese: {salute}%. Ogni secondo con una spia accesa pesa: è per questo che il pannello lo guarda qualcuno ogni giorno, non quando capita.",
+          "avvisi": "{n, plural, one {# avviso} other {# avvisi}}",
+          "ricomincia": "ricomincia",
+          "avanti": "livello 4 · il cloud"
+        }
       },
       "notte": {
         "titolo": "La notte del forno"
