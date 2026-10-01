@@ -1,0 +1,4 @@
+/* ── Il gioco del metodo: livello 1, lo schermo ─────────────────────────────
+   Ogni selettore di questo file sta sotto [data-gioco-livello="schermo"]: i pezzi
+   comuni (banco, testa, console, azioni, righe) sono in base.css e qui non si
+   ridefiniscono. Le animazioni nuove si chiamano gioco-schermo-*. */

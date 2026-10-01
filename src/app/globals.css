@@ -1,5 +1,11 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
+@import "../styles/gioco/base.css";
+@import "../styles/gioco/schermo.css";
+@import "../styles/gioco/logiche.css";
+@import "../styles/gioco/pannello.css";
+@import "../styles/gioco/notte.css";
+@import "../styles/gioco/finale.css";
 
 @theme inline {
   --color-paper: var(--paper);

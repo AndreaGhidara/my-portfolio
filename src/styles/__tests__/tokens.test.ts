@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { palette } from "../palette";
 
@@ -65,15 +65,33 @@ describe("tokens.css", () => {
     }
   });
 
-  it("contiene solo colori hex dalla palette", () => {
+  it("contiene solo colori hex dalla palette, in tutti i fogli di stile", () => {
+    // Non solo tokens.css: tutti i .css sotto src/styles/, a qualunque
+    // profondita'. Il gioco del metodo ha i suoi file in gioco/, e un
+    // esadecimale scritto li' sarebbe un colore fuori tavolozza che questa
+    // prova non vedeva.
+    const fogli = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((voce) =>
+        voce.isDirectory()
+          ? fogli(path.join(dir, voce.name))
+          : voce.name.endsWith(".css")
+            ? [path.join(dir, voce.name)]
+            : [],
+      );
+    const tutti = fogli(path.resolve(__dirname, ".."));
+    expect(tutti.length, "la ricerca dei fogli di stile non trova niente").toBeGreaterThan(1);
+
     const hexRegex = /#[0-9A-Fa-f]{6}/g;
-    const hexesInCss = css.match(hexRegex) || [];
-    const hexesInCssLower = hexesInCss.map((h) => h.toLowerCase());
     const paletteHexesLower = Object.values(palette).map((h) =>
       h.toLowerCase(),
     );
-    for (const hex of hexesInCssLower) {
-      expect(paletteHexesLower).toContain(hex);
+    for (const foglio of tutti) {
+      const hexes = readFileSync(foglio, "utf8").match(hexRegex) || [];
+      for (const hex of hexes) {
+        expect(paletteHexesLower, `${path.relative(__dirname, foglio)}: ${hex}`).toContain(
+          hex.toLowerCase(),
+        );
+      }
     }
   });
 

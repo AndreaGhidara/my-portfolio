@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
+import { renderConTesti as render } from "@/test/renderConTesti";
 import { ServicesView } from "../ServicesView";
 import type { ServicesViewProps } from "../ServicesView";
 import { LABEL, drawWidth } from "../layers";
 import { testi } from "../cassetta/__tests__/fixture";
 
-/** Il quarto, come nel tavolo vero: il mondo verticale disegna i primi quattro
- *  oggetti di ogni strato, e il post-it bianco deve stare fra quelli. */
+/** Il quarto, come nel tavolo vero. */
 const MUTO = 3;
 
 const layer = (id: string, n: number, mute = false) => ({
@@ -21,9 +21,9 @@ const layer = (id: string, n: number, mute = false) => ({
 });
 
 /**
- * Il mondo viene disegnato due volte, una per formato, e il CSS ne nasconde uno.
- * Il gemello nascosto porta data-ghost: sta nel DOM ma non conta, ne' per i test
- * ne' per uno screen reader.
+ * Gli oggetti del tavolo. Il mondo si disegna una volta sola, largo: il
+ * :not([data-ghost]) e' rimasto da quando ce n'era un gemello, e tiene il conto
+ * giusto se un giorno tornasse.
  */
 const SOLI_VERI = "[data-desk-object]:not([data-ghost])";
 
@@ -91,9 +91,6 @@ describe("il tavolo è la lista", () => {
 
   it("ogni strato ha il suo titolo e la sua riga", () => {
     const { container } = render(<ServicesView {...props} />);
-    // Il gemello nascosto e' aria-hidden, quindi per getByRole non esiste: i
-    // titoli tornano uno per strato. Le righe invece sono testo semplice e
-    // getByText ne troverebbe due, percio' si cercano dentro il mondo vero.
     const vero = container.querySelector("[data-desk-world]:not([aria-hidden])") as HTMLElement;
     for (const l of props.layers) {
       expect(screen.getByRole("heading", { level: 3, name: l.title })).toBeInTheDocument();
@@ -136,31 +133,6 @@ describe("il tavolo è la lista", () => {
     expect(within(vero).getAllByRole("link")).toHaveLength(1);
   });
 
-  it("nel gemello il post-it si disegna e si preme, ma non entra nel giro dei Tab", () => {
-    // Sotto i 1024px il disegno e' il gemello, e questo post-it li' c'e': e' il
-    // quarto oggetto del suo strato, non il sesto, quindi non porta data-off.
-    // Un post-it che porta da qualche parte e non si preme sarebbe il disegno di
-    // un comando, percio' l'<a> c'e'. Ma il gemello e' aria-hidden per intero:
-    // una seconda fermata del Tab annuncerebbe il nulla, e il nome del comando
-    // sta nell'altro mondo: quello che uno screen reader legge davvero.
-    const { container } = render(<ServicesView {...props} />);
-    const gemello = container.querySelector("[data-desk-world][aria-hidden]") as HTMLElement;
-    const muti = [...gemello.querySelectorAll("[data-desk-object]")].filter(
-      (el) => !el.querySelector("[data-desk-label]"),
-    );
-    expect(muti).toHaveLength(1);
-    expect(muti[0]).not.toHaveAttribute("data-off");
-    const comando = muti[0].querySelector("[data-desk-blank]") as HTMLElement;
-    expect(comando).toHaveAttribute("href", "#contact");
-    expect(comando).toHaveAttribute("tabindex", "-1");
-    // Dentro ci sta la nota (il conto dei caffe'), che qui e' il disegno stesso
-    // del post-it: sotto i 1024px il mondo che si vede e' questo. Quello che il
-    // gemello NON porta e' la domanda, che e' il nome del comando: quella sta
-    // nell'altro mondo, l'unico che uno screen reader legge.
-    expect(comando.querySelector("[data-desk-note]")).not.toBeNull();
-    expect(comando.querySelector("[data-desk-ask]")).toBeNull();
-  });
-
   it("le sagome sono decorative: il significato sta nell'etichetta, non nel disegno", () => {
     const { container } = render(<ServicesView {...props} />);
     for (const oggetto of container.querySelectorAll(SOLI_VERI)) {
@@ -182,15 +154,11 @@ describe("il tavolo è la lista", () => {
     expect(etichetta.style.maxWidth).toBe(`${LABEL.width}em`);
   });
 
-  it("il gemello nascosto non si fa leggere due volte", () => {
+  it("il mondo e' uno solo: il gemello verticale ha lasciato il posto al gioco", () => {
     const { container } = render(<ServicesView {...props} />);
-    const gemelli = container.querySelectorAll("[data-desk-world][aria-hidden]");
-    expect(gemelli).toHaveLength(1);
-    // Tutti i suoi oggetti sono marcati: e' con data-ghost che i test e il CSS
-    // distinguono la copia disegnata dalla copia che si legge.
-    for (const oggetto of gemelli[0].querySelectorAll("[data-desk-object]")) {
-      expect(oggetto).toHaveAttribute("data-ghost");
-    }
+    expect(container.querySelectorAll("[data-desk-world]")).toHaveLength(1);
+    expect(container.querySelector("[data-desk-world][aria-hidden]")).toBeNull();
+    expect(container.querySelector("section#services [data-desk-stage] [data-gioco]")).not.toBeNull();
   });
 });
 

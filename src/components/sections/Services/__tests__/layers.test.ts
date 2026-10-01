@@ -508,11 +508,10 @@ function misura(testo: string, dichiarazione: RegExp, dove: string): number[] {
 
 const ETICHETTA = blocco("[data-desk-object] [data-desk-label] {");
 const MONDO = blocco("[data-desk-world] {");
-const MONDO_STRETTO = blocco('[data-desk-world][data-layout="tall"] {', true);
 
-/** Il rem del sito, e le due finestre piu' strette in cui ogni mondo si disegna. */
+/** Il rem del sito, e la finestra piu' stretta in cui il mondo si disegna. */
 const REM = 16;
-const FINESTRA = { wide: 1024, tall: 320 };
+const FINESTRA = { wide: 1024 };
 
 describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
   it("LABEL.height sono le due righe e il respiro scritti nel CSS", () => {
@@ -541,11 +540,12 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
       /font-size:\s*clamp\(\s*([\d.]+)rem\s*,\s*([\d.]+)cqw\s*,\s*([\d.]+)rem\s*\)/,
       "etichetta",
     );
-    const larghezze: Record<DeskLayout, number[]> = {
+    // Solo il mondo largo: il verticale non si disegna piu' (sotto i 1024px
+    // la sezione e' il gioco), e il foglio di stile non ne dichiara la misura.
+    const larghezze = {
       wide: misura(MONDO, /width:\s*min\(([\d.]+)vw,\s*([\d.]+)rem\)/, "mondo"),
-      tall: misura(MONDO_STRETTO, /width:\s*min\(([\d.]+)vw,\s*([\d.]+)rem\)/, "mondo stretto"),
     };
-    for (const layout of LAYOUTS) {
+    for (const layout of ["wide"] as const) {
       const [vw, rem] = larghezze[layout];
       const mondo = Math.min((FINESTRA[layout] * vw) / 100, rem * REM);
       const corpo = Math.min(Math.max((cqw * mondo) / 100, minimo * REM), massimo * REM);
