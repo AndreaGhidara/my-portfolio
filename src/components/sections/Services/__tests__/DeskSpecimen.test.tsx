@@ -69,7 +69,7 @@ describe("il post-it grigio", () => {
 
   const tavolo = () =>
     render(
-      <DeskTable layers={finto()} centre="il progetto" blank="E la tua, qual è? Scrivimi." note={NOTA} layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" blank="E la tua, qual è? Scrivimi." note={NOTA} />,
     );
 
   it("porta la sua nota, e si vede senza che nessuno ci passi sopra", () => {
@@ -167,7 +167,7 @@ describe("i campioni sanno disegnarsi", () => {
 describe("dove stanno e come si comportano", () => {
   it("ce n'e' esattamente uno per ogni oggetto che lo dichiara", () => {
     const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" />,
     );
     const attesi = oggetti.filter((o) => o.sample).length;
     expect(container.querySelectorAll("[data-desk-sample]")).toHaveLength(attesi);
@@ -177,7 +177,7 @@ describe("dove stanno e come si comportano", () => {
     // Un campione che entra nell'albero di accessibilita' fa leggere "I colori,
     // I colori", o peggio, "Aa". L'etichetta e' il nome; questo e' il disegno.
     const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" />,
     );
     for (const campione of container.querySelectorAll("[data-desk-sample]")) {
       expect(
@@ -189,7 +189,7 @@ describe("dove stanno e come si comportano", () => {
 
   it("non toccano il conteggio delle etichette: restano ventitre'", () => {
     const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" />,
     );
     expect(container.querySelectorAll("[data-desk-label]")).toHaveLength(23);
   });

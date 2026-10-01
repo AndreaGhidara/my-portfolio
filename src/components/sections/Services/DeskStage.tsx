@@ -283,11 +283,9 @@ export function DeskStage({
             centre={centre}
             blank={blank}
             note={note}
-            layout="wide"
           />
           {/* Sotto i 1024px il tavolo non c'e': c'e' il gioco, e il CSS fa il
-              cambio (display:none sopra e sotto soglia, come prima col
-              gemello verticale). Niente soglia in JavaScript: misurare lo
+              cambio (display:none sopra e sotto soglia). Niente soglia in JavaScript: misurare lo
               schermo prima di disegnare vorrebbe dire un primo fotogramma
               sbagliato, e un buco fra le due soglie. */}
           <Gioco />

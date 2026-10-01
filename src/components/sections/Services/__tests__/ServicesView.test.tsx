@@ -144,7 +144,7 @@ describe("il tavolo è la lista", () => {
     // nessuno disegna piu'.
     const { container } = render(<ServicesView {...props} />);
     const primo = container.querySelector(SOLI_VERI) as HTMLElement;
-    expect(primo.style.width).toBe(`${drawWidth("wide", "sheet")}%`);
+    expect(primo.style.width).toBe(`${drawWidth("sheet")}%`);
     const etichetta = primo.querySelector("[data-desk-label]") as HTMLElement;
     expect(etichetta.style.maxWidth).toBe(`${LABEL.width}em`);
   });
