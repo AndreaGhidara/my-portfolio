@@ -1,4 +1,759 @@
 /* ── Il gioco del metodo: livello 2, le logiche ─────────────────────────────
    Ogni selettore di questo file sta sotto [data-gioco-livello="logiche"]: i pezzi
    comuni (banco, testa, console, azioni, righe) sono in base.css e qui non si
-   ridefiniscono. Le animazioni nuove si chiamano gioco-logiche-*. */
+   ridefiniscono. Le animazioni nuove si chiamano gioco-logiche-*.
+
+   Sopra il circuito con i sei nodi e il pacco (l'ordine della torta) che
+   corre; sotto la console del nodo. Alla partenza la console e' la schermata
+   del Forno Aurora: li' i colori sono quelli del sito finto (--sf, --ss, --st,
+   --sa, --sm, scritti da Logiche.tsx con variabiliSito), non del portfolio. */
+
+[data-gioco-livello="logiche"] {
+  /* Il verde chiaro del bordo di un nodo fatto. */
+  --logiche-verde: color-mix(in oklab, var(--green) 45%, var(--paper));
+  /* L'errore: rosa e mattone, tutti e due dall'arancio. */
+  --logiche-rosa: color-mix(in oklab, var(--orange) 16%, var(--paper));
+  --logiche-mattone: color-mix(in oklab, var(--orange) 62%, var(--ink));
+}
+
+/* ── Il circuito ───────────────────────────────────────────────────────── */
+[data-gioco-livello="logiche"] .fili {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+[data-gioco-livello="logiche"] .fili .tratteggio {
+  stroke: var(--gioco-bordo-scuro);
+  stroke-width: 0.6;
+  stroke-dasharray: 1.6 1.2;
+}
+
+[data-gioco-livello="logiche"] .fili .fatti {
+  stroke: var(--bulb);
+  stroke-width: 2;
+}
+
+[data-gioco-livello="logiche"] .regole {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+[data-gioco-livello="logiche"] .regole i {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border: 1.2px solid var(--bulb);
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+[data-gioco-livello="logiche"] .regole i.si { background: var(--bulb); }
+
+/* I nodi: pulsanti, ma quelli non ancora raggiunti non si aprono. */
+[data-gioco-livello="logiche"] .nodo {
+  position: absolute;
+  z-index: 2;
+  inline-size: 3.1rem;
+  translate: -50% -50%;
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+[data-gioco-livello="logiche"] .nodo:disabled { cursor: default; }
+
+[data-gioco-livello="logiche"] .nodo .chip {
+  position: relative;
+  inline-size: 2.7rem;
+  block-size: 2.7rem;
+  padding: 0.3rem;
+  border: 2px solid var(--gioco-bordo-scuro);
+  border-radius: 9px;
+  background: var(--paper);
+  opacity: 0.5;
+  transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+}
+
+[data-gioco-livello="logiche"] .nodo .chip svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+[data-gioco-livello="logiche"] .nodo .num {
+  position: absolute;
+  inset-inline-start: -0.35rem;
+  inset-block-end: -0.35rem;
+  inline-size: 0.95rem;
+  block-size: 0.95rem;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--gioco-bordo-scuro);
+  border-radius: 50%;
+  background: var(--gioco-scuro-2);
+  color: var(--paper);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.46rem;
+  font-style: normal;
+}
+
+[data-gioco-livello="logiche"] .nodo .nome {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.44rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-align: center;
+  color: var(--mutedDark);
+}
+
+[data-gioco-livello="logiche"] .nodo.qui .chip {
+  opacity: 1;
+  border-color: var(--bulb);
+  box-shadow:
+    0 0 0 5px color-mix(in oklab, var(--bulb) 18%, transparent),
+    0 0 18px color-mix(in oklab, var(--bulb) 35%, transparent);
+}
+
+[data-gioco-livello="logiche"] .nodo.qui .num {
+  border-color: var(--orange);
+  background: var(--orange);
+}
+
+[data-gioco-livello="logiche"] .nodo.qui .nome { color: var(--paper); }
+
+[data-gioco-livello="logiche"] .nodo.fatto .chip {
+  opacity: 1;
+  border-color: var(--logiche-verde);
+}
+
+[data-gioco-livello="logiche"] .nodo.fatto::after {
+  content: "✓";
+  position: absolute;
+  inset-inline-end: -0.1rem;
+  inset-block-start: -0.2rem;
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--green);
+  color: var(--paper);
+  font-size: 0.45rem;
+}
+
+[data-gioco-livello="logiche"] .nodo.rotto .chip::before {
+  content: "⚡";
+  position: absolute;
+  inset-inline-start: -0.25rem;
+  inset-block-start: -0.35rem;
+  inline-size: 0.95rem;
+  block-size: 0.95rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bulb);
+  color: var(--ink);
+  font-size: 0.5rem;
+}
+
+/* Il pacco: l'ordine della torta che corre da un nodo all'altro. L'onda ha
+   per chiave il nodo, quindi riparte a ogni arrivo, dopo il viaggio. */
+[data-gioco-livello="logiche"] .pacco {
+  position: absolute;
+  z-index: 4;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  translate: -50% -175%;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow:
+    0 0 0 5px color-mix(in oklab, var(--orange) 25%, transparent),
+    0 6px 12px -4px color-mix(in oklab, var(--ink) 60%, transparent);
+  font-size: 0.6rem;
+  pointer-events: none;
+  transition:
+    left 0.9s cubic-bezier(0.6, 0, 0.3, 1),
+    top 0.9s cubic-bezier(0.6, 0, 0.3, 1);
+}
+
+[data-gioco-livello="logiche"] .pacco .onda {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  animation: gioco-logiche-pulsa 1.4s 0.9s ease-in-out infinite;
+}
+
+@keyframes gioco-logiche-pulsa {
+  50% { box-shadow: 0 0 0 9px color-mix(in oklab, var(--orange) 12%, transparent); }
+}
+
+/* ── Il palco: la scena, o l'incidente al suo posto ────────────────────── */
+[data-gioco-livello="logiche"] .incidente {
+  display: grid;
+  align-content: start;
+  gap: 0.4rem;
+  padding: 0.55rem 0.6rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 10px;
+  background: var(--gioco-crema);
+  animation: gioco-timbra 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+[data-gioco-livello="logiche"] .incidente .errore {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  background: var(--logiche-rosa);
+  color: var(--logiche-mattone);
+  font-size: 0.72rem;
+}
+
+[data-gioco-livello="logiche"] .incidente .regola {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  line-height: 1.55;
+}
+
+[data-gioco-livello="logiche"] .incidente .regola p {
+  display: grid;
+  grid-template-columns: 3.2rem 1fr;
+  align-items: start;
+  gap: 0.35rem;
+}
+
+[data-gioco-livello="logiche"] .incidente .regola p + p { margin-block-start: 0.3rem; }
+
+[data-gioco-livello="logiche"] .incidente .regola span {
+  padding: 0.08rem 0.3rem;
+  border-radius: 3px;
+  background: var(--ink);
+  color: var(--bulb);
+  text-align: center;
+}
+
+[data-gioco-livello="logiche"] .incidente .salvato {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+/* La regola gia' trovata, quando il nodo e' fatto. */
+[data-gioco-livello="logiche"] .trovata {
+  position: absolute;
+  inset-inline-end: 0.3rem;
+  inset-block-end: 0.2rem;
+  padding: 0.12rem 0.45rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--bulb);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+}
+
+/* ── Le sei scene ──────────────────────────────────────────────────────── */
+[data-gioco-livello="logiche"] .campo {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-block-start: 0.3rem;
+  padding: 0.38rem 0.55rem;
+  border: 1.5px solid var(--graph);
+  border-radius: 7px;
+  background: var(--paper);
+  font-size: 0.74rem;
+}
+
+[data-gioco-livello="logiche"] .campo.giusto { border-color: var(--green); }
+
+[data-gioco-livello="logiche"] .campo small {
+  margin-inline-start: auto;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  color: var(--muted);
+}
+
+[data-gioco-livello="logiche"] .torte {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+}
+
+[data-gioco-livello="logiche"] .torta {
+  position: relative;
+  padding: 0.45rem 0.3rem 0.4rem;
+  border: 1.5px solid var(--graph);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.7rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+[data-gioco-livello="logiche"] .torta .disco {
+  display: block;
+  inline-size: 2rem;
+  block-size: 1.3rem;
+  margin: 0 auto 0.3rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 50% 50% 6px 6px / 70% 70% 6px 6px;
+  background: var(--orange);
+}
+
+/* Crostata, Sacher, millefoglie: arancio, cioccolato, crema. */
+[data-gioco-livello="logiche"] .torta:nth-child(2) .disco { background: color-mix(in oklab, var(--ink) 78%, var(--orange)); }
+[data-gioco-livello="logiche"] .torta:nth-child(3) .disco { background: color-mix(in oklab, var(--paper) 78%, var(--bulb)); }
+
+[data-gioco-livello="logiche"] .torta small {
+  display: block;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.54rem;
+  color: var(--muted);
+}
+
+[data-gioco-livello="logiche"] .torta.scelta {
+  border-color: var(--orange);
+  transform: translateY(-3px);
+}
+
+[data-gioco-livello="logiche"] .torta.finita { opacity: 0.45; }
+
+[data-gioco-livello="logiche"] .torta .timbro {
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 40%;
+  translate: -50% -50%;
+  rotate: -12deg;
+  padding: 0.05rem 0.35rem;
+  border: 1.5px solid var(--orange);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--orange);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+  font-style: normal;
+}
+
+[data-gioco-livello="logiche"] .giorni {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+[data-gioco-livello="logiche"] .giorno {
+  padding: 0.35rem 0 0.3rem;
+  border: 1.5px solid var(--graph);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+
+[data-gioco-livello="logiche"] .giorno small {
+  display: block;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.48rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+[data-gioco-livello="logiche"] .giorno .barra {
+  display: block;
+  block-size: 3px;
+  margin: 0.25rem 0.3rem 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--orange) var(--pieno), var(--graph) var(--pieno));
+}
+
+[data-gioco-livello="logiche"] .giorno.pieno {
+  background: color-mix(in oklab, var(--graph) 40%, var(--paper));
+  color: var(--muted);
+}
+
+[data-gioco-livello="logiche"] .giorno.scelto {
+  border-color: var(--green);
+  background: color-mix(in oklab, var(--green) 10%, var(--paper));
+}
+
+[data-gioco-livello="logiche"] .carta {
+  position: relative;
+  block-size: 5.2rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--gioco-scuro-2), var(--ink));
+  color: var(--paper);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+}
+
+/* Il chip della carta. */
+[data-gioco-livello="logiche"] .carta::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0.7rem;
+  inset-block-start: 1.45rem;
+  inline-size: 1.5rem;
+  block-size: 1.1rem;
+  border-radius: 3px;
+  background: linear-gradient(135deg, var(--bulb), color-mix(in oklab, var(--bulb) 65%, var(--muted)));
+}
+
+[data-gioco-livello="logiche"] .carta .num {
+  position: absolute;
+  inset-inline-start: 0.7rem;
+  inset-block-end: 1.2rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+}
+
+[data-gioco-livello="logiche"] .carta .imp {
+  position: absolute;
+  inset-inline-end: 0.7rem;
+  inset-block-start: 0.55rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.9rem;
+}
+
+[data-gioco-livello="logiche"] .carta .stato {
+  position: absolute;
+  inset-inline-end: 0.7rem;
+  inset-block-end: 0.5rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: var(--green);
+  font-size: 0.52rem;
+}
+
+[data-gioco-livello="logiche"] .mail {
+  overflow: hidden;
+  border: 1.5px solid var(--graph);
+  border-radius: 8px;
+  background: var(--paper);
+  font-size: 0.7rem;
+}
+
+[data-gioco-livello="logiche"] .mail .intest {
+  padding: 0.35rem 0.55rem;
+  border-block-end: 1px solid var(--graph);
+  background: color-mix(in oklab, var(--graph) 25%, var(--paper));
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  color: var(--muted);
+}
+
+[data-gioco-livello="logiche"] .mail .intest b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+[data-gioco-livello="logiche"] .mail p {
+  padding: 0.45rem 0.55rem;
+  line-height: 1.45;
+}
+
+[data-gioco-livello="logiche"] .registro {
+  overflow: hidden;
+  border: 1.5px solid var(--ink);
+  border-radius: 8px;
+  background: var(--paper);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+}
+
+[data-gioco-livello="logiche"] .registro div {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr 3rem 2.6rem;
+  gap: 0.3rem;
+  padding: 0.3rem 0.45rem;
+  border-block-start: 1px solid var(--graph);
+}
+
+[data-gioco-livello="logiche"] .registro div:first-child {
+  border-block-start: 0;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+[data-gioco-livello="logiche"] .registro div.nuovo {
+  background: var(--gioco-crema);
+  animation: gioco-entra 0.6s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+/* ── La fine: si stampa il foglietto d'ordine ──────────────────────────── */
+[data-gioco-livello="logiche"] .foglietto {
+  display: grid;
+  inline-size: 72%;
+  margin: 0 auto;
+  padding: 0.6rem 0.7rem 0.9rem;
+  background: var(--paper);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  line-height: 1.55;
+  box-shadow: 0 10px 18px -12px color-mix(in oklab, var(--ink) 50%, transparent);
+  /* Il bordo strappato in fondo: la maschera conta solo l'opacita'. */
+  mask: conic-gradient(from -45deg at bottom, transparent, var(--ink) 1deg 89deg, transparent 90deg) 50% / 10px 100%;
+  animation: gioco-logiche-stampa 1.2s steps(10) both;
+}
+
+[data-gioco-livello="logiche"] .foglietto b {
+  font-family: var(--font-display), sans-serif;
+  font-size: 0.8rem;
+  font-weight: 400;
+  text-align: center;
+}
+
+[data-gioco-livello="logiche"] .foglietto hr {
+  margin: 0.3rem 0;
+  border: 0;
+  border-block-start: 1px dashed var(--mutedDark);
+}
+
+@keyframes gioco-logiche-stampa {
+  from { clip-path: inset(0 0 100% 0); }
+}
+
+/* ── La partenza: lo schermo del livello 1, e sotto l'appunto ──────────── */
+[data-gioco-livello="logiche"] .partenza {
+  grid-row: 1 / -1;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  min-block-size: 0;
+}
+
+[data-gioco-livello="logiche"] .partenza > .mono { text-align: center; }
+
+[data-gioco-livello="logiche"] .telefono {
+  min-block-size: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  background: var(--sf);
+  color: var(--st);
+  box-shadow: 0 5px 0 var(--ink);
+}
+
+[data-gioco-livello="logiche"] .telefono .barra {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.32rem 0.55rem;
+  background: var(--ink);
+  color: var(--mutedDark);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+}
+
+[data-gioco-livello="logiche"] .telefono .barra i {
+  inline-size: 0.38rem;
+  block-size: 0.38rem;
+  border-radius: 50%;
+  background: var(--gioco-bordo-scuro);
+}
+
+[data-gioco-livello="logiche"] .telefono .barra span {
+  flex: 1;
+  margin-inline-start: 0.3rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: var(--gioco-scuro-2);
+}
+
+[data-gioco-livello="logiche"] .sito {
+  min-block-size: 0;
+  display: grid;
+  grid-template-columns: 1fr 42%;
+  grid-template-rows: auto 1fr;
+}
+
+[data-gioco-livello="logiche"] .sito .menu {
+  grid-column: 1 / 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.42rem 0.7rem;
+  border-block-end: 1px solid var(--ss);
+  font-size: 0.54rem;
+}
+
+[data-gioco-livello="logiche"] .sito .menu b {
+  font-family: var(--font-finto-fraunces), Georgia, serif;
+  font-size: 0.8rem;
+  letter-spacing: -0.01em;
+}
+
+[data-gioco-livello="logiche"] .sito .menu span {
+  letter-spacing: 0.03em;
+  color: var(--sm);
+}
+
+[data-gioco-livello="logiche"] .sito .testo {
+  display: grid;
+  align-content: center;
+  gap: 0.42rem;
+  padding: 0.6rem 0.3rem 0.7rem 0.75rem;
+}
+
+[data-gioco-livello="logiche"] .sito .testo small {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.46rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sa);
+}
+
+[data-gioco-livello="logiche"] .sito h4 {
+  font-family: var(--font-finto-fraunces), Georgia, serif;
+  font-size: 1.32rem;
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+
+[data-gioco-livello="logiche"] .sito h4 em { color: var(--sa); }
+
+[data-gioco-livello="logiche"] .sito p {
+  font-size: 0.58rem;
+  line-height: 1.35;
+  color: var(--sm);
+}
+
+[data-gioco-livello="logiche"] .sito .foto {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--ss);
+}
+
+[data-gioco-livello="logiche"] .sito .foto svg {
+  inline-size: 118%;
+  block-size: auto;
+  color: var(--st);
+}
+
+[data-gioco-livello="logiche"] .prenota {
+  position: relative;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-block-start: 0.15rem;
+  padding: 0.5rem 0.85rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sa);
+  color: var(--sf);
+  box-shadow: 0 3px 0 var(--st);
+  font: 700 0.66rem var(--font-body), system-ui, sans-serif;
+  cursor: pointer;
+}
+
+[data-gioco-livello="logiche"] .prenota::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--sa);
+  border-radius: 999px;
+  animation: gioco-logiche-onda 1.6s ease-out infinite;
+}
+
+[data-gioco-livello="logiche"] .prenota:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--st);
+}
+
+[data-gioco-livello="logiche"] .dito {
+  position: absolute;
+  inset-inline-end: -0.7rem;
+  inset-block-end: -1rem;
+  font-size: 1.05rem;
+  pointer-events: none;
+  animation: gioco-logiche-tocca 1.6s ease-in-out infinite;
+}
+
+@keyframes gioco-logiche-onda {
+  from { opacity: 0.8; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.2, 1.6); }
+}
+
+@keyframes gioco-logiche-tocca {
+  0%, 100% { transform: translate(0, 0); }
+  45% { transform: translate(-3px, -4px) scale(0.92); }
+}
+
+/* L'appunto: un secondo schermino che dice cosa succede premendo. */
+[data-gioco-livello="logiche"] .appunto {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 3px 0 var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+[data-gioco-livello="logiche"] .appunto .ic {
+  inline-size: 2.1rem;
+  block-size: 2.1rem;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--ink);
+  border-radius: 8px;
+  background: var(--bulb);
+  font-size: 1rem;
+}
+
+[data-gioco-livello="logiche"] .appunto b {
+  display: block;
+  font-size: 0.8rem;
+}
+
+[data-gioco-livello="logiche"] .appunto b + span {
+  display: block;
+  margin-block-start: 0.1rem;
+  font-size: 0.64rem;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+[data-gioco-livello="logiche"] .appunto .mini {
+  display: grid;
+  grid-template-columns: repeat(3, 0.72rem);
+  gap: 2px;
+}
+
+[data-gioco-livello="logiche"] .appunto .mini i {
+  block-size: 0.72rem;
+  border-radius: 2px;
+  background: var(--graph);
+}
+
+[data-gioco-livello="logiche"] .appunto .mini i.si { background: var(--green); }

@@ -165,7 +165,188 @@
         "titolo": "Build the screen"
       },
       "logiche": {
-        "titolo": "Behind the screen"
+        "titolo": "Behind the screen",
+        "testa": "2 · behind the screen",
+        "regole": "rules",
+        "nodo": "node {numero} of 6 · {nome}",
+        "partenza": {
+          "occhiello": "the screen you built",
+          "indirizzo": "fornoaurora.it",
+          "nome": "Forno Aurora",
+          "menu": "bread · cakes · open",
+          "via": "via Roma 12",
+          "titolo": "Warm bread",
+          "titoloAccento": "from six.",
+          "testo": "Sourdough, wood oven, cakes to order.",
+          "prenota": "Book the cake",
+          "appuntoTitolo": "Book here",
+          "appuntoTesto": "Press it: behind the screen six pieces of logic start, and you follow each one."
+        },
+        "nodi": [
+          {
+            "nome": "Your account",
+            "titolo": "Who's ordering?",
+            "spiega": "First the bakery knows you: you find your past orders and never retype your details.",
+            "fai": "log in as Andrea",
+            "rompi": "fail 3 times",
+            "errore": "Wrong password, for the third time.",
+            "regola": {
+              "se": "three wrong tries in a row",
+              "allora": "the account pauses 15 minutes and a login link is sent"
+            }
+          },
+          {
+            "nome": "Catalogue",
+            "titolo": "Which cake?",
+            "spiega": "Cakes, prices and what's still available come from one place: what you see is true.",
+            "fai": "pick the Sacher",
+            "rompi": "pick the millefoglie",
+            "errore": "Sunday's millefoglie is sold out.",
+            "regola": {
+              "se": "a cake is sold out",
+              "allora": "it can't be picked; the site offers the closest one"
+            }
+          },
+          {
+            "nome": "Bookings",
+            "titolo": "For which day?",
+            "spiega": "Each day the bakery can make so many cakes: the calendar knows, and never promises what isn't there.",
+            "fai": "book Saturday",
+            "rompi": "book Sunday",
+            "errore": "Sunday is fully booked.",
+            "regola": {
+              "se": "the chosen day is full",
+              "allora": "offer the nearest free day: Saturday"
+            }
+          },
+          {
+            "nome": "Payments",
+            "titolo": "Deposit",
+            "spiega": "A 5 euro deposit holds the spot. Payment is where a mistake costs the most.",
+            "fai": "pay the deposit",
+            "rompi": "the card is declined",
+            "errore": "The bank declined the card.",
+            "regola": {
+              "se": "the payment fails",
+              "allora": "the cake stays held for 15 minutes and you never pay twice"
+            }
+          },
+          {
+            "nome": "Contacts",
+            "titolo": "Order email",
+            "spiega": "Once booked, an email goes out: the customer knows what, for when, and where to come.",
+            "fai": "send confirmation",
+            "rompi": "wrong address",
+            "errore": "«andrea@gmial.con» doesn't exist: the email would bounce.",
+            "regola": {
+              "se": "the address looks mistyped",
+              "allora": "it asks «did you mean gmail.com?» first"
+            }
+          },
+          {
+            "nome": "Your back office",
+            "titolo": "In the bakery's ledger",
+            "spiega": "The order lands where the bakery already works: no retyping, and it's listed by morning.",
+            "fai": "log the order",
+            "rompi": "order twice in a row",
+            "errore": "The same order arrived twice in one second.",
+            "regola": {
+              "se": "the same order arrives twice in a minute",
+              "allora": "only one stays, and the customer pays once"
+            }
+          }
+        ],
+        "scene": {
+          "email": "andrea@esempio.it",
+          "dentro": "in",
+          "torte": [
+            {
+              "nome": "Crostata",
+              "prezzo": "18 €"
+            },
+            {
+              "nome": "Sacher",
+              "prezzo": "24 €"
+            },
+            {
+              "nome": "Millefoglie",
+              "prezzo": "22 €"
+            }
+          ],
+          "finita": "gone",
+          "giorni": [
+            "M",
+            "T",
+            "W",
+            "T",
+            "F",
+            "S",
+            "S"
+          ],
+          "pieno": "full",
+          "importo": "5.00 €",
+          "carta": "•••• •••• •••• 4242",
+          "pagato": "paid",
+          "mailA": "to:",
+          "mailDa": "from: Forno Aurora",
+          "mailTitolo": "Your Sacher is booked.",
+          "mailTesto": "Saturday from 9 at via Roma 12. 5 € deposit received.",
+          "registro": [
+            [
+              "no.",
+              "cake",
+              "day",
+              "status"
+            ],
+            [
+              "0140",
+              "Crostata",
+              "fri",
+              "ready"
+            ],
+            [
+              "0141",
+              "Sacher",
+              "sat",
+              "oven"
+            ]
+          ],
+          "nuovo": [
+            "0142",
+            "Sacher",
+            "sat",
+            "new"
+          ]
+        },
+        "incidente": {
+          "se": "IF",
+          "allora": "THEN",
+          "salvato": "the site held. Now do it the right way."
+        },
+        "trovata": "rule found",
+        "giaRotto": "broken",
+        "avanti": "next: {nome}",
+        "stampa": "print the order",
+        "fine": {
+          "occhiello": "order received · rules found {trovate} of 6",
+          "titolo": "Six logic steps, one order",
+          "mancano": "Tap the nodes without ⚡ in the circuit to find the other rules.",
+          "tutte": "You tried to break it all, and the site held every time.",
+          "negozio": "FORNO AURORA",
+          "ordine": "ORDER NO. 0142 · ANDREA",
+          "giorni": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday"
+          ],
+          "caparra": "DEPOSIT 5.00 € PAID",
+          "laboratorio": "TICKET FOR THE KITCHEN",
+          "ricomincia": "restart",
+          "livello3": "level 3"
+        }
       },
       "pannello": {
         "titolo": "After launch"
