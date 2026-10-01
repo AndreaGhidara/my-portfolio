@@ -10,21 +10,6 @@
   background: linear-gradient(var(--ink), color-mix(in oklab, var(--ink) 80%, var(--muted)));
 }
 
-[data-gioco-livello="notte"] .stelle {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  --stella: color-mix(in oklab, var(--paper) 55%, transparent);
-  background-image:
-    radial-gradient(1px 1px at 12% 20%, var(--stella) 50%, transparent 51%),
-    radial-gradient(1px 1px at 34% 12%, var(--stella) 50%, transparent 51%),
-    radial-gradient(1.4px 1.4px at 58% 26%, var(--stella) 50%, transparent 51%),
-    radial-gradient(1px 1px at 76% 10%, var(--stella) 50%, transparent 51%),
-    radial-gradient(1px 1px at 88% 34%, var(--stella) 50%, transparent 51%),
-    radial-gradient(1px 1px at 22% 44%, var(--stella) 50%, transparent 51%),
-    radial-gradient(1.2px 1.2px at 66% 48%, var(--stella) 50%, transparent 51%);
-}
-
 [data-gioco-livello="notte"] .orologio {
   position: absolute;
   inset-inline-start: 0.7rem;

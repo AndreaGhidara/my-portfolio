@@ -26,7 +26,7 @@ import {
 } from "../layers";
 import { SHAPES } from "../../../../../scripts/build-desk.mjs";
 
-const LAYOUTS: DeskLayout[] = ["wide", "tall"];
+const LAYOUTS: DeskLayout[] = ["wide"];
 
 /**
  * Il pavimento dell'aria fra due cose sul tavolo, in percentuale dell'ALTEZZA
@@ -60,10 +60,9 @@ const CLEARANCE_FLOOR = 1.7;
  * compagni, e i quattro anelli si leggevano come una nuvola sola. Nessuna prova
  * se ne accorgeva, perche' 1,53 sta sopra il pavimento globale.
  *
- * 3,0 punti sono circa 19 px a 1440. Non e' il massimo raggiungibile: il mondo
- * orizzontale ne tiene 4,28 e quello verticale 3,52, ma e' la soglia sotto la
- * quale l'occhio ricomincia a raggruppare per vicinanza invece che per anello,
- * ed e' il mondo verticale a fissare il margine.
+ * 3,0 punti sono circa 19 px a 1440. Non e' il massimo raggiungibile (il
+ * mondo ne tiene 4,28), ma e' la soglia sotto la quale l'occhio ricomincia a
+ * raggruppare per vicinanza invece che per anello.
  */
 const RING_FLOOR = 3.0;
 
@@ -114,14 +113,8 @@ function everyObject(layout: DeskLayout) {
 }
 
 describe("il mondo del tavolo", () => {
-  it("ha due formati: orizzontale per il desktop, verticale per il telefono", () => {
+  it("e' orizzontale: si disegna solo da desktop", () => {
     expect(WORLD.wide.width).toBeGreaterThan(WORLD.wide.height);
-    expect(WORLD.tall.height).toBeGreaterThan(WORLD.tall.width);
-  });
-
-  it("sul telefono mostra meno oggetti per strato: quattro invece di sei", () => {
-    expect(OBJECTS_PER_LAYER.wide).toBe(6);
-    expect(OBJECTS_PER_LAYER.tall).toBe(4);
   });
 
   it("ogni strato ha almeno tanti oggetti quanti il formato ne mostra", () => {
@@ -150,12 +143,6 @@ describe("quanto sono grandi gli oggetti", () => {
         expect(larghezza / altezza, `${layout}/${name}`).toBeCloseTo(box.w / box.h, 5);
       }
     }
-  });
-
-  it("nel mondo verticale si disegnano piu' piccoli: a misura naturale un foglio sarebbe un quinto della larghezza", () => {
-    const naturale = (SHAPE_BOX.sheet.w * 100) / WORLD.tall.width;
-    expect(naturale).toBeGreaterThan(20);
-    expect(drawWidth("tall", "sheet")).toBeLessThan(naturale * 0.6);
   });
 });
 
@@ -210,19 +197,6 @@ describe("quanto e' grande un oggetto", () => {
         }
       }
     }
-  });
-
-  it("il post-it bianco si disegna anche sul telefono: e' l'unico oggetto che porta da qualche parte", () => {
-    // Il mondo verticale disegna i primi OBJECTS_PER_LAYER.tall oggetti di ogni
-    // strato e gli altri li lascia nell'elenco senza disegnarli. Se il post-it
-    // finisse fuori da quei primi, sul telefono resterebbe un comando che si
-    // annuncia e non si vede: il fuoco su una cosa larga zero pixel, e niente
-    // da premere col dito. E' il motivo per cui in content/desk.ts sta quarto.
-    const blank = deskLayers[3].objects.findIndex((o) => o.mute);
-    expect(blank).toBeGreaterThanOrEqual(0);
-    expect(blank, "il post-it bianco e' fuori dal disegno del telefono").toBeLessThan(
-      OBJECTS_PER_LAYER.tall,
-    );
   });
 
   it("il post-it bianco non ha etichetta e non ne occupa il posto", () => {
@@ -646,9 +620,8 @@ describe("la domanda sul post-it ci sta dentro il post-it", () => {
     );
     expect(testi.every((t) => t.length > 0)).toBe(true);
 
-    // Il post-it si disegna solo nel mondo orizzontale, che vive dai 1024px in
-    // su: sotto, il disegno e' il gemello e li' la domanda non si scrive. Le due
-    // finestre sono gli estremi: la piu' stretta che lo disegna e una in cui il
+    // Il post-it si disegna solo nel mondo del tavolo, che vive dai 1024px in
+    // su: sotto c'e' il gioco. Le due finestre sono gli estremi: la piu' stretta che lo disegna e una in cui il
     // mondo ha gia' toccato il suo massimo.
     for (const finestra of [FINESTRA.wide, 2560]) {
       const mondo = Math.min((finestra * vw) / 100, rem * REM);

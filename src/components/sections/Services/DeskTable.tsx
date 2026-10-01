@@ -26,35 +26,27 @@ export type DeskLayerData = {
  * una cosa sola, guardata in due modi.
  *
  * Il mondo si disegna solo largo, da desktop. Sotto i 1024px la sezione e' il
- * gioco (gioco/Gioco.tsx) e il CSS toglie questo mondo dall'impaginato. La
- * geometria verticale di layers.ts e `ghost` vengono dal gemello che stava li'
- * prima del gioco: oggi nessuno le chiede.
+ * gioco (gioco/Gioco.tsx) e il CSS toglie questo mondo dall'impaginato.
  *
- * Sotto il piano ci sono le didascalie dei quattro strati, in colonna sul
- * telefono e in quattro colonne da desktop. Il piano e' un elemento a se':
+ * Sotto il piano ci sono le didascalie dei quattro strati, in quattro
+ * colonne. Il piano e' un elemento a se':
  * gli oggetti contano le loro percentuali su quello, non sul blocco intero, o
  * ogni riga di testo in piu' sposterebbe il tavolo.
  */
 export function DeskTable({
   layers,
   centre,
-  composto,
   blank,
   note,
   layout,
-  ghost = false,
 }: {
   layers: DeskLayerData[];
   centre: string;
-  /** Il titolino sopra gli strati. Il CSS lo mostra solo sotto i 1024px. */
-  composto: string;
   /** Il nome del comando sul post-it bianco: l'unico oggetto che si preme. */
   blank: string;
   /** Quello che c'e' scritto sul post-it prima che lo si prema. */
   note: string;
   layout: DeskLayout;
-  /** Il gemello che il CSS nasconde: sta nel DOM, ma non va letto due volte. */
-  ghost?: boolean;
 }) {
   const shown = OBJECTS_PER_LAYER[layout];
 
@@ -62,7 +54,6 @@ export function DeskTable({
     <div
       data-desk-world
       data-layout={layout}
-      aria-hidden={ghost || undefined}
       style={
         {
           "--world-w": WORLD[layout].width,
@@ -103,11 +94,6 @@ export function DeskTable({
         </div>
       </div>
 
-      {/* Sotto i 1024px gli strati diventano un elenco, e un elenco vuole un
-          nome: senza, quattro titoli si leggono come quattro sezioni nuove
-          invece che come le parti di una cosa sola. */}
-      <p data-desk-composto className="eyebrow">{composto}</p>
-
       <ol data-desk-layers>
         {layers.map((layer, index) => (
           <li key={layer.id} data-desk-layer={layer.id}>
@@ -124,21 +110,11 @@ export function DeskTable({
                 } as CSSProperties
               }
             >
-              {/* Il numero e' presentazione, non contenuto: dice che gli
-                  strati sono quattro e che questo e' l'ennesimo. Da desktop
-                  il CSS lo nasconde, perche' li' gli strati arrivano uno alla
-                  volta e contarli non serve. */}
-              <span data-desk-num aria-hidden="true">
-                {String(index + 1).padStart(2, "0")}
-              </span>
               <h3>{layer.title}</h3>
               <p>{layer.lead}</p>
             </div>
 
             <ul>
-              {/* `i % shown`: gli oggetti oltre il quarto, sul telefono, riusano
-                  la posizione del primo. Sono display:none e non li vede
-                  nessuno — serve solo che placeObject riceva un indice valido. */}
               {layer.objects.map((object, i) => (
                 <DeskObject
                   key={object.id}
@@ -146,10 +122,8 @@ export function DeskTable({
                   label={object.label}
                   sample={object.sample}
                   layout={layout}
-                  placement={placeObject(layout, index, i % shown)}
-                  beat={objectBeat(index, i % shown, shown)}
-                  ghost={ghost}
-                  hidden={i >= shown}
+                  placement={placeObject(layout, index, i)}
+                  beat={objectBeat(index, i, shown)}
                   // L'oggetto senza etichetta e' il post-it bianco, e non ce
                   // n'e' un altro: e' il posto per la cosa che non e' ancora
                   // stata raccontata, quindi porta dove la si racconta. Il

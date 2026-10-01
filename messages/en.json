@@ -90,7 +90,6 @@
     "stageTitle": "Everything you don't see",
     "stageLead": "A finished website. From here on, everything underneath it.",
     "centre": "the project",
-    "composto": "What it's made of",
     "blank": "And yours, what is it? Write to me.",
     "punch": "What you call «a website» is the screen in the middle. The rest is the work behind it.",
     "layers": {
@@ -146,7 +145,6 @@
       "comune": {
         "barrette": "The four levels of the game",
         "etichetta": "{numero} · {nome}",
-        "avanti": "next",
         "livelli": {
           "schermo": "screen",
           "logiche": "logic",
@@ -285,7 +283,6 @@
       },
       "logiche": {
         "titolo": "Behind the screen",
-        "testa": "2 · behind the screen",
         "regole": "rules",
         "nodo": "node {numero} of 6 · {nome}",
         "partenza": {
@@ -468,7 +465,6 @@
         }
       },
       "pannello": {
-        "testa": "3 · after launch",
         "conta": {
           "spento": "panel off",
           "acceso": "on",
