@@ -65,7 +65,7 @@ export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, on
         <>
           <button type="button" data-pratica-chiudi data-entra onClick={onChiudi}>
             <span aria-hidden="true">×</span>
-            <span className="sr-only">{labels.close}</span>
+            <span className="sr-only">{labels.chiudi}</span>
           </button>
 
           <article data-pratica>
@@ -183,7 +183,7 @@ export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, on
                       cliccabile: l'assenza si legge come un dato. */}
                   {data.url ? (
                     <a data-pratica-link href={data.url} target="_blank" rel="noopener noreferrer">
-                      {labels.visit} <span aria-hidden="true">↗</span>
+                      {labels.visita} <span aria-hidden="true">↗</span>
                     </a>
                   ) : (
                     <span data-pratica-senza-link>{labels.riservato}</span>

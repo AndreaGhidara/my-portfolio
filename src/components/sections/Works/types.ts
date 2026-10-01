@@ -49,11 +49,11 @@ export type WorkCaseLabels = {
   scelta: string;
   /** Come e' stata condotta. */
   conduzione: string;
-  visit: string;
-  /** Sostituisce `visit` quando non c'è un sito da visitare. */
+  visita: string;
+  /** Sostituisce `visita` quando non c'è un sito da visitare. */
   riservato: string;
-  open: string;
-  close: string;
+  apri: string;
+  chiudi: string;
   /** Il nome della linguetta per chi legge a voce: cosa fa il bottone. */
   riporta: string;
   /** Le voci della pratica, il foglio che il dossier apre. */

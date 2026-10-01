@@ -28,7 +28,7 @@ export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewPro
 
       {/* L'archivio esce dalla colonna del testo: ogni cartella e' larga quanto
           la pagina, tolto il gutter. */}
-      <WorksShelf items={items} labels={labels} />
+      <WorksShelf lavori={items} labels={labels} />
     </section>
   );
 }

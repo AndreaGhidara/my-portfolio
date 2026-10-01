@@ -29,10 +29,10 @@ import { Dietro } from "./schermoDietro";
  */
 
 const INIZIALI: Scelte = {
-  pal: 0,
-  car: 0,
-  sca: SCALE_FINTE.indexOf(SCALA_INIZIALE),
-  lay: 0,
+  palette: 0,
+  caratteri: 0,
+  scala: SCALE_FINTE.indexOf(SCALA_INIZIALE),
+  impaginazione: 0,
   img: "pane",
   vista: "pc",
 };
@@ -145,10 +145,10 @@ function Banco({ onAvanti, visibile, onRicomincia }: LivelloProps & { onRicominc
         : null;
 
   const sito = {
-    impaginazione: IMPAGINAZIONI_FINTE[scelte.lay].id,
+    impaginazione: IMPAGINAZIONI_FINTE[scelte.impaginazione].id,
     illustrazione: scelte.img,
-    coppia: CARATTERI_FINTI[scelte.car],
-    scala: SCALE_FINTE[scelte.sca],
+    coppia: CARATTERI_FINTI[scelte.caratteri],
+    scala: SCALE_FINTE[scelte.scala],
   };
 
   return (
@@ -159,7 +159,7 @@ function Banco({ onAvanti, visibile, onRicomincia }: LivelloProps & { onRicominc
       data-pronto={pronto || undefined}
       data-aperto={aperto || undefined}
       data-dietro={dietro || undefined}
-      style={variabiliSito(PALETTE_FINTE[scelte.pal].colori) as CSSProperties}
+      style={variabiliSito(PALETTE_FINTE[scelte.palette].colori) as CSSProperties}
     >
       <div className="passo-1" inert={dietro}>
         <div className="testa">

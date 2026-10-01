@@ -22,10 +22,10 @@ export type Vista = "pc" | "cell";
 
 /** Quello che gli attrezzi hanno scelto: indici nelle liste di sitoFinto.ts. */
 export type Scelte = {
-  pal: number;
-  car: number;
-  sca: number;
-  lay: number;
+  palette: number;
+  caratteri: number;
+  scala: number;
+  impaginazione: number;
   img: IdIllustrazione;
   vista: Vista;
 };
@@ -91,7 +91,7 @@ export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: Casse
       <div className="scelte tre" role="group" aria-label={titolo}>
         {PALETTE_FINTE.map((p, i) =>
           scelta(
-            "pal",
+            "palette",
             i,
             <>
               <span className="pal" aria-hidden="true">
@@ -111,7 +111,7 @@ export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: Casse
       <div className="scelte" role="group" aria-label={titolo}>
         {CARATTERI_FINTI.map((c, i) =>
           scelta(
-            "car",
+            "caratteri",
             i,
             <>
               <span className="aa" aria-hidden="true" style={{ fontFamily: c.titolo, fontWeight: c.peso }}>
@@ -125,13 +125,13 @@ export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: Casse
       </div>
     );
   } else if (attivo === "testi") {
-    const s = SCALE_FINTE[scelte.sca];
+    const s = SCALE_FINTE[scelte.scala];
     corpo = (
       <>
         <div className="scelte tre" role="group" aria-label={titolo}>
           {SCALE_FINTE.map((x, i) =>
             scelta(
-              "sca",
+              "scala",
               i,
               <>
                 <span className="aa-scala" aria-hidden="true" style={{ fontSize: `${0.6 + i * 0.3}rem` }}>
@@ -168,7 +168,7 @@ export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: Casse
       <div className="scelte" role="group" aria-label={titolo}>
         {IMPAGINAZIONI_FINTE.map((l, i) =>
           scelta(
-            "lay",
+            "impaginazione",
             i,
             <>
               <Mini mini={l.mini} />
