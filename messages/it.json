@@ -444,7 +444,71 @@
         }
       },
       "notte": {
-        "titolo": "La notte del forno"
+        "titolo": "La notte del forno",
+        "prepara": {
+          "occhiello": "sono le 23 · il forno chiude",
+          "titolo": "Cosa prepari prima di dormire?",
+          "spiega": "Accendi quello che vuoi pronto. Poi la notte va da sola.",
+          "vai": "vai a dormire"
+        },
+        "corsa": {
+          "occhiello": "la notte",
+          "titolo": "Dormi. Il sito no.",
+          "spiega": "Guarda la striscia lassù: verde il sito c'è, rossa il sito è giù.",
+          "zzz": "zzz"
+        },
+        "mattina": {
+          "occhiello": "le 7 · il resoconto",
+          "tutto": "Otto ore su otto. Nessuno se n'è accorto.",
+          "ore": "Il sito c'è stato {ore, number} ore su 8",
+          "spiegaTutto": "Ed è proprio questo il punto: l'infrastruttura si vede solo quando manca.",
+          "spiegaParte": "Quello che è andato giù non era pronto. Si prepara una volta, e poi lavora tutte le notti.",
+          "rifai": "rifai la notte",
+          "meglio": "prepara meglio",
+          "finale": "il finale"
+        },
+        "cielo": {
+          "orologio": "il forno dorme · il sito no",
+          "apre": "le 7 · il forno apre"
+        },
+        "parato": "parato",
+        "giu": "giù",
+        "giuOre": "giù {ore, number} ore",
+        "giuMin": "giù {min} min",
+        "voci": {
+          "dominio": "Il dominio",
+          "sicurezza": "La sicurezza",
+          "dati": "I dati",
+          "copie": "Le copie",
+          "dove": "Dove sta",
+          "velocita": "La velocità"
+        },
+        "eventi": {
+          "dominio": {
+            "fatto": "scade il dominio fornoaurora.it",
+            "parato": "rinnovato da solo"
+          },
+          "sicurezza": {
+            "fatto": "2.000 password provate sull'area clienti",
+            "parato": "chiusa dopo tre tentativi"
+          },
+          "dati": {
+            "fatto": "il server si spegne per un guasto",
+            "parato": "i dati ripartono intatti"
+          },
+          "copie": {
+            "fatto": "un aggiornamento cancella il catalogo",
+            "parato": "rimesso dalla copia delle 3"
+          },
+          "dove": {
+            "fatto": "i primi clienti aprono il sito da Brescia",
+            "parato": "server a Milano: subito"
+          },
+          "velocita": {
+            "fatto": "un post porta 800 persone insieme",
+            "parato": "pagine pronte, reggono"
+          }
+        }
       },
       "finale": {
         "testa": "fine · 4 livelli su 4",
