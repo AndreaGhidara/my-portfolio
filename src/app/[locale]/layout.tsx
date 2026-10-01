@@ -27,7 +27,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { site } from "@/content/site";
 
 const SITE_URL = site.url;
-const DEFAULT_LOCALE = "it";
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -104,10 +103,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const langPrefix = locale === DEFAULT_LOCALE ? "/it" : `/${locale}`;
-  const canonical = `${SITE_URL}${langPrefix}`;
+  const canonical = `${SITE_URL}/${locale}`;
   const languages = Object.fromEntries(
-    routing.locales.map((l) => [l, l === DEFAULT_LOCALE ? "/it" : `/${l}`]),
+    routing.locales.map((l) => [l, `/${l}`]),
   );
 
   const title = "Andrea Ghidara";
