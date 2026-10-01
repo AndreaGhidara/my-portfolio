@@ -1,23 +1,9 @@
 "use client";
 
-import {
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useId, useMemo, useRef, useState, type ReactNode } from "react";
 import type { MotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
-import {
-  INCROCI,
-  RADICE,
-  RAMI,
-  ZONE,
-  type Capo,
-} from "@/content/cassetta";
+import { ZONE, type Capo, type ZonaId } from "@/content/cassetta";
 import { Etichetta } from "./Etichetta";
 import {
   NODI,
@@ -31,36 +17,14 @@ import {
   tappe,
   vicini,
 } from "./grafo";
+import { FILI, riposo, type Filo } from "./movimento";
 import type { Passo, TestiCassetta } from "./tipi";
+import { useAgo } from "./useAgo";
+import { ENTRATA, useEntrata } from "./useEntrata";
+import { useTrascinamento } from "./useTrascinamento";
 
 const LARGO = 1200;
 const ALTO = 820;
-/** Oltre questi pixel di schermo un clic diventa un trascinamento. */
-const SOGLIA_TRASCINA = 6;
-
-type Punto = { x: number; y: number };
-type Filo = { a: string; b: string; incrocio: boolean };
-
-const FILI: Filo[] = [
-  ...RAMI.map(([a, b]) => ({ a, b, incrocio: false })),
-  ...INCROCI.map(([a, b]) => ({ a, b, incrocio: true })),
-];
-
-const riposo = new Map(NODI.map((n) => [n.id, { x: n.x, y: n.y }]));
-
-/**
- * L'ordine dell'entrata: dal cartellino in giu', per rami, come un albero che
- * si apre. Ogni nodo parte dal punto in cui sta suo padre.
- */
-const ENTRATA = (() => {
-  const ordine: string[] = [RADICE.id];
-  for (let i = 0; i < ordine.length; i++) {
-    for (const [a, b] of RAMI)
-      if (a === ordine[i] && !ordine.includes(b)) ordine.push(b);
-  }
-  for (const n of NODI) if (!ordine.includes(n.id)) ordine.push(n.id);
-  return new Map(ordine.map((id, i) => [id, i]));
-})();
 
 /**
  * La mappa della cassetta: nove pezze di stoffa, gli attrezzi cuciti sopra
@@ -102,18 +66,8 @@ export function Mappa({
 }) {
   const banco = useRef<HTMLDivElement | null>(null);
   const svg = useRef<SVGSVGElement | null>(null);
-  const gruppi = useRef(new Map<string, SVGGElement>());
-  const tracciati = useRef<(SVGPathElement | null)[]>([]);
-  const cucituraRef = useRef<SVGPathElement | null>(null);
-  const mascheraRef = useRef<SVGPathElement | null>(null);
-  const agoRef = useRef<SVGGElement | null>(null);
   const gsapRef = useRef<typeof import("gsap").gsap | null>(null);
-  const posizioni = useRef(
-    new Map<string, Punto>([...riposo].map(([id, p]) => [id, { ...p }])),
-  );
   const [acceso, setAcceso] = useState<string | null>(null);
-  const [cuciti, setCuciti] = useState(Number.POSITIVE_INFINITY);
-  const [entrata, setEntrata] = useState<"attesa" | "entra" | null>(null);
   const idMaschera = useId().replace(/:/g, "");
 
   const percorso = useMemo(() => (capo ? tappe(capo) : []), [capo]);
@@ -133,248 +87,25 @@ export function Mappa({
 
   const pieno = level === "full" && attiva;
 
-  /* L'entrata, una volta sola e solo se la mappa non e' gia' in vista: chi
-     ricarica a meta' pagina la trova ferma e completa. */
-  useEffect(() => {
-    const el = banco.current;
-    if (!pieno || !el || typeof IntersectionObserver === "undefined") return;
-    const r = el.getBoundingClientRect();
-    if (r.top < window.innerHeight && r.bottom > 0) return;
-    setEntrata("attesa");
-    const osservatore = new IntersectionObserver(
-      ([voce]) => {
-        if (!voce.isIntersecting) return;
-        setEntrata("entra");
-        osservatore.disconnect();
-      },
-      { threshold: 0.2 },
-    );
-    osservatore.observe(el);
-    return () => {
-      osservatore.disconnect();
-      setEntrata(null);
-    };
-  }, [pieno]);
-
-  /** Riscrive solo i fili del nodo che si muove, non tutti e ottanta. */
-  const ridisegna = (id: string) => {
-    const pos = posizioni.current;
-    FILI.forEach((f, i) => {
-      if (f.a !== id && f.b !== id) return;
-      tracciati.current[i]?.setAttribute(
-        "d",
-        curva(pos.get(f.a)!, pos.get(f.b)!),
-      );
-    });
-    const p = pos.get(id)!;
-    gruppi.current
-      .get(id)
-      ?.setAttribute(
-        "transform",
-        `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`,
-      );
-  };
-
-  /* L'ago. Parte a ogni capo nuovo, solo a "full": il filo si scopre dietro di
-     lui e le etichette si accendono quando ci passa. Altrimenti il capo e' gia'
-     cucito. In fase di layout: il capo nuovo non deve mostrarsi gia' cucito per
-     un fotogramma prima che l'ago parta. */
-  useLayoutEffect(() => {
-    const maschera = mascheraRef.current;
-    const filo = cucituraRef.current;
-    const ago = agoRef.current;
-    const gsap = gsapRef.current;
-    if (!capo || !maschera || !filo || !ago) {
-      // Via il capo a meta' corsa: l'ago non deve restare fermo sulla mappa.
-      if (agoRef.current) agoRef.current.style.opacity = "0";
-      return;
-    }
-
-    const tutto = () => {
-      maschera.style.strokeDasharray = "none";
-      maschera.style.strokeDashoffset = "0";
-      ago.style.opacity = "0";
-      setCuciti(Number.POSITIVE_INFINITY);
-    };
-    if (!pieno || !gsap || typeof filo.getTotalLength !== "function") {
-      tutto();
-      return;
-    }
-
-    const lunghezza = filo.getTotalLength();
-    // Dove sta ogni tappa lungo il filo: le curve parziali misurate da un
-    // tracciato di servizio, dentro l'SVG perche' fuori il browser non misura.
-    const prova = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "path",
-    );
-    svg.current?.appendChild(prova);
-    const soglie = disegnoCucitura.parziali.map((d) => {
-      prova.setAttribute("d", d);
-      return prova.getTotalLength();
-    });
-    prova.remove();
-
-    maschera.style.strokeDasharray = `${lunghezza} ${lunghezza}`;
-    maschera.style.strokeDashoffset = `${lunghezza}`;
-    ago.style.opacity = "1";
-    setCuciti(1);
-
-    const stato = { q: 0 };
-    let fatti = 1;
-    const tween = gsap.to(stato, {
-      q: 1,
-      duration: Math.min(5.2, 0.26 * percorso.length),
-      ease: "none",
-      onUpdate: () => {
-        const l = stato.q * lunghezza;
-        maschera.style.strokeDashoffset = `${lunghezza - l}`;
-        const p = filo.getPointAtLength(l);
-        const p2 = filo.getPointAtLength(Math.min(lunghezza, l + 2));
-        const angolo =
-          (Math.atan2(p2.y - p.y, p2.x - p.x) * 180) / Math.PI + 90;
-        const su = Math.sin(stato.q * 60) * 4;
-        ago.setAttribute(
-          "transform",
-          `translate(${p.x} ${p.y + su}) rotate(${angolo})`,
-        );
-        let n = fatti;
-        while (n < soglie.length && soglie[n] <= l + 0.5) n++;
-        if (n !== fatti) {
-          fatti = n;
-          setCuciti(n);
-        }
-      },
-      onComplete: tutto,
-    });
-    return () => {
-      tween.kill();
-      ago.style.opacity = "0";
-      setCuciti(Number.POSITIVE_INFINITY);
-    };
-  }, [capo, pieno, disegnoCucitura, percorso.length]);
-
-  /* Il trascinamento: a "full" un'etichetta si prende e si sposta, e al
-     rilascio torna al suo posto con una molla di GSAP. Niente ciclo sempre
-     acceso: si lavora solo mentre qualcosa si muove, e si riscrivono solo i
-     fili del nodo preso. Sotto la soglia il gesto e' un clic. */
-  const presa = useRef<{
-    id: string;
-    x0: number;
-    y0: number;
-    dx: number;
-    dy: number;
-    mosso: boolean;
-  } | null>(null);
-
-  const inMappa = (x: number, y: number): Punto => {
-    const m = svg.current?.getScreenCTM();
-    if (!m) return { x, y };
-    const inversa = m.inverse();
-    return {
-      x: inversa.a * x + inversa.c * y + inversa.e,
-      y: inversa.b * x + inversa.d * y + inversa.f,
-    };
-  };
-
-  const giu = (id: string) => (e: React.PointerEvent<SVGGElement>) => {
-    if (e.button !== 0) return;
-    const p = posizioni.current.get(id)!;
-    const q = inMappa(e.clientX, e.clientY);
-    presa.current = {
-      id,
-      x0: e.clientX,
-      y0: e.clientY,
-      dx: p.x - q.x,
-      dy: p.y - q.y,
-      mosso: false,
-    };
-    gsapRef.current?.killTweensOf(p);
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
-
-  const muovi = (e: React.PointerEvent<SVGGElement>) => {
-    const pr = presa.current;
-    if (!pr || !pieno || !gsapRef.current) return;
-    if (
-      !pr.mosso &&
-      Math.hypot(e.clientX - pr.x0, e.clientY - pr.y0) < SOGLIA_TRASCINA
-    )
-      return;
-    pr.mosso = true;
-    const q = inMappa(e.clientX, e.clientY);
-    const p = posizioni.current.get(pr.id)!;
-    p.x = q.x + pr.dx;
-    p.y = q.y + pr.dy;
-    ridisegna(pr.id);
-  };
-
-  // Le molle nascono da un gesto, fuori dal contesto di useSectionAnimation:
-  // nessuno le spegnerebbe allo smontaggio.
-  const molle = useRef(new Set<gsap.core.Tween>());
-  useEffect(() => {
-    const vive = molle.current;
-    return () => {
-      for (const t of vive) t.kill();
-      vive.clear();
-    };
-  }, []);
-
-  const molla = (id: string) => {
-    const gsap = gsapRef.current;
-    const p = posizioni.current.get(id)!;
-    const r = riposo.get(id)!;
-    if (!gsap) {
-      p.x = r.x;
-      p.y = r.y;
-      ridisegna(id);
-      return;
-    }
-    const tween = gsap.to(p, {
-      x: r.x,
-      y: r.y,
-      duration: 1.1,
-      ease: "elastic.out(1, 0.45)",
-      onUpdate: () => ridisegna(id),
-      onComplete: () => {
-        molle.current.delete(tween);
+  const entrata = useEntrata(banco, pieno);
+  const { cucituraRef, mascheraRef, agoRef, cuciti } = useAgo({
+    capo,
+    pieno,
+    cucitura: disegnoCucitura,
+    tappe: percorso.length,
+    svg,
+    gsapRef,
+  });
+  const { gruppi, tracciati, presa, giu, muovi, su, annulla } =
+    useTrascinamento({
+      svg,
+      gsapRef,
+      pieno,
+      onClic: (id) => {
+        onNodo(id);
+        if (!capo) setAcceso(id);
       },
     });
-    molle.current.add(tween);
-  };
-
-
-  const su = (e: React.PointerEvent<SVGGElement>) => {
-    const pr = presa.current;
-    presa.current = null;
-    if (!pr) return;
-    if (e.currentTarget.hasPointerCapture(e.pointerId))
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    if (pr.mosso) {
-      molla(pr.id);
-      return;
-    }
-    onNodo(pr.id);
-    if (!capo) setAcceso(pr.id);
-  };
-
-  const annulla = () => {
-    const pr = presa.current;
-    presa.current = null;
-    if (pr?.mosso) molla(pr.id);
-  };
-
-  // Rimesso tutto al suo posto quando il movimento si spegne a meta' presa.
-  useEffect(() => {
-    if (pieno) return;
-    for (const [id, r] of riposo) {
-      const p = posizioni.current.get(id)!;
-      if (p.x === r.x && p.y === r.y) continue;
-      p.x = r.x;
-      p.y = r.y;
-      ridisegna(id);
-    }
-  }, [pieno]);
 
   /* La strada fino al cartellino, e i vicini: solo senza un capo scelto,
      perche' con un capo la mappa racconta gia' un'altra cosa. */
@@ -617,7 +348,7 @@ export function Mappa({
 }
 
 /** La trama di ogni pezza: pieni e vuoti, righe, punti, quadretti. Il colore lo decide il CSS. */
-const TRAMA: Record<string, string | null> = {
+const TRAMA: Record<ZonaId, "righe" | "punti" | "quadretti" | null> = {
   front: null,
   stili: "punti",
   mezzo: null,
