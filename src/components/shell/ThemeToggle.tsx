@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
  * zigrinato, non un contorno.
  *
  * Nell'originale era coricata perche' doveva scorrere lungo una guida.
- * Qui non scorre, quindi sta dritta — come una lampadina vera.
+ * Qui non scorre, quindi sta dritta, come una lampadina vera.
  *
  * Acceso = tema scuro, la stessa metafora di prima: e' buio, accendo la
  * luce. Il colore acceso lo decide il CSS su html[data-theme="dark"] e non
@@ -101,7 +101,7 @@ export function ThemeToggle({ label }: { label: string }) {
         <circle data-bulb-halo cx="12" cy="9" r="9" fill="url(#bulb-halo)" />
 
         {/* Vetro: sfera piu' collo, due forme che si fondono nello stesso
-            riempimento — e' la sagoma del vecchio interruttore. */}
+            riempimento: e' la sagoma del vecchio interruttore. */}
         <g data-bulb-glass>
           <circle cx="12" cy="9" r="5.6" />
           <path d="M8.9 13 h6.2 v2.4 h-6.2 z" />

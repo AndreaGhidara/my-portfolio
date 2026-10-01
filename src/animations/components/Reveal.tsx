@@ -79,8 +79,8 @@ export function Reveal({
 
   // Tutto quello che Reveal non conosce arriva all'elemento reso. Un involucro
   // di presentazione che mangia gli attributi costringe chi lo usa ad avvolgerlo
-  // in un <div> solo per poterli scrivere, e l'elemento che conta — qui una
-  // <ol> — smette di essere quello che finisce nel DOM.
+  // in un <div> solo per poterli scrivere, e l'elemento che conta (qui una
+  // <ol>) smette di essere quello che finisce nel DOM.
   return (
     <Tag ref={scope} className={className} {...rest}>
       {children}

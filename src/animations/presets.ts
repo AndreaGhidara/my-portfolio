@@ -31,7 +31,7 @@ export { INIZIO_ENTRATA } from "./finestre";
  *
  * `translate`, `rotate` e `scale` non sono di troppo: Tailwind v4 NON compila
  * piu' le utility di trasformazione dentro `transform`, le scrive nelle
- * proprieta' indipendenti — `-translate-y-[16%]` diventa `translate: 0 -16%`.
+ * proprieta' indipendenti: `-translate-y-[16%]` diventa `translate: 0 -16%`.
  * GSAP, per non litigare con loro, le azzera in linea (`translate: none`).
  * Togliendo solo `transform` si lascia addosso quell'azzeramento, e l'elemento
  * resta senza la trasformazione che il CSS gli dava: il ritratto
@@ -73,7 +73,7 @@ type Common = {
 };
 
 /**
- * SI TIMBRA — arriva sovradimensionato e storto, e si assesta con un
+ * SI TIMBRA: arriva sovradimensionato e storto, e si assesta con un
  * rimbalzo. Su "reduced" battono tutti insieme, senza rotazione.
  */
 export function stamp(
@@ -129,7 +129,7 @@ export function weave(
 }
 
 /**
- * SI DIPINGE — il colore avanza sotto una maschera invece di comparire.
+ * SI DIPINGE: il colore avanza sotto una maschera invece di comparire.
  * Anima la custom property --paint, non la geometria.
  */
 export function paint(
@@ -148,7 +148,7 @@ export function paint(
 }
 
 /**
- * CRESCE — arriva grande come un punto e si apre fino alla sua misura.
+ * CRESCE: arriva grande come un punto e si apre fino alla sua misura.
  *
  * Nato per il ritratto dell'apertura, che e' l'unica immagine del sito a stare
  * dentro un altro disegno: il cerchio si dipinge, e mentre si dipinge la testa
@@ -184,7 +184,7 @@ export function cresce(
     duration: level === "full" ? 0.8 : 0.6,
     ease: "back.out(1.4)",
     delay,
-    /* Il ritratto porta un translate scritto nel CSS — e' alzato del 16% per
+    /* Il ritratto porta un translate scritto nel CSS: e' alzato del 16% per
        far uscire la testa dal cerchio. Un `from` lascerebbe in linea la
        matrice d'arrivo, che quel translate lo contiene ma congelato in pixel:
        cambiando larghezza dello schermo il cerchio cambia misura e la testa
@@ -220,8 +220,8 @@ export function reveal(
     stagger,
     /* Un `from` finisce lasciando scritto nello stile in linea lo stato
        d'arrivo, e uno stile in linea batte il foglio di stile per sempre. Dove
-       il CSS usa `transform` per qualcos'altro — le cartelle dei Lavori si
-       alzano di 6px al passaggio del mouse — l'entrata gli lascia addosso un
+       il CSS usa `transform` per qualcos'altro (le cartelle dei Lavori si
+       alzano di 6px al passaggio del mouse), l'entrata gli lascia addosso un
        translate(0,0) e quel sollevamento non succede piu'. Qui si ripulisce
        quello che l'entrata ha scritto, e il CSS torna padrone. */
     ...pulizia(targets, clearProps),
@@ -230,7 +230,7 @@ export function reveal(
 }
 
 /**
- * ARRIVA DI LATO — entra scorrendo dal bordo che gli e' stato assegnato.
+ * ARRIVA DI LATO: entra scorrendo dal bordo che gli e' stato assegnato.
  *
  * Il verso non se lo inventa l'animazione: le quattro consegne portano gia'
  * un `data-lato`, che e' il lato da cui il disegno sta gia' impaginato. Facendoli entrare da li', il movimento e'
@@ -268,7 +268,7 @@ export function daLato(
 }
 
 /**
- * ARRIVA DA DIETRO — cresce dal fondo e si mette a fuoco.
+ * ARRIVA DA DIETRO: cresce dal fondo e si mette a fuoco.
  *
  * Non e' uno zoom: la scala parte vicina a 1 e il movimento vero e' il fatto
  * che la cosa era piu' lontana un attimo prima. Sopra il 10% di scala si legge
@@ -300,7 +300,7 @@ export function daDietro(
 }
 
 /**
- * CADE E SI ATTACCA — scende da sopra e si ferma con un rimbalzo corto.
+ * CADE E SI ATTACCA: scende da sopra e si ferma con un rimbalzo corto.
  *
  * E' il gesto di appuntare: un tesserino sul foglio, un francobollo sulla
  * busta. Il rimbalzo (`back.out`) e' quello che lo fa leggere come una cosa

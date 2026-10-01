@@ -23,7 +23,7 @@ export const palette = {
      messaggio del modulo contatti e' partito.
      Prima quel riquadro era arancione, cioe' il colore del sito, ed e' stato
      Andrea a dire che a colpo d'occhio sembrava un errore. Contro una
-     convenzione che tutti hanno imparato — verde vuol dire e' andata bene —
+     convenzione che tutti hanno imparato (verde vuol dire e' andata bene),
      la coerenza di tavolozza vale meno della persona che si e' appena chiesta
      se il suo messaggio sia partito. Smorzato verso l'oliva per stare sulla
      carta senza fare semaforo: 5,32:1 sul chiaro.

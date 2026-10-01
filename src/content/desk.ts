@@ -11,15 +11,15 @@ export type DeskShape = "sheet" | "phone" | "card" | "rack" | "plate" | "postit"
  *
  * Un campione non e' un'icona: e' un FRAMMENTO della cosa. "I colori" non sono
  * una tavolozza stilizzata, sono i tre colori veri del brand; "Il dominio" non
- * e' un globo, e' un dominio scritto. La differenza non e' estetica — un simbolo
- * dice "questo significa sicurezza", un campione fa vedere com'e' fatta — ed e'
+ * e' un globo, e' un dominio scritto. La differenza non e' estetica: un simbolo
+ * dice "questo significa sicurezza", un campione fa vedere com'e' fatta. Ed e'
  * l'unica regola che tiene questi ventidue disegni lontani dal catalogo di
  * icone che il tavolo non vuole essere.
  *
  * Il tipo sta qui, col contenuto, e non col componente che lo disegna: e' il
  * tavolo a dichiarare cosa ha da mostrare, non il disegnatore a decidere cosa
  * gli va di disegnare. Il verso di questa dipendenza e' anche quello che rende
- * la copertura una questione di compilazione invece che di attenzione — la
+ * la copertura una questione di compilazione invece che di attenzione: la
  * tavola dei disegni e' un Record su questo tipo, e un campione senza disegno
  * non compila.
  */
@@ -52,7 +52,7 @@ export type DeskObject = {
   shape: DeskShape;
   /**
    * Il frammento che questo oggetto mostra di se'. Due oggetti non ce l'hanno,
-   * e in tutti e due i casi e' una scelta dichiarata e non una dimenticanza —
+   * e in tutti e due i casi e' una scelta dichiarata e non una dimenticanza;
    * la prova in DeskSpecimen.test.tsx tiene la lista e la ragione di ognuno:
    *
    * - `hosting` ("Dove sta") perche' l'hosting non ha una faccia, e qualunque
@@ -63,14 +63,14 @@ export type DeskObject = {
    *   e i campioni sono disegni fissi dentro un componente. Arriva quindi dalle
    *   traduzioni come `blank` e `note`, non da SPECIMENS. Se un giorno un altro
    *   oggetto avesse bisogno di un campione con del testo tradotto, la strada e'
-   *   quella — non un'eccezione in piu' in questa lista.
+   *   quella, non un'eccezione in piu' in questa lista.
    */
   sample?: SampleId;
   /**
    * Il post-it grigio. E' l'unico oggetto senza ETICHETTA, e senza apposta: gli
    * altri ventitre' sono pezzi di lavoro e portano il loro nome sotto, questo e'
-   * l'unica cosa sul tavolo che non e' lavoro — ci sta scritto il conto dei
-   * caffe' — ed e' l'unica che si preme. Quello che ci sta sopra arriva dalle
+   * l'unica cosa sul tavolo che non e' lavoro (ci sta scritto il conto dei
+   * caffe') ed e' l'unica che si preme. Quello che ci sta sopra arriva dalle
    * traduzioni (`note`), e la domanda che compare al passaggio del mouse e' il
    * nome del comando (`blank`).
    */

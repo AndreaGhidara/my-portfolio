@@ -15,13 +15,13 @@ import { aRiposo, lancio, passo, type Pezzo } from "./carta/fisica";
  * si toccano. Sono l'elemento LCP della pagina, e `HeroMotion` le timbra
  * all'ingresso e poi le fa seguire il puntatore con un parallasse. Quindi qui
  * non si sostituisce niente: si sovrappone una tela alla singola lettera che
- * si sta toccando, posizionata sul suo rettangolo — che il parallasse lo porta
+ * si sta toccando, posizionata sul suo rettangolo, che il parallasse lo porta
  * gia' dentro, quindi lo eredita gratis. A riposo non esiste una tela, non
  * gira un ciclo, e il nome e' esattamente quello di prima.
  *
  * Solo a "full": e' un gesto che si fa col puntatore, e fermo non vuol dire
  * niente. A "reduced", a "none" e senza JavaScript non si monta nemmeno, e
- * l'hero resta quello che e' sempre stato — che e' anche il motivo per cui in
+ * l'hero resta quello che e' sempre stato, che e' anche il motivo per cui in
  * jsdom (dove il livello e' sempre "none") questo componente non disegna mai:
  * una tela li' non ha un contesto 2D.
  */
@@ -307,7 +307,7 @@ export function CartaStropicciata() {
   }, [livello]);
 
   // Lo strato c'e' sempre nel DOM ma e' vuoto e non riceve il puntatore: e'
-  // solo il posto dove le tele vanno a stare. Decorativo per intero — il nome
+  // solo il posto dove le tele vanno a stare. Decorativo per intero: il nome
   // che uno screen reader legge resta quello del wordmark.
   const tela = <div ref={strato} data-carta aria-hidden="true" />;
   /* A "full" lo strato va in fondo a <body>, fuori da #hero. Quando la

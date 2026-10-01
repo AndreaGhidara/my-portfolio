@@ -9,7 +9,7 @@ export type Metric = {
 };
 
 /**
- * ATTENZIONE — decisione presa consapevolmente dall'utente.
+ * ATTENZIONE: decisione presa consapevolmente dall'utente.
  * Tutti i numeri qui sotto sono PLAUSIBILI MA INVENTATI: non sono stati
  * misurati. Sono di scala (componenti, volumi, durate) e non commerciali
  * (conversioni, fatturato), perché sono meno contestabili.
@@ -76,7 +76,7 @@ export const metrics: Metric[] = [
   {
     // Il post-it grigio del tavolo. E' l'unico numero del sito che non e' una
     // metrica di lavoro: e' una battuta, e va letta come tale. Sta qui lo stesso
-    // — e con estimated: true come gli altri — perche' la regola di questo file
+    // (e con estimated: true come gli altri) perche' la regola di questo file
     // e' "ogni numero inventato sta in un posto solo e si dichiara inventato",
     // e un numero che si autorizza l'eccezione perche' e' simpatico e' esatta-
     // mente il modo in cui quella regola smette di valere.

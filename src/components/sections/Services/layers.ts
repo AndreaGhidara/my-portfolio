@@ -45,8 +45,8 @@ export const SHAPE_BOX: Record<DeskDrawing, { w: number; h: number }> = {
  * spazio che il tavolo non aveva. Non e' una rifinitura estetica: e' la moneta
  * con cui si compra l'aria FRA gli anelli. A misura piena il minimo globale
  * raggiungibile e' 1,40 e fra anelli vicini restano 1,53 punti, cioe' ogni
- * oggetto ha il suo vicino piu' prossimo fuori dal proprio anello — da quattro
- * a quattordici volte piu' vicino dei suoi compagni — e i quattro anelli si
+ * oggetto ha il suo vicino piu' prossimo fuori dal proprio anello (da quattro
+ * a quattordici volte piu' vicino dei suoi compagni) e i quattro anelli si
  * leggono come una nuvola sola. Con 0,95 le due misure diventano 2,00 e 4,29:
  * salgono INSIEME, che e' il motivo per cui il conto e' onesto. Su schermo un
  * foglio passa da 103 a 98 pixel.
@@ -56,7 +56,7 @@ export const DRAW_SCALE: Record<DeskLayout, number> = { wide: 0.95 };
 /**
  * Le cifre con cui una percentuale arriva al CSS. Non e' una rifinitura: quel
  * numero viene serializzato due volte, una dal server dentro l'HTML e una dal
- * client dentro la prop, e le due serializzazioni non danno la stessa stringa —
+ * client dentro la prop, e le due serializzazioni non danno la stessa stringa:
  * 76.60017417717651 diventa "76.6002" da una parte e resta intero dall'altra.
  * React lo vede come un attributo che non combacia e lo dice in console a ogni
  * caricamento. Arrotondando alla sorgente le due stringhe sono la stessa.
@@ -87,7 +87,7 @@ export function drawWidth(layout: DeskLayout, shape: DeskDrawing): number {
  * Si ricava dalla larghezza ARROTONDATA, non dal viewBox: nel browser l'altezza
  * non e' un numero che qualcuno scrive, e' la larghezza vera moltiplicata per
  * l'aspect-ratio della sagoma. Ripartendo dal viewBox il modello misurerebbe un
- * rettangolo alto qualche millesimo piu' di quello disegnato — poco, ma un
+ * rettangolo alto qualche millesimo piu' di quello disegnato: poco, ma un
  * modello che non parte da quello che il browser ha in mano non e' il modello.
  */
 export function drawHeight(layout: DeskLayout, shape: DeskDrawing): number {
@@ -125,7 +125,7 @@ export function objectExtent(
  * testo ci sta dentro, e chi traduce non puo' far collassare il disegno.
  *
  * `width` e' la larghezza massima della striscia (max-width, in em: ci sta la
- * parola piu' lunga senza sbordare — 12 caratteri, 7,2em di avanzamento, piu'
+ * parola piu' lunga senza sbordare: 12 caratteri, 7,2em di avanzamento, piu'
  * il respiro laterale). `height` sono due righe piu' il respiro. `em` e' quanto
  * vale 1em in percentuale della LARGHEZZA del mondo, con il carattere che
  * segue il contenitore (cqw) fra un minimo e un massimo in rem. E' il valore
@@ -135,7 +135,7 @@ export function objectExtent(
  * Nessuno di questi quattro numeri e' scelto qui: sono tutti la traduzione di
  * una dichiarazione di tokens.css (interlinea e respiro per `height`, `top`
  * per `gap`, il corpo del carattere e la larghezza del mondo per `em`). E'
- * un contratto fra due file che non si parlano, e i test lo leggono davvero —
+ * un contratto fra due file che non si parlano, e i test lo leggono davvero:
  * cambiare il foglio di stile senza cambiare qui fa cadere una prova. Serviva:
  * una prova di sovrapposizione e' cieca, per costruzione, a un ingombro che si
  * restringe, quindi rimpicciolire uno di questi numeri lascerebbe tutto verde.
@@ -151,7 +151,7 @@ export const LABEL = {
 /**
  * L'ingombro vero di un oggetto: il disegno, la striscia dell'etichetta sotto,
  * il tutto inclinato attorno al centro del disegno. Sono scostamenti dal centro,
- * in percentuale del mondo. Non e' simmetrico — l'etichetta sta solo sotto —
+ * in percentuale del mondo. Non e' simmetrico (l'etichetta sta solo sotto),
  * quindi non basta una mezza estensione per lato.
  */
 export function objectFootprint(
@@ -183,7 +183,7 @@ export function objectFootprint(
   // La rotazione del CSS avviene in PIXEL, e qui le due coordinate non hanno la
   // stessa unita': x e' una quota della larghezza del mondo, y una quota della
   // sua altezza. Ruotare quella coppia mista con la matrice isotropa
-  // [cos -sin; sin cos] misura un rettangolo che il browser non disegna mai —
+  // [cos -sin; sin cos] misura un rettangolo che il browser non disegna mai:
   // nel mondo orizzontale (1440x920) tiene troppo largo e troppo poco alto.
   // Si passa in pixel, si ruota, si torna: k e' altezza/larghezza del mondo.
   //   x' = x·cos − y·k·sin      y' = x·sin/k + y·cos
@@ -235,9 +235,9 @@ export const OBJECTS_PER_LAYER: Record<DeskLayout, number> = { wide: 6 };
  * e' rettangolare, e agli angoli di un cerchio resta spazio sprecato.
  *
  * Gli anelli sono ANNIDATI: ogni raggio e' maggiore del precedente in tutte e
- * due le direzioni. Non e' un vezzo di simmetria, e' il senso del disegno —
+ * due le direzioni. Non e' un vezzo di simmetria, e' il senso del disegno:
  * l'ordine degli strati e' il movimento della telecamera, dal piu' vicino al
- * piu' lontano — ed e' il vincolo che va tenuto a mano, perche' e' l'unico che
+ * piu' lontano. Ed e' il vincolo che va tenuto a mano, perche' e' l'unico che
  * una ricerca automatica ha tutto l'interesse a violare: lasciata libera mette
  * il quarto anello dentro il secondo e guadagna aria su un tavolo che non
  * racconta piu' niente.
@@ -245,19 +245,19 @@ export const OBJECTS_PER_LAYER: Record<DeskLayout, number> = { wide: 6 };
  * Questi otto raggi, i quattro angoli di partenza e i ventiquattro scostamenti
  * sono tarati insieme, contro l'ingombro vero di objectFootprint(): sagoma PIU'
  * etichetta, per tutte e 24 le coppie del tavolo e non solo dentro uno strato.
- * Gli anelli non sono omotetici — il primo e' stretto e alto, gli ultimi due
- * larghi e appena piu' alti — perche' due anelli vicini si toccherebbero
+ * Gli anelli non sono omotetici (il primo e' stretto e alto, gli ultimi due
+ * larghi e appena piu' alti) perche' due anelli vicini si toccherebbero
  * sull'asse verticale, e li' lo spazio non c'e': dal bordo del laptop al bordo
  * del mondo ci stanno meno di tre ingombri, non quattro. Quello che li tiene
  * separati non e' il raggio, e' che dove uno mette un oggetto l'altro non ce
- * l'ha — ed e' ANGLE_OFFSET a deciderlo.
+ * l'ha, ed e' ANGLE_OFFSET a deciderlo.
  *
  * La taratura non punta a "non si sovrappongono" ma a DUE pavimenti di aria
  * dichiarati, e sono due misure diverse:
  *
  *   - fra due cose qualsiasi del tavolo (due oggetti dello stesso anello, un
  *     oggetto e il centro, un oggetto e il bordo) restano piu' di 2,0 punti di
- *     altezza del mondo — a 1440 sono piu' di dodici pixel;
+ *     altezza del mondo (a 1440 sono piu' di dodici pixel);
  *   - fra due oggetti di ANELLI DIVERSI ne restano piu' di 4,2.
  *
  * Il secondo e' il pavimento che conta per come si legge il disegno, ed e'
@@ -298,11 +298,11 @@ const START_ANGLE: Record<DeskLayout, number[]> = {
  *
  * Per questo nel mondo orizzontale gli scostamenti sono VENTIQUATTRO e non sei:
  * uno per ogni oggetto di ogni anello. Prima erano sei, condivisi dai quattro
- * strati — meno numeri, e per un po' e' sembrata economia. Non lo era: con lo
+ * strati: meno numeri, e per un po' e' sembrata economia. Non lo era: con lo
  * stesso schema di irregolarita' ripetuto quattro volte, i quattro anelli
  * ripetevano anche i loro grappoli, li allineavano lungo gli stessi raggi, e il
  * massimo raggiungibile fra anelli vicini era 1,53 punti. Sciogliendoli strato
- * per strato — e senza cambiare nient'altro — si arriva a 3,45; con i disegni
+ * per strato, e senza cambiare nient'altro, si arriva a 3,45; con i disegni
  * al 95% (vedi DRAW_SCALE) a 4,29, con il minimo globale che nel frattempo sale
  * da 1,40 a 2,00.
  *
@@ -328,7 +328,7 @@ const PAD = 2.4;
  * su cui e' tarata l'inquadratura d'apertura del palco, e sta qui perche' e' un
  * dato della geometria: una copia a mano in DeskStage vorrebbe dire che il
  * giorno in cui i raggi cambiano la camera apre sull'inquadratura sbagliata
- * senza che niente lo dica. Che e' quello che e' successo — la ritaratura che
+ * senza che niente lo dica. Che e' quello che e' successo: la ritaratura che
  * ha separato gli anelli ha portato questo numero da 25,2 a 28,68, il quindici
  * per cento piu' in fuori, e l'apertura era rimasta indietro.
  */
@@ -404,8 +404,8 @@ export const PUNCH_BEAT: Beat = { from: 0.9, span: 0.07 };
 
 /**
  * La finestra di una didascalia. A tavolo fermo le quattro stanno in colonna e
- * si leggono tutte insieme; sotto la camera stanno tutte nello STESSO posto —
- * la fascia sotto l'angolo sinistro del piano — e allora una alla volta e'
+ * si leggono tutte insieme; sotto la camera stanno tutte nello STESSO
+ * posto (la fascia sotto l'angolo sinistro del piano) e allora una alla volta e'
  * l'unica lettura possibile: entra col suo strato, esce quando comincia il
  * successivo. L'ultima resta finche' non arriva la tesi, che e' la frase che la
  * sostituisce.

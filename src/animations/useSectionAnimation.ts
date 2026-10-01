@@ -26,7 +26,7 @@ export type Scena = {
  *
  * L'attesa è `requestIdleCallback` con un tetto: se il browser non trova mai un
  * momento libero, dopo 800ms si parte lo stesso. Nessuna animazione qui è
- * immediata — la più presta è quella dell'apertura, e mezzo secondo di ritardo
+ * immediata: la più presta è quella dell'apertura, e mezzo secondo di ritardo
  * su una cosa che dura mezzo secondo non la nota nessuno.
  *
  * La pulizia la fa `gsap.context`: revert allo smontaggio e a ogni cambio di
@@ -35,7 +35,7 @@ export type Scena = {
 /**
  * In fase di layout e non dopo, e non e' un dettaglio: React stacca i `ref`
  * DOPO le pulizie di layout e PRIMA di quelle passive. Chi smonta leggendo
- * `scope.current` — il palco del tavolo toglie due custom property da li' —
+ * `scope.current` (il palco del tavolo toglie due custom property da li')
  * con un `useEffect` trovava null e non puliva niente. Sul server il layout
  * effect non esiste, quindi si ripiega su useEffect: tanto li' non gira.
  * Qui dentro non si fa lavoro pesante: si prenota soltanto il momento libero

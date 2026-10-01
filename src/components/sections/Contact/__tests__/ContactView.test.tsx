@@ -176,7 +176,7 @@ describe("le etichette arancioni si leggono", () => {
 
   // Sono le micro etichette in monospaziato sopra ogni blocco: "Ho un
   // progetto", "Entro 24 ore", "L'altra uscita". Stanno tutte sotto i 12px, e
-  // l'arancio pieno su carta fa 3,27:1 — sotto il 4,5:1 che WCAG chiede al
+  // l'arancio pieno su carta fa 3,27:1, sotto il 4,5:1 che WCAG chiede al
   // testo piccolo. --accento-testo e' lo stesso arancio scurito quel tanto che
   // basta (5,42:1), e sul tema scuro torna pieno perche' li' il problema non
   // c'e'.
