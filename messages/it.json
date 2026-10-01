@@ -141,6 +141,53 @@
           "care": "La manutenzione"
         }
       }
+    },
+    "gioco": {
+      "comune": {
+        "barrette": "I quattro livelli del gioco",
+        "etichetta": "{numero} · {nome}",
+        "avanti": "avanti",
+        "livelli": {
+          "schermo": "lo schermo",
+          "logiche": "le logiche",
+          "pannello": "i servizi",
+          "notte": "il cloud"
+        },
+        "righe": {
+          "schermo": "Prima costruisci lo schermo: colori, caratteri, sezioni. Poi svitalo e guarda cosa c'è sotto.",
+          "logiche": "Dietro lo schermo un ordine attraversa sei logiche, e a ogni nodo lo porti avanti tu. Oppure provi a rompere il sito.",
+          "pannello": "Il sito è online. Un mese dopo il lancio, in un minuto: le spie si accendono, e qualcuno interviene.",
+          "notte": "Quello che tiene in piedi il sito anche alle tre di notte. Si prepara prima, e si vede solo quando manca.",
+          "finale": "Il giro è finito. Dalle barrette qui sopra puoi riaprire ogni livello."
+        }
+      },
+      "schermo": {
+        "titolo": "Costruisci lo schermo"
+      },
+      "logiche": {
+        "titolo": "Dietro lo schermo"
+      },
+      "pannello": {
+        "titolo": "Dopo il lancio"
+      },
+      "notte": {
+        "titolo": "La notte del forno"
+      },
+      "finale": {
+        "testa": "fine · 4 livelli su 4",
+        "alba": "Hai visto tutto\nquello che non si vede.",
+        "dopoAlba": "e alle sette il forno apre, come ogni mattina",
+        "occhiello": "il giro completo",
+        "titolo": "Un sito sono quattro strati",
+        "strati": {
+          "schermo": "lo schermo · quello che si vede",
+          "logiche": "le logiche · quello che fa",
+          "pannello": "i servizi · come si tiene in vita",
+          "notte": "il cloud · quello che lo tiene in piedi"
+        },
+        "tornaAlSito": "torna al sito",
+        "parliamone": "parliamone"
+      }
     }
   },
   "cassetta": {

@@ -1391,14 +1391,6 @@ html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] 
 }
 
 
-/* Il gemello nascosto e' aria-hidden e puo' sparire del tutto. L'altro no: e'
-   quello che porta le etichette che legge uno screen reader, e sotto i 1024px,
-   dove non si disegna, deve restare comunque nell'albero di accessibilita' —
-   con display:none il tavolo sul telefono non lo leggerebbe piu' nessuno. */
-[data-desk-world][data-layout="tall"] { display: none; }
-
-
-
 /* Il centro. La sua larghezza arriva inline da CENTRE.width, perche' e' con
    quel numero che i test verificano che nessun oggetto lo copra. */
 [data-desk-centre] {
@@ -1512,116 +1504,14 @@ html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] 
    Sono gli oggetti del solo mondo verticale, che e' gia' aria-hidden. */
 [data-desk-object][data-off] { display: none; }
 
-/* ──────────────────────────────────────────────────────────────────────────
-   Il tavolo sotto i 1024px.
-
-   Da desktop la sezione e' una camera: il piano sta fermo, arretra, e ogni
-   didascalia arriva insieme ai suoi oggetti. Quel meccanismo qui e' spento
-   (`resolveMotionLevel` da' "full" solo con `(pointer: fine)` E
-   `(min-width: 1024px)`), e quello che restava era il disegno del tavolo
-   schiacciato in verticale piu' quattro paragrafi staccati: gli oggetti si
-   sovrapponevano tutti sullo stesso rettangolo e il testo non diceva piu' a
-   quali si riferiva.
-
-   Qui la sezione diventa un elenco, in quest'ordine: il titolo con i suoi
-   testi, «il progetto» a tutta larghezza, e poi i quattro strati, ognuno con
-   le sue forme. Niente sticky e niente altezze di schermo: sono le due cose
-   che su un telefono costano di piu' e rendono di meno.
-
-   NOTA D'ORDINE: questo blocco sta QUI e non piu' su, vicino alle altre regole
-   del mondo, e non e' pignoleria. Deve disfare
-   `[data-desk-object] { position: absolute }` qui sopra, e una @media non
-   aggiunge specificita': a parita' decide l'ordine. Scritto prima, il blocco
-   perdeva e gli oggetti restavano assoluti dentro una griglia.
-   ────────────────────────────────────────────────────────────────────────── */
+/* Sotto i 1024px il tavolo non si disegna: la sezione e' il gioco del metodo
+   (Services/gioco, src/styles/gioco/), che fa il cambio al contrario.
+   Fuori dall'impaginato per davvero, non ridotto a un pixel ritagliato: sono
+   piu' di trecento elementi che sul telefono nessuno vedra' mai, e il browser
+   continuerebbe a impaginarli e a ricalcolarli a ogni scorsa. La camera legge
+   questo mondo solo a livello pieno, che vuole gia' i 1024px. */
 @media (max-width: 1023px) {
-  /* ── «Il progetto», a tutta larghezza ─────────────────────────────────── */
-  /* Era un francobollo in mezzo a un rettangolo alto e vuoto: le proporzioni
-     del mondo (720x1280) servono a tenere gli oggetti attorno al laptop, e qui
-     gli oggetti non ci stanno piu'. Senza di loro il piano e' solo la cornice
-     dello schermo, e tanto vale che lo schermo si veda. */
-  [data-desk-surface] { aspect-ratio: 3 / 2; }
-  /* La larghezza del centro arriva inline da CENTRE.width ed e' misurata sul
-     mondo largo: un valore inline si disfa solo cosi'. */
-  [data-desk-centre] { inline-size: 94% !important; }
-
-  /* ── «Da cosa e' composto» ────────────────────────────────────────────── */
-  [data-desk-composto] { margin-block-start: 2.75rem; }
-
-  /* ── I quattro strati ─────────────────────────────────────────────────── */
-  [data-desk-layers] { gap: 2.75rem; margin-top: 0.9rem; }
-
-  [data-desk-layer] {
-    padding-block-start: 1.1rem;
-    border-block-start: 1px solid var(--line);
-  }
-
-  [data-desk-num] {
-    font-family: var(--font-mono), ui-monospace, monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.18em;
-    /* L'arancio da testo: questi numeri sono a 0,62rem su carta, e pieno
-       farebbe 3,27:1. */
-    color: var(--accento-testo);
-  }
-  [data-desk-caption] h3 { margin-block-start: 0.15rem; }
-
-  /* Le forme dello strato, sotto la sua frase. Due per riga: a quattro, su un
-     mondo largo 26rem, ognuna verrebbe larga un quarto, cioe' un francobollo
-     con l'etichetta piu' larga del disegno che nomina. */
-  [data-desk-layer] > ul {
-    position: static;
-    aspect-ratio: auto;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    /* Il vuoto fra le righe e' grande perche' ci deve stare l'etichetta, che
-       e' assoluta a `top: 104%` e non occupa altezza: con un gap normale la
-       riga di sotto se la mangia. */
-    gap: 2.4rem 1.1rem;
-    align-items: end;
-    margin-block-start: 1.5rem;
-  }
-
-  [data-desk-object] {
-    position: static;
-    /* La larghezza arriva INLINE da layers.ts ed e' una percentuale del piano,
-       che qui non esiste piu': la cella la decide la griglia. Il primo
-       tentativo era `min-width: 100%` per evitare l'!important, ed e' stato
-       peggio: su un elemento di griglia quella percentuale si misura sulla
-       cella che la percentuale stessa sta dimensionando, e gli oggetti sono
-       venuti larghi quanto la pagina. */
-    width: 100% !important;
-    /* Senza il mezzo passo indietro: serviva a centrare l'oggetto sulle sue
-       coordinate, e le coordinate non si applicano piu'. */
-    transform: rotate(var(--rot, 0deg));
-    /* E QUESTA e' la riga che fa vedere le forme per quello che sono. I
-       campioni dentro le sagome si misurano in cqw, e il contenitore di
-       interrogazione e' il MONDO: sul tavolo un oggetto e' il 10% del mondo e
-       il campione gli sta dentro in proporzione, ma qui l'oggetto e' quasi
-       meta' del mondo e il campione restava della misura di prima. Risultato:
-       quattro sagome vuote con dentro una briciola. E' la stessa cosa che «Come
-       lavoro» ha gia' risolto cosi'. */
-    container-type: inline-size;
-  }
-
-  /* Le marche del campione, rimisurate sulla SAGOMA. I valori sono quelli del
-     tavolo moltiplicati per il rapporto fra le due scatole: un oggetto era il
-     ~10% del mondo, quindi 1cqw di la' vale ~10cqw di qua. */
-  [data-desk-object] [data-desk-sample] [data-m="aa"] { font-size: 21cqw; }
-  [data-desk-object] [data-desk-sample] [data-m="mono"] { font-size: 7.8cqw; }
-  [data-desk-object] [data-desk-sample] [data-m="mono"][data-piccolo] { font-size: 6.2cqw; }
-
-  /* Fuori dall'impaginato per davvero, non ridotto a un pixel ritagliato.
-     Era nascosto ma restava nel flusso: 305 elementi su 1.335 che sotto i
-     1024px nessuno vedra' mai, e che il browser continuava a impaginare e a
-     ricalcolare a ogni scorsa. Misurato: -28% di CPU durante lo scorrimento.
-     Nessuno lo misura da qui: la camera legge questo mondo solo a livello
-     pieno, che vuole gia' i 1024px e il puntatore fine. */
   [data-desk-world][data-layout="wide"] { display: none; }
-  [data-desk-world][data-layout="tall"] {
-    display: block;
-    width: min(92vw, 26rem);
-  }
 }
 
 /* Il titolino e i numeri sono roba da elenco: da desktop gli strati arrivano

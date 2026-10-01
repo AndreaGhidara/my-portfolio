@@ -141,6 +141,53 @@
           "care": "Upkeep"
         }
       }
+    },
+    "gioco": {
+      "comune": {
+        "barrette": "The four levels of the game",
+        "etichetta": "{numero} · {nome}",
+        "avanti": "next",
+        "livelli": {
+          "schermo": "screen",
+          "logiche": "logic",
+          "pannello": "services",
+          "notte": "cloud"
+        },
+        "righe": {
+          "schermo": "First build the screen: colours, type, sections. Then unscrew it and see what's underneath.",
+          "logiche": "Behind the screen an order crosses six pieces of logic, and you move it on at each node. Or try to break the site.",
+          "pannello": "The site is live. A month after launch, in one minute: the lights come on, and someone steps in.",
+          "notte": "What keeps the site up even at three in the morning. It's set up in advance, and seen only when missing.",
+          "finale": "That's the whole round. Use the bars above to reopen any level."
+        }
+      },
+      "schermo": {
+        "titolo": "Build the screen"
+      },
+      "logiche": {
+        "titolo": "Behind the screen"
+      },
+      "pannello": {
+        "titolo": "After launch"
+      },
+      "notte": {
+        "titolo": "The bakery's night"
+      },
+      "finale": {
+        "testa": "end · 4 levels of 4",
+        "alba": "You've seen everything\nyou don't see.",
+        "dopoAlba": "and at seven the bakery opens, as always",
+        "occhiello": "the full round",
+        "titolo": "A website is four layers",
+        "strati": {
+          "schermo": "screen · what you see",
+          "logiche": "logic · what it does",
+          "pannello": "services · how it stays alive",
+          "notte": "cloud · what keeps it standing"
+        },
+        "tornaAlSito": "back to site",
+        "parliamone": "let's talk"
+      }
     }
   },
   "cassetta": {

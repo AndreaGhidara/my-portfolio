@@ -1,0 +1,4 @@
+/* ── Il gioco del metodo: livello 2, le logiche ─────────────────────────────
+   Ogni selettore di questo file sta sotto [data-gioco-livello="logiche"]: i pezzi
+   comuni (banco, testa, console, azioni, righe) sono in base.css e qui non si
+   ridefiniscono. Le animazioni nuove si chiamano gioco-logiche-*. */

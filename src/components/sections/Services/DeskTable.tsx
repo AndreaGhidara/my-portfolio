@@ -25,11 +25,10 @@ export type DeskLayerData = {
  * intero. Non c'e' una versione accessibile parallela da tenere allineata: c'e'
  * una cosa sola, guardata in due modi.
  *
- * Il mondo viene disegnato due volte, una per formato, e il CSS ne nasconde uno.
- * Le due geometrie sono troppo diverse per stare in un solo set di coordinate, e
- * sceglierle in JavaScript vorrebbe dire misurare lo schermo prima di disegnare:
- * il primo fotogramma sarebbe vuoto. Il costo e' un <ol> in piu' nel DOM, e le
- * etichette del gemello nascosto sono aria-hidden per non farle leggere due volte.
+ * Il mondo si disegna solo largo, da desktop. Sotto i 1024px la sezione e' il
+ * gioco (gioco/Gioco.tsx) e il CSS toglie questo mondo dall'impaginato. La
+ * geometria verticale di layers.ts e `ghost` vengono dal gemello che stava li'
+ * prima del gioco: oggi nessuno le chiede.
  *
  * Sotto il piano ci sono le didascalie dei quattro strati, in colonna sul
  * telefono e in quattro colonne da desktop. Il piano e' un elemento a se':
@@ -156,10 +155,6 @@ export function DeskTable({
                   // stata raccontata, quindi porta dove la si racconta. Il
                   // segnale e' l'etichetta che manca, che e' lo stesso `mute`
                   // di content/desk.ts arrivato fin qui.
-                  // Anche nel gemello, che sotto i 1024px e' il disegno vero:
-                  // il post-it e' il quarto oggetto del suo strato apposta, e
-                  // sul telefono si vede. Come si comporta li' lo decide
-                  // DeskObject — si preme, non si tabula.
                   href={object.label === null ? "#contact" : undefined}
                   action={object.label === null ? blank : undefined}
                   note={object.label === null ? note : undefined}

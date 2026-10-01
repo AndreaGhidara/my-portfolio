@@ -1,0 +1,4 @@
+/* ── Il gioco del metodo: livello 3, i servizi ─────────────────────────────
+   Ogni selettore di questo file sta sotto [data-gioco-livello="pannello"]: i pezzi
+   comuni (banco, testa, console, azioni, righe) sono in base.css e qui non si
+   ridefiniscono. Le animazioni nuove si chiamano gioco-pannello-*. */
