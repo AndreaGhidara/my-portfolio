@@ -103,8 +103,9 @@
   font-size: 0.9rem;
   line-height: 1.55;
   color: var(--gioco-fuori-testo);
-  animation: gioco-entra 0.35s ease backwards;
 }
+
+[data-gioco-riga] > p { animation: gioco-entra 0.35s ease backwards; }
 
 /* ── Il banco: sopra lo scuro, sotto la console. Alto uguale per tutti ──── */
 [data-gioco] .banco {
@@ -168,6 +169,11 @@
   font-size: 0.56rem;
   color: var(--bulb);
 }
+
+/* Al cambio di livello il fuoco arriva sul banco via codice (Gioco.tsx): li'
+   l'anello attorno a tutto il banco non dice niente a chi usa il dito. Da
+   tastiera resta, perche' li' e' il segno di dove si e'. */
+[data-gioco] [data-gioco-livello]:focus:not(:focus-visible) { outline: none; }
 
 /* ── La console: quello che si fa adesso ───────────────────────────────── */
 [data-gioco] .console {
