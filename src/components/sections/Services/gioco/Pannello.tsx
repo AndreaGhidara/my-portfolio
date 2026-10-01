@@ -119,6 +119,7 @@ function avanza(s: Stato, a: Azione): Stato {
 
 export function Pannello({ onAvanti, visibile }: LivelloProps) {
   const t = useTranslations("services.gioco.pannello");
+  const comune = useTranslations("services.gioco.comune");
   const eventi = t.raw("eventi") as Evento[];
   const [s, manda] = useReducer(avanza, INIZIO);
 
@@ -161,7 +162,7 @@ export function Pannello({ onAvanti, visibile }: LivelloProps) {
     <div className="banco" data-gioco-livello="pannello">
       <div className="sopra reticolo">
         <div className="testa">
-          <span className="livello">{t("testa")}</span>
+          <span className="livello">{comune("etichetta", { numero: 3, nome: comune("livelli.pannello") })}</span>
           <span className="destra">{conta}</span>
         </div>
 

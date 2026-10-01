@@ -1,6 +1,8 @@
 import { deskLayers, type DeskShape } from "@/content/desk";
 
-export type DeskLayout = "wide" | "tall";
+/** Il formato del mondo. Ce n'era anche uno verticale, per il telefono: sotto i
+ *  1024px la sezione e' diventata il gioco del metodo, e il formato e' uno. */
+export type DeskLayout = "wide";
 export type Placement = { x: number; y: number; rotate: number };
 export type Beat = { from: number; span: number };
 
@@ -11,7 +13,6 @@ export type Beat = { from: number; span: number };
  */
 export const WORLD: Record<DeskLayout, { width: number; height: number }> = {
   wide: { width: 1440, height: 920 },
-  tall: { width: 720, height: 1280 },
 };
 
 /** Il laptop non e' uno degli oggetti dello schedario: e' il centro, ed e' una
@@ -39,12 +40,8 @@ export const SHAPE_BOX: Record<DeskDrawing, { w: number; h: number }> = {
 };
 
 /**
- * Quanto si disegna piu' piccolo del suo viewBox. Nel mondo verticale a misura
- * naturale un foglio occuperebbe un quinto della larghezza del telefono (150 su
- * 720) e i quattro strati non ci starebbero: il mondo verticale e' largo la
- * meta' di quello orizzontale, e i disegni lo seguono.
- *
- * Nel mondo orizzontale non e' 1 ma 0,95, e quel cinque per cento e' l'unico
+ * Quanto si disegna piu' piccolo del suo viewBox. Non e' 1 ma 0,95, e quel
+ * cinque per cento e' l'unico
  * spazio che il tavolo non aveva. Non e' una rifinitura estetica: e' la moneta
  * con cui si compra l'aria FRA gli anelli. A misura piena il minimo globale
  * raggiungibile e' 1,40 e fra anelli vicini restano 1,53 punti, cioe' ogni
@@ -54,7 +51,7 @@ export const SHAPE_BOX: Record<DeskDrawing, { w: number; h: number }> = {
  * salgono INSIEME, che e' il motivo per cui il conto e' onesto. Su schermo un
  * foglio passa da 103 a 98 pixel.
  */
-export const DRAW_SCALE: Record<DeskLayout, number> = { wide: 0.95, tall: 0.5 };
+export const DRAW_SCALE: Record<DeskLayout, number> = { wide: 0.95 };
 
 /**
  * Le cifre con cui una percentuale arriva al CSS. Non e' una rifinitura: quel
@@ -130,10 +127,10 @@ export function objectExtent(
  * `width` e' la larghezza massima della striscia (max-width, in em: ci sta la
  * parola piu' lunga senza sbordare — 12 caratteri, 7,2em di avanzamento, piu'
  * il respiro laterale). `height` sono due righe piu' il respiro. `em` e' quanto
- * vale 1em in percentuale della LARGHEZZA del mondo: nel mondo orizzontale il
- * carattere e' fissato in rem su un mondo largo al piu' 62rem, in quello
- * verticale segue il contenitore (cqw). Sono i valori piu' larghi dei due
- * intervalli, perche' un ingombro sbagliato deve sbagliare in eccesso.
+ * vale 1em in percentuale della LARGHEZZA del mondo, con il carattere che
+ * segue il contenitore (cqw) fra un minimo e un massimo in rem. E' il valore
+ * piu' largo dell'intervallo, perche' un ingombro sbagliato deve sbagliare in
+ * eccesso.
  *
  * Nessuno di questi quattro numeri e' scelto qui: sono tutti la traduzione di
  * una dichiarazione di tokens.css (interlinea e respiro per `height`, `top`
@@ -148,7 +145,7 @@ export const LABEL = {
   height: 2.6,
   /** Stacco sotto il disegno, in frazione della sua altezza (in CSS: top 104%). */
   gap: 0.04,
-  em: { wide: 1.197, tall: 2.72 } as Record<DeskLayout, number>,
+  em: { wide: 1.197 } as Record<DeskLayout, number>,
 };
 
 /**
@@ -229,11 +226,8 @@ export function centreBox(layout: DeskLayout): {
   return { x0: 50 - halfX, x1: 50 + halfX, y0: 50 - halfY, y1: 50 + halfY + CENTRE.caption };
 }
 
-/**
- * Sul telefono si mostrano quattro oggetti per strato invece di sei. I due che
- * restano fuori spariscono dal DISEGNO, non dalla lista: il DOM e' lo stesso.
- */
-export const OBJECTS_PER_LAYER: Record<DeskLayout, number> = { wide: 6, tall: 4 };
+/** Quanti oggetti ha ogni strato sul tavolo. */
+export const OBJECTS_PER_LAYER: Record<DeskLayout, number> = { wide: 6 };
 
 /**
  * I raggi di ogni strato, in percentuale del mondo, contati dal centro. Gli
@@ -281,19 +275,12 @@ const RADII: Record<DeskLayout, { rx: number; ry: number }[]> = {
     { rx: 41.13, ry: 31.21 },
     { rx: 42.43, ry: 32.74 },
   ],
-  tall: [
-    { rx: 15.7, ry: 11.6 },
-    { rx: 26.5, ry: 23.8 },
-    { rx: 29.9, ry: 31.5 },
-    { rx: 44.6, ry: 36.8 },
-  ],
 };
 
 /** Da dove parte a distribuire gli oggetti ogni strato. Sfalsati apposta:
  *  allineati, i quattro strati formavano dei raggi e sembrava un sole. */
 const START_ANGLE: Record<DeskLayout, number[]> = {
   wide: [81.09, 166.32, 115.17, 147.81],
-  tall: [123, 164, -59, -149],
 };
 
 /**
@@ -319,11 +306,6 @@ const START_ANGLE: Record<DeskLayout, number[]> = {
  * al 95% (vedi DRAW_SCALE) a 4,29, con il minimo globale che nel frattempo sale
  * da 1,40 a 2,00.
  *
- * Il mondo verticale tiene le sue quattro cifre ripetute uguali per i quattro
- * strati: li' il problema non c'e' — fra anelli vicini ci sono gia' 3,5 punti,
- * perche' il mondo e' alto il doppio di quanto e' largo e gli anelli ci si
- * annidano davvero — e quattro righe identiche dicono esattamente questo.
- *
  * Sono scostamenti, non una seconda rotazione: dentro ogni strato la loro media
  * e' zero, e la rotazione dell'anello sta tutta in START_ANGLE. Chi li ritara
  * rilegga la nota su RADII: si muovono tutti insieme, e le prove che li tengono
@@ -335,12 +317,6 @@ const ANGLE_OFFSET: Record<DeskLayout, number[][]> = {
     [-1.17, -25.2, 27.49, -2.06, -24.23, 25.19],
     [-0.49, 14.55, -7.05, -0.94, -4.15, -1.9],
     [-7.06, 11.24, -17.12, -6.61, 14.34, 5.23],
-  ],
-  tall: [
-    [20, 8, 20, 8],
-    [20, 8, 20, 8],
-    [20, 8, 20, 8],
-    [20, 8, 20, 8],
   ],
 };
 

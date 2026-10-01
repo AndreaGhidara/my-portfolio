@@ -1500,10 +1500,6 @@ html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] 
      quindi niente che reduced-motion debba spegnere. */
 }
 
-/* Fuori dai primi quattro: sparisce dal disegno sul telefono, non dalla lista.
-   Sono gli oggetti del solo mondo verticale, che e' gia' aria-hidden. */
-[data-desk-object][data-off] { display: none; }
-
 /* Sotto i 1024px il tavolo non si disegna: la sezione e' il gioco del metodo
    (Services/gioco, src/styles/gioco/), che fa il cambio al contrario.
    Fuori dall'impaginato per davvero, non ridotto a un pixel ritagliato: sono
@@ -1512,13 +1508,6 @@ html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] 
    questo mondo solo a livello pieno, che vuole gia' i 1024px. */
 @media (max-width: 1023px) {
   [data-desk-world][data-layout="wide"] { display: none; }
-}
-
-/* Il titolino e i numeri sono roba da elenco: da desktop gli strati arrivano
-   uno alla volta con la camera, contarli non serve e un titolo fisso sopra la
-   scena sarebbe una didascalia che non aspetta nessuno. */
-@media (min-width: 1024px) {
-  [data-desk-composto], [data-desk-num] { display: none; }
 }
 
 /* ── I materiali ────────────────────────────────────────────────────────────

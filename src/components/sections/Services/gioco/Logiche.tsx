@@ -53,6 +53,7 @@ const STILE_SITO = variabiliSito(BOTTEGA.colori) as CSSProperties;
 
 export function Logiche({ onAvanti }: LivelloProps) {
   const t = useTranslations("services.gioco.logiche");
+  const comune = useTranslations("services.gioco.comune");
   const locale = useLocale();
   const nodi = t.raw("nodi") as Nodo[];
   const scene = t.raw("scene") as TestiScene;
@@ -117,7 +118,7 @@ export function Logiche({ onAvanti }: LivelloProps) {
         </svg>
 
         <div className="testa">
-          <span className="livello">{t("testa")}</span>
+          <span className="livello">{comune("etichetta", { numero: 2, nome: comune("livelli.logiche") })}</span>
           <span className="destra regole">
             {t("regole")}
             {stati.map((x, i) => (

@@ -20,19 +20,14 @@ const layer = (id: string, n: number, mute = false) => ({
   })),
 });
 
-/**
- * Gli oggetti del tavolo. Il mondo si disegna una volta sola, largo: il
- * :not([data-ghost]) e' rimasto da quando ce n'era un gemello, e tiene il conto
- * giusto se un giorno tornasse.
- */
-const SOLI_VERI = "[data-desk-object]:not([data-ghost])";
+/** Gli oggetti del tavolo. */
+const SOLI_VERI = "[data-desk-object]";
 
 const props: ServicesViewProps = {
   eyebrow: "Il metodo",
   stageTitle: "Tutto quello che non si vede",
   stageLead: "Un sito finito.",
   centre: "il progetto",
-  composto: "Da cosa e\' composto",
   punch: "Quello che chiami 'un sito' è lo schermo al centro.",
   blank: "E la tua, qual è?",
   note: "23.777 caffè",

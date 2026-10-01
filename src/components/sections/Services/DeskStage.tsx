@@ -90,7 +90,6 @@ export function DeskStage({
   title,
   lead,
   centre,
-  composto,
   blank,
   note,
   punch,
@@ -100,8 +99,6 @@ export function DeskStage({
   title: string;
   lead: string;
   centre: string;
-  /** Il titolino sopra gli strati, solo sotto i 1024px. */
-  composto: string;
   blank: string;
   /** La nota sul post-it grigio. */
   note: string;
@@ -282,7 +279,6 @@ export function DeskStage({
           <DeskTable
             layers={layers}
             centre={centre}
-            composto={composto}
             blank={blank}
             note={note}
             layout="wide"

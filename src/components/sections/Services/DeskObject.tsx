@@ -82,8 +82,6 @@ export function DeskObject({
   layout,
   placement,
   beat,
-  hidden,
-  ghost,
   href,
   action,
   note,
@@ -96,10 +94,6 @@ export function DeskObject({
   layout: DeskLayout;
   placement: Placement;
   beat: Beat;
-  /** Fuori dai primi quattro: sparisce dal DISEGNO sul telefono, non dalla lista. */
-  hidden: boolean;
-  /** Il gemello che il CSS nasconde: si disegna, ma non si legge. */
-  ghost: boolean;
   /** Solo il post-it bianco ce l'ha. */
   href?: string;
   /** Il nome accessibile del comando. Sul tavolo non si vede finche' non lo si
@@ -113,31 +107,13 @@ export function DeskObject({
 }) {
   const sagoma = <DeskShapeArt drawing={shape} />;
 
-  // Il campione si disegna in tutti e due i mondi, ma nel verticale solo per gli
-  // oggetti che si vedono davvero.
-  //
-  // Prima era solo nell'orizzontale, e la ragione era buona finche' e' durata:
-  // nel mondo verticale le sagome stavano sul piano a DRAW_SCALE.tall, larghe
-  // una cinquantina di pixel, e un calendario da cinquanta pixel non e' un
-  // calendario, e' sporco sul foglio. Sotto i 1024px il piano non esiste piu':
-  // gli oggetti sono in griglia a due per riga e stanno sui 180px, cioe' PIU'
-  // larghi dei 98 che hanno sul tavolo da desktop. A quella misura il campione
-  // e' esattamente quello che distingue "I colori" da "I caratteri", che senza
-  // sono due fogli identici.
-  //
-  // `!hidden` tiene il conto del DOM dove stava: nel verticale se ne vedono
-  // quattro per strato, e gli altri due sono display:none. Disegnare il
-  // campione anche a quelli sarebbe pagarlo per niente.
-  const campione =
-    sample && (layout === "wide" || !hidden) ? <DeskSpecimen sample={sample} /> : null;
+  const campione = sample ? <DeskSpecimen sample={sample} /> : null;
 
   return (
     <li
       data-desk-object
       data-desk-piece
       data-shape={shape}
-      data-ghost={ghost ? "" : undefined}
-      data-off={hidden ? "" : undefined}
       style={
         {
           left: `${placement.x}%`,
@@ -151,27 +127,13 @@ export function DeskObject({
       }
     >
       {href ? (
-        // Il comando sta in tutti e due i mondi, perche' il post-it si disegna
-        // in tutti e due: sotto i 1024px quello che si vede e' il gemello, e un
-        // post-it che porta da qualche parte ma non si preme sarebbe un disegno
-        // di un comando. Nel gemello pero' e' una superficie da toccare e basta:
-        // il gemello e' aria-hidden per intero, e un secondo <a> nel giro dei
-        // Tab sarebbe una fermata che non annuncia niente. Niente domanda
-        // scritta, per la stessa ragione — li' non si legge (e a quella misura
-        // non si leggerebbe comunque): il nome del comando lo porta l'altro
-        // mondo, che sotto i 1024px e' quello che uno screen reader legge.
-        <a href={href} data-desk-blank tabIndex={ghost ? -1 : undefined}>
+        <a href={href} data-desk-blank>
           {sagoma}
           {/* Quello che c'e' scritto sul post-it. Decorazione come ogni altro
               campione del tavolo: il nome del comando e' la domanda qui sotto,
               e due testi dentro un <a> sono un comando che si annuncia due
               volte. Si scansa quando la domanda entra — non stanno nello stesso
               posto per caso, ci stanno tutte e due al centro del foglio. */}
-          {/* Anche nel gemello, ed e' il mondo che si vede sotto i 1024px: senza,
-              da telefono il post-it era un quadrato grigio e basta. Non e' un
-              problema di lettura a voce — il gemello e' aria-hidden per intero —
-              ma di disegno: e' l'unico oggetto del tavolo che porta scritto
-              qualcosa, e vuoto non si capisce cosa sia. */}
           {note ? (
             <span data-desk-note aria-hidden="true">
               {note}
@@ -181,7 +143,7 @@ export function DeskObject({
               resta nell'albero di accessibilita' ed e' quella che uno screen
               reader annuncia. Niente data-desk-label — questa non e' una voce
               dell'elenco, e il conteggio delle etichette resta ventitre'. */}
-          {ghost ? null : <span data-desk-ask>{action}</span>}
+          <span data-desk-ask>{action}</span>
         </a>
       ) : (
         <>

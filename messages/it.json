@@ -90,7 +90,6 @@
     "stageTitle": "Tutto quello che non si vede",
     "stageLead": "Un sito finito. Da qui in poi, tutto quello che c'è sotto.",
     "centre": "il progetto",
-    "composto": "Da cosa è composto",
     "blank": "E la tua, qual è? Scrivimi.",
     "punch": "Quello che chiami «un sito» è lo schermo al centro. Il resto è il lavoro che c'è dietro.",
     "layers": {
@@ -146,7 +145,6 @@
       "comune": {
         "barrette": "I quattro livelli del gioco",
         "etichetta": "{numero} · {nome}",
-        "avanti": "avanti",
         "livelli": {
           "schermo": "lo schermo",
           "logiche": "le logiche",
@@ -285,7 +283,6 @@
       },
       "logiche": {
         "titolo": "Dietro lo schermo",
-        "testa": "2 · dietro lo schermo",
         "regole": "regole",
         "nodo": "nodo {numero} di 6 · {nome}",
         "partenza": {
@@ -468,7 +465,6 @@
         }
       },
       "pannello": {
-        "testa": "3 · dopo il lancio",
         "conta": {
           "spento": "pannello spento",
           "acceso": "acceso",
