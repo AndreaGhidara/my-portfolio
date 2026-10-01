@@ -1,0 +1,152 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useMotionLevel } from "@/animations/motionPolicy";
+import { NESSUNA_PRATICA, pratica, type Evento, type Pratica } from "./pratica";
+import { scivola, type Cartella, type Scivolata } from "./scivola";
+
+/** Una pratica aperta ferma tutto quello che misura la pagina sotto. */
+export const praticaAperta = () => document.documentElement.hasAttribute("data-dialog-open");
+
+/**
+ * Aprire e chiudere la pratica. Gli stati e le loro regole sono in pratica.ts,
+ * puri; qui c'e' quello che ogni passaggio fa alla pagina: l'archivio inerte,
+ * gli attributi su <html>, la cartella che cade e risale, il fuoco.
+ *
+ * Lo stato del dossier sta qui e non nelle singole cartelle perche' il dialog e'
+ * uno solo: uno per cartella significherebbe quattro <dialog> nel DOM, quattro
+ * trappole di focus e la certezza che prima o poi se ne aprano due. Qui sta
+ * anche la coda: aprire e chiudere durano un secondo e mezzo ciascuno, e un
+ * clic o un Esc nel mezzo non si perde ne' si accavalla.
+ *
+ * Lo stato sta in un ref e non in useReducer: ogni passaggio fa i suoi effetti
+ * subito, nello stesso giro del clic o della promessa che l'ha mosso, come
+ * prima. Con useReducer aspetterebbero un render.
+ *
+ * `prepara` porta la cartella in vista prima che cada (vedi useProfondita).
+ */
+export function usePratica(
+  schedario: RefObject<HTMLOListElement | null>,
+  prepara: (i: number, cartella: Cartella) => Promise<void> | null,
+) {
+  const [attiva, setAttiva] = useState<number | null>(null);
+  const movimento = useMotionLevel();
+  const dialogo = useRef<HTMLDialogElement | null>(null);
+  const stato = useRef<Pratica<Cartella>>(NESSUNA_PRATICA);
+  /** La cartella che cade: un'animazione, che nello stato puro non entra. */
+  const scivolata = useRef<Scivolata | null>(null);
+
+  const manda = useCallback(
+    function manda(evento: Evento<Cartella>) {
+      const prima = stato.current;
+      const dopo = pratica(prima, evento);
+      if (dopo === prima) return;
+      stato.current = dopo;
+      const p = prima.corso;
+      const c = dopo.corso;
+      const { gen } = dopo;
+
+      /* Il clic. L'archivio inerte da subito, perche' sotto la cartella caduta
+         c'e' la faccia della precedente, e il contenuto nel DOM da subito. Se
+         la cartella non e' davanti o non e' in vista la pagina scorre prima,
+         svelta, e la cartella cade quando e' ferma. */
+      if (!p) {
+        if (!c) return;
+        schedario.current?.setAttribute("inert", "");
+        // La barra in basso resta finche' non arriva il velo (vedi sezioni/barra.css).
+        document.documentElement.setAttribute("data-pratica-in-corso", "");
+        setAttiva(c.i);
+        const attesa = c.moto === "quattro-tempi" ? prepara(c.i, c.cartella) : null;
+        if (attesa) void attesa.then(() => manda({ tipo: "cade", gen }));
+        else manda({ tipo: "cade", gen });
+        return;
+      }
+
+      /* La cartella e' di nuovo ferma: la pagina torna libera. Il fuoco torna
+         esplicito su «Apri il caso»: la faccia cliccata non lo prende, e il
+         ritorno nativo del dialog finirebbe su body. */
+      if (!c) {
+        scivolata.current?.ferma();
+        scivolata.current = null;
+        schedario.current?.removeAttribute("inert");
+        document.documentElement.removeAttribute("data-dialog-open");
+        document.documentElement.removeAttribute("data-pratica-in-corso");
+        p.cartella.apri.focus({ preventScroll: true });
+        if (p.apriDopo) manda({ tipo: "apri", ...p.apriDopo });
+        return;
+      }
+
+      const dialog = dialogo.current;
+      /* Tempo 1, con la cartella davanti e in vista. data-dialog-open da qui:
+         Lenis si ferma prima che la cartella cada, e lo scroll non riscrive
+         `--profondita` mentre cade. */
+      if (c.caduta && !p.caduta) {
+        document.documentElement.setAttribute("data-dialog-open", "");
+        scivolata.current = scivola(c.cartella, c.moto);
+      }
+      // Tempi 3 e 4: il reducer li avvia quando ci sono la caduta e il contenuto.
+      if (c.avviata && !p.avviata && dialog) {
+        void scivolata.current?.apri(dialog).then(() => manda({ tipo: "aperta", gen }));
+      }
+      if (c.fase === "chiude" && p.fase !== "chiude" && dialog) {
+        void scivolata.current?.chiudi(dialog);
+      }
+      /* Il close del dialog, da qualunque parte arrivi. Il close watcher (al
+         secondo Esc, o col gesto indietro di Android) chiude il dialog da solo,
+         anche a chiusura orchestrata gia' partita: quello che resta del foglio
+         si salta sempre, e si passa alla risalita. Chiusa da chiudi(), il
+         foglio e' gia' lasciato e rifarlo non cambia niente. */
+      if (c.fase === "risale" && p.fase !== "risale") {
+        if (dialog) scivolata.current?.lasciaIlFoglio(dialog);
+        void (scivolata.current?.risali() ?? Promise.resolve()).then(() => manda({ tipo: "ferma", gen }));
+      }
+    },
+    [schedario, prepara],
+  );
+
+  const apri = useCallback(
+    (i: number, cartella: Cartella) =>
+      manda({ tipo: "apri", i, cartella, moto: movimento === "none" ? "dissolvenza" : "quattro-tempi" }),
+    [manda, movimento],
+  );
+
+  const chiudi = useCallback(() => manda({ tipo: "chiudi" }), [manda]);
+
+  const alClose = useCallback(() => {
+    setAttiva(null);
+    manda({ tipo: "chiusa" });
+  }, [manda]);
+
+  useEffect(() => {
+    if (attiva !== null) manda({ tipo: "montata" });
+  }, [attiva, manda]);
+
+  /* Esc fra il clic e showModal(): la cartella cade e il dialog non c'e'
+     ancora, quindi niente cancel. Non si perde: si chiude appena aperta. */
+  useEffect(() => {
+    const alTasto = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || dialogo.current?.open) return;
+      manda({ tipo: "esc" });
+    };
+    document.addEventListener("keydown", alTasto);
+    return () => document.removeEventListener("keydown", alTasto);
+  }, [manda]);
+
+  /* Smontato a meta': niente pagina bloccata ne' archivio inerte. */
+  useEffect(() => {
+    const lista = schedario.current;
+    const dialog = dialogo.current;
+    return () => {
+      if (!stato.current.corso) return;
+      stato.current = pratica(stato.current, { tipo: "smonta" });
+      scivolata.current?.ferma();
+      scivolata.current = null;
+      if (dialog?.open) dialog.close();
+      lista?.removeAttribute("inert");
+      document.documentElement.removeAttribute("data-dialog-open");
+      document.documentElement.removeAttribute("data-pratica-in-corso");
+    };
+  }, [schedario]);
+
+  return { attiva, dialogo, apri, chiudi, alClose };
+}
