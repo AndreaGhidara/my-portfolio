@@ -162,7 +162,126 @@
         }
       },
       "schermo": {
-        "titolo": "Build the screen"
+        "attrezzi": "The tools",
+        "stato": {
+          "prova": "try",
+          "provato": "tried"
+        },
+        "attrezzo": {
+          "colori": {
+            "nome": "colors",
+            "titolo": "Palette",
+            "testo": "Five colors that talk: background, surface, text, accent, grey. The images follow them too."
+          },
+          "caratteri": {
+            "nome": "fonts",
+            "titolo": "The fonts",
+            "testo": "One for headings, one for reading. Swap the pair, watch the title."
+          },
+          "testi": {
+            "nome": "sizes",
+            "titolo": "The type sizes",
+            "testo": "Title, subtitle, paragraph: one scale that keeps everything in order."
+          },
+          "sezioni": {
+            "nome": "layout",
+            "titolo": "Sections",
+            "testo": "The same content, four ways to show it: each one says something different."
+          },
+          "immagini": {
+            "nome": "images",
+            "titolo": "The images",
+            "testo": "The first thing people see. Light to download, right for the business."
+          },
+          "telefono": {
+            "nome": "phone",
+            "titolo": "The phone",
+            "testo": "Most people will see it here first. Same site, made for six inches."
+          }
+        },
+        "palette": {
+          "bottega": "shop",
+          "notte": "night",
+          "salvia": "sage",
+          "cipria": "blush",
+          "oceano": "ocean",
+          "terracotta": "terracotta"
+        },
+        "scale": {
+          "compatta": "compact",
+          "equilibrata": "balanced",
+          "generosa": "generous"
+        },
+        "impaginazioni": {
+          "classica": "classic",
+          "manifesto": "manifesto",
+          "copertina": "cover",
+          "bento": "bento"
+        },
+        "illustrazioni": {
+          "pane": "loaf",
+          "vetrina": "window",
+          "torta": "cake",
+          "cornetto": "pastry"
+        },
+        "campione": {
+          "h1": "H1 · Warm bread",
+          "h2": "H2 · Cakes",
+          "p": "Paragraph: sourdough, wood oven."
+        },
+        "vista": {
+          "pc": "computer",
+          "cell": "phone"
+        },
+        "pronto": "The screen is done. <b>Undo the four screws</b> and see what's behind it.",
+        "tornaAlComputer": "Looks good here too. <b>Back to the computer</b>: one more thing to do.",
+        "vite": "undo screw {numero}",
+        "dietro": {
+          "testa": "behind the screen",
+          "occhiello": "you're in",
+          "testo": "Behind the screen you just built, the logic runs: every tap from a visitor follows a wire to a rule. Level two starts here.",
+          "ricomincia": "restart",
+          "ingresso": "the visitor taps",
+          "regola": "every tap is a written rule"
+        },
+        "sito": {
+          "nav": {
+            "pane": "Bread",
+            "torte": "Cakes",
+            "orari": "Hours",
+            "prenota": "Book"
+          },
+          "titolo": "Warm bread",
+          "titoloEm": "from six.",
+          "nota": "Sourdough, a wood oven, and the Sunday cake to book ahead.",
+          "cta": "Book the cake",
+          "schede": {
+            "pane": {
+              "titolo": "Bread",
+              "testo": "Six kinds, daily."
+            },
+            "torte": {
+              "titolo": "Cakes",
+              "testo": "Made to order."
+            },
+            "dove": {
+              "titolo": "Find us",
+              "testo": "Via Roma 12."
+            }
+          },
+          "bollo": "wood oven",
+          "fascia": "BREAD · CAKES · FOCACCIA · FROM SIX · SOURDOUGH · ",
+          "numero": "No. 01 · autumn",
+          "sfornato": "just baked",
+          "lato": "bread · cakes · buns",
+          "indirizzo": "Sourdough and a wood oven, at Via Roma 12.",
+          "aperto": "open",
+          "oggi": "today",
+          "quartiere": "local bakery",
+          "tipi": "breads,\nevery morning",
+          "prenotaTorta": "Book\nthe cake",
+          "giorni": "MTWTFSS"
+        }
       },
       "logiche": {
         "titolo": "Behind the screen",
