@@ -1,6 +1,13 @@
 "use client";
 
-import { useRef, useState, type ComponentType, type CSSProperties } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type CSSProperties,
+  type MouseEvent,
+} from "react";
 import { useTranslations } from "next-intl";
 import { palette } from "@/styles/palette";
 import { useVisibile } from "./usaVisibile";
@@ -66,6 +73,14 @@ const TOKEN_FISSI = {
   "--greenDark": palette.greenDark,
 } as CSSProperties;
 
+/**
+ * Quanto dura la guardia sul doppio tocco. Il banco e' alto uguale per tutti e
+ * i pulsanti dello stato dopo compaiono nello stesso punto di quelli di prima:
+ * il secondo tocco di un doppio tocco premerebbe quello appena comparso
+ * («avanti» e poi «fai» del nodo dopo, «livello 4» e poi «vai a dormire»).
+ */
+const DOPPIO_TOCCO = 350;
+
 export function Gioco() {
   const t = useTranslations("services.gioco.comune");
   const radice = useRef<HTMLDivElement | null>(null);
@@ -79,6 +94,52 @@ export function Gioco() {
   const passo = PASSI[qui];
   const Livello = COMPONENTI[passo];
 
+  // Il timeStamp dell'ultimo tocco accettato su un pulsante delle azioni, e se
+  // da allora il livello e' cambiato.
+  const ultimoTocco = useRef<number | null>(null);
+  const appenaCambiato = useRef(false);
+
+  /*
+   * In cattura sulla radice, prima che il pulsante lo senta. La guardia vale
+   * solo dove il doppio tocco fa danni: un pulsante delle azioni, oppure il
+   * primo tocco nel banco dopo un cambio di livello. Le scelte multiple (gli
+   * interruttori della notte, gli attrezzi del livello 1) restano libere, e
+   * cosi' le barrette, che non stanno nel banco. timeStamp e non Date: e'
+   * l'ora dell'evento, non quella in cui lo si guarda.
+   */
+  const guardia = (e: MouseEvent<HTMLDivElement>) => {
+    const premuto = (e.target as Element).closest("button, a");
+    if (!premuto || !premuto.closest("[data-gioco-livello]")) return;
+    const azione = premuto.closest(".azioni") !== null;
+    const dentro = ultimoTocco.current !== null && e.timeStamp - ultimoTocco.current < DOPPIO_TOCCO;
+    if (dentro && (azione || appenaCambiato.current)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    appenaCambiato.current = false;
+    if (azione) ultimoTocco.current = e.timeStamp;
+  };
+
+  /*
+   * Al cambio di livello (non al primo montaggio: li' nessuno ha chiesto
+   * niente) il fuoco va sul banco nuovo. Il pulsante premuto non c'e' piu', e
+   * il fuoco finirebbe sul body: chi naviga da tastiera ripartirebbe dalla
+   * cima della pagina. preventScroll perche' il banco e' gia' dove si guarda.
+   */
+  const primo = useRef(true);
+  useEffect(() => {
+    appenaCambiato.current = true;
+    if (primo.current) {
+      primo.current = false;
+      return;
+    }
+    const nuovo = radice.current?.querySelector<HTMLElement>("[data-gioco-livello]");
+    if (!nuovo) return;
+    nuovo.tabIndex = -1;
+    nuovo.focus({ preventScroll: true });
+  }, [passo]);
+
   const vai = (i: number) => {
     setQui(i);
     setRaggiunto((r) => Math.max(r, i));
@@ -91,7 +152,7 @@ export function Gioco() {
   };
 
   return (
-    <div ref={radice} data-gioco style={TOKEN_FISSI}>
+    <div ref={radice} data-gioco style={TOKEN_FISSI} onClickCapture={guardia}>
       <div data-gioco-barrette role="group" aria-label={t("barrette")}>
         {LIVELLI.map((id, i) => {
           // Nel finale nessuna barretta e' «qui»: sono tutte fatte.
@@ -117,10 +178,12 @@ export function Gioco() {
         })}
       </div>
 
-      {/* Le key sono diverse: la riga e il banco sono fratelli. */}
-      <p key={`riga-${passo}`} data-gioco-riga>
-        {t(`righe.${passo}`)}
-      </p>
+      {/* La regione resta la stessa e cambia il testo dentro: una regione
+          appena nata non la annuncia nessuno. Il testo ha la sua key per
+          rientrare in dissolvenza. */}
+      <div data-gioco-riga aria-live="polite">
+        <p key={`riga-${passo}`}>{t(`righe.${passo}`)}</p>
+      </div>
 
       <Livello
         key={`banco-${passo}`}

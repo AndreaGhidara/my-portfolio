@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { screen, within } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderConTesti } from "@/test/renderConTesti";
 import { installaIntersectionObserver } from "@/test/intersectionObserver";
@@ -19,9 +19,11 @@ const { livelloFinto } = vi.hoisted(() => ({
     function LivelloFinto({ onAvanti, visibile }: LivelloProps) {
       return (
         <div className="banco" data-gioco-livello={id} data-visibile={visibile ? "si" : "no"}>
-          <button type="button" onClick={onAvanti}>
-            avanti finto
-          </button>
+          <div className="azioni">
+            <button type="button" onClick={onAvanti}>
+              avanti finto
+            </button>
+          </div>
         </div>
       );
     },
@@ -44,10 +46,23 @@ const barrette = (nome = comune.barrette) =>
 const avanti = (container: HTMLElement) =>
   within(banco(container)).getByRole("button", { name: "avanti finto" });
 
+/**
+ * Il guscio ignora un secondo tocco sui pulsanti del banco che arriva entro
+ * 350 ms dal primo (il doppio tocco). Le prove del giro premono come una
+ * persona che legge: l'orologio va avanti di 400 ms prima di ogni tocco. E'
+ * finto solo Date, da cui jsdom prende il timeStamp degli eventi.
+ */
+const premi = async (utente: ReturnType<typeof userEvent.setup>, el: Element) => {
+  vi.setSystemTime(Date.now() + 400);
+  await utente.click(el);
+};
+
 beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
   installaIntersectionObserver();
 });
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
@@ -70,7 +85,7 @@ describe("il gioco, le barrette", () => {
     const utente = userEvent.setup();
     const { container } = renderConTesti(<Gioco />);
     expect(screen.getByText(comune.righe.schermo)).toBeInTheDocument();
-    await utente.click(avanti(container));
+    await premi(utente, avanti(container));
     expect(screen.getByText(comune.righe.logiche)).toBeInTheDocument();
     expect(screen.queryByText(comune.righe.schermo)).toBeNull();
   });
@@ -78,8 +93,8 @@ describe("il gioco, le barrette", () => {
   it("riapre i livelli gia' raggiunti, non quelli dopo", async () => {
     const utente = userEvent.setup();
     const { container } = renderConTesti(<Gioco />);
-    await utente.click(avanti(container));
-    await utente.click(avanti(container));
+    await premi(utente, avanti(container));
+    await premi(utente, avanti(container));
     expect(banco(container)).toHaveAttribute("data-gioco-livello", "pannello");
 
     await utente.click(barrette()[0]);
@@ -101,7 +116,7 @@ describe("il gioco, il giro intero", () => {
     const { container } = renderConTesti(<Gioco />);
     for (const livello of ["schermo", "logiche", "pannello", "notte"]) {
       expect(banco(container)).toHaveAttribute("data-gioco-livello", livello);
-      await utente.click(avanti(container));
+      await premi(utente, avanti(container));
     }
     expect(banco(container)).toHaveAttribute("data-gioco-livello", "finale");
     expect(screen.getByRole("heading", { name: finale.titolo })).toBeInTheDocument();
@@ -115,9 +130,9 @@ describe("il gioco, il giro intero", () => {
   it("«torna al sito» ricomincia dal livello 1, e i livelli dopo si richiudono", async () => {
     const utente = userEvent.setup();
     const { container } = renderConTesti(<Gioco />);
-    for (let i = 0; i < 4; i++) await utente.click(avanti(container));
+    for (let i = 0; i < 4; i++) await premi(utente, avanti(container));
 
-    await utente.click(screen.getByRole("button", { name: new RegExp(finale.tornaAlSito) }));
+    await premi(utente, screen.getByRole("button", { name: new RegExp(finale.tornaAlSito) }));
     expect(banco(container)).toHaveAttribute("data-gioco-livello", "schermo");
     const [uno, ...resto] = barrette();
     expect(uno).toHaveAttribute("aria-current", "step");
@@ -127,7 +142,7 @@ describe("il gioco, il giro intero", () => {
   it("«parliamone» porta ai Contatti", async () => {
     const utente = userEvent.setup();
     const { container } = renderConTesti(<Gioco />);
-    for (let i = 0; i < 4; i++) await utente.click(avanti(container));
+    for (let i = 0; i < 4; i++) await premi(utente, avanti(container));
     expect(screen.getByRole("link", { name: new RegExp(finale.parliamone) })).toHaveAttribute(
       "href",
       "#contact",
@@ -137,7 +152,7 @@ describe("il gioco, il giro intero", () => {
   it("il finale elenca i quattro strati, nell'ordine dei livelli", async () => {
     const utente = userEvent.setup();
     const { container } = renderConTesti(<Gioco />);
-    for (let i = 0; i < 4; i++) await utente.click(avanti(container));
+    for (let i = 0; i < 4; i++) await premi(utente, avanti(container));
     const strati = within(banco(container)).getAllByRole("listitem");
     expect(strati.map((s) => s.textContent)).toEqual([
       `1${finale.strati.schermo}`,
@@ -145,6 +160,56 @@ describe("il gioco, il giro intero", () => {
       `3${finale.strati.pannello}`,
       `4${finale.strati.notte}`,
     ]);
+  });
+});
+
+describe("il doppio tocco", () => {
+  it("due tocchi entro 350 ms fanno avanzare di un livello solo", () => {
+    const { container } = renderConTesti(<Gioco />);
+    fireEvent.click(avanti(container));
+    expect(banco(container)).toHaveAttribute("data-gioco-livello", "logiche");
+    vi.setSystemTime(Date.now() + 200);
+    fireEvent.click(avanti(container));
+    expect(banco(container)).toHaveAttribute("data-gioco-livello", "logiche");
+  });
+
+  it("dopo 350 ms il secondo tocco passa", () => {
+    const { container } = renderConTesti(<Gioco />);
+    fireEvent.click(avanti(container));
+    vi.setSystemTime(Date.now() + 360);
+    fireEvent.click(avanti(container));
+    expect(banco(container)).toHaveAttribute("data-gioco-livello", "pannello");
+  });
+
+  it("le barrette non sono pulsanti del banco: si premono subito", () => {
+    const { container } = renderConTesti(<Gioco />);
+    fireEvent.click(avanti(container));
+    fireEvent.click(barrette()[0]);
+    expect(banco(container)).toHaveAttribute("data-gioco-livello", "schermo");
+  });
+});
+
+describe("il cambio di livello si sente", () => {
+  it("il fuoco va sul banco nuovo, ma non al primo montaggio", async () => {
+    const utente = userEvent.setup();
+    const { container } = renderConTesti(<Gioco />);
+    expect(document.activeElement).not.toBe(banco(container));
+    await premi(utente, avanti(container));
+    expect(document.activeElement).toBe(banco(container));
+    expect(banco(container)).toHaveAttribute("data-gioco-livello", "logiche");
+    expect(banco(container)).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("la riga del livello e' una regione che si annuncia", async () => {
+    const utente = userEvent.setup();
+    const { container } = renderConTesti(<Gioco />);
+    const riga = container.querySelector("[data-gioco-riga]") as HTMLElement;
+    expect(riga).toHaveAttribute("aria-live", "polite");
+    await premi(utente, avanti(container));
+    // La stessa regione, col testo nuovo: una regione appena nata non la
+    // annuncia nessuno.
+    expect(container.querySelector("[data-gioco-riga]")).toBe(riga);
+    expect(riga).toHaveTextContent(comune.righe.logiche);
   });
 });
 
