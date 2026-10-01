@@ -14,7 +14,7 @@ import {
 
 /**
  * Il disegno di una sagoma: due strati, non uno. Sotto la superficie, sopra il
- * tracciato — e sono due perche' una maschera CSS dipinge UN colore solo, e con
+ * tracciato. Sono due perche' una maschera CSS dipinge UN colore solo, e con
  * un colore solo un foglio, una scheda e un telefono restano lo stesso grigio
  * identico. I quattro strati del tavolo si leggevano come quattro contorni
  * della stessa famiglia invece che come quattro tipi di cosa.
@@ -28,7 +28,7 @@ import {
  * funzionare da se'. Cambia solo che adesso ci sono due superfici da colorare.
  *
  * I led del rack sono lo strato in piu' che nessuna maschera puo' portare:
- * una maschera e' una forma, e loro sono colore. Decorativi — niente da
+ * una maschera e' una forma, e loro sono colore. Decorativi: niente da
  * annunciare, come tutto il resto del disegno. Quali sagome li portino non lo
  * sa questo componente: e' un fatto della sagoma, e sta con gli altri fatti
  * per sagoma nella tavola dei materiali.
@@ -52,7 +52,7 @@ export function DeskShapeArt({ drawing }: { drawing: DeskDrawing }) {
  *
  * L'opacita' e' scritta in CSS e non in JavaScript: dipende da --p, che il palco
  * aggiornera' una volta per fotogramma. Il default `var(--p, 1)` e' il patto del
- * fallback — se il JavaScript non gira, --p non viene mai scritta, vale 1, e si
+ * fallback: se il JavaScript non gira, --p non viene mai scritta, vale 1, e si
  * vede il tavolo completo. Il fotogramma finale e' lo stato di riposo.
  *
  * La sagoma e' fatta di maschere CSS e non di <img>: dentro una <img> il
@@ -62,7 +62,7 @@ export function DeskShapeArt({ drawing }: { drawing: DeskDrawing }) {
  * Quanti strati siano, e perche', lo dice DeskShapeArt qui sopra.
  *
  * Ventitre' oggetti su ventiquattro sono un disegno con una parola sotto. Il
- * ventiquattresimo — il post-it bianco — e' un comando, e allora la sagoma sta
+ * ventiquattresimo (il post-it bianco) e' un comando, e allora la sagoma sta
  * dentro un <a>: l'unica cosa del tavolo che si preme.
  *
  * Porta DUE ganci e non uno, e dicono due cose diverse. `data-desk-object` vuol
@@ -100,7 +100,7 @@ export function DeskObject({
    *  sfiora, ma si legge sempre: e' il nome che annuncia uno screen reader. */
   action?: string;
   /** Quello che c'e' SCRITTO sul post-it, e che si vede sempre. Non e' il nome
-   *  del comando — quello resta `action` — ed e' per questo che va aria-hidden:
+   *  del comando (quello resta `action`) ed e' per questo che va aria-hidden:
    *  visibile e annunciata insieme, uno screen reader leggerebbe due cose per
    *  un comando solo. */
   note?: string;
@@ -132,7 +132,7 @@ export function DeskObject({
           {/* Quello che c'e' scritto sul post-it. Decorazione come ogni altro
               campione del tavolo: il nome del comando e' la domanda qui sotto,
               e due testi dentro un <a> sono un comando che si annuncia due
-              volte. Si scansa quando la domanda entra — non stanno nello stesso
+              volte. Si scansa quando la domanda entra: non stanno nello stesso
               posto per caso, ci stanno tutte e due al centro del foglio. */}
           {note ? (
             <span data-desk-note aria-hidden="true">
@@ -141,7 +141,7 @@ export function DeskObject({
           ) : null}
           {/* La domanda e' il nome del comando: con opacity 0 non si vede, ma
               resta nell'albero di accessibilita' ed e' quella che uno screen
-              reader annuncia. Niente data-desk-label — questa non e' una voce
+              reader annuncia. Niente data-desk-label: questa non e' una voce
               dell'elenco, e il conteggio delle etichette resta ventitre'. */}
           <span data-desk-ask>{action}</span>
         </a>

@@ -42,13 +42,13 @@ export function HeroMotion({ children }: { children: ReactNode }) {
        e la ragione e' una metrica.
        Il claim e' l'elemento piu' grande della prima schermata: e' lui che il
        browser cronometra come Largest Contentful Paint. Portandolo a opacita'
-       zero — come fa `reveal` — se l'animazione parte PRIMA che il browser
+       zero (come fa `reveal`) se l'animazione parte PRIMA che il browser
        l'abbia dipinto, quel cronometro non parte al primo disegno ma quando la
        frase ricompare. Misurato con Lighthouse mobile: LCP a 3,0s con 2,5s di
        sola attesa, su una frase che nel documento c'e' dall'inizio.
        Quindi il claim si muove e basta, senza dissolvenza: sale di qualche
        pixel, resta sempre visibile, e l'LCP e' il primo disegno. Il resto della
-       copia — sottotitolo e bottoni — non e' l'elemento piu' grande e puo'
+       copia (sottotitolo e bottoni) non e' l'elemento piu' grande e puo'
        continuare a comparire. */
     const claim = root.querySelector<HTMLElement>("[data-hero-claim]");
     const resto = [...root.querySelectorAll<HTMLElement>("[data-hero-copy] > *")].filter(

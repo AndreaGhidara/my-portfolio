@@ -31,8 +31,8 @@ export const works: Work[] = [
     /**
      * Il lavoro di adesso, coperto da un accordo di riservatezza: niente nome,
      * niente indirizzo, niente schermata. E' l'unico modo di far entrare qui
-     * dentro quello che sto facendo ORA — gli altri tre vengono tutti da
-     * D.lab, finita ad aprile — e sta in cima perche' e' il piu' recente.
+     * dentro quello che sto facendo ORA (gli altri tre vengono tutti da
+     * D.lab, finita ad aprile) e sta in cima perche' e' il piu' recente.
      */
     id: "riservato",
     year: 2026,

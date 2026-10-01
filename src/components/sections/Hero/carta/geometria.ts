@@ -1,7 +1,7 @@
 /**
  * La geometria dell'accartocciamento. Tutto puro: niente DOM, niente canvas.
  *
- * Sta separato dal disegno per la ragione imparata sul gesto della freccia —
+ * Sta separato dal disegno per la ragione imparata sul gesto della freccia:
  * quello che finisce dentro un ciclo di disegno nessun test lo vede piu', e in
  * questo modulo c'e' esattamente il genere di codice in cui un segno sbagliato
  * non si nota guardando: la prima stesura della mappa affine ne aveva due, e
@@ -19,12 +19,12 @@ export type Affine = readonly [number, number, number, number, number, number];
 /**
  * La trasformazione affine che porta il triangolo `s` sul triangolo `d`.
  *
- * Derivata come DUE sistemi 3x3 — uno per la x, uno per la y — e non copiata
+ * Derivata come DUE sistemi 3x3 (uno per la x, uno per la y) e non copiata
  * da una formula compatta. La versione compatta e' facile da sbagliare e
  * difficile da leggere: quella che avevo scritto per prima aveva due segni
  * invertiti, sull'identita' restituiva (1,0,0,-1,0,0) e disegnava tutto
  * capovolto. Con l'identita' questa restituisce (1,0,0,1,0,0), ed e' il modo
- * di accorgersene in un secondo — c'e' una prova che lo verifica.
+ * di accorgersene in un secondo: c'e' una prova che lo verifica.
  *
  * `null` quando il triangolo sorgente e' degenere: non c'e' niente da mappare.
  */
@@ -49,7 +49,7 @@ export const LATO = 12;
 /**
  * Il raggio della pallina, in frazione del lato del foglio. Da qui esce un
  * diametro attorno al 40% del foglio, ed e' il numero che decide se la
- * pallina si legge come pallina: a 0,46 — la prima stesura — il foglio
+ * pallina si legge come pallina: a 0,46 (la prima stesura) il foglio
  * restava un quadrato rimpicciolito.
  */
 export const RAGGIO = 0.205;
@@ -112,7 +112,7 @@ export type Vertice = {
  * cosi' chi partiva dal bordo finiva sul bordo: l'ordine si conservava e
  * restava leggibile che fosse un foglio quadrato rimpicciolito. Scorrelando i
  * due raggi il bordo finisce DENTRO, il foglio si ripiega su se stesso, e la
- * pallina smette di essere leggibile — che e' tutto il punto. Una prova misura
+ * pallina smette di essere leggibile, che e' tutto il punto. Una prova misura
  * quella scorrelazione, perche' e' la proprieta' e non un dettaglio.
  */
 export function maglia(seme: number): Vertice[] {
@@ -167,8 +167,8 @@ export type Cella = { i: number; j: number; z: number };
  * Le celle dalla piu' lontana alla piu' vicina.
  *
  * Senza questo ordine le facce si coprono nell'ordine della griglia e il
- * risultato e' un collage piatto: e' l'ordinamento in profondita' — piu'
- * dell'ombra — a far leggere una pallina invece di un'immagine schiacciata.
+ * risultato e' un collage piatto: e' l'ordinamento in profondita' (piu'
+ * dell'ombra) a far leggere una pallina invece di un'immagine schiacciata.
  */
 export function celleInProfondita(punti: readonly Posato[]): Cella[] {
   const celle: Cella[] = [];
@@ -188,7 +188,7 @@ export const GRADINI = 5;
  * Quanto si vede il foglio a un dato grado di piega, come indice di gradino.
  *
  * Zero fin quasi a un terzo: passando col cursore si increspa SOLO
- * l'inchiostro, e la carta compare mentre si appallottola — perche' e'
+ * l'inchiostro, e la carta compare mentre si appallottola, perche' e'
  * piegandosi che prende luce. Disegnata subito era un quadrato del colore
  * della pagina, e se ne vedeva solo il bordo piegarsi: era il difetto.
  */

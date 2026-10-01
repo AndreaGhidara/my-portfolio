@@ -75,8 +75,8 @@ describe("servizi", () => {
 
 describe("lavori", () => {
   it("sono quattro, e uno solo e' coperto da accordo", () => {
-    // CustomerTrack e' uscito — costruita per intero e mai messa online, il
-    // dominio non risolve, e un caso senza utenti non prova niente — e al suo
+    // CustomerTrack e' uscito (costruita per intero e mai messa online, il
+    // dominio non risolve, e un caso senza utenti non prova niente) e al suo
     // posto e' entrato il lavoro di adesso, che non si puo' nominare. E' anche
     // l'unico modo di far entrare qui dentro qualcosa che non venga da D.lab,
     // finita ad aprile: senza, la sezione racconterebbe solo un posto lasciato.

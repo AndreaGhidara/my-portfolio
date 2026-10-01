@@ -8,7 +8,7 @@ import { useSectionAnimation } from "@/animations/useSectionAnimation";
  * in ingresso, mai lasciata statica: statica si legge come trascuratezza,
  * in tessitura si legge come lavoro in corso.
  * L'SVG è in linea, non via <img>, perché servono i singoli <path> per
- * animarli uno a uno — e perché a ~1 KB una richiesta di rete in più sul
+ * animarli uno a uno, e perché a ~1 KB una richiesta di rete in più sul
  * percorso critico dell'hero non si giustifica.
  */
 export function WebCorner({ className }: { className?: string }) {

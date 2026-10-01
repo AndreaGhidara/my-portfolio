@@ -7,7 +7,7 @@ import { site } from "@/content/site";
 /**
  * Niente "edge": il runtime edge non permette di importare qui i file JSON
  * dei messaggi. La correttezza (una card di anteprima nella lingua giusta)
- * conta più della scelta del runtime — questa rotta non è su un percorso
+ * conta più della scelta del runtime: questa rotta non è su un percorso
  * ad alto traffico.
  */
 export const size = { width: 1200, height: 630 };
@@ -17,7 +17,7 @@ export const contentType = "image/png";
  * L'export `alt` è statico per vincolo di next/og: la sola via per farlo
  * variare per lingua è `generateImageMetadata`, che però aggiunge un
  * segmento id all'URL (es. /it/opengraph-image/0) e rompe il percorso
- * /{locale}/opengraph-image atteso dai crawler di anteprima — verificato
+ * /{locale}/opengraph-image atteso dai crawler di anteprima, verificato
  * concretamente in build (route diventata
  * /[locale]/opengraph-image/[__metadata_id__], 404 sul percorso base).
  * L'immagine (il contenuto visibile nella card) resta comunque
