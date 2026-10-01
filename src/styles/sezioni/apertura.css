@@ -1,0 +1,48 @@
+/* I due bottoni dell'apertura e l'anello che passa dall'uno all'altro. */
+
+/* ──────────────────────────────────────────────────────────────────────────
+   I due bottoni dell'apertura: l'anello si sposta su quello che stai per
+   scegliere.
+
+   Di suo sta su «Parliamone», che e' l'azione suggerita. Quando il puntatore
+   va sull'altro, passa di la': in ogni istante si vede quale dei due si sta
+   per premere, e non c'e' mai un momento in cui l'anello e' su tutti e due o
+   su nessuno.
+
+   E' un anello INTERNO, e non e' un dettaglio di gusto: il fuoco da tastiera
+   di questo sito e' gia' un anello arancione (globals.css: `outline: 2px solid
+   var(--accent)` con `outline-offset: 3px`). Disegnando anche questo fuori dal
+   bottone, chi naviga da tastiera non avrebbe piu' modo di sapere dove si
+   trova, e chi usa il mouse vedrebbe comparire in hover una cosa che sul resto
+   del sito significa «sei qui». Dentro contro fuori li tiene distinti a colpo
+   d'occhio, e sono due segnali diversi che possono anche coesistere.
+
+   Su touch l'hover non esiste: l'anello resta dov'e', che e' il comportamento
+   giusto e non un ripiego.
+   ────────────────────────────────────────────────────────────────────────── */
+[data-hero-cta] > a {
+  box-shadow: inset 0 0 0 0 transparent;
+  transition: box-shadow 220ms ease;
+}
+
+[data-hero-cta] > a:first-child {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+/* Solo dove il puntatore esiste davvero. Su touch molti browser lasciano
+   l'hover appiccicato dopo il tocco: senza questa guardia, chi tocca «Guarda i
+   lavori» e torna indietro si ritroverebbe l'anello fermo sul bottone
+   sbagliato, cioe' il contrario di quello che deve dire. Li' resta a riposo. */
+@media (hover: hover) {
+  [data-hero-cta]:has(> a:last-child:hover) > a:first-child {
+    box-shadow: inset 0 0 0 0 transparent;
+  }
+
+  [data-hero-cta]:has(> a:last-child:hover) > a:last-child {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-hero-cta] > a { transition: none; }
+}

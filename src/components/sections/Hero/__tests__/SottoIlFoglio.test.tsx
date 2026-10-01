@@ -69,7 +69,7 @@ describe("la seconda sezione che passa sopra la prima", () => {
   });
 });
 
-describe("le regole dell'effetto in tokens.css", () => {
+describe("le regole dell'effetto in sezioni/sopra.css", () => {
   const blocco = regole(undefined, { dopo: "LA SECONDA SEZIONE PASSA SOPRA LA PRIMA" });
   const dove = (selettore: RegExp) => blocco.filter((r) => selettore.test(r.selettore));
 
