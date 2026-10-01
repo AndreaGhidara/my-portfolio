@@ -49,7 +49,7 @@ export function JourneyView({
     // overflow clip e non hidden: hidden fa della sezione un contenitore di
     // scorrimento e il palco sticky non aggancia. Su tutti e due gli assi, a
     // differenza di #services e #process che tagliano solo in x (vedi la
-    // regola in tokens.css): qui in x il binario e' largo
+    // regola in sezioni/lavori.css): qui in x il binario e' largo
     // migliaia di pixel e in y il foglio dei numeri che cade deve sparire sul
     // bordo della sezione, non finire sopra «Il tuo turno». clip non crea un
     // contenitore di scorrimento, quindi lo sticky regge.

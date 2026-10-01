@@ -152,7 +152,8 @@ describe("la scala dei materiali", () => {
  * IL CONTRATTO CSS-COME-TESTO.
  *
  * Il modulo qui sopra e' la specifica; il CSS (tokens.css e
- * sezioni/tavolo.css) e' l'unico che dipinge. Se i due divergono, la prova della scala misura un tavolo che nessuno vede, che
+ * sezioni/tavolo.css) e' l'unico che dipinge. Se i due divergono, la prova
+ * della scala misura un tavolo che nessuno vede, che
  * e' il modo piu' silenzioso di non provare niente. E' lo stesso pattern gia'
  * in uso per il contratto dell'etichetta e per la porta del movimento.
  */

@@ -126,7 +126,7 @@ export function objectExtent(shape: DeskDrawing, rotate: number): { x: number; y
  * eccesso.
  *
  * Nessuno di questi quattro numeri e' scelto qui: sono tutti la traduzione di
- * una dichiarazione di tokens.css (interlinea e respiro per `height`, `top`
+ * una dichiarazione di sezioni/tavolo.css (interlinea e respiro per `height`, `top`
  * per `gap`, il corpo del carattere e la larghezza del mondo per `em`). E'
  * un contratto fra due file che non si parlano, e i test lo leggono davvero:
  * cambiare il foglio di stile senza cambiare qui fa cadere una prova. Serviva:

@@ -52,7 +52,7 @@ function SegnoEsito({ esito }: { esito: "success" | "error" }) {
 
 /**
  * I campi non sono piu' riquadri ma righe su cui si scrive, e il vestito sta
- * in tokens.css: un campo senza contorno ha due cose da difendere che una
+ * in sezioni/contatti.css: un campo senza contorno ha due cose da difendere che una
  * scatola dava gratis, il fuoco della tastiera e la dimensione del bersaglio
  * sotto il pollice. Due prove le verificano nel foglio di stile, perche' nel
  * DOM non si vedono.

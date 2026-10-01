@@ -127,7 +127,7 @@ export function HeroView({
           {/* L'anello arancione sta di suo su «Parliamone», che e' l'azione
               suggerita, e passa all'altro bottone quando ci si porta sopra: si
               vede sempre quale dei due si sta per scegliere. Il disegno e' in
-              tokens.css, sotto [data-hero-cta]. */}
+              sezioni/apertura.css, sotto [data-hero-cta]. */}
           <div data-hero-cta className="mt-7 flex flex-wrap justify-center gap-3">
             <a
               href="#contact"

@@ -11,7 +11,7 @@ import { attacco, copertura } from "./foglio";
  * perche' lo sticky di Hero vale solo dentro questo contenitore: finita la
  * stampante, Hero se ne va con lei. Nessuna corsa in piu'.
  *
- * Il movimento lo fa il CSS (tokens.css), tutto sotto `data-acceso`, che si
+ * Il movimento lo fa il CSS (sezioni/sopra.css), tutto sotto `data-acceso`, che si
  * scrive qui dopo aver misurato e si toglie nella pulizia: senza JavaScript e
  * a "none" la pagina e' quella di prima. Qui si scrivono solo due numeri:
  * dove Hero si ferma (`--attacco`) e quanto e' coperto (`--copertura`).

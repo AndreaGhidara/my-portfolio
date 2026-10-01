@@ -29,7 +29,7 @@ export function ProcessView({ eyebrow, title, intro, deliveries }: ProcessViewPr
         <p className="eyebrow">{eyebrow}</p>
         {/* L'intestazione si ferma prima di meta' pagina: e' la misura con cui
             la sezione e' stata impaginata, e sotto i 1024px le regole in
-            tokens.css la centrano. */}
+            sezioni/processo.css la centrano. */}
         <h2 id="titolo-process" className="titolo-sezione max-w-[30rem]">{title}</h2>
         <p className="mt-5 max-w-[30rem] leading-relaxed text-[var(--fg-muted)]">{intro}</p>
         </Reveal>

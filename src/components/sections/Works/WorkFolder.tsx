@@ -78,7 +78,7 @@ export function WorkFolder({
         <span className="sr-only">, {riportaLabel}</span>
       </button>
 
-      {/* Ad archivio acceso il dorso prende il puntatore (vedi tokens.css) e
+      {/* Ad archivio acceso il dorso prende il puntatore (vedi sezioni/lavori.css) e
           non fa niente: e' la fascia fra le linguette e la faccia, e un click
           li' non deve arrivare alla faccia di una cartella coperta. */}
       <div ref={dorso} data-dorso aria-hidden="true" />

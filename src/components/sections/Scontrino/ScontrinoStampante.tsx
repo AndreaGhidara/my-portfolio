@@ -347,7 +347,7 @@ export function ScontrinoStampante({
                 servizio={servizi[stato.servizio]}
               />
               {/* Fuori portata finche' la stampa non e' finita: fino ad allora
-                  sono fuori dal flusso (tokens.css), e un fuoco su un bottone
+                  sono fuori dal flusso (sezioni/scontrino.css), e un fuoco su un bottone
                   che non si vede non serve a nessuno. */}
               <div data-scontrino-azioni inert={stato.fase !== "ferma"}>
                 <a href="#contact">{testi.parliamone}</a>

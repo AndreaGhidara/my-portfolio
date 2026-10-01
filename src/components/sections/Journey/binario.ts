@@ -64,7 +64,7 @@ export const POSE: readonly Posa[] = [
  * Un foglio tagliato in altezza non si legge, e in orizzontale non c'e' modo di
  * scorrerlo: meglio la colonna, che si legge sempre.
  *
- * Misurata, non scelta, in Chrome con le regole del telefono di tokens.css
+ * Misurata, non scelta, in Chrome con le regole del telefono di sezioni/percorso.css
  * (tappe in attesa ferme, corpo piccolo nascosto) e quelle compatte dei
  * telefoni bassi. Per ogni foglio si prende il rettangolo vero, tesserino,
  * scostamento e inclinazione compresi, e la sua distanza dal centro della
