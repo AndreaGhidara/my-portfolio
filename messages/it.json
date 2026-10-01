@@ -162,7 +162,126 @@
         }
       },
       "schermo": {
-        "titolo": "Costruisci lo schermo"
+        "attrezzi": "Gli attrezzi",
+        "stato": {
+          "prova": "prova",
+          "provato": "provato"
+        },
+        "attrezzo": {
+          "colori": {
+            "nome": "colori",
+            "titolo": "La palette",
+            "testo": "Cinque colori che si parlano: fondo, superficie, testo, accento, grigio. Anche le immagini li seguono."
+          },
+          "caratteri": {
+            "nome": "caratteri",
+            "titolo": "I caratteri",
+            "testo": "Uno per i titoli, uno per leggere. Cambia coppia e guarda il titolo."
+          },
+          "testi": {
+            "nome": "testi",
+            "titolo": "Le misure dei testi",
+            "testo": "Titolo, sottotitolo, paragrafo: una scala sola che tiene tutto in ordine."
+          },
+          "sezioni": {
+            "nome": "sezioni",
+            "titolo": "Le sezioni",
+            "testo": "Lo stesso contenuto, quattro modi di presentarlo: ognuno dice una cosa diversa."
+          },
+          "immagini": {
+            "nome": "immagini",
+            "titolo": "Le immagini",
+            "testo": "La prima cosa che si guarda. Leggera da scaricare, giusta per l'attività."
+          },
+          "telefono": {
+            "nome": "telefono",
+            "titolo": "Il telefono",
+            "testo": "Quasi tutti lo vedranno prima qui. Stesso sito, pensato per sei pollici."
+          }
+        },
+        "palette": {
+          "bottega": "bottega",
+          "notte": "notte",
+          "salvia": "salvia",
+          "cipria": "cipria",
+          "oceano": "oceano",
+          "terracotta": "terracotta"
+        },
+        "scale": {
+          "compatta": "compatta",
+          "equilibrata": "equilibrata",
+          "generosa": "generosa"
+        },
+        "impaginazioni": {
+          "classica": "classica",
+          "manifesto": "manifesto",
+          "copertina": "copertina",
+          "bento": "bento"
+        },
+        "illustrazioni": {
+          "pane": "pane",
+          "vetrina": "vetrina",
+          "torta": "torta",
+          "cornetto": "cornetto"
+        },
+        "campione": {
+          "h1": "H1 · Pane caldo",
+          "h2": "H2 · Le torte",
+          "p": "Paragrafo: lievito madre, forno a legna."
+        },
+        "vista": {
+          "pc": "il computer",
+          "cell": "il telefono"
+        },
+        "pronto": "Lo schermo è finito. <b>Svita le quattro viti</b> e guarda cosa c'è dietro.",
+        "tornaAlComputer": "Bello anche qui. <b>Torna al computer</b>: c'è ancora una cosa da fare.",
+        "vite": "svita la vite {numero}",
+        "dietro": {
+          "testa": "dietro lo schermo",
+          "occhiello": "sei entrato",
+          "testo": "Dietro lo schermo che hai appena costruito corrono le logiche: ogni tocco del visitatore segue un filo fino a una regola. Qui comincia il livello due.",
+          "ricomincia": "ricomincia",
+          "ingresso": "il visitatore tocca",
+          "regola": "ogni tocco è una regola scritta"
+        },
+        "sito": {
+          "nav": {
+            "pane": "Pane",
+            "torte": "Torte",
+            "orari": "Orari",
+            "prenota": "Prenota"
+          },
+          "titolo": "Pane caldo",
+          "titoloEm": "dalle sei.",
+          "nota": "Lievito madre, forno a legna, e la torta della domenica da prenotare.",
+          "cta": "Prenota la torta",
+          "schede": {
+            "pane": {
+              "titolo": "Il pane",
+              "testo": "Ogni mattina, sei tipi."
+            },
+            "torte": {
+              "titolo": "Le torte",
+              "testo": "Su ordinazione."
+            },
+            "dove": {
+              "titolo": "Dove siamo",
+              "testo": "Via Roma 12."
+            }
+          },
+          "bollo": "forno a legna",
+          "fascia": "PANE · TORTE · FOCACCE · DALLE SEI · LIEVITO MADRE · ",
+          "numero": "N° 01 · autunno",
+          "sfornato": "appena sfornato",
+          "lato": "pane · torte · focacce",
+          "indirizzo": "Lievito madre e forno a legna, in via Roma 12.",
+          "aperto": "aperto",
+          "oggi": "oggi",
+          "quartiere": "forno di quartiere",
+          "tipi": "tipi di pane,\nogni mattina",
+          "prenotaTorta": "Prenota\nla torta",
+          "giorni": "LMMGVSD"
+        }
       },
       "logiche": {
         "titolo": "Dietro lo schermo",
