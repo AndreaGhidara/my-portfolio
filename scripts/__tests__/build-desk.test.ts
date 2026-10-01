@@ -22,7 +22,7 @@ describe("le sagome del tavolo", () => {
     // monta come maschere da /brand/desk/*.svg, quindi quello che si vede e'
     // il file, non il generatore: ritoccare una sagoma e scordarsi
     // `npm run assets` spedisce il disegno vecchio, e senza questa prova se ne
-    // accorgerebbe solo un viewBox cambiato — un path no, e i path sono tutto
+    // accorgerebbe solo un viewBox cambiato: un path no, e i path sono tutto
     // il disegno.
     //
     // Vale per tutti e due gli strati: il pieno e' un file come il contorno, e
@@ -67,7 +67,7 @@ describe("le sagome del tavolo", () => {
 /**
  * Il secondo strato. Una maschera CSS dipinge un colore solo: finche' la
  * sagoma era un tracciato e basta, foglio, scheda e telefono erano lo stesso
- * grigio identico. Il pieno e' il file che restituisce i materiali — il solo
+ * grigio identico. Il pieno e' il file che restituisce i materiali: il solo
  * contorno esterno, chiuso, sotto il tracciato.
  */
 describe("i pieni delle sagome", () => {
