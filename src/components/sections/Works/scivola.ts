@@ -16,7 +16,7 @@
  *
  * Della cartella si animano solo `translate` e `rotate` (piu' altezza e ombra
  * del foglio): le cartelle archiviate hanno gia' `scale` e `filter` dalla loro
- * profondita', e WorksShelf misura la cartella. Niente stili in linea: a fine
+ * profondita', e useProfondita misura la cartella. Niente stili in linea: a fine
  * corsa si cancellano le animazioni e resta il CSS di prima.
  */
 
@@ -98,7 +98,7 @@ export function scivola(c: Cartella, moto: Moto): Scivolata {
   let dialogAperto: HTMLDialogElement | null = null;
   const cade = [c.linguetta, c.dorso, c.faccia];
 
-  // Misurato al clic, dopo che WorksShelf ha riportato davanti la cartella.
+  // Misurato al clic, dopo che useProfondita ha riportato davanti la cartella.
   const alto = c.faccia.offsetHeight - 16;
   const giu = window.innerHeight - c.li.getBoundingClientRect().top + 40;
   const ombra = getComputedStyle(c.li).getPropertyValue("--cartella-ombra").trim();

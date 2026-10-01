@@ -43,7 +43,7 @@
    aprire. */
 html[data-dialog-open]:not([data-pratica-in-corso]) [data-nav-basso] { display: none; }
 
-/* La pratica dei Lavori (data-pratica-in-corso, scritto da WorksShelf) tiene
+/* La pratica dei Lavori (data-pratica-in-corso, scritto da usePratica) tiene
    la barra finche' non arriva il velo: sparire al tocco, prima che la
    cartella si muova, sembrava un salto. Se ne va e torna col velo, in
    dissolvenza, e da nascosta non prende il puntatore. */
