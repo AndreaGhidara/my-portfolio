@@ -6,6 +6,30 @@ import { installaIntersectionObserver } from "@/test/intersectionObserver";
 import it_ from "../../../../../../messages/it.json";
 import en_ from "../../../../../../messages/en.json";
 import { Gioco } from "../Gioco";
+import type { IdLivello, LivelloProps } from "../livelli";
+
+/**
+ * Qui si prova il guscio, non i livelli: ognuno ha le sue prove. Al posto dei
+ * quattro livelli veri c'e' un banco finto con la stessa radice, un pulsante
+ * che chiama onAvanti e `visibile` scritto in chiaro, cosi' si vede anche che
+ * il guscio lo passa giu'. Il finale resta quello vero: e' del guscio.
+ */
+const { livelloFinto } = vi.hoisted(() => ({
+  livelloFinto: (id: IdLivello) =>
+    function LivelloFinto({ onAvanti, visibile }: LivelloProps) {
+      return (
+        <div className="banco" data-gioco-livello={id} data-visibile={visibile ? "si" : "no"}>
+          <button type="button" onClick={onAvanti}>
+            avanti finto
+          </button>
+        </div>
+      );
+    },
+}));
+vi.mock("../Schermo", () => ({ Schermo: livelloFinto("schermo") }));
+vi.mock("../Logiche", () => ({ Logiche: livelloFinto("logiche") }));
+vi.mock("../Pannello", () => ({ Pannello: livelloFinto("pannello") }));
+vi.mock("../Notte", () => ({ Notte: livelloFinto("notte") }));
 
 const comune = it_.services.gioco.comune;
 const finale = it_.services.gioco.finale;
@@ -16,10 +40,9 @@ const banco = (container: HTMLElement) =>
 const barrette = (nome = comune.barrette) =>
   within(screen.getByRole("group", { name: nome })).getAllByRole("button");
 
-/** Il pulsante «avanti» dei segnaposto: l'unico del banco finche' i livelli
- *  veri non arrivano. */
+/** Il pulsante del livello finto che chiama onAvanti. */
 const avanti = (container: HTMLElement) =>
-  within(banco(container)).getByRole("button", { name: new RegExp(comune.avanti) });
+  within(banco(container)).getByRole("button", { name: "avanti finto" });
 
 beforeEach(() => {
   installaIntersectionObserver();
@@ -125,11 +148,23 @@ describe("il gioco, il giro intero", () => {
   });
 });
 
+describe("il gioco passa ai livelli se e' sullo schermo", () => {
+  it("visibile parte vero, diventa falso quando il gioco esce, e torna vero al rientro", () => {
+    vi.unstubAllGlobals();
+    const io = installaIntersectionObserver();
+    const { container } = renderConTesti(<Gioco />);
+    expect(banco(container)).toHaveAttribute("data-visibile", "si");
+    io.esce();
+    expect(banco(container)).toHaveAttribute("data-visibile", "no");
+    io.entra();
+    expect(banco(container)).toHaveAttribute("data-visibile", "si");
+  });
+});
+
 describe("il gioco in inglese", () => {
-  it("barrette, riga e banco parlano la lingua della pagina", () => {
+  it("barrette e riga parlano la lingua della pagina", () => {
     renderConTesti(<Gioco />, { locale: "en" });
     expect(barrette(en_.services.gioco.comune.barrette)[0]).toHaveTextContent("1 · screen");
     expect(screen.getByText(/First build the screen/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /next/ })).toBeInTheDocument();
   });
 });
