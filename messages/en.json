@@ -444,7 +444,71 @@
         }
       },
       "notte": {
-        "titolo": "The bakery's night"
+        "titolo": "The bakery's night",
+        "prepara": {
+          "occhiello": "11 pm · the bakery closes",
+          "titolo": "What do you set up before bed?",
+          "spiega": "Switch on what you want ready. Then the night runs alone.",
+          "vai": "go to sleep"
+        },
+        "corsa": {
+          "occhiello": "the night",
+          "titolo": "You sleep. The site doesn't.",
+          "spiega": "Watch the strip up there: green the site is up, red it's down.",
+          "zzz": "zzz"
+        },
+        "mattina": {
+          "occhiello": "7 am · the report",
+          "tutto": "Eight hours of eight. Nobody noticed.",
+          "ore": "The site was up {ore, number} hours of 8",
+          "spiegaTutto": "That's the whole point: infrastructure only shows when it's missing.",
+          "spiegaParte": "What went down wasn't ready. You set it up once, then it works every night.",
+          "rifai": "redo the night",
+          "meglio": "prepare better",
+          "finale": "the finale"
+        },
+        "cielo": {
+          "orologio": "bakery asleep · site awake",
+          "apre": "7 am · bakery opens"
+        },
+        "parato": "held",
+        "giu": "down",
+        "giuOre": "down {ore, number} h",
+        "giuMin": "down {min} min",
+        "voci": {
+          "dominio": "The domain",
+          "sicurezza": "Security",
+          "dati": "The data",
+          "copie": "Backups",
+          "dove": "Location",
+          "velocita": "Speed"
+        },
+        "eventi": {
+          "dominio": {
+            "fatto": "the fornoaurora.it domain expires",
+            "parato": "renewed on its own"
+          },
+          "sicurezza": {
+            "fatto": "2,000 passwords tried on the client area",
+            "parato": "locked after three tries"
+          },
+          "dati": {
+            "fatto": "a fault shuts the server down",
+            "parato": "data restarts intact"
+          },
+          "copie": {
+            "fatto": "an update wipes the catalogue",
+            "parato": "restored from the 3 am copy"
+          },
+          "dove": {
+            "fatto": "first customers visit from Brescia",
+            "parato": "server in Milan: instant"
+          },
+          "velocita": {
+            "fatto": "a post brings 800 people at once",
+            "parato": "pages ready, they hold"
+          }
+        }
       },
       "finale": {
         "testa": "end · 4 levels of 4",
