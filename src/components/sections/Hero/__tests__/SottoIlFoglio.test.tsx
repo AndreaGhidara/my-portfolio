@@ -70,7 +70,7 @@ describe("la seconda sezione che passa sopra la prima", () => {
 });
 
 describe("le regole dell'effetto in sezioni/sopra.css", () => {
-  const blocco = regole(undefined, { dopo: "LA SECONDA SEZIONE PASSA SOPRA LA PRIMA" });
+  const blocco = regole().filter((r) => r.file.endsWith(path.join("sezioni", "sopra.css")));
   const dove = (selettore: RegExp) => blocco.filter((r) => selettore.test(r.selettore));
 
   it("hanno un blocco loro", () => {

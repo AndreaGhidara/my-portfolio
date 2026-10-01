@@ -63,11 +63,12 @@ export type Coat = {
 
 export type Surface = {
   /**
-   * La PRIMA RIGA, esatta, della regola che porta la ricetta in `sezioni/tavolo.css`.
-   * La regola del tema scuro e' la stessa preceduta da `[data-theme="dark"] `.
-   * E' un ancoraggio per la prova del contratto, non un selettore da usare
-   * altrove: si cerca a capo riga perche' `[data-desk-shape] {` e' contenuto
-   * per intero dentro `[data-theme="dark"] [data-desk-shape] {`.
+   * Il selettore della regola che porta la ricetta in `sezioni/tavolo.css`,
+   * come lo si scrive in testa alla regola: la graffa o la virgola in coda
+   * la prova del contratto le toglie, e cerca il selettore intero fra quelli
+   * della lista. La regola del tema scuro e' la stessa preceduta da
+   * `[data-theme="dark"] `. E' un ancoraggio per la prova, non un selettore
+   * da usare altrove.
    */
   anchor: string;
   family: Family;
