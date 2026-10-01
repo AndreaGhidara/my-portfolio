@@ -1,4 +1,5 @@
 import type { ProcessDelivery } from "@/content/process";
+import { due } from "@/lib/formato";
 import { DeskShapeArt } from "../Services/DeskObject";
 import { ProcessSpecimen } from "./ProcessSpecimen";
 import type { ProcessDeliveryView } from "./ProcessView";
@@ -30,7 +31,7 @@ export function ProcessBlock({
     <li data-process-item data-lato={piece.lato}>
       <div data-process-text>
         <p className="eyebrow">
-          {String(index + 1).padStart(2, "0")} · {delivery.quando}
+          {due(index + 1)} · {delivery.quando}
         </p>
         <h3>{delivery.titolo}</h3>
         <p data-process-lead>{delivery.lead}</p>

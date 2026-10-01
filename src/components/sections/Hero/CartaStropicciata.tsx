@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useMotionLevel } from "@/animations/motionPolicy";
+import { palette } from "@/styles/palette";
 import { GRADINI, RAGGIO, maglia, veloPer, type Vertice } from "./carta/geometria";
 import { accartoccia, sorgente } from "./carta/disegno";
 import { aRiposo, lancio, passo, type Pezzo } from "./carta/fisica";
@@ -45,8 +46,8 @@ export function CartaStropicciata() {
     if (!nome || immagini.length === 0) return;
 
     const stile = getComputedStyle(document.body);
-    const carta = stile.getPropertyValue("--bg").trim() || "#F5F1E8";
-    const riga = stile.getPropertyValue("--line").trim() || "#D9D3C4";
+    const carta = stile.getPropertyValue("--bg").trim() || palette.paper;
+    const riga = stile.getPropertyValue("--line").trim() || palette.graph;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
 
     type Lettera = {

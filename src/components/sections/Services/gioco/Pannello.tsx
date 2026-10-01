@@ -2,7 +2,7 @@
 
 import { useEffect, useReducer, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
-import type { LivelloProps } from "./livelli";
+import { numeroLivello, type LivelloProps } from "./livelli";
 import { Icona, type IconaServizio } from "./icone";
 
 /**
@@ -162,7 +162,7 @@ export function Pannello({ onAvanti, visibile }: LivelloProps) {
     <div className="banco" data-gioco-livello="pannello">
       <div className="sopra reticolo">
         <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: 3, nome: comune("livelli.pannello") })}</span>
+          <span className="livello">{comune("etichetta", { numero: numeroLivello("pannello"), nome: comune("livelli.pannello") })}</span>
           <span className="destra">{conta}</span>
         </div>
 

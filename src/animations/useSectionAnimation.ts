@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import { useMotionLevel, type MotionLevel } from "./motionPolicy";
+import { quandoLibero } from "./quandoLibero";
 import type * as Presets from "./presets";
 
 /** Quello che una sezione riceve per costruire le sue animazioni. */
@@ -77,15 +78,11 @@ export function useSectionAnimation(
       }, scope.current ?? undefined);
     };
 
-    const suIdle = typeof window !== "undefined" && "requestIdleCallback" in window;
-    const id = suIdle
-      ? window.requestIdleCallback(() => void avvia(), { timeout: 800 })
-      : window.setTimeout(() => void avvia(), 200);
+    const annulla = quandoLibero(() => void avvia());
 
     return () => {
       vivo = false;
-      if (suIdle) window.cancelIdleCallback(id as number);
-      else window.clearTimeout(id as number);
+      annulla();
       // Prima quello che ha registrato `build` (ascoltatori, guide), poi il
       // contesto: al contrario, il revert toglierebbe di mezzo gli elementi su
       // cui la pulizia deve ancora lavorare.

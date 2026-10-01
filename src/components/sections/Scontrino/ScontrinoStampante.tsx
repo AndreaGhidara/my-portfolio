@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useMotionLevel } from "@/animations/motionPolicy";
+import { due } from "@/lib/formato";
 import { ScontrinoFigura, ScontrinoSchema } from "./ScontrinoSchema";
 import {
   CADUTA,
@@ -44,8 +45,6 @@ export type TestiStampante = {
   scala: string;
   firma: string;
 };
-
-const due = (n: number) => String(n).padStart(2, "0");
 
 /**
  * Le righe dello scontrino, una per elemento. Il titolo grande ha la sua

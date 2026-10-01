@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import type Lenis from "lenis";
 import { useMotionLevel } from "@/animations/motionPolicy";
+import { quandoLibero } from "@/animations/quandoLibero";
 
 /**
  * Lo scroll fluido acceso in questo momento, o null. Serve a chi deve portare
@@ -92,15 +93,11 @@ export function SmoothScroll() {
     // Dopo la prima pittura, come le animazioni: qui non c'e' niente da
     // mostrare, c'e' solo da rendere piu' morbido un gesto che l'utente non ha
     // ancora fatto.
-    const suIdle = "requestIdleCallback" in window;
-    const id = suIdle
-      ? window.requestIdleCallback(() => void avvia(), { timeout: 800 })
-      : window.setTimeout(() => void avvia(), 200);
+    const annulla = quandoLibero(() => void avvia());
 
     return () => {
       vivo = false;
-      if (suIdle) window.cancelIdleCallback(id as number);
-      else window.clearTimeout(id as number);
+      annulla();
       smonta?.();
     };
   }, [level]);
