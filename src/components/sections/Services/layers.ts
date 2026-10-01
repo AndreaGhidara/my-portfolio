@@ -1,8 +1,5 @@
 import { deskLayers, type DeskShape } from "@/content/desk";
 
-/** Il formato del mondo. Ce n'era anche uno verticale, per il telefono: sotto i
- *  1024px la sezione e' diventata il gioco del metodo, e il formato e' uno. */
-export type DeskLayout = "wide";
 export type Placement = { x: number; y: number; rotate: number };
 export type Beat = { from: number; span: number };
 
@@ -10,10 +7,10 @@ export type Beat = { from: number; span: number };
  * Le proporzioni del mondo, e nient'altro. Le coordinate degli oggetti sono
  * in percentuale: il mondo prende la misura che vuole dal CSS (aspect-ratio
  * piu' width) e qui dentro non si sa quanto e' grande lo schermo.
+ *
+ * Il formato e' uno, largo: sotto i 1024px la sezione e' il gioco del metodo.
  */
-export const WORLD: Record<DeskLayout, { width: number; height: number }> = {
-  wide: { width: 1440, height: 920 },
-};
+export const WORLD = { width: 1440, height: 920 };
 
 /** Il laptop non e' uno degli oggetti dello schedario: e' il centro, ed e' una
  *  sagoma anche lui. */
@@ -51,7 +48,7 @@ export const SHAPE_BOX: Record<DeskDrawing, { w: number; h: number }> = {
  * salgono INSIEME, che e' il motivo per cui il conto e' onesto. Su schermo un
  * foglio passa da 103 a 98 pixel.
  */
-export const DRAW_SCALE: Record<DeskLayout, number> = { wide: 0.95 };
+export const DRAW_SCALE = 0.95;
 
 /**
  * Le cifre con cui una percentuale arriva al CSS. Non e' una rifinitura: quel
@@ -75,8 +72,8 @@ const quota = (n: number) => +n.toFixed(CIFRE);
  * Arrotondata come tutte le percentuali che finiscono in uno style inline: vedi
  * la nota di CIFRE.
  */
-export function drawWidth(layout: DeskLayout, shape: DeskDrawing): number {
-  return quota((DRAW_SCALE[layout] * SHAPE_BOX[shape].w * 100) / WORLD[layout].width);
+export function drawWidth(shape: DeskDrawing): number {
+  return quota((DRAW_SCALE * SHAPE_BOX[shape].w * 100) / WORLD.width);
 }
 
 /**
@@ -90,9 +87,9 @@ export function drawWidth(layout: DeskLayout, shape: DeskDrawing): number {
  * rettangolo alto qualche millesimo piu' di quello disegnato: poco, ma un
  * modello che non parte da quello che il browser ha in mano non e' il modello.
  */
-export function drawHeight(layout: DeskLayout, shape: DeskDrawing): number {
+export function drawHeight(shape: DeskDrawing): number {
   const { w, h } = SHAPE_BOX[shape];
-  return (drawWidth(layout, shape) * h * WORLD[layout].width) / (w * WORLD[layout].height);
+  return (drawWidth(shape) * h * WORLD.width) / (w * WORLD.height);
 }
 
 /**
@@ -105,12 +102,8 @@ export function drawHeight(layout: DeskLayout, shape: DeskDrawing): number {
  * Attenzione: questo e' il disegno, non l'oggetto. L'oggetto e' il disegno PIU'
  * la sua etichetta, e si misura con objectFootprint().
  */
-export function objectExtent(
-  layout: DeskLayout,
-  shape: DeskDrawing,
-  rotate: number,
-): { x: number; y: number } {
-  const f = objectFootprint(layout, shape, rotate, false);
+export function objectExtent(shape: DeskDrawing, rotate: number): { x: number; y: number } {
+  const f = objectFootprint(shape, rotate, false);
   return { x: f.x1, y: f.y1 };
 }
 
@@ -145,7 +138,7 @@ export const LABEL = {
   height: 2.6,
   /** Stacco sotto il disegno, in frazione della sua altezza (in CSS: top 104%). */
   gap: 0.04,
-  em: { wide: 1.197 } as Record<DeskLayout, number>,
+  em: 1.197,
 };
 
 /**
@@ -155,24 +148,22 @@ export const LABEL = {
  * quindi non basta una mezza estensione per lato.
  */
 export function objectFootprint(
-  layout: DeskLayout,
   shape: DeskDrawing,
   rotate: number,
   labelled: boolean,
 ): { x0: number; x1: number; y0: number; y1: number } {
-  const halfX = drawWidth(layout, shape) / 2;
-  const halfY = drawHeight(layout, shape) / 2;
+  const halfX = drawWidth(shape) / 2;
+  const halfY = drawHeight(shape) / 2;
   let x0 = -halfX;
   let x1 = halfX;
   const y0 = -halfY;
   let y1 = halfY;
   if (labelled) {
-    const em = LABEL.em[layout];
+    const em = LABEL.em;
     const labelX = (LABEL.width * em) / 2;
     // L'altezza dell'etichetta e' in em, cioe' in frazioni della LARGHEZZA del
-    // mondo: va riportata sull'altezza, o il mondo verticale la conta due volte.
-    const labelY =
-      LABEL.height * em * (WORLD[layout].width / WORLD[layout].height);
+    // mondo: va riportata sull'altezza, o in un mondo non quadrato si sbaglia.
+    const labelY = LABEL.height * em * (WORLD.width / WORLD.height);
     x0 = Math.min(x0, -labelX);
     x1 = Math.max(x1, labelX);
     y1 = halfY + LABEL.gap * halfY * 2 + labelY;
@@ -184,10 +175,10 @@ export function objectFootprint(
   // stessa unita': x e' una quota della larghezza del mondo, y una quota della
   // sua altezza. Ruotare quella coppia mista con la matrice isotropa
   // [cos -sin; sin cos] misura un rettangolo che il browser non disegna mai:
-  // nel mondo orizzontale (1440x920) tiene troppo largo e troppo poco alto.
+  // in questo mondo (1440x920) tiene troppo largo e troppo poco alto.
   // Si passa in pixel, si ruota, si torna: k e' altezza/larghezza del mondo.
   //   x' = x·cos − y·k·sin      y' = x·sin/k + y·cos
-  const k = WORLD[layout].height / WORLD[layout].width;
+  const k = WORLD.height / WORLD.width;
   const corners = [
     [x0, y0],
     [x1, y0],
@@ -213,7 +204,7 @@ export function objectFootprint(
 export const CENTRE = { width: 21, caption: 3.0 };
 
 /** Il rettangolo occupato dal centro, in percentuale del mondo. */
-export function centreBox(layout: DeskLayout): {
+export function centreBox(): {
   x0: number;
   x1: number;
   y0: number;
@@ -222,12 +213,12 @@ export function centreBox(layout: DeskLayout): {
   const halfX = CENTRE.width / 2;
   const halfY =
     ((CENTRE.width * SHAPE_BOX.laptop.h) / SHAPE_BOX.laptop.w / 2) *
-    (WORLD[layout].width / WORLD[layout].height);
+    (WORLD.width / WORLD.height);
   return { x0: 50 - halfX, x1: 50 + halfX, y0: 50 - halfY, y1: 50 + halfY + CENTRE.caption };
 }
 
 /** Quanti oggetti ha ogni strato sul tavolo. */
-export const OBJECTS_PER_LAYER: Record<DeskLayout, number> = { wide: 6 };
+export const OBJECTS_PER_LAYER = 6;
 
 /**
  * I raggi di ogni strato, in percentuale del mondo, contati dal centro. Gli
@@ -268,20 +259,16 @@ export const OBJECTS_PER_LAYER: Record<DeskLayout, number> = { wide: 6 };
  *
  * Cambiarne uno solo a occhio rompe il tavolo: si muovono tutti insieme.
  */
-const RADII: Record<DeskLayout, { rx: number; ry: number }[]> = {
-  wide: [
-    { rx: 14.97, ry: 26.28 },
-    { rx: 28.17, ry: 30.16 },
-    { rx: 41.13, ry: 31.21 },
-    { rx: 42.43, ry: 32.74 },
-  ],
-};
+const RADII: { rx: number; ry: number }[] = [
+  { rx: 14.97, ry: 26.28 },
+  { rx: 28.17, ry: 30.16 },
+  { rx: 41.13, ry: 31.21 },
+  { rx: 42.43, ry: 32.74 },
+];
 
 /** Da dove parte a distribuire gli oggetti ogni strato. Sfalsati apposta:
  *  allineati, i quattro strati formavano dei raggi e sembrava un sole. */
-const START_ANGLE: Record<DeskLayout, number[]> = {
-  wide: [81.09, 166.32, 115.17, 147.81],
-};
+const START_ANGLE: number[] = [81.09, 166.32, 115.17, 147.81];
 
 /**
  * Quanto ogni oggetto si scosta, in gradi, dal posto regolare che gli toccava
@@ -289,14 +276,13 @@ const START_ANGLE: Record<DeskLayout, number[]> = {
  * oggetti ogni sessanta gradi si leggono come il quadrante di un orologio, non
  * come un piano su cui qualcuno lavora.
  *
- * E' anche l'unica cosa che fa spazio, e nel mondo orizzontale e' LA cosa che
- * fa spazio. Dal bordo del laptop al bordo del mondo non ci stanno quattro
+ * E' anche l'unica cosa che fa spazio, ed e' LA cosa che fa spazio. Dal bordo del laptop al bordo del mondo non ci stanno quattro
  * ingombri incolonnati: i quattro anelli devono per forza intrecciarsi, e
  * l'unico modo di tenerli leggibili e' che dove un anello mette un oggetto il
  * vicino abbia un vuoto. Cioe' e' qui, non nei raggi, che si decide se si
  * vedono quattro corone o una nuvola.
  *
- * Per questo nel mondo orizzontale gli scostamenti sono VENTIQUATTRO e non sei:
+ * Per questo gli scostamenti sono VENTIQUATTRO e non sei:
  * uno per ogni oggetto di ogni anello. Prima erano sei, condivisi dai quattro
  * strati: meno numeri, e per un po' e' sembrata economia. Non lo era: con lo
  * stesso schema di irregolarita' ripetuto quattro volte, i quattro anelli
@@ -311,14 +297,12 @@ const START_ANGLE: Record<DeskLayout, number[]> = {
  * rilegga la nota su RADII: si muovono tutti insieme, e le prove che li tengono
  * sono i due pavimenti d'aria.
  */
-const ANGLE_OFFSET: Record<DeskLayout, number[][]> = {
-  wide: [
-    [-12.71, 3.32, 1.05, 11.32, -1.78, -1.19],
-    [-1.17, -25.2, 27.49, -2.06, -24.23, 25.19],
-    [-0.49, 14.55, -7.05, -0.94, -4.15, -1.9],
-    [-7.06, 11.24, -17.12, -6.61, 14.34, 5.23],
-  ],
-};
+const ANGLE_OFFSET: number[][] = [
+  [-12.71, 3.32, 1.05, 11.32, -1.78, -1.19],
+  [-1.17, -25.2, 27.49, -2.06, -24.23, 25.19],
+  [-0.49, 14.55, -7.05, -0.94, -4.15, -1.9],
+  [-7.06, 11.24, -17.12, -6.61, 14.34, 5.23],
+];
 
 /** Distanza fra il perimetro dello strato e il centro dell'oggetto, in % di mezzo mondo. */
 const PAD = 2.4;
@@ -332,7 +316,7 @@ const PAD = 2.4;
  * ha separato gli anelli ha portato questo numero da 25,2 a 28,68, il quindici
  * per cento piu' in fuori, e l'apertura era rimasta indietro.
  */
-export const FIRST_RING_REACH = RADII.wide[0].ry + PAD;
+export const FIRST_RING_REACH = RADII[0].ry + PAD;
 
 /**
  * Intersezione fra un raggio e il perimetro di un rettangolo. Restituisce lo
@@ -351,13 +335,12 @@ function onRect(angle: number, rx: number, ry: number): [number, number] {
  * partissero da due misure diverse, la prova non proverebbe il disegno.
  */
 export function objectBox(
-  layout: DeskLayout,
   layer: number,
   index: number,
 ): { x0: number; x1: number; y0: number; y1: number } {
   const object = deskLayers[layer].objects[index];
-  const placement = placeObject(layout, layer, index);
-  const f = objectFootprint(layout, object.shape, placement.rotate, !object.mute);
+  const placement = placeObject(layer, index);
+  const f = objectFootprint(object.shape, placement.rotate, !object.mute);
   return {
     x0: placement.x + f.x0,
     x1: placement.x + f.x1,
@@ -366,13 +349,11 @@ export function objectBox(
   };
 }
 
-export function placeObject(layout: DeskLayout, layer: number, index: number): Placement {
-  const count = OBJECTS_PER_LAYER[layout];
-  const { rx, ry } = RADII[layout][layer];
+export function placeObject(layer: number, index: number): Placement {
+  const count = OBJECTS_PER_LAYER;
+  const { rx, ry } = RADII[layer];
   const angle =
-    ((START_ANGLE[layout][layer] + index * (360 / count) + ANGLE_OFFSET[layout][layer][index]) *
-      Math.PI) /
-    180;
+    ((START_ANGLE[layer] + index * (360 / count) + ANGLE_OFFSET[layer][index]) * Math.PI) / 180;
   const [dx, dy] = onRect(angle, rx + PAD, ry + PAD);
   // Deterministico: nessun Math.random. Il tavolo deve uscire identico a ogni
   // render, o server e client disegnano due tavoli diversi e React protesta.

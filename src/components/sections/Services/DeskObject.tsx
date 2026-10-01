@@ -8,7 +8,6 @@ import {
   drawWidth,
   type Beat,
   type DeskDrawing,
-  type DeskLayout,
   type Placement,
 } from "./layers";
 
@@ -79,7 +78,6 @@ export function DeskObject({
   shape,
   label,
   sample,
-  layout,
   placement,
   beat,
   href,
@@ -91,7 +89,6 @@ export function DeskObject({
   /** Il frammento che l'oggetto mostra di se'. Due oggetti non ce l'hanno, ed e'
    *  dichiarato in content/desk.ts insieme alla ragione. */
   sample?: SampleId;
-  layout: DeskLayout;
   placement: Placement;
   beat: Beat;
   /** Solo il post-it bianco ce l'ha. */
@@ -118,7 +115,7 @@ export function DeskObject({
         {
           left: `${placement.x}%`,
           top: `${placement.y}%`,
-          width: `${drawWidth(layout, shape)}%`,
+          width: `${drawWidth(shape)}%`,
           "--rot": `${placement.rotate}deg`,
           "--from": beat.from,
           "--span": beat.span,

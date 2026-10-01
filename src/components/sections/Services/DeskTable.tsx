@@ -7,7 +7,6 @@ import {
   WORLD,
   objectBeat,
   placeObject,
-  type DeskLayout,
 } from "./layers";
 import { DeskObject, DeskShapeArt } from "./DeskObject";
 
@@ -38,7 +37,6 @@ export function DeskTable({
   centre,
   blank,
   note,
-  layout,
 }: {
   layers: DeskLayerData[];
   centre: string;
@@ -46,18 +44,17 @@ export function DeskTable({
   blank: string;
   /** Quello che c'e' scritto sul post-it prima che lo si prema. */
   note: string;
-  layout: DeskLayout;
 }) {
-  const shown = OBJECTS_PER_LAYER[layout];
-
   return (
     <div
       data-desk-world
-      data-layout={layout}
+      // Il formato e' uno solo, ma l'attributo resta: e' quello che la camera
+      // di DeskStage e il CSS cercano per trovare il mondo.
+      data-layout="wide"
       style={
         {
-          "--world-w": WORLD[layout].width,
-          "--world-h": WORLD[layout].height,
+          "--world-w": WORLD.width,
+          "--world-h": WORLD.height,
         } as CSSProperties
       }
     >
@@ -121,9 +118,8 @@ export function DeskTable({
                   shape={object.shape}
                   label={object.label}
                   sample={object.sample}
-                  layout={layout}
-                  placement={placeObject(layout, index, i)}
-                  beat={objectBeat(index, i, shown)}
+                  placement={placeObject(index, i)}
+                  beat={objectBeat(index, i, OBJECTS_PER_LAYER)}
                   // L'oggetto senza etichetta e' il post-it bianco, e non ce
                   // n'e' un altro: e' il posto per la cosa che non e' ancora
                   // stata raccontata, quindi porta dove la si racconta. Il
