@@ -34,7 +34,7 @@ const dominio = (url: string) => new URL(url).hostname.replace(/^www\./, "");
  *
  * Il foglio e' carta in tutti e due i temi, come l'editor della cassetta e'
  * scuro in tutti e due: e' un oggetto, non la pagina. I suoi colori sono suoi
- * (vedi tokens.css), e niente di quello che si ribalta col tema entra qui,
+ * (vedi sezioni/lavori.css), e niente di quello che si ribalta col tema entra qui,
  * .eyebrow compreso.
  */
 export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, onClose }: WorkDialogProps) {

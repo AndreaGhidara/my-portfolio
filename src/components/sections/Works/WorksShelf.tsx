@@ -515,7 +515,7 @@ export function WorksShelf({
       };
       corso.current = nuovo;
       schedario.current?.setAttribute("inert", "");
-      // La barra in basso resta finche' non arriva il velo (vedi tokens.css).
+      // La barra in basso resta finche' non arriva il velo (vedi sezioni/barra.css).
       document.documentElement.setAttribute("data-pratica-in-corso", "");
       setAttiva(i);
       const attesa =

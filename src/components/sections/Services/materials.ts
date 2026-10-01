@@ -63,7 +63,7 @@ export type Coat = {
 
 export type Surface = {
   /**
-   * La PRIMA RIGA, esatta, della regola che porta la ricetta in `tokens.css`.
+   * La PRIMA RIGA, esatta, della regola che porta la ricetta in `sezioni/tavolo.css`.
    * La regola del tema scuro e' la stessa preceduta da `[data-theme="dark"] `.
    * E' un ancoraggio per la prova del contratto, non un selettore da usare
    * altrove: si cerca a capo riga perche' `[data-desk-shape] {` e' contenuto

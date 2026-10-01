@@ -91,7 +91,7 @@ export function HeroMotion({ children }: { children: ReactNode }) {
   }, scope);
 
   /* data-hero-strato: e' lo strato che si stringe e sale quando la stampante
-     passa sopra (SottoIlFoglio, regole in tokens.css). Contiene solo il contenuto:
+     passa sopra (SottoIlFoglio, regole in sezioni/sopra.css). Contiene solo il contenuto:
      una trasformazione sulla sezione diventerebbe il riferimento dello strato
      fisso della carta, che smetterebbe di coprire lo schermo. La carta sta
      fuori, in HeroView. */

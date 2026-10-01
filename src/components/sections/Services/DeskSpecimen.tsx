@@ -26,7 +26,7 @@ import type { SampleId } from "@/content/desk";
  * elementi sarebbero ventidue disegni da mantenere; qui sono composizioni di
  * poche marche ricorrenti (una riga, un blocco, una tessera, un testo mono) e
  * il foglio di stile ne dichiara la forma una volta sola. Quello che cambia da
- * un campione all'altro e' la DISPOSIZIONE, che sta in tokens.css accanto a
+ * un campione all'altro e' la DISPOSIZIONE, che sta in sezioni/tavolo.css accanto a
  * tutto il resto del tavolo.
  */
 

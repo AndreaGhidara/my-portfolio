@@ -54,7 +54,7 @@
 /* Da desktop la sezione e' il tavolo con la camera, e il gioco non c'e':
    display:none lo toglie anche dall'albero di accessibilita', quindi i suoi
    pulsanti non sono fermate del Tab che nessuno vede. E' lo stesso patto del
-   mondo largo, che sotto i 1024px fa il contrario (tokens.css). */
+   mondo largo, che sotto i 1024px fa il contrario (sezioni/tavolo.css). */
 @media (min-width: 1024px) {
   [data-gioco] { display: none; }
 }

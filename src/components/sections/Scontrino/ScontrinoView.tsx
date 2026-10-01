@@ -25,7 +25,7 @@ export type ScontrinoViewProps = {
  * c'era prima (SottoIlFoglio).
  *
  * Il fondo e' arancione e di notte resta arancione: dentro solo carta e
- * inchiostro, come nel percorso. Le regole stanno in tokens.css.
+ * inchiostro, come nel percorso. Le regole stanno in sezioni/scontrino.css.
  */
 export function ScontrinoView({ eyebrow, title, lead, locale, servizi, testi }: ScontrinoViewProps) {
   return (

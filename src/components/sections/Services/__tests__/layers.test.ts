@@ -416,7 +416,7 @@ describe("la camera", () => {
 
 /**
  * L'etichetta e' un contratto fra due file che non si parlano: layers.ts tiene
- * il posto, tokens.css lo disegna. Cambiare interlinea, respiro o stacco nel
+ * il posto, sezioni/tavolo.css lo disegna. Cambiare interlinea, respiro o stacco nel
  * foglio di stile senza dirlo a LABEL fa misurare alla geometria un rettangolo
  * piu' piccolo di quello vero, e nessuna prova di sovrapposizione se ne
  * accorge, perche' una prova di collisione e' cieca per costruzione a un

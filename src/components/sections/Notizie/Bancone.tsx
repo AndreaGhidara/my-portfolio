@@ -7,7 +7,7 @@ import { disponi, raccolte, riempi, titoloDi, type Pallina } from "./formato";
 import { Ritaglio } from "./Ritaglio";
 import type { TestiNotizie } from "./tipi";
 
-/** Sotto questa larghezza il giornale sta sotto la macchina: la stessa soglia e' in tokens.css. */
+/** Sotto questa larghezza il giornale sta sotto la macchina: la stessa soglia e' in sezioni/notizie.css. */
 export const TELEFONO = "(max-width: 959px)";
 
 type Stato = { tipo: "attesa" } | { tipo: "errore" } | { tipo: "pronto"; raccolta: Raccolta };

@@ -10,7 +10,7 @@ import type { Passo, TestiCassetta } from "./tipi";
 
 /**
  * Dove si vede la mappa: con il mouse, e da 1280px in su. Sotto, o con il
- * dito, l'editor. La stessa condizione sta in tokens.css, che e' chi sceglie
+ * dito, l'editor. La stessa condizione sta in sezioni/cassetta.css, che e' chi sceglie
  * davvero quale delle due scatole si vede: qui serve solo a sapere quale
  * animare.
  */
