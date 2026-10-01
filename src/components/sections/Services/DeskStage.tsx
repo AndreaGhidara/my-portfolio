@@ -128,10 +128,12 @@ export function DeskStage({
     stage.current?.style.removeProperty("--s");
   }, []);
 
-  // useGSAP con delle dipendenze rimanda il revert allo smontaggio, non al
-  // cambio di livello, e a livello "none" useSectionAnimation non chiama
-  // nemmeno la build. Chi esce da "full" non avrebbe quindi nessuno a spegnergli
-  // la camera: questo effetto e' quel qualcuno.
+  // Questo effetto nasce quando le animazioni passavano da useGSAP, che con
+  // delle dipendenze rimandava il revert allo smontaggio e non al cambio di
+  // livello: chi usciva da "full" non aveva nessuno a spegnergli la camera.
+  // Oggi useSectionAnimation pulisce anche al cambio di livello (e a "none" non
+  // chiama nemmeno la build); questo resta la rete che spegne la camera ogni
+  // volta che il livello non e' "full", comunque ci si arrivi.
   //
   // useLayoutEffect e non useEffect: il commit che porta via il CSS della camera
   // e questa pulizia devono stare nello stesso giro. Passivo, si spegne DOPO che
@@ -212,8 +214,8 @@ export function DeskStage({
       onUpdate: (self) => write(self.progress),
     });
 
-    // Anche lo smontaggio passa di qui: gsap.context di useGSAP chiama questa
-    // al revert. Le due property nessun altro le toglierebbe, e restassero
+    // Anche lo smontaggio passa di qui: useSectionAnimation chiama quello che
+    // la build restituisce, allo smontaggio e a ogni cambio di livello. Le due property nessun altro le toglierebbe, e restassero
     // appiccicate a --p = 0 il tavolo resterebbe vuoto per sempre.
     return spegni;
   }, scope);
