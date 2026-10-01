@@ -1,3 +1,4 @@
+import { due } from "@/lib/formato";
 import type { IconaCloud } from "./icone";
 
 /**
@@ -35,7 +36,7 @@ export const minutoDelPasso = (passo: number) => passo * MINUTI_A_PASSO;
 /** «23:40», «07:00»: l'ora del muro, dai minuti dalle 23. */
 export function oraDi(minuto: number): string {
   const ore = (23 + Math.floor(minuto / 60)) % 24;
-  return `${String(ore).padStart(2, "0")}:${String(minuto % 60).padStart(2, "0")}`;
+  return `${due(ore)}:${due(minuto % 60)}`;
 }
 
 type Taglio = readonly [inizio: number, fine: number];

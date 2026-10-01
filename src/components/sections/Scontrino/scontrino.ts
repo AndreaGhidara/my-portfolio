@@ -10,6 +10,8 @@
  * cambiarli qui senza ripassare da li' e' ritarare a occhio chiuso.
  */
 
+import { due } from "@/lib/formato";
+
 /** Caratteri di una riga dello scontrino: i separatori e le righe allineate ai due capi. */
 export const LARGHEZZA = 32;
 
@@ -49,8 +51,6 @@ export type DatiScontrino = {
   totale: string;
   daParlarne: string;
 };
-
-const due = (n: number) => String(n).padStart(2, "0");
 
 /** Due testi ai capi della riga, con gli spazi in mezzo. */
 export function aiLati(sinistra: string, destra: string): string {

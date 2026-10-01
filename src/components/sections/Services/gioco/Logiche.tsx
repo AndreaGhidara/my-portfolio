@@ -2,7 +2,7 @@
 
 import { useState, type CSSProperties } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import type { LivelloProps } from "./livelli";
+import { numeroLivello, type LivelloProps } from "./livelli";
 import { Icona, type IconaNodo } from "./icone";
 import { BOTTEGA, ILLUSTRAZIONI, VIEWBOX_ILLUSTRAZIONI, variabiliSito } from "./sitoFinto";
 import { GIORNO_PIENO, Scena, TORTA_FINITA, type StatoNodo, type TestiScene } from "./logicheScene";
@@ -118,7 +118,7 @@ export function Logiche({ onAvanti }: LivelloProps) {
         </svg>
 
         <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: 2, nome: comune("livelli.logiche") })}</span>
+          <span className="livello">{comune("etichetta", { numero: numeroLivello("logiche"), nome: comune("livelli.logiche") })}</span>
           <span className="destra regole">
             {t("regole")}
             {stati.map((x, i) => (

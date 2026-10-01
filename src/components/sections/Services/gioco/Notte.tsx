@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import type { LivelloProps } from "./livelli";
+import { numeroLivello, type LivelloProps } from "./livelli";
 import { Icona } from "./icone";
 import {
   EVENTI,
@@ -78,7 +78,7 @@ export function Notte({ onAvanti, visibile }: LivelloProps) {
       <div className="sopra">
         <div className="stelle" aria-hidden="true" />
         <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: 4, nome: comune("livelli.notte") })}</span>
+          <span className="livello">{comune("etichetta", { numero: numeroLivello("notte"), nome: comune("livelli.notte") })}</span>
           <span className="destra">{mattina ? t("cielo.apre") : t("titolo")}</span>
         </div>
         <div className="orologio">

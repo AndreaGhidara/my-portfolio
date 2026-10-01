@@ -1,12 +1,10 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
+import { due } from "@/lib/formato";
 import { WorkShot } from "./WorkShot";
 import type { Cartella } from "./scivola";
 import type { WorkCaseData } from "./types";
-
-/** Il numero della cartella a due cifre: sulla faccia e sulla pratica. */
-export const due = (n: number) => String(n).padStart(2, "0");
 
 /**
  * Una cartella dell'archivio: la linguetta col nome, il dorso con un foglio

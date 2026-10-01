@@ -11,7 +11,7 @@ import {
 import { useTranslations } from "next-intl";
 import { palette } from "@/styles/palette";
 import { useVisibile } from "./usaVisibile";
-import { LIVELLI, type IdLivello, type LivelloProps } from "./livelli";
+import { LIVELLI, numeroLivello, type IdLivello, type LivelloProps } from "./livelli";
 import { Schermo } from "./Schermo";
 import { Logiche } from "./Logiche";
 import { Pannello } from "./Pannello";
@@ -172,7 +172,7 @@ export function Gioco() {
               }}
             >
               <i aria-hidden="true" />
-              {t("etichetta", { numero: i + 1, nome: t(`livelli.${id}`) })}
+              {t("etichetta", { numero: numeroLivello(id), nome: t(`livelli.${id}`) })}
             </button>
           );
         })}

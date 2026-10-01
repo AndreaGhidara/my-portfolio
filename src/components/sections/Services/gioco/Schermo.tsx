@@ -2,9 +2,16 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
-import type { LivelloProps } from "./livelli";
+import { numeroLivello, type LivelloProps } from "./livelli";
 import { Icona } from "./icone";
-import { CARATTERI_FINTI, IMPAGINAZIONI_FINTE, PALETTE_FINTE, SCALE_FINTE, variabiliSito } from "./sitoFinto";
+import {
+  CARATTERI_FINTI,
+  IMPAGINAZIONI_FINTE,
+  PALETTE_FINTE,
+  SCALA_INIZIALE,
+  SCALE_FINTE,
+  variabiliSito,
+} from "./sitoFinto";
 import { SitoFinto } from "./schermoSito";
 import { ATTREZZI, Cassetto, type IdAttrezzo, type Scelte } from "./schermoCassetto";
 import { Dietro } from "./schermoDietro";
@@ -21,7 +28,14 @@ import { Dietro } from "./schermoDietro";
  * schermo si fermano, e al rientro ripartono da capo.
  */
 
-const INIZIALI: Scelte = { pal: 0, car: 0, sca: 1, lay: 0, img: "pane", vista: "pc" };
+const INIZIALI: Scelte = {
+  pal: 0,
+  car: 0,
+  sca: SCALE_FINTE.indexOf(SCALA_INIZIALE),
+  lay: 0,
+  img: "pane",
+  vista: "pc",
+};
 
 const DOPO_ATTREZZI = 400;
 const DOPO_VITI = 850;
@@ -149,7 +163,7 @@ function Banco({ onAvanti, visibile, onRicomincia }: LivelloProps & { onRicominc
     >
       <div className="passo-1" inert={dietro}>
         <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: 1, nome: comune("livelli.schermo") })}</span>
+          <span className="livello">{comune("etichetta", { numero: numeroLivello("schermo"), nome: comune("livelli.schermo") })}</span>
           <span className="pallini" aria-hidden="true">
             {ATTREZZI.map((a, i) => (
               <i key={a} className={i < fatti.length ? "si" : undefined} />

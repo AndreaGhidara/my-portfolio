@@ -9,6 +9,9 @@ export const LIVELLI = ["schermo", "logiche", "pannello", "notte"] as const;
 
 export type IdLivello = (typeof LIVELLI)[number];
 
+/** Il numero che il giocatore legge: il primo livello e' l'1. */
+export const numeroLivello = (id: IdLivello) => LIVELLI.indexOf(id) + 1;
+
 /**
  * Le props di ogni livello, finale compreso.
  *

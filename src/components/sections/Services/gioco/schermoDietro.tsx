@@ -3,6 +3,7 @@
 import { useId } from "react";
 import { useTranslations } from "next-intl";
 import { Icona, type IconaNodo } from "./icone";
+import { numeroLivello } from "./livelli";
 
 /**
  * L'anteprima del livello 2: lo schermo e' caduto e si vede il circuito che
@@ -119,7 +120,7 @@ export function Dietro({ onRicomincia }: { onRicomincia: () => void }) {
       </svg>
 
       <div className="testa">
-        <span className="livello">{comune("etichetta", { numero: 2, nome: t("testa") })}</span>
+        <span className="livello">{comune("etichetta", { numero: numeroLivello("logiche"), nome: t("testa") })}</span>
       </div>
 
       <div className="didascalia">
