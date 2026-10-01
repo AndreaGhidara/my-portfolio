@@ -424,7 +424,7 @@ describe("il foglio non cambia misura da una notizia all'altra", () => {
   });
 
   it("sul telefono la notizia e la fila hanno misure fisse, e la testata non va a capo", () => {
-    expect(telefono).not.toBe("");
+    expect(regole(undefined, telefono).length, "la media del telefono non ha regole").toBeGreaterThan(0);
     expect(regola("[data-foglio-notizia]", telefono)).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
     expect(regola("[data-foglio-uscite]", telefono)).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
     expect(regola("[data-foglio-testa]", telefono)).toMatch(/flex-direction:\s*column/);
