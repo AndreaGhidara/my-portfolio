@@ -1,7 +1,6 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, it, expect } from "vitest";
 import { deskLayers } from "@/content/desk";
+import { regole } from "@/test/css";
 import it_ from "../../../../../messages/it.json";
 import en_ from "../../../../../messages/en.json";
 import {
@@ -447,31 +446,18 @@ describe("la camera", () => {
  * ingombro che si restringe. Leggere il CSS come testo e' brutto: e' anche
  * l'unica cosa in questo repository che possa cogliere quella modifica.
  */
-const TOKENS = readFileSync(resolve(process.cwd(), "src/styles/tokens.css"), "utf8")
-  // Via i commenti: qui si legge quello che il browser applica, non quello che
-  // il foglio di stile racconta di se'.
-  .replace(/\/\*[\s\S]*?\*\//g, "");
-
 /**
- * Il selettore si cerca ANCORATO A CAPO RIGA, non con un indexOf qualunque.
- * "[data-desk-world] {" e' contenuto per intero dentro
- * "[data-desk][data-motion='full'] [data-desk-world] {", che sta piu' in giu'
- * nel file: con indexOf la regola giusta si trova solo perche' l'originale
+ * Il selettore si cerca INTERO, non come pezzo di testo.
+ * "[data-desk-world]" e' contenuto per intero dentro
+ * "[data-desk][data-motion='full'] [data-desk-world]", che sta piu' in giu':
+ * cercato come testo, la regola giusta si troverebbe solo perche' l'originale
  * viene prima, e la prima regola discendente scritta piu' in alto ripunterebbe
  * in silenzio la rete di sicurezza della geometria su un margin-bottom.
- * Il ^[ \t]* tiene le regole dentro @media, che sono rientrate, ma non lascia
- * passare niente prima del selettore sulla stessa riga.
  */
-function blocco(selettore: string, ultimo = false): string {
-  const ancorato = new RegExp(
-    `^[ \\t]*${selettore.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`,
-    "gm",
-  );
-  const trovati = [...TOKENS.matchAll(ancorato)];
-  const trovato = ultimo ? trovati.at(-1) : trovati[0];
-  if (!trovato) throw new Error(`tokens.css non ha piu' la regola ${selettore}`);
-  const apre = TOKENS.indexOf("{", trovato.index);
-  return TOKENS.slice(apre + 1, TOKENS.indexOf("}", apre));
+function blocco(selettore: string): string {
+  const [trovata] = regole(selettore);
+  if (!trovata) throw new Error(`il foglio di stile non ha piu' la regola ${selettore}`);
+  return trovata.corpo;
 }
 
 function misura(testo: string, dichiarazione: RegExp, dove: string): number[] {
@@ -480,8 +466,8 @@ function misura(testo: string, dichiarazione: RegExp, dove: string): number[] {
   return trovato.slice(1).map(Number);
 }
 
-const ETICHETTA = blocco("[data-desk-object] [data-desk-label] {");
-const MONDO = blocco("[data-desk-world] {");
+const ETICHETTA = blocco("[data-desk-object] [data-desk-label]");
+const MONDO = blocco("[data-desk-world]");
 
 /** Il rem del sito, e la finestra piu' stretta in cui il mondo si disegna. */
 const REM = 16;
@@ -602,7 +588,7 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
  * lo stesso 0,6em della prova delle etichette e per le stesse ragioni.
  */
 describe("la domanda sul post-it ci sta dentro il post-it", () => {
-  const DOMANDA = blocco("[data-desk-ask] {");
+  const DOMANDA = blocco("[data-desk-ask]");
 
   it("in tutte e due le lingue, e in tutte le finestre in cui si disegna", () => {
     const [rientro] = misura(DOMANDA, /inset:\s*([\d.]+)%/, "domanda");
@@ -665,9 +651,9 @@ describe("la domanda sul post-it ci sta dentro il post-it", () => {
  * cioe' i due testi da leggere insieme.
  */
 describe("il titolo e la tesi hanno gli stessi numeri nei due file", () => {
-  const TITOLO = blocco('[data-desk][data-motion="full"] [data-desk-title] {');
-  const TESI = blocco('[data-desk][data-motion="full"] [data-desk-punch] {');
-  const DIDASCALIA = blocco('[data-desk][data-motion="full"] [data-desk-caption] {');
+  const TITOLO = blocco('[data-desk][data-motion="full"] [data-desk-title]');
+  const TESI = blocco('[data-desk][data-motion="full"] [data-desk-punch]');
+  const DIDASCALIA = blocco('[data-desk][data-motion="full"] [data-desk-caption]');
 
   it("il titolo esce esattamente nella finestra di TITLE_BEAT", () => {
     const [da, quanto] = misura(TITOLO, /1 - \(var\(--p, 1\) - ([\d.]+)\) \/ ([\d.]+)/, "titolo");
@@ -709,22 +695,13 @@ describe("il titolo e la tesi hanno gli stessi numeri nei due file", () => {
 
 
 /**
- * Il blocco della camera, e tutto il resto del foglio di stile. Le graffe si
- * contano invece di fermarsi alla prima: dentro una @media la prima graffa che
- * chiude e' quella della prima regola, non quella del blocco.
+ * Le regole della camera, e tutto il resto del foglio di stile. La camera e'
+ * quello che del tavolo sta dentro la media query del movimento: le altre
+ * sezioni ne hanno una loro, con le loro chiavi, e non sono la camera.
  */
 const CAMERA = (() => {
-  const chiave = "@media (prefers-reduced-motion: no-preference)";
-  const inizio = TOKENS.indexOf(chiave);
-  if (inizio < 0) throw new Error(`tokens.css non ha piu' ${chiave}`);
-  const apre = TOKENS.indexOf("{", inizio);
-  let profondita = 0;
-  let i = apre;
-  for (; i < TOKENS.length; i++) {
-    if (TOKENS[i] === "{") profondita += 1;
-    else if (TOKENS[i] === "}" && (profondita -= 1) === 0) break;
-  }
-  return { dentro: TOKENS.slice(apre + 1, i), fuori: TOKENS.slice(0, inizio) + TOKENS.slice(i + 1) };
+  const dentro = regole(/\[data-desk/, { media: "(prefers-reduced-motion: no-preference)" });
+  return { dentro, fuori: regole().filter((r) => !dentro.includes(r)) };
 })();
 
 /**
@@ -743,7 +720,11 @@ describe("il patto del fallback e' scritto in ogni riga che legge la camera", ()
     // vede intero e il fotogramma a riposo e' anche quello finale. Basta un
     // `, 1` dimenticato perche' l'opacita' diventi invalida e mezzo tavolo
     // sparisca per chi non ha il JavaScript, e nient'altro se ne accorgerebbe.
-    const letture = [...TOKENS.matchAll(/var\(\s*--[ps]\b[^)]*\)/g)].map((m) => m[0]);
+    // Le letture del tavolo: il gioco del metodo ha un --p suo, la lunghezza
+    // di una barra, che con la camera non c'entra.
+    const letture = regole(/\[data-desk/).flatMap((r) =>
+      [...r.corpo.matchAll(/var\(\s*--[ps]\b[^)]*\)/g)].map((m) => m[0]),
+    );
     // Se un giorno le letture sparissero tutte, il ciclo qui sotto sarebbe vero
     // per vuoto: il conto dice che ce ne sono ancora.
     expect(letture.length).toBeGreaterThanOrEqual(5);
@@ -763,9 +744,7 @@ describe("il movimento ha una porta sola, e due chiavi per quella porta", () => 
     // data-motion. Una regola scritta qui dentro senza la chiave si
     // applicherebbe anche a un tablet, dove il palco non aggancia niente: piano
     // sticky, track alto 380vh e nessuno che scriva --p.
-    const selettori = [...CAMERA.dentro.matchAll(/(^|\})\s*([^{}]+)\{/g)].flatMap((m) =>
-      m[2].split(",").map((s) => s.trim().replace(/\s+/g, " ")),
-    );
+    const selettori = CAMERA.dentro.flatMap((r) => r.selettori);
     expect(selettori.length).toBeGreaterThanOrEqual(9);
     for (const selettore of selettori) {
       expect(selettore, `${selettore} entra senza chiave`).toContain(
@@ -779,18 +758,19 @@ describe("il movimento ha una porta sola, e due chiavi per quella porta", () => 
     // corsa e un palco che sta fermo mentre passano. Fuori da quella porta
     // vorrebbero dire tre schermi di vuoto da scorrere a mano, con il tavolo
     // gia' finito e fermo, che e' il modo peggiore di rompere il fallback.
-    expect(CAMERA.dentro).toContain("380vh");
-    expect(CAMERA.dentro).toContain("position: sticky");
-    expect(CAMERA.fuori).not.toContain("380vh");
+    const corpi = (dove: typeof CAMERA.dentro) => dove.map((r) => r.corpo).join("\n");
+    expect(corpi(CAMERA.dentro)).toContain("380vh");
+    expect(corpi(CAMERA.dentro)).toContain("position: sticky");
+    expect(corpi(CAMERA.fuori)).not.toContain("380vh");
 
     // Non la PAROLA sticky: il PALCO. Sotto i 1024px gli oggetti di uno strato
     // si appiccicano in alto mentre si legge la loro frase, ed e' un
     // impaginato, non una camera: nessun binario, nessuna altezza di schermo,
     // niente da agganciare. Quello che non deve uscire di qui e' il palco che
     // sta fermo con i suoi 380vh dietro, e sono questi due selettori.
-    for (const blocco of CAMERA.fuori.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
-      if (!/position:\s*sticky/.test(blocco[2])) continue;
-      expect(blocco[1], `${blocco[1].trim()} rende sticky il palco fuori dalla porta`)
+    for (const { selettore, corpo } of CAMERA.fuori) {
+      if (!/position:\s*sticky/.test(corpo)) continue;
+      expect(selettore, `${selettore} rende sticky il palco fuori dalla porta`)
         .not.toMatch(/data-desk-stage|data-desk-track/);
     }
   });

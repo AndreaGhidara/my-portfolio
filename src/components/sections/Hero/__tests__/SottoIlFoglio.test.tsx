@@ -4,6 +4,7 @@ import path from "node:path";
 import { render } from "@testing-library/react";
 import { SottoIlFoglio } from "../SottoIlFoglio";
 import { HeroView } from "../HeroView";
+import { regole } from "@/test/css";
 
 const radice = path.resolve(__dirname, "../../../../..");
 const leggi = (percorso: string) => readFileSync(path.resolve(radice, percorso), "utf8");
@@ -69,40 +70,38 @@ describe("la seconda sezione che passa sopra la prima", () => {
 });
 
 describe("le regole dell'effetto in tokens.css", () => {
-  const css = leggi("src/styles/tokens.css");
-  const inizio = css.indexOf("LA SECONDA SEZIONE PASSA SOPRA LA PRIMA");
-  // Senza commenti: parlano di #hero e #scontrino, e non sono regole.
-  const blocco = inizio >= 0 ? css.slice(inizio).replace(/\/\*[\s\S]*?\*\//g, "") : "";
+  const blocco = regole(undefined, { dopo: "LA SECONDA SEZIONE PASSA SOPRA LA PRIMA" });
+  const dove = (selettore: RegExp) => blocco.filter((r) => selettore.test(r.selettore));
 
   it("hanno un blocco loro", () => {
-    expect(blocco, "il blocco dell'effetto non c'e'").not.toBe("");
+    expect(blocco.length, "il blocco dell'effetto non c'e'").toBeGreaterThan(0);
   });
 
   it("non danno a #hero ne' z-index ne' isolation", () => {
     // Sticky, Hero apre gia' un contesto suo, e lo strato fisso della carta a
     // "full" sta per questo in <body> (CartaStropicciata). Un livello dato a
     // mano alla sezione non serve a niente e confonderebbe chi legge.
-    const regole = [...blocco.matchAll(/#hero\s*\{([^}]*)\}/g)];
-    expect(regole.length, "nessuna regola su #hero: lo sticky dov'e'?").toBeGreaterThan(0);
-    for (const [, corpo] of regole) {
+    const sezione = dove(/#hero$/);
+    expect(sezione.length, "nessuna regola su #hero: lo sticky dov'e'?").toBeGreaterThan(0);
+    for (const { corpo } of sezione) {
       expect(corpo).not.toMatch(/z-index/);
       expect(corpo).not.toMatch(/isolation/);
     }
   });
 
   it("muovono Hero e la stampante solo sotto l'attributo di accensione", () => {
-    for (const [, selettore] of blocco.matchAll(/([^{}]*(?:#hero|#scontrino|\[data-hero-strato\])[^{}]*)\{/g)) {
-      expect(selettore, `${selettore.trim()} vale anche a effetto spento`).toContain("[data-acceso]");
+    for (const { selettore } of dove(/#hero|#scontrino|\[data-hero-strato\]/)) {
+      expect(selettore, `${selettore} vale anche a effetto spento`).toContain("[data-acceso]");
     }
   });
 
   it("il contenuto di Hero apre un contesto suo, o il ritratto buca il velo", () => {
-    expect(blocco).toMatch(/\[data-hero-strato\]\s*\{[^}]*isolation:\s*isolate/);
+    expect(dove(/\[data-hero-strato\]$/).map((r) => r.corpo).join("\n")).toMatch(/isolation:\s*isolate/);
   });
 
   it("velo e ombra sono inchiostro, non nero scritto a mano", () => {
-    expect(blocco).not.toMatch(/#000\b|rgba?\(/);
-    expect(blocco).toMatch(/#hero::after\s*\{[^}]*var\(--ink\)/);
-    expect(blocco).toMatch(/#scontrino\s*\{[^}]*box-shadow:[^;]*var\(--ink\)/);
+    expect(blocco.map((r) => r.corpo).join("\n")).not.toMatch(/#000\b|rgba?\(/);
+    expect(dove(/#hero::after$/).map((r) => r.corpo).join("\n")).toMatch(/var\(--ink\)/);
+    expect(dove(/#scontrino$/).map((r) => r.corpo).join("\n")).toMatch(/box-shadow:[^;]*var\(--ink\)/);
   });
 });

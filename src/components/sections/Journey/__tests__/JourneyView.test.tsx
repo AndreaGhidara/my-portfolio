@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
 import { render, screen, within } from "@testing-library/react";
 import { JourneyView, type JourneyViewProps } from "../JourneyView";
 import { journey } from "@/content/journey";
+import { regole } from "@/test/css";
 
 const props: JourneyViewProps = {
   eyebrow: "Percorso",
@@ -124,12 +124,8 @@ describe("JourneyView", () => {
   });
 });
 
-const css = readFileSync("src/styles/tokens.css", "utf8");
-
 /** Le regole del foglio di stile che riguardano il percorso, corpo compreso. */
-const regoleDelPercorso = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-  .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }))
-  .filter((r) => /\[data-journey-/.test(r.selettore));
+const regoleDelPercorso = regole(/\[data-journey-/);
 
 describe("i colori del percorso", () => {
   it("non chiedono niente ai token che cambiano col tema", () => {

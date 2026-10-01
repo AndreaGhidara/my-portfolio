@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { readFileSync } from "node:fs";
 import { act, cleanup, waitFor } from "@testing-library/react";
 import { renderConTesti } from "@/test/renderConTesti";
+import { regole } from "@/test/css";
 import { DeskStage } from "../DeskStage";
 import { cameraScale } from "../layers";
 
@@ -303,10 +303,6 @@ describe("cameraScale e' una camera, non una curva qualsiasi", () => {
 });
 
 describe("il post-it dice una cosa sola per volta", () => {
-  const css = readFileSync("src/styles/tokens.css", "utf8");
-  const regole = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-    .map(([, selettore, corpo]) => ({ selettore: selettore.trim(), corpo }));
-
   it("a tavolo fermo la nota si toglie, come si toglie al passaggio del mouse", () => {
     // Sul post-it ci stanno due scritte nello stesso punto: il conto dei caffe'
     // e la domanda che e' il nome del comando. Si danno il cambio. La domanda
@@ -314,10 +310,8 @@ describe("il post-it dice una cosa sola per volta", () => {
     // movimento, chi arriva con un puntatore grosso), e li' l'hover non
     // succede mai: senza una regola che spenga la nota nello stesso caso, le
     // due scritte si leggono una sopra l'altra.
-    const ferma = regole.find(
-      (r) =>
-        /\[data-desk\]:not\(\[data-motion="full"\]\)/.test(r.selettore) &&
-        /\[data-desk-note\]/.test(r.selettore),
+    const ferma = regole(/\[data-desk\]:not\(\[data-motion="full"\]\)/).find((r) =>
+      /\[data-desk-note\]/.test(r.selettore),
     );
     expect(ferma, "manca la regola che spegne la nota a tavolo fermo").toBeDefined();
     expect(ferma!.corpo).toMatch(/opacity:\s*0/);

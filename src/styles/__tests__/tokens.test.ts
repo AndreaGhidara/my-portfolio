@@ -2,8 +2,9 @@ import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { palette } from "../palette";
+import { regole, type Regola } from "@/test/css";
 
-const css = readFileSync(path.resolve(__dirname, "../tokens.css"), "utf8");
+const dice = (dove: Regola[], dichiarazione: RegExp) => dove.some((r) => dichiarazione.test(r.corpo));
 
 describe("tokens.css", () => {
   it("l'anello dei bottoni dell'apertura sta DENTRO, perche' il fuoco sta fuori", () => {
@@ -13,27 +14,29 @@ describe("tokens.css", () => {
     // stesso disegno: chi naviga da tastiera non saprebbe piu' dove si trova, e
     // chi usa il mouse vedrebbe comparire in hover la cosa che altrove
     // significa «sei qui». Dentro contro fuori e' tutta la differenza.
-    const blocco = css.match(/\[data-hero-cta\][\s\S]*?@media \(prefers-reduced-motion[^}]*\}[^}]*\}/)?.[0];
-    expect(blocco, "le regole dei bottoni dell'apertura non ci sono piu'").toBeTruthy();
-    expect(blocco).toMatch(/box-shadow:\s*inset/);
-    expect(blocco, "l'anello e' diventato un outline: si confonde col fuoco").not.toMatch(
-      /\boutline\s*:/,
+    const bottoni = regole(/\[data-hero-cta\]/);
+    expect(bottoni.length, "le regole dei bottoni dell'apertura non ci sono piu'").toBeGreaterThan(0);
+    expect(dice(bottoni, /box-shadow:\s*inset/)).toBe(true);
+    expect(dice(bottoni, /\boutline\s*:/), "l'anello e' diventato un outline: si confonde col fuoco").toBe(
+      false,
     );
     // E si sposta solo dove il puntatore esiste: su touch l'hover resta
     // appiccicato dopo il tocco e lascerebbe l'anello sul bottone sbagliato.
-    expect(blocco).toContain("@media (hover: hover)");
+    expect(bottoni.some((r) => r.dentro.includes("@media (hover: hover)"))).toBe(true);
   });
 
   it("definisce ogni token della palette con lo stesso valore", () => {
     const paletteVarsInCss = ["paper", "ink", "orange", "graph", "muted"];
     for (const name of paletteVarsInCss) {
-      expect(css).toContain(`--${name}: ${palette[name as keyof typeof palette]}`);
+      expect(regole().map((r) => r.dichiarazioni[`--${name}`])).toContain(
+        palette[name as keyof typeof palette],
+      );
     }
   });
 
   it("definisce il tema scuro invertendo carta e inchiostro", () => {
-    expect(css).toContain('[data-theme="dark"]');
-    expect(css).toMatch(/\[data-theme="dark"\][\s\S]*--bg:\s*var\(--ink\)/);
+    expect(regole('[data-theme="dark"]').length).toBeGreaterThan(0);
+    expect(dice(regole(/\[data-theme="dark"\]/), /--bg:\s*var\(--ink\)/)).toBe(true);
   });
 
   it("un dossier chiuso resta display:none", () => {
@@ -42,10 +45,9 @@ describe("tokens.css", () => {
     // <dialog> chiuso. Il dossier chiuso restava disegnato e, senza figli,
     // diventava una scatola alta 2px: una linea sotto le cartelle, `fixed`
     // dopo la prima apertura, quindi incollata allo schermo mentre si scorre.
-    expect(css).toMatch(/\[data-work-dialog\]:not\(\[open\]\)\s*\{[^}]*display:\s*none/);
+    expect(dice(regole("[data-work-dialog]:not([open])"), /display:\s*none/)).toBe(true);
 
-    const bareRule = /\[data-work-dialog\]\s*\{[^}]*display\s*:/;
-    expect(css).not.toMatch(bareRule);
+    expect(dice(regole(/\[data-work-dialog\]$/), /display\s*:/)).toBe(false);
   });
 
   it("ogni sagoma del tavolo ha due strati, e i due file esistono davvero", () => {
@@ -54,9 +56,10 @@ describe("tokens.css", () => {
     // si dipinge. Il tavolo resterebbe verde in ogni prova e piatto in pagina.
     for (const sagoma of ["sheet", "card", "postit", "plate", "rack", "phone", "laptop"]) {
       for (const file of [`${sagoma}.svg`, `${sagoma}-fill.svg`]) {
-        expect(css, `${file} non e' montato in tokens.css`).toContain(
-          `url("/brand/desk/${file}")`,
-        );
+        expect(
+          regole().some((r) => r.corpo.includes(`url("/brand/desk/${file}")`)),
+          `${file} non e' montato nel foglio di stile`,
+        ).toBe(true);
         expect(
           existsSync(path.resolve(__dirname, `../../../public/brand/desk/${file}`)),
           `public/brand/desk/${file} non c'e': npm run assets`,
@@ -101,8 +104,8 @@ describe("tokens.css", () => {
     // sigla e' a 1,5rem e puo' restare carta; «ITALIA» e' a 0,5rem e deve
     // stare in --on-accent, che fa 5,08:1. Il prototipo le aveva tutte e due
     // in carta, ed e' il difetto che questa prova blocca.
-    const sigla = css.match(/\[data-francobollo-sigla\]\s*\{[^}]*\}/)?.[0];
-    const paese = css.match(/\[data-francobollo-paese\]\s*\{[^}]*\}/)?.[0];
+    const sigla = regole("[data-francobollo-sigla]")[0]?.corpo;
+    const paese = regole("[data-francobollo-paese]")[0]?.corpo;
     expect(sigla, "la sigla del francobollo non c'e' piu'").toBeTruthy();
     expect(paese, "il paese del francobollo non c'e' piu'").toBeTruthy();
     expect(sigla).toMatch(/font-size:\s*1\.5rem/);
@@ -116,8 +119,8 @@ describe("tokens.css", () => {
     // Il piede non mette padding proprio, o quel padding diventerebbe una
     // cornice del colore del blocco tutto intorno alla busta: e' esattamente
     // cio' che la busta doveva smettere di avere.
-    const piede = css.match(/\[data-footer\]\s*\{[^}]*\}/)?.[0];
-    const busta = css.match(/\[data-busta\]\s*\{[^}]*\}/)?.[0];
+    const piede = regole("[data-footer]")[0]?.corpo;
+    const busta = regole("[data-busta]")[0]?.corpo;
     expect(piede, "le regole del piede non ci sono piu'").toBeTruthy();
     expect(busta, "le regole della busta non ci sono piu'").toBeTruthy();
     expect(piede, "il piede ha di nuovo un padding: torna la cornice").not.toMatch(/padding/);
@@ -128,7 +131,7 @@ describe("tokens.css", () => {
     // Il blocco d'inchiostro era cio' che chiudeva la pagina. Una busta color
     // carta a filo del fondo la lascerebbe aperta: e' il rischio scritto per
     // la proposta A nel prototipo, e il rimedio e' lo stesso, il taglio.
-    const taglio = css.match(/\[data-busta\]::after\s*\{[^}]*\}/)?.[0];
+    const taglio = regole("[data-busta]::after")[0]?.corpo;
     expect(taglio, "il taglio in fondo alla pagina non c'e' piu'").toBeTruthy();
     expect(taglio).toMatch(/background-color:\s*var\(--fg\)/);
   });
@@ -140,22 +143,21 @@ describe("la barra in basso", () => {
     // di sezioni appiccicata sopra sarebbe una seconda navigazione dentro una
     // cosa che ne ha gia' una, e coprirebbe il contenuto che sei appena andato
     // ad aprire.
-    expect(css).toMatch(
-      /html\[data-dialog-open\][^{]*\[data-nav-basso\][^{]*\{[^}]*display:\s*none/,
-    );
+    expect(dice(regole(/html\[data-dialog-open\].*\[data-nav-basso\]/), /display:\s*none/)).toBe(true);
   });
 
   it("la busta si fa da parte, o la barra le sta sopra l'ultima riga", () => {
     // Lo spazio va DENTRO la busta: sul piede diventerebbe una cornice del
     // colore del blocco tutto intorno, che e' cio' che la busta ha smesso di
     // avere (vedi la prova qui sopra).
-    const blocchi = [...css.matchAll(/@media \(max-width: 767px\) \{[\s\S]*?\n\}/g)].map((m) => m[0]);
-    expect(blocchi.length, "manca il blocco sotto i 768px").toBeGreaterThan(0);
-    const spazio = blocchi.find((b) => /\[data-busta\][^}]*padding-block-end/.test(b));
+    const stretto = { media: "(max-width: 767px)" };
+    expect(regole(undefined, stretto).length, "manca il blocco sotto i 768px").toBeGreaterThan(0);
+    const spazio = regole(/\[data-busta\]/, stretto).find((r) => /padding-block-end/.test(r.corpo));
     expect(spazio, "la busta non lascia spazio alla barra").toBeTruthy();
     // E deve stare DOPO la dichiarazione di `padding` della busta, o la
     // scorciatoia se lo riprende.
-    expect(css.indexOf(spazio!)).toBeGreaterThan(css.indexOf("[data-busta] {"));
+    const tutte = regole();
+    expect(tutte.indexOf(spazio!)).toBeGreaterThan(tutte.indexOf(regole("[data-busta]")[0]));
   });
 });
 
@@ -165,8 +167,8 @@ describe("la superficie del tema scuro", () => {
     // il bordo basta. Su inchiostro no: lo schedario diventa un reticolo
     // piatto e l'accostamento delle cartelle non si vede piu'. Sul chiaro il
     // token resta il fondo di pagina, quindi li' non cambia niente.
-    expect(css).toMatch(/:root\s*\{[\s\S]*?--superficie:[\s\S]*?\}/);
-    expect(css).toMatch(/\[data-theme="dark"\]\s*\{[\s\S]*?--superficie:[\s\S]*?\}/);
+    expect(dice(regole(":root"), /--superficie:/)).toBe(true);
+    expect(dice(regole(/\[data-theme="dark"\]$/), /--superficie:/)).toBe(true);
   });
 });
 
@@ -176,7 +178,7 @@ describe("le entrate laterali non allargano la pagina", () => {
     // cioe' la pagina trascinabile di lato per tutta la durata dell'entrata.
     // hidden non va bene: farebbe di queste due un contenitore di scorrimento,
     // e l'intestazione appiccicata in cima smetterebbe di appiccicarsi.
-    const regola = css.match(/#services,\s*\n#process \{[^}]*\}/)?.[0];
+    const regola = regole("#services").find((r) => r.selettore === "#services, #process")?.corpo;
     expect(regola, "manca il ritaglio orizzontale delle sezioni con entrate laterali").toBeTruthy();
     expect(regola).toMatch(/overflow-x:\s*clip/);
     expect(regola).not.toMatch(/overflow-x:\s*hidden/);
@@ -188,17 +190,17 @@ describe("le consegne sul tablet", () => {
     // Misurato a 768px prima della correzione: il testo si fermava a 34rem e
     // restava a sinistra, con 184px di vuoto a destra e il disegno centrato
     // sotto. Tutto spinto da una parte.
-    const blocco = css.match(/@media \(max-width: 899px\) \{[\s\S]*?\[data-process-text\][\s\S]*?\n\}/)?.[0];
-    expect(blocco, "il testo delle consegne non si centra sotto i 900px").toBeTruthy();
-    expect(blocco).toMatch(/margin-inline:\s*auto/);
+    const testo = regole(/\[data-process-text\]/, { media: "(max-width: 899px)" });
+    expect(dice(testo, /margin-inline:\s*auto/), "il testo delle consegne non si centra sotto i 900px").toBe(true);
   });
 
   it("la testata si centra fino a 1023px, non solo dove le consegne sono una colonna", () => {
     // Fra i 900 e i 1023 le consegne sono gia' a due colonne, ma la testata
     // col suo tetto stretto resterebbe appoggiata a sinistra.
-    const blocco = css.match(/@media \(max-width: 1023px\) \{[\s\S]*?\[data-process-testata\][\s\S]*?\n\}/)?.[0];
-    expect(blocco, "la testata del processo non si centra sotto i 1024px").toBeTruthy();
-    expect(blocco).toMatch(/margin-inline:\s*auto/);
+    const testata = regole(/\[data-process-testata\]/, { media: "(max-width: 1023px)" });
+    expect(dice(testata, /margin-inline:\s*auto/), "la testata del processo non si centra sotto i 1024px").toBe(
+      true,
+    );
   });
 });
 
