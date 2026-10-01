@@ -6,7 +6,7 @@ import { regole, type Regola } from "@/test/css";
 
 const dice = (dove: Regola[], dichiarazione: RegExp) => dove.some((r) => dichiarazione.test(r.corpo));
 
-describe("tokens.css", () => {
+describe("i fogli di stile", () => {
   it("l'anello dei bottoni dell'apertura sta DENTRO, perche' il fuoco sta fuori", () => {
     // Il fuoco da tastiera di tutto il sito e' `outline: 2px solid var(--accent)`
     // con `outline-offset: 3px` (globals.css): un anello arancione fuori dal

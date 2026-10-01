@@ -145,7 +145,7 @@ describe("i colori del percorso", () => {
     // La prova qui sopra legge il foglio di stile e non vede le classi di
     // utilita' col valore fra parentesi quadre: i due numeri portavano
     // `text-[var(--fg)]` e `text-[var(--fg-muted)]` nel JSX, e sull'arancio
-    // sarebbero spariti di notte senza che nessuna regola di tokens.css lo
+    // sarebbero spariti di notte senza che nessuna regola di percorso.css lo
     // dicesse. Qui si guarda l'altra meta' del problema.
     const { container } = render(<JourneyView {...props} />);
     const classi = [...container.querySelectorAll<HTMLElement>("[class]")].map(

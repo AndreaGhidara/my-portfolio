@@ -1,0 +1,89 @@
+/* La seconda sezione che passa sopra la prima. */
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA SECONDA SEZIONE PASSA SOPRA LA PRIMA
+
+   Hero si ferma sotto la testata e la stampante gli sale sopra come un foglio, con
+   gli angoli alti arrotondati e un'ombra sul bordo. Intanto Hero «va sotto»:
+   un velo d'inchiostro, si stringe, sale. Tutto proporzionale a --copertura
+   (0 quando la stampante tocca il fondo di Hero, 1 quando ne raggiunge la cima),
+   che scrive SottoIlFoglio insieme a --attacco, il punto in cui Hero si ferma.
+
+   Ogni regola che muove qualcosa sta sotto [data-acceso], che il componente
+   scrive dopo aver misurato e toglie a "none": senza JavaScript e con il
+   movimento ridotto la pagina e' quella di prima.
+
+   I LIVELLI, e sono il punto delicato. Un elemento sticky apre sempre un
+   contesto di impilamento suo, z-index o no: lo strato fisso della carta
+   (z-index 40) dentro Hero finirebbe sotto il foglio, ed e' per questo che a
+   "full" CartaStropicciata lo porta in fondo a <body>. Alla sezione non si da'
+   ne' z-index ne' isolation: non servono, la stampante le passa sopra lo stesso.
+   Il contesto lo apre dichiarato lo strato del contenuto, che dentro Hero
+   separa il ritratto (z-index 10) dal velo: senza, il ritratto resterebbe
+   acceso sopra il velo. La trasformazione ne apre gia' uno, ma e' un effetto
+   collaterale, e non ci si appoggia. La stampante sta a 2: sopra Hero, sotto le
+   due barre.
+
+   I numeri sono quelli tarati nel prototipo
+   (docs/prototipi/2026-09-27-sezione-sopra.html).
+   ═══════════════════════════════════════════════════════════════════════ */
+[data-sotto-il-foglio] {
+  position: relative;
+  /* Quanto inchiostro scende su Hero a copertura piena. */
+  --buio: 0.55;
+  /* Di quanto si stringe: 0.06 e' al 94%. */
+  --rimpicciolisce: 0.06;
+  /* Di quanto sale mentre va sotto, della sua altezza. */
+  --sale: 4%;
+  --raggio: 18px;
+}
+
+/* Il palco visibile: 100svh, il viewport piccolo, come la sonda del percorso. */
+[data-foglio-sonda] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100vh;
+  height: 100svh;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+[data-sotto-il-foglio][data-acceso] #hero {
+  position: sticky;
+  /* 3,75rem e' la testata (60px misurati), per il fotogramma prima della misura. */
+  top: var(--attacco, 3.75rem);
+}
+
+/* Il velo sta sulla sezione intera, gutter compreso: e' Hero che va
+   sotto, non solo il suo contenuto. Uno pseudo-elemento non e' una
+   trasformazione, e lo strato fisso della carta non se ne accorge. */
+[data-sotto-il-foglio][data-acceso] #hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--ink);
+  opacity: calc(var(--copertura, 0) * var(--buio));
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* translate prima di scale, come negli scale/translate del prototipo: la
+   salita non si stringe con il resto. L'origine al 30% tiene il nome quasi
+   fermo: a stringersi verso l'alto e' il fondo, che il foglio sta coprendo. */
+[data-sotto-il-foglio][data-acceso] [data-hero-strato] {
+  isolation: isolate;
+  transform-origin: 50% 30%;
+  transform: translateY(calc(var(--copertura, 0) * var(--sale) * -1))
+    scale(calc(1 - var(--copertura, 0) * var(--rimpicciolisce)));
+  will-change: transform;
+}
+
+/* L'ombra sulla sezione stessa: `overflow: hidden` ritaglia il contenuto, non
+   la box-shadow esterna. */
+[data-sotto-il-foglio][data-acceso] #scontrino {
+  z-index: 2;
+  border-radius: var(--raggio) var(--raggio) 0 0;
+  box-shadow: 0 -18px 40px -12px color-mix(in oklab, var(--ink) 55%, transparent);
+}
