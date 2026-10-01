@@ -165,7 +165,188 @@
         "titolo": "Costruisci lo schermo"
       },
       "logiche": {
-        "titolo": "Dietro lo schermo"
+        "titolo": "Dietro lo schermo",
+        "testa": "2 · dietro lo schermo",
+        "regole": "regole",
+        "nodo": "nodo {numero} di 6 · {nome}",
+        "partenza": {
+          "occhiello": "lo schermo che hai costruito",
+          "indirizzo": "fornoaurora.it",
+          "nome": "Forno Aurora",
+          "menu": "pane · torte · orari",
+          "via": "via Roma 12",
+          "titolo": "Pane caldo",
+          "titoloAccento": "dalle sei.",
+          "testo": "Lievito madre, forno a legna, torte su ordinazione.",
+          "prenota": "Prenota la torta",
+          "appuntoTitolo": "Qui puoi prenotare",
+          "appuntoTesto": "Premi il pulsante: dietro lo schermo partono sei logiche, e le segui una per una."
+        },
+        "nodi": [
+          {
+            "nome": "L'area riservata",
+            "titolo": "Chi sta ordinando?",
+            "spiega": "Prima di tutto il forno ti riconosce: così ritrovi i tuoi ordini e non riscrivi i dati ogni volta.",
+            "fai": "entra come Andrea",
+            "rompi": "sbaglia 3 volte",
+            "errore": "Password sbagliata, per la terza volta.",
+            "regola": {
+              "se": "tre tentativi sbagliati di fila",
+              "allora": "l'account si ferma 15 minuti e arriva un link per rientrare"
+            }
+          },
+          {
+            "nome": "Il catalogo",
+            "titolo": "Quale torta?",
+            "spiega": "Le torte, i prezzi e cosa è ancora disponibile vengono da un posto solo: quello che vedi è vero.",
+            "fai": "scegli la Sacher",
+            "rompi": "scegli la millefoglie",
+            "errore": "La millefoglie di domenica è finita.",
+            "regola": {
+              "se": "una torta è finita",
+              "allora": "non si può scegliere e il sito propone la più simile"
+            }
+          },
+          {
+            "nome": "Le prenotazioni",
+            "titolo": "Per che giorno?",
+            "spiega": "Ogni giorno il forno può fare un numero di torte: il calendario lo sa, e non promette quello che non c'è.",
+            "fai": "prenota sabato",
+            "rompi": "prenota domenica",
+            "errore": "Domenica è tutto pieno.",
+            "regola": {
+              "se": "il giorno scelto è pieno",
+              "allora": "proponi il giorno libero più vicino: sabato"
+            }
+          },
+          {
+            "nome": "I pagamenti",
+            "titolo": "La caparra",
+            "spiega": "Una caparra di 5 euro tiene il posto. Il pagamento è il punto in cui un errore costa di più.",
+            "fai": "paga la caparra",
+            "rompi": "la carta viene rifiutata",
+            "errore": "La banca ha rifiutato la carta.",
+            "regola": {
+              "se": "il pagamento non va a buon fine",
+              "allora": "la torta resta tenuta per 15 minuti e non si paga mai due volte"
+            }
+          },
+          {
+            "nome": "I contatti",
+            "titolo": "La conferma",
+            "spiega": "Appena prenotata, parte un'email: il cliente sa cosa ha ordinato, per quando, e dove venire.",
+            "fai": "manda la conferma",
+            "rompi": "indirizzo sbagliato",
+            "errore": "«andrea@gmial.con» non esiste: l'email tornerebbe indietro.",
+            "regola": {
+              "se": "l'indirizzo sembra scritto male",
+              "allora": "il sito chiede «intendevi gmail.com?» prima di mandare"
+            }
+          },
+          {
+            "nome": "Il tuo gestionale",
+            "titolo": "Nel registro del forno",
+            "spiega": "L'ordine arriva dove il forno lavora già: non va ricopiato a mano, e la mattina è in lista.",
+            "fai": "registra l'ordine",
+            "rompi": "ordina due volte di fila",
+            "errore": "Lo stesso ordine è arrivato due volte in un secondo.",
+            "regola": {
+              "se": "lo stesso ordine arriva due volte in un minuto",
+              "allora": "ne resta uno solo, e il cliente paga una volta"
+            }
+          }
+        ],
+        "scene": {
+          "email": "andrea@esempio.it",
+          "dentro": "dentro",
+          "torte": [
+            {
+              "nome": "Crostata",
+              "prezzo": "18 €"
+            },
+            {
+              "nome": "Sacher",
+              "prezzo": "24 €"
+            },
+            {
+              "nome": "Millefoglie",
+              "prezzo": "22 €"
+            }
+          ],
+          "finita": "finita",
+          "giorni": [
+            "L",
+            "M",
+            "M",
+            "G",
+            "V",
+            "S",
+            "D"
+          ],
+          "pieno": "pieno",
+          "importo": "5,00 €",
+          "carta": "•••• •••• •••• 4242",
+          "pagato": "pagato",
+          "mailA": "a:",
+          "mailDa": "da: Forno Aurora",
+          "mailTitolo": "La tua Sacher è prenotata.",
+          "mailTesto": "Sabato dalle 9 in via Roma 12. Caparra di 5 € ricevuta.",
+          "registro": [
+            [
+              "n.",
+              "torta",
+              "giorno",
+              "stato"
+            ],
+            [
+              "0140",
+              "Crostata",
+              "ven",
+              "pronta"
+            ],
+            [
+              "0141",
+              "Sacher",
+              "sab",
+              "forno"
+            ]
+          ],
+          "nuovo": [
+            "0142",
+            "Sacher",
+            "sab",
+            "nuova"
+          ]
+        },
+        "incidente": {
+          "se": "SE",
+          "allora": "ALLORA",
+          "salvato": "il sito ha retto. Ora fallo nel modo giusto."
+        },
+        "trovata": "regola trovata",
+        "giaRotto": "già rotto",
+        "avanti": "avanti: {nome}",
+        "stampa": "stampa l'ordine",
+        "fine": {
+          "occhiello": "l'ordine è arrivato · regole trovate {trovate} di 6",
+          "titolo": "Sei logiche, un ordine solo",
+          "mancano": "Tocca i nodi senza ⚡ nel circuito per scoprire le altre regole.",
+          "tutte": "Hai provato a rompere tutto, e il sito ha retto ogni volta.",
+          "negozio": "FORNO AURORA",
+          "ordine": "ORDINE N. 0142 · ANDREA",
+          "giorni": [
+            "lunedì",
+            "martedì",
+            "mercoledì",
+            "giovedì",
+            "venerdì",
+            "sabato"
+          ],
+          "caparra": "CAPARRA 5,00 € PAGATA",
+          "laboratorio": "SCONTRINO PER IL LABORATORIO",
+          "ricomincia": "ricomincia",
+          "livello3": "livello 3"
+        }
       },
       "pannello": {
         "titolo": "Dopo il lancio"
