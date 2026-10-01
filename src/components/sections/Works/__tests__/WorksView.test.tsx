@@ -10,11 +10,11 @@ const labels = {
   lavoro: "Il lavoro",
   scelta: "La soluzione scelta",
   conduzione: "Come è stata condotta",
-  visit: "Visita il sito",
+  visita: "Visita il sito",
   screenshotAlt: "{name}: schermata",
   riservato: "Coperto da accordo di riservatezza",
-  open: "Apri il caso",
-  close: "Chiudi",
+  apri: "Apri il caso",
+  chiudi: "Chiudi",
   riporta: "riporta davanti la cartella",
   archivio: "Archivio lavori",
   pratica: "Pratica n.",
@@ -269,7 +269,7 @@ describe("WorksView", () => {
   it("il link al sito si apre in una scheda nuova, in sicurezza", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[0]);
-    const link = screen.getByRole("link", { name: new RegExp(labels.visit) });
+    const link = screen.getByRole("link", { name: new RegExp(labels.visita) });
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });
@@ -492,7 +492,7 @@ describe("aprire e chiudere la pratica", () => {
   it("× chiude: la pagina torna libera e il fuoco torna su «Apri il caso» della cartella aperta", async () => {
     const { container } = render(<WorksView {...props} />);
     await userEvent.click(apri()[1]);
-    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: labels.close }));
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: labels.chiudi }));
 
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     await waitFor(() => expect(document.documentElement).not.toHaveAttribute("data-dialog-open"));
@@ -544,7 +544,7 @@ describe("aprire e chiudere la pratica", () => {
   it("dopo la chiusura si riapre, e mostra il caso nuovo", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[0]);
-    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: labels.close }));
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: labels.chiudi }));
     await waitFor(() => expect(document.documentElement).not.toHaveAttribute("data-dialog-open"));
     await userEvent.click(apri()[1]);
     expect(screen.getByRole("dialog", { name: "Aidify · 2024" })).toBeVisible();

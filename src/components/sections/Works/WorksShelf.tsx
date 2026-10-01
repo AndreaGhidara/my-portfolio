@@ -164,16 +164,16 @@ function facceNellaSonda(lista: HTMLElement) {
  * clic o un Esc nel mezzo non si perde ne' si accavalla.
  */
 export function WorksShelf({
-  items,
+  lavori,
   labels,
 }: {
-  items: WorkCaseData[];
+  lavori: WorkCaseData[];
   labels: WorkCaseLabels;
 }) {
-  const [active, setActive] = useState<number | null>(null);
+  const [attiva, setAttiva] = useState<number | null>(null);
   const [ciStanno, setCiStanno] = useState(false);
-  const level = useMotionLevel();
-  const livello = useRef(level);
+  const movimento = useMotionLevel();
+  const livello = useRef(movimento);
   const schedario = useRef<HTMLOListElement | null>(null);
   const dialogo = useRef<HTMLDialogElement | null>(null);
   const corso = useRef<Corso | null>(null);
@@ -184,8 +184,8 @@ export function WorksShelf({
   const preparaCaduta = useRef<((i: number) => Promise<void> | null) | null>(null);
 
   useEffect(() => {
-    livello.current = level;
-  }, [level]);
+    livello.current = movimento;
+  }, [movimento]);
 
   /* Si decide al montaggio, quando arrivano i caratteri (cambiano la riga), e
      poi al resize secondo ridecidere(): una larghezza nuova subito, una sola
@@ -517,7 +517,7 @@ export function WorksShelf({
       schedario.current?.setAttribute("inert", "");
       // La barra in basso resta finche' non arriva il velo (vedi tokens.css).
       document.documentElement.setAttribute("data-pratica-in-corso", "");
-      setActive(i);
+      setAttiva(i);
       const attesa =
         moto === "quattro-tempi" ? (preparaCaduta.current ? preparaCaduta.current(i) : portaInVista(cartella)) : null;
       if (attesa) void attesa.then(() => cade(nuovo));
@@ -562,7 +562,7 @@ export function WorksShelf({
      salta sempre, e si passa alla risalita. Chiusa da chiudi(), il foglio e'
      gia' lasciato e rifarlo non cambia niente. */
   const alClose = useCallback(() => {
-    setActive(null);
+    setAttiva(null);
     const c = corso.current;
     const dialog = dialogo.current;
     if (!c || c.fase === "risale") return;
@@ -573,10 +573,10 @@ export function WorksShelf({
 
   useEffect(() => {
     const c = corso.current;
-    if (active === null || !c || c.fase !== "apre") return;
+    if (attiva === null || !c || c.fase !== "apre") return;
     c.montata = true;
     avanti(c);
-  }, [active, avanti]);
+  }, [attiva, avanti]);
 
   /* Smontato a meta': niente pagina bloccata ne' archivio inerte. */
   useEffect(() => {
@@ -619,15 +619,15 @@ export function WorksShelf({
       <ol
         ref={schedario}
         data-work-shelf
-        style={{ ...MISURE, "--n": items.length } as CSSProperties}
+        style={{ ...MISURE, "--n": lavori.length } as CSSProperties}
       >
-        {items.map((item, index) => (
+        {lavori.map((item, index) => (
           <WorkFolder
             key={item.id}
             data={item}
             index={index}
-            totale={items.length}
-            openLabel={labels.open}
+            totale={lavori.length}
+            openLabel={labels.apri}
             riservatoLabel={labels.riservato}
             riportaLabel={labels.riporta}
             onOpen={(cartella) => apri(index, cartella)}
@@ -639,9 +639,9 @@ export function WorksShelf({
 
       <WorkDialog
         dialogo={dialogo}
-        data={active === null ? null : (items[active] ?? null)}
-        numero={(active ?? 0) + 1}
-        totale={items.length}
+        data={attiva === null ? null : (lavori[attiva] ?? null)}
+        numero={(attiva ?? 0) + 1}
+        totale={lavori.length}
         labels={labels}
         onChiudi={chiudi}
         onClose={alClose}
