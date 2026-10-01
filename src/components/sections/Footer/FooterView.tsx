@@ -1,4 +1,5 @@
 import { Reveal } from "@/animations/components/Reveal";
+import { Oggi } from "./Oggi";
 export type FooterViewProps = {
   tagline: string;
   /** L'etichetta sopra l'indirizzo: «Rispondi a». */
@@ -62,11 +63,6 @@ export function FooterView({
 }: FooterViewProps) {
   const urlFor = (id: string) =>
     socials.find((social) => social.id === id)?.url ?? "#";
-
-  const oggi = new Date();
-  const gg = String(oggi.getDate()).padStart(2, "0");
-  const mm = String(oggi.getMonth() + 1).padStart(2, "0");
-  const data = `${gg}.${mm}.${String(oggi.getFullYear()).slice(-2)}`;
 
   /**
    * Le barre di smistamento in fondo alla busta.
@@ -166,7 +162,7 @@ export function FooterView({
                 letterSpacing=".3"
                 data-testid="busta-annullo-data"
               >
-                {data}
+                <Oggi formato="annullo" />
               </text>
             </svg>
           </Reveal>
@@ -194,7 +190,7 @@ export function FooterView({
                 distinzione arriva da dimensione e posizione, non da un colore
                 piu' debole. */}
             <p data-footer-diritti>
-              © {oggi.getFullYear()} {name}. {rights}
+              © <Oggi formato="anno" /> {name}. {rights}
             </p>
           </div>
         </div>

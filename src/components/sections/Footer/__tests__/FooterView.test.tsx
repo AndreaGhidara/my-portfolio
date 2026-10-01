@@ -1,5 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { describe, it, expect, afterEach, vi } from "vitest";
+import { act, render, screen, within } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
+import { hydrateRoot } from "react-dom/client";
 import { FooterView } from "../FooterView";
 
 const props = {
@@ -20,6 +22,10 @@ const props = {
 };
 
 describe("FooterView", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("è un contentinfo, così gli assistivi lo saltano o ci arrivano a comando", () => {
     render(<FooterView {...props} />);
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
@@ -39,9 +45,12 @@ describe("FooterView", () => {
     expect(screen.getByRole("link", { name: props.ariaLabels.github })).toBeInTheDocument();
   });
 
-  it("mostra l'anno corrente nel copyright", () => {
+  it("l'anno del copyright e' quello della visita, non quello della build", () => {
+    // La pagina e' statica: un anno calcolato sul server resterebbe quello in
+    // cui e' stata generata. Una data finta lontana dalla build lo distingue.
+    vi.useFakeTimers({ toFake: ["Date"], now: new Date(2031, 2, 5) });
     render(<FooterView {...props} />);
-    expect(screen.getByText(new RegExp(String(new Date().getFullYear())))).toBeVisible();
+    expect(screen.getByText(/© 2031 Andrea Ghidara/)).toBeVisible();
   });
 
   it("la busta è indirizzata: nome, email e città stanno nello stesso blocco", () => {
@@ -83,12 +92,36 @@ describe("FooterView", () => {
   it("l'annullo porta la data di oggi in gg.mm.aa, non una data cablata", () => {
     // Un timbro postale con una data ferma invecchia a vista: a distanza di
     // mesi dice solo che la pagina non si tocca da un pezzo.
+    // E deve essere quella del giorno della visita: la pagina e' generata una
+    // volta sola, e una data presa sul server sarebbe quella della build.
+    vi.useFakeTimers({ toFake: ["Date"], now: new Date(2031, 2, 5) });
     render(<FooterView {...props} />);
-    const oggi = new Date();
-    const gg = String(oggi.getDate()).padStart(2, "0");
-    const mm = String(oggi.getMonth() + 1).padStart(2, "0");
-    const aa = String(oggi.getFullYear()).slice(-2);
-    expect(screen.getByTestId("busta-annullo-data")).toHaveTextContent(`${gg}.${mm}.${aa}`);
+    expect(screen.getByTestId("busta-annullo-data")).toHaveTextContent("05.03.31");
+  });
+
+  it("l'html della build si idrata alla data della visita, senza errori", async () => {
+    // Il caso vero: l'html e' scritto il giorno della build e aperto mesi dopo.
+    // Annullo e copyright devono dire il giorno della visita, e il primo render
+    // del browser deve coincidere con l'html, o React segnala un mismatch.
+    vi.useFakeTimers({ toFake: ["Date"], now: new Date(2030, 0, 1) });
+    const html = renderToString(<FooterView {...props} />);
+    expect(html).not.toContain("2030");
+    expect(html).not.toContain("01.01.30");
+
+    vi.setSystemTime(new Date(2031, 2, 5));
+    const errori = vi.spyOn(console, "error").mockImplementation(() => {});
+    const contenitore = document.createElement("div");
+    contenitore.innerHTML = html;
+    document.body.appendChild(contenitore);
+    await act(async () => {
+      hydrateRoot(contenitore, <FooterView {...props} />);
+    });
+
+    expect(within(contenitore).getByTestId("busta-annullo-data")).toHaveTextContent("05.03.31");
+    expect(within(contenitore).getByText(/© 2031 Andrea Ghidara/)).toBeInTheDocument();
+    expect(errori).not.toHaveBeenCalled();
+    errori.mockRestore();
+    contenitore.remove();
   });
 
   it("il copyright sta DENTRO la busta: fuori non c'e' piu' niente in cui stare", () => {
