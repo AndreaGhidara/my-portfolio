@@ -1,12 +1,6 @@
-/* ── Il gioco del metodo: il finale ─────────────────────────────────────────
-   Tutto sotto [data-gioco-livello="finale"] (vedi la regola in base.css).
-
-   Il cielo che si fa giorno. Nel prototipo la notte era blu, e il blu nella
-   tavolozza non c'e': qui la notte e' un inchiostro appena scaldato verso il
-   grigio, e il giorno e' la carta col giallo della lampadina sopra. Il giorno
-   non e' un cambio di fondo (due gradienti non si dissolvono l'uno
-   nell'altro): e' uno strato sopra la notte che sale di opacita'. Con il
-   movimento ridotto le animazioni si azzerano e il giorno e' gia' li'. */
+/* Tutto sotto [data-game-level="finale"]. Il blu non e' in tavolozza: la notte
+   e' inchiostro scaldato verso il grigio. Il giorno e' uno strato che sale di
+   opacita', perche' due gradienti non si dissolvono l'uno nell'altro. */
 
 [data-game-level="finale"] .above {
   background: linear-gradient(var(--ink), color-mix(in oklab, var(--ink) 80%, var(--muted)));
@@ -55,7 +49,6 @@
   letter-spacing: 0.08em;
 }
 
-/* I quattro strati, uno per livello. */
 [data-game-level="finale"] .layers {
   display: grid;
   align-content: start;

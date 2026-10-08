@@ -16,17 +16,9 @@ import { FakeSite } from "./screenSite";
 import { DRAWER_TOOLS, Drawer, type DrawerToolId, type Choices } from "./screenDrawer";
 import { ScreenBack } from "./screenBack";
 
-/**
- * Livello 1, lo schermo. Sotto il portatile sei attrezzi cambiano davvero la
- * landing del Forno Aurora (colori, caratteri, misure, sezioni, immagini,
- * telefono). Provati tutti, compaiono quattro viti: svitate, lo schermo cade
- * in avanti, si vede il circuito che c'era dietro e il gioco passa da solo al
- * livello 2.
- *
- * I tempi sono quelli del prototipo: le viti 0,4 s dopo l'ultimo attrezzo,
- * il circuito 0,85 s dopo l'ultima vite, il livello dopo a 2,8 s. Fuori dallo
- * schermo si fermano, e al rientro ripartono da capo.
- */
+// Tempi del prototipo: le viti 0,4 s dopo l'ultimo attrezzo, il circuito
+// 0,85 s dopo l'ultima vite, il livello dopo a 2,8 s. Fuori dallo schermo si
+// fermano, e al rientro ripartono da capo.
 
 const INITIAL_CHOICES: Choices = {
   palette: 0,
@@ -41,7 +33,6 @@ const AFTER_TOOLS = 400;
 const AFTER_SCREWS = 850;
 const TO_NEXT_LEVEL = 2800;
 
-/** Le quattro viti agli angoli della cornice, ognuna col taglio storto a modo suo. */
 const SCREWS = [
   { x: "1rem", y: "1rem" },
   { x: "calc(100% - 1rem)", y: "1rem" },
@@ -51,7 +42,6 @@ const SCREWS = [
 
 type Flash = { field: DrawerToolId; n: number };
 
-/** Dove lampeggia la landing dopo una scelta: il punto appena cambiato. */
 function flashTarget(site: HTMLElement, field: DrawerToolId): Element | null {
   if (field === "caratteri" || field === "testi") return site.querySelector("[data-title]");
   if (field === "immagini") return site.querySelector("[data-img]");
@@ -59,10 +49,7 @@ function flashTarget(site: HTMLElement, field: DrawerToolId): Element | null {
   return site;
 }
 
-/**
- * «Ricomincia», nell'anteprima del circuito, rifa' il livello da capo: si
- * rimonta il banco, e con lui spariscono stato e timer.
- */
+// «Ricomincia» rimonta il banco: con lui spariscono stato e timer.
 export function Screen(props: LevelProps) {
   const [round, setRound] = useState(0);
   return <Bench key={round} {...props} onRestart={() => setRound((g) => g + 1)} />;

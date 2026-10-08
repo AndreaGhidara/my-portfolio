@@ -15,21 +15,14 @@ import { NodeLabel } from "./NodeLabel";
 import { toolById, sortedWeights } from "./graph";
 import type { ToolboxStep, ToolboxCopy } from "./types";
 
-/** Il ritmo a cui il file si riscrive, riga dopo riga. */
+// Millisecondi per riga: un file intero in poco piu' di un secondo.
 const LINE_INTERVAL = 70;
 
 type OpenFile = { kind: "config" } | { kind: "zone"; zone: ZoneId };
 
-/**
- * La cassetta sul telefono, e sul computer sotto i 1280px o senza mouse: una
- * finestra di codice. In alto le cartelle degli scomparti, aperto il file del
- * tuo sito; scelto un lavoro il file si riscrive da solo, riga per riga, e la
- * barra di stato in fondo mostra la composizione. Ogni nome tra virgolette si
- * tocca e apre l'etichetta, che sale dal basso.
- *
- * La finestra e' scura in tutti e due i temi, perche' e' un editor. L'altezza e'
- * fissa e il codice scorre dentro: scegliere un lavoro non sposta la pagina.
- */
+// La cassetta sul telefono, e sul computer sotto i 1280px o senza mouse.
+// Altezza fissa e codice che scorre dentro: scegliere un lavoro non sposta la
+// pagina.
 export function Editor({
   copy,
   garment,
@@ -73,10 +66,8 @@ export function Editor({
     [opened, garment, copy],
   );
 
-  /* Un lavoro nuovo riapre il file del sito e lo riscrive. A "none" e' gia'
-     scritto; altrove una riga ogni 70ms, cioe' un file intero in poco piu' di
-     un secondo. In fase di layout, o il file nuovo si vedrebbe intero per un
-     fotogramma prima di sparire e ricominciare. */
+  // In fase di layout, o il file nuovo si vedrebbe intero per un fotogramma
+  // prima di sparire e ricominciare a scriversi.
   const firstRun = useRef(true);
   useLayoutEffect(() => {
     if (firstRun.current) {
@@ -97,8 +88,7 @@ export function Editor({
     return () => window.clearTimeout(id);
   }, [visible, lines.length]);
 
-  // Il codice scorre con la scrittura, come in un editor vero: l'ultima riga
-  // nuova resta in vista. Solo dentro la finestra, mai la pagina.
+  // L'ultima riga nuova resta in vista. Scorre la finestra, mai la pagina.
   useEffect(() => {
     const el = code.current;
     if (el && visible < lines.length) el.scrollTop = el.scrollHeight;

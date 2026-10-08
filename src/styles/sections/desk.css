@@ -1,10 +1,6 @@
-/* Il tavolo dei servizi: la scena, i materiali, i due temi, i campioni, le marche e la camera. */
 
-/* ── Il tavolo ──────────────────────────────────────────────────────────────
-   La geometria arriva tutta da layers.ts, in percentuale: qui non si sa quanto
-   e' grande lo schermo, e non serve saperlo. --p e --s le scrivera' il palco,
-   una volta per fotogramma; finche' nessuno le scrive, --p vale 1 e il tavolo
-   e' quello di adesso, completo. E' il patto del fallback. */
+/* La geometria arriva da layers.ts in percentuale. Finche' nessuno scrive --p,
+   vale 1 e il tavolo e' completo: e' il patto del fallback. */
 
 [data-desk-track] { position: relative; }
 
@@ -15,32 +11,19 @@
   gap: 3rem;
   padding-block: var(--section-y);
   padding-inline: var(--gutter);
-  /* clip e non hidden: hidden crea un contenitore di scorrimento, e quando
-     arrivera' la camera romperebbe il position: sticky del palco. Serve solo
-     a non far uscire dalla pagina l'etichetta di un oggetto di bordo. */
+  /* clip e non hidden: hidden crea un contenitore di scorrimento e romperebbe
+     lo sticky del palco. */
   overflow-x: clip;
 }
 
 [data-desk-title] { max-width: 34rem; text-align: center; }
 [data-desk-title] p:last-child { margin-top: 1rem; color: var(--fg-muted); }
 
-/* La tesi che chiude la scena. Prima era un paragrafo centrato appoggiato
-   subito sotto le quattro didascalie, e si leggeva come una quinta voce invece
-   che come una conclusione: stessa misura, stesso peso, e quarantotto pixel di
-   stacco da quelle sopra.
-
-   Adesso ha un filo sopra e il respiro per starci: il filo e' corto quanto lei
-   e centrato, quindi non taglia la pagina, dice solo "qui finisce il discorso".
-   E il corpo sale, perche' fra le didascalie a 0,9rem e i titoli di sezione a
-   3rem non c'era niente in mezzo. */
 [data-desk-punch] {
   max-width: 40rem;
   text-align: center;
-  /* Il corpo guarda tutte e due le misure e prende la piu' stretta. Con la sola
-     2.8vw su un portatile da 1280x800 la frase restava al massimo, perche' la
-     larghezza c'era: mancava l'altezza, ed e' li' che andava a finire addosso
-     ai disegni del tavolo. Con min() lo schermo basso la rimpicciolisce da se',
-     senza una soglia scritta che poi qualcuno deve ricordarsi di aggiornare. */
+  /* min() sull'altezza: con la sola 2.8vw su un 1280x800 la frase restava al
+     massimo e finiva sui disegni. */
   font-size: clamp(1.05rem, min(2.8vw, 2.4vh), 1.85rem);
   line-height: 1.3;
   text-wrap: balance;
@@ -49,16 +32,12 @@
   border-block-start: 1px solid var(--line);
 }
 
-/* Il mondo e' due cose impilate: il piano del tavolo, che ha le proporzioni
-   dichiarate da layers.ts, e sotto le didascalie dei quattro strati. Le <ul>
-   degli oggetti ricalcano il piano invece di stare dentro il blocco intero:
-   cosi' le percentuali di layers.ts continuano a misurare il piano, e una riga
-   di testo in piu' in una didascalia non sposta il tavolo di un pixel. */
+/* Le <ul> degli oggetti ricalcano il piano e non il blocco intero: una riga
+   in piu' in una didascalia non sposta il tavolo. */
 [data-desk-world] {
   position: relative;
   width: min(94vw, 62rem);
-  /* Le etichette si misurano sulla larghezza del mondo e non su quella della
-     finestra: lo stesso mondo, stretto o largo, deve avere lo stesso disegno. */
+  /* Le etichette si misurano sul mondo, non sulla finestra. */
   container-type: inline-size;
 }
 
@@ -76,9 +55,7 @@
   width: 100%;
 }
 
-
-/* Il centro. La sua larghezza arriva inline da CENTRE.width, perche' e' con
-   quel numero che i test verificano che nessun oggetto lo copra. */
+/* La larghezza arriva inline da CENTRE.width: e' quella che i test verificano. */
 [data-desk-centre] {
   position: absolute;
   left: 50%;
@@ -87,17 +64,11 @@
   color: var(--fg);
 }
 
-/* Il sito finito dentro lo schermo. Misure in percentuale della scatola del
-   laptop: lo schermo disegnato va da 2,5% a 97,5% in orizzontale e da 3,75% a
-   87% in verticale, e questo ci sta dentro con un margine. Non c'e' nessun
-   testo (a questa misura sarebbe illeggibile comunque), ma c'e' l'arancio del
-   bottone, che e' l'unica cosa che distingue un sito finito da un wireframe. */
+/* Percentuali della scatola del laptop: lo schermo disegnato va da 2,5% a
+   97,5% in orizzontale e da 3,75% a 87% in verticale. */
 [data-desk-screen] {
-  /* La luce dello schermo. Da quando la scocca ha il suo pieno scuro, il sito
-     qui dentro non puo' piu' essere currentColor: sul tema chiaro sarebbe
-     inchiostro su inchiostro. E' --paper fisso, come fissa e' la scocca: uno
-     schermo acceso e' chiaro anche di giorno, ed e' il contrasto con la scocca
-     a farlo leggere acceso invece che disegnato. */
+  /* --paper fisso come fissa e' la scocca: con currentColor, a tema chiaro,
+     sarebbe inchiostro su inchiostro. */
   color: var(--paper);
   position: absolute;
   left: 6%;
@@ -115,7 +86,6 @@
   background-color: color-mix(in oklab, currentColor 38%, transparent);
 }
 
-/* La barra in cima: e' quella che dice "e' un sito", non un foglio. */
 [data-desk-screen-bar] {
   height: 12%;
   background-color: color-mix(in oklab, currentColor 20%, transparent);
@@ -130,8 +100,6 @@
 [data-desk-screen-line]:nth-of-type(3) { width: 88%; }
 [data-desk-screen-line]:nth-of-type(4) { width: 80%; }
 [data-desk-screen-line]:nth-of-type(5) { width: 64%; }
-/* L'arancio. Sul tavolo ci sono due soli colori: il giallo del post-it e
-   questo, ed e' qui che deve stare: al centro, sulla cosa che si compra. */
 [data-desk-screen-cta] {
   height: 13%;
   width: 34%;
@@ -176,88 +144,38 @@
 [data-desk-object] {
   position: absolute;
   transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
-  /* Niente `color` qui: dei due strati nessuno lo legge piu' (il pieno e il
-     tratto hanno le loro tinte) e l'anello di fuoco e' var(--accent), non
-     currentColor (globals.css). Era una riga che sembrava dipingere e non
-     dipingeva nulla.
-     left, top, width e la finestra --from/--span sono dati e arrivano inline.
-     L'opacita' pure: dipende da --from e --span, che sono dati dell'oggetto.
-     Qui non si dichiara nessuna transizione: non c'e' niente che si muove, e
-     quindi niente che reduced-motion debba spegnere. */
+  /* Niente `color`: i due strati hanno le loro tinte e l'anello di fuoco e'
+     var(--accent). Posizione, larghezza e opacita' arrivano inline. */
 }
 
-/* Sotto i 1024px il tavolo non si disegna: la sezione e' il gioco del metodo
-   (Services/gioco, src/styles/gioco/), che fa il cambio al contrario.
-   Fuori dall'impaginato per davvero, non ridotto a un pixel ritagliato: sono
-   piu' di trecento elementi che sul telefono nessuno vedra' mai, e il browser
-   continuerebbe a impaginarli e a ricalcolarli a ogni scorsa. La camera legge
-   questo mondo solo a livello pieno, che vuole gia' i 1024px. */
+/* Sotto i 1024px la sezione e' il gioco (Services/game, styles/game/): fuori
+   dall'impaginato davvero, sono piu' di trecento elementi da non ricalcolare. */
 @media (max-width: 1023px) {
   [data-desk-world][data-layout="wide"] { display: none; }
 }
 
-/* ── I materiali ────────────────────────────────────────────────────────────
-   Le sagome sono maschere e non <img>: dentro una <img> il currentColor degli
-   SVG si risolve sul documento dell'immagine, che del tema non sa niente, e i
-   disegni resterebbero neri anche su fondo inchiostro. Come maschera il colore
-   lo mette chi la contiene.
-
-   Ma una maschera dipinge UN COLORE SOLO. Con un file solo per sagoma, foglio,
-   scheda e telefono erano lo stesso grigio identico: quattro contorni della
-   stessa famiglia invece di quattro tipi di cosa. Da qui ogni sagoma e' due
-   strati (la superficie sotto, il tratto sopra) e due maschere, tagliate
-   dallo stesso contorno esterno dal generatore, quindi a registro.
-
-   Il colore non e' piu' currentColor, e questo e' il punto delicato: era lui a
-   seguire il tema gratis. Ogni tinta qui sotto nasce percio' da un token del
-   tema (mai un colore scritto a mano) e ognuna dichiara a quale delle due
-   famiglie appartiene:
-
-   - quello che e' CARTA (foglio, scheda, piastra, e il post-it bianco) e'
-     quello che il piano NON e': in chiaro sta appena sotto il fondo, in scuro
-     e' la cosa che brilla;
-   - quello che e' UN APPARECCHIO (rack, telefono, laptop) e' una scatola
-     scura, e resta scura anche di notte: in chiaro precipita a nero, in scuro
-     si appiattisce sul piano e a tenerlo su restano il tratto e i led;
-   - il post-it e' fisso e basta: giallo su qualunque tavolo.
-
-   Le due famiglie devono percio' muoversi in DIREZIONI OPPOSTE quando il tema
-   si inverte. E' il motivo per cui la tavola si dichiara due volte: la prima
-   stesura ne aveva una sola, le due famiglie salivano insieme, e in tema scuro
-   si incrociavano sullo stesso identico grigio. */
+/* Una maschera dipinge un colore solo: ogni sagoma e' due strati e due
+   maschere a registro. Ogni tinta nasce da un token: la carta in scuro sale,
+   l'apparecchio resta scuro, il post-it e' fisso. Per questo due tavole. */
 
 [data-desk-shape] {
   display: block;
   position: relative;
   width: 100%;
-  /* L'ombra sta sul CONTENITORE, non sui due strati: il filtro si applica
-     prima della maschera, e su un elemento mascherato l'ombra verrebbe
-     ritagliata via dalla maschera stessa. Qui cade fuori dalla sagoma, com'e'
-     giusto, e cade solo sulle superfici: l'etichetta e' una sorella, non una
-     figlia, e un'ombra sotto una parola non e' un tavolo, e' un banner.
-     E' la STESSA ombra per tutti, corta e vicina: gli oggetti stanno sullo
-     stesso piano sotto la stessa luce, e un'ombra proporzionale alla sagoma
-     direbbe che il foglio piu' grande e' anche quello piu' sollevato.
-     Il colore sta in --desk-ombra e si dichiara due volte, una per tema: era
-     --ink al 26% per tutti e due, e in tema scuro --bg E' --ink: l'ombra
-     aveva la luminanza esatta del fondo su cui cadeva, cioe' non c'era.
-     Scostamento e sfocatura stanno sotto i 3px: l'ombra non entra nel modello
-     geometrico, e il pavimento d'aria fra due oggetti vale ~6,3px a 1440. */
+  /* L'ombra sta sul contenitore: su un elemento mascherato la maschera la
+     ritaglierebbe. Uguale per tutti, e sotto i 3px: il modello geometrico non
+     la conta, e il pavimento d'aria vale circa 6,3px a 1440. */
   --desk-shadow: color-mix(in oklab, var(--ink) 26%, transparent);
   filter: drop-shadow(0 0.07em 0.11em var(--desk-shadow));
 }
 
-/* In una stanza buia sotto una scatola nera non c'e' niente di piu' scuro da
-   mettere: il piano E' il nero della palette. Quello che si vede davvero e' il
-   contatto che schiarisce appena attorno alla sagoma: il riflesso, non il
-   buio. Resta sotto al pieno della scocca, cosi' stacca l'oggetto dal piano
-   senza confondersi col suo bordo. */
+/* In scuro --bg e' --ink: l'ombra diventa un contatto che schiarisce, sotto
+   il pieno della scocca per non confondersi col bordo. */
 [data-theme="dark"] [data-desk-shape] {
   --desk-shadow: color-mix(in oklab, var(--fg-muted) 14%, transparent);
 }
 
-/* I due strati (piu' i led del rack) stanno uno sull'altro. Nessuno z-index:
-   l'ordine e' quello del DOM, e il pieno e' scritto per primo. */
+/* Nessuno z-index: l'ordine e' quello del DOM, il pieno e' scritto per primo. */
 [data-desk-shape] > * {
   position: absolute;
   inset: 0;
@@ -266,15 +184,12 @@
   mask-size: 100% 100%;
 }
 
-/* Il default e' il disegno di prima: una sagoma senza materiale dichiarato
-   resta il suo contorno, e non sparisce. */
+/* Senza materiale dichiarato resta il contorno, e non sparisce. */
 [data-desk-fill] { background-color: var(--desk-full, transparent); }
 [data-desk-line] { background-color: var(--desk-stroke, currentColor); }
 
-/* Le maschere pendono dalla SAGOMA e non dall'oggetto: cosi' chiunque disegni
-   una DeskShapeArt se le porta dietro, tavolo o no. Le consegne di «Come
-   lavoro» usano le stesse sagome fuori dal tavolo, e senza questo non
-   avrebbero niente da mostrare. */
+/* Le maschere pendono dalla sagoma e non dall'oggetto: i disegni fuori dal
+   tavolo le usano senza data-desk-object. */
 [data-desk-shape][data-shape="sheet"]  [data-desk-fill] { mask-image: url("/brand/desk/sheet-fill.svg"); }
 [data-desk-shape][data-shape="sheet"]  [data-desk-line] { mask-image: url("/brand/desk/sheet.svg"); }
 [data-desk-shape][data-shape="card"]   [data-desk-fill] { mask-image: url("/brand/desk/card-fill.svg"); }
@@ -290,63 +205,26 @@
 [data-desk-shape][data-shape="laptop"] [data-desk-fill] { mask-image: url("/brand/desk/laptop-fill.svg"); }
 [data-desk-shape][data-shape="laptop"] [data-desk-line] { mask-image: url("/brand/desk/laptop.svg"); }
 
-/* La tavola dei materiali: ogni sagoma dichiara la sua coppia, i due strati la
-   leggono. Sta in un posto solo apposta: e' la tavola della specifica, e
-   sparpagliata fra quattordici regole non si riconoscerebbe piu'.
+/* La tavola dei materiali pende da [data-desk-piece]: i disegni fuori dal
+   tavolo non hanno data-desk-object. Si dichiara due volte, una per tema, e
+   materials.ts ne tiene la copia che le prove misurano. */
 
-   Pende da [data-desk-piece] e non da [data-desk-object]: «un pezzo disegnato»
-   e non «una delle ventiquattro cose sul tavolo». I disegni fuori dal tavolo
-   (le consegne di «Come lavoro», e prima quelli di «E in pratica?») sono la
-   prima cosa e non la seconda: dargli data-desk-object romperebbe la prova che
-   conta i ventiquattro (spec §4.4), e con la tavola agganciata all'oggetto
-   restavano contorni nudi in colore di testo, le stesse sagome senza i loro
-   materiali.
-
-   E si dichiara DUE VOLTE, una per tema. La prima stesura ne aveva una sola, e
-   in tema scuro la scheda (--fg 15% su --bg) e la scocca (--ink 78% con
-   --fg-muted) cadevano sullo stesso identico colore: 1.00:1. Non era un valore
-   sbagliato, era strutturale: la carta segue il tema e in scuro SALE,
-   l'apparecchio e' fisso ma schiarito per non fare nero-su-nero e sale anche
-   lui. Le due famiglie si incrociano, e nessuna tavolozza unica puo' impedirlo.
-
-   Il disegno, in una riga: in chiaro la carta sta appena sotto il fondo e
-   l'apparecchio precipita a nero; in scuro si scambiano i mestieri: la carta
-   e' la cosa che brilla, l'apparecchio resta basso vicino al fondo e a tenerlo
-   su sono il tratto e i led. In una stanza buia una scatola nera su una
-   scrivania scura non si legge per il suo pieno: si legge per i suoi riflessi.
-
-   I numeri non sono gusto: stanno anche in materials.ts, dove una prova calcola
-   ogni miscela in oklab e verifica le distanze (famiglie >= 3.0, gradini della
-   carta >= 1.25, ogni pieno sul fondo >= 1.20) in tutti e due i temi. Una
-   seconda prova verifica che questo file dichiari esattamente quelle ricette:
-   il difetto era numerico, e un foglio di stile che diverge dal modulo lo
-   rimetterebbe in pagina senza che niente cada. */
-
-/* ── Tema chiaro ─────────────────────────────────────────────────────────── */
-
-/* Carta appena staccata dal fondo, bordo grafite: e' il foglio. */
 [data-desk-piece][data-shape="sheet"] {
   --desk-full: color-mix(in oklab, var(--fg) 9%, var(--bg));
   --desk-stroke: var(--fg-muted);
 }
 
-/* Carta, e il bordo di inchiostro: la scheda e' stampata, il foglio no. */
 [data-desk-piece][data-shape="card"] {
   --desk-full: color-mix(in oklab, var(--fg) 20%, var(--bg));
   --desk-stroke: color-mix(in oklab, var(--fg) 80%, var(--bg));
 }
 
-/* Grafite: la piastra e' l'unica cosa di metallo sul tavolo. Il tratto e' la
-   stessa grafite tirata verso il testo, per staccare il bordo dal pieno. */
 [data-desk-piece][data-shape="plate"] {
   --desk-full: color-mix(in oklab, var(--fg-muted) 55%, var(--bg));
   --desk-stroke: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
 }
 
-/* La scocca: rack, telefono e laptop sono la stessa cosa: scatole scure. Non
-   e' --fg, e' --ink: un apparecchio non si inverte col tema. Su carta precipita
-   a nero, ed e' giusto che lo faccia: e' l'unica cosa del tavolo che non e'
-   fatta di carta. */
+/* Rack, telefono e laptop: --ink e non --fg, un apparecchio non si inverte. */
 [data-desk-piece][data-shape="rack"],
 [data-desk-piece][data-shape="phone"],
 [data-desk-centre] {
@@ -354,35 +232,19 @@
   --desk-stroke: color-mix(in oklab, var(--ink) 42%, var(--fg-muted));
 }
 
-/* Il post-it e' l'unico calore che non sia arancio, e --bulb pieno: un post-it
-   giallo e' giallo su qualunque tavolo. Il bordo e' lo stesso giallo spento
-   nell'inchiostro, fisso anche lui, perche' fissa e' la carta che borda.
-   E' l'unica superficie che NON si dichiara due volte: se la ridichiarasse
-   uguale in tema scuro, direbbe che segue il tema, e non lo segue. */
+/* Fisso: --bulb e' giallo su qualunque tavolo. L'unica superficie che non
+   si ridichiara in tema scuro. */
 [data-desk-piece][data-shape="postit"] {
   --desk-full: var(--bulb);
   --desk-stroke: color-mix(in oklab, var(--bulb) 55%, var(--ink));
 }
 
-/* Il post-it BIANCO. La spec (§3.2) lo chiama cosi': e' la ventiquattresima
-   cosa, quella che si preme, e non e' un'etichetta del tavolo. Finche' tutto
-   era contorno la differenza non si vedeva; da quando i pieni esistono, un
-   giallo identico agli altri cinque e' un'altra cosa da quella che la spec
-   dice. Prende il pieno della carta piu' chiara (lo STESSO del foglio) e
-   tiene il bordo giallo spento: resta un post-it, ma non e' uno degli altri.
-   Il tratto non lo ridichiara, lo eredita.
-
-   Non e' piu' VUOTO, ed e' un cambio recente: ci sta scritto sopra il conto dei
-   caffe'. Il grigio serve ancora, e anzi serve di piu': e' l'unico oggetto del
-   tavolo che non e' un pezzo di lavoro, ed e' l'unico che si preme. */
+/* Il pieno della carta piu' chiara, lo stesso del foglio. Il tratto non lo
+   ridichiara: eredita il giallo spento degli altri post-it. */
 [data-desk-piece][data-shape="postit"] [data-desk-blank] {
   --desk-full: color-mix(in oklab, var(--fg) 9%, var(--bg));
 }
 
-/* ── Tema scuro ──────────────────────────────────────────────────────────── */
-
-/* Qui la carta e' la cosa che brilla: sale netta sopra il fondo, e i segni
-   sopra restano scuri: una matita e' una matita anche di notte. */
 [data-theme="dark"] [data-desk-piece][data-shape="sheet"] {
   --desk-full: color-mix(in oklab, var(--fg) 68%, var(--bg));
   --desk-stroke: color-mix(in oklab, var(--ink) 60%, var(--fg-muted));
@@ -398,9 +260,6 @@
   --desk-stroke: color-mix(in oklab, var(--ink) 62%, var(--fg-muted));
 }
 
-/* E l'apparecchio scende: resta basso, vicino al fondo, e a tenerlo su sono il
-   tratto e i led. E' l'inverso del tema chiaro, ed e' l'unico modo perche' le
-   due famiglie non si incrocino quando il fondo diventa inchiostro. */
 [data-theme="dark"] [data-desk-piece][data-shape="rack"],
 [data-theme="dark"] [data-desk-piece][data-shape="phone"],
 [data-theme="dark"] [data-desk-centre] {
@@ -412,18 +271,12 @@
   --desk-full: color-mix(in oklab, var(--fg) 68%, var(--bg));
 }
 
-/* I led del rack. Sono l'unica cosa del tavolo che una maschera non sa portare:
-   una maschera e' una forma, un led e' un colore. Tre accesi e uno spento, come
-   un rack vero. Le ellissi sono in percentuale, non in px, cosi' restano
-   punti di luce e non palle quando la camera arretra.
-   Le quattro unita' del rack, nel viewBox 132x104, hanno il centro a 17,5,
-   39,5, 61,5 e 83,5: sono le quattro quote qui sotto, in percentuale. */
+/* Tre accesi e uno spento. Ellissi in percentuale per restare punti di luce
+   quando la camera arretra. Le quote sono i centri delle quattro unita' nel
+   viewBox 132x104: 17,5, 39,5, 61,5 e 83,5. */
 [data-desk-leds] {
-  /* La maschera del rack, esplicita. Le longhand (repeat/position/size) le
-     eredita da [data-desk-shape] > *, ma senza mask-image i quattro gradienti
-     non erano ritagliati da niente: stavano dentro la sagoma solo perche' le
-     percentuali capitavano giuste. E' il pieno e non il contorno perche' il
-     pieno E' il corpo del rack. */
+  /* mask-image esplicita: senza, i gradienti stavano nella sagoma solo per
+     caso delle percentuali. */
   mask-image: url("/brand/desk/rack-fill.svg");
   background-image:
     radial-gradient(ellipse 4% 5% at 85% 17%, var(--bulb) 45%, transparent 100%),
@@ -436,19 +289,8 @@
     radial-gradient(ellipse 4% 5% at 85% 80%, var(--bulb) 45%, transparent 100%);
 }
 
-/* Il post-it bianco: l'unico oggetto del tavolo che si preme. Il suo pieno sta
-   nella tavola dei materiali qui sopra, con gli altri: e' bianco, come lo
-   chiama la spec, e non giallo come i cinque colleghi.
-
-   La domanda sta DENTRO la sagoma e non sotto come le etichette. Non e' una
-   scelta grafica: l'ingombro di questo oggetto, per layers.ts, e' il solo
-   disegno (objectBox lo misura senza striscia, perche' e' muto), e una parola
-   appesa sotto si mangerebbe l'aria che la geometria dichiara senza che
-   nessuna prova se ne accorga. Dentro, il rettangolo resta quello e il
-   pavimento di 1,2 punti non si muove.
-
-   Non si vede quasi mai, ma si legge sempre: con opacity 0 il testo resta
-   nell'albero di accessibilita', ed e' quel testo il nome del comando. */
+/* La domanda sta dentro la sagoma: per layers.ts questo oggetto e' muto, e
+   una parola appesa sotto mangerebbe l'aria dichiarata. */
 [data-desk-blank] {
   display: block;
   position: relative;
@@ -458,30 +300,21 @@
 
 [data-desk-ask] {
   position: absolute;
-  /* Dentro il foglio, non sul bordo: il post-it e' disegnato a mano e i lati
-     non sono dritti. */
+  /* Dentro il foglio: il post-it e' disegnato a mano e i lati non sono dritti. */
   inset: 12%;
   display: grid;
   place-items: center;
   text-align: center;
   font-family: var(--font-mono), monospace;
-  /* Il corpo segue il mondo come quello delle etichette: dentro il post-it ci
-     stanno undici caratteri per riga, e la domanda ne conta diciassette. */
+  /* Undici caratteri per riga, e la domanda ne conta diciassette. */
   font-size: clamp(0.42rem, 1cqw, 0.68rem);
   line-height: 1.25;
-  /* Inchiostro fisso, non --fg: il post-it e' giallo pieno in tutti e due i
-     temi, e sul tema scuro --fg e' carta: la domanda sparirebbe dentro il
-     giallo proprio nell'unico momento in cui la si legge. */
+  /* Inchiostro fisso: in tema scuro --fg e' carta, e sparirebbe nel giallo. */
   color: var(--ink);
   opacity: 0;
 }
 
-/* Quello che c'e' SCRITTO sul post-it, e che si vede sempre. Prima qui non
-   c'era niente: il post-it stava grigio e muto finche' qualcuno non ci passava
-   sopra col mouse, e nessuno passa il mouse su un quadrato che non sembra
-   niente. L'affordance esisteva solo dopo che l'avevi gia' trovata.
-   Sta nello stesso posto della domanda apposta: sono due cose che si danno il
-   cambio, non due cose da leggere insieme. */
+/* Stesso posto della domanda: si danno il cambio. */
 [data-desk-note] {
   position: absolute;
   inset: 12%;
@@ -491,32 +324,22 @@
   font-family: var(--font-mono), monospace;
   font-size: clamp(0.42rem, 1cqw, 0.68rem);
   line-height: 1.25;
-  /* Inchiostro fisso come la domanda, e per la stessa ragione: vedi sotto. */
   color: var(--ink);
   opacity: 0.75;
 }
 
-/* Al passaggio e al fuoco. E sempre, a tavolo fermo: li' nessuno passa di li'
-   per caso (chi arriva col dito un hover non ce l'ha) e un post-it che non
-   dice niente resterebbe un quadrato giallo che non si sa cos'e'. */
+/* A tavolo fermo l'hover non arriva (col dito non c'e'): la domanda resta
+   scritta. */
 [data-desk-blank]:hover [data-desk-ask],
 [data-desk-blank]:focus-visible [data-desk-ask],
 [data-desk]:not([data-motion="full"]) [data-desk-ask] {
   opacity: 1;
 }
 
-/* ...e la nota si toglie di mezzo, o le due scritte si sovrappongono.
-   Il secondo selettore e' lo stesso caso visto dall'altra parte: a tavolo
-   fermo la domanda sta scritta sempre (riga sopra) e l'hover non succede mai,
-   perche' chi ha chiesto niente movimento o arriva con un puntatore grosso non
-   ha un modo di passarci sopra. Senza, quei due si leggono uno dentro
-   l'altro. */
 [data-desk-blank]:hover [data-desk-note],
 [data-desk-blank]:focus-visible [data-desk-note],
-/* ...e a tavolo fermo, ma SOLO nel mondo dove la domanda esiste. Nel gemello
-   (quello che si vede sotto i 1024px, aria-hidden per intero) la domanda non
-   viene disegnata: spegnere anche li' la nota lasciava un post-it grigio e
-   muto, che e' il difetto da cui era partita tutta questa storia. */
+/* Solo nel mondo dove la domanda esiste: nel gemello aria-hidden la nota
+   spenta lasciava un post-it muto. */
 [data-desk]:not([data-motion="full"])
   [data-desk-world]:not([aria-hidden="true"])
   [data-desk-note] {
@@ -527,19 +350,14 @@
   transition: opacity 0.25s;
 }
 
-/* La dissolvenza sta solo a movimento pieno, e non serve un'altra media query
-   per tenerla: [data-motion="full"] lo scrive resolveMotionLevel, che davanti a
-   prefers-reduced-motion: reduce dice "none". Chi ha chiesto di non muovere
-   niente legge la domanda gia' scritta, ferma. */
+/* Niente media query in piu': data-motion="full" lo scrive
+   resolveMotionLevel, che con reduce dice "none". */
 [data-desk][data-motion="full"] [data-desk-ask] {
   transition: opacity 0.25s;
 }
 
-/* Un comando che prende il fuoco si vede anche se la camera non e' ancora
-   arrivata al suo strato: --p decide quando un oggetto ENTRA, il Tab no, e un
-   anello di fuoco su una cosa trasparente non e' un anello di fuoco.
-   E' l'unico !important del tavolo, e ci vuole: l'opacita' arriva inline
-   perche' e' un dato dell'oggetto, e una regola non batte uno style. */
+/* Il Tab non aspetta --p, e un anello di fuoco su una cosa trasparente non
+   si vede. !important perche' l'opacita' arriva inline. */
 [data-desk-object]:focus-within {
   opacity: 1 !important;
 }
@@ -549,94 +367,47 @@
   left: 50%;
   top: 104%;
   transform: translateX(-50%);
-  /* Va a capo invece di restare su una riga: "L'area riservata" su una riga
-     sola e' largo il doppio dell'oggetto che nomina, e finisce addosso
-     all'etichetta accanto. Sul tavolo lo spazio verticale costa meno di
-     quello orizzontale.
-
-     Le misure che seguono sono la striscia che layers.ts tiene libera attorno a
-     ogni oggetto, e non sono libere: un test le legge DA QUI e verifica che
-     LABEL le rispecchi. Due righe da 1.2 piu' 0.2 di respiro fanno i 2.6em di
-     LABEL.height, il top: 104% e' LABEL.gap, il corpo del carattere e' LABEL.em.
-     Cambiarne una senza cambiare layers.ts fa cadere una prova, apposta: la
-     geometria misurerebbe un rettangolo piu' piccolo di quello disegnato, e
-     nessuna prova di sovrapposizione se ne accorgerebbe.
-     max-width (che arriva inline, da LABEL.width) e' larga
-     quanto la parola piu' lunga del vocabolario del tavolo ("prenotazioni",
-     dodici caratteri) piu' il respiro laterale, cosi' niente sborda dal posto
-     che gli e' stato tenuto. Senza spaziatura fra le lettere: 0.04em su dodici
-     caratteri sono mezzo em, ed e' mezzo em che va tolto a un altro oggetto. */
+  /* Le misure sono quelle di LABEL in layers.ts, e un test le rilegge da qui:
+     due righe da 1.2 piu' 0.2 di respiro fanno LABEL.height, top: 104% e'
+     LABEL.gap. Niente letter-spacing: su dodici caratteri e' mezzo em. */
   width: max-content;
   text-align: center;
   line-height: 1.2;
   font-family: var(--font-mono), monospace;
   font-size: clamp(0.5rem, 2.6cqw, 0.72rem);
   color: var(--fg);
-  /* Il fondo della pagina sotto la parola. Non serve piu' a salvare
-     un'etichetta finita sopra il disegno di un altro oggetto: da quando la
-     prova di collisione garantisce 1,2 punti d'aria fra ingombri COMPRENSIVI
-     dell'etichetta, quel caso non capita: e' la rete che tiene se un giorno
-     quel pavimento si abbassasse. Con gli oggetti pieni costerebbe
-     caro (un rettangolo del colore della pagina aperto dentro una superficie) ed e'
-     un motivo in piu' per non abbassarlo. */
+  /* Rete di sicurezza se il pavimento d'aria fra gli ingombri si abbassasse. */
   background-color: var(--bg);
   padding: 0.1em 0.2em;
 }
 
-/* ── I campioni ─────────────────────────────────────────────────────────────
-   Quello che ogni oggetto mostra di se'. La regola sta in DeskSpecimen.tsx e
-   vale anche qui: un campione e' un FRAMMENTO della cosa, mai un suo simbolo.
-   Il che, tradotto in CSS, vuol dire che quasi tutto quello che segue e' una
-   disposizione di poche marche ricorrenti (una riga, un blocco, una tessera,
-   un testo mono) e non ventidue disegni.
+/* Le marche nascono da --desk-stroke, il contorno del materiale: nessun
+   colore a mano, e una prova cade se ci compare un esadecimale. */
 
-   Nessun colore scritto a mano: le marche nascono da --desk-tratto, che e' il
-   contorno del MATERIALE di quell'oggetto (la tavola qui sotto lo dichiara per
-   sagoma). Un campione dentro una scheda e' quindi automaticamente del colore
-   della scheda, e dentro un post-it del colore del post-it. Una prova legge
-   queste regole e cade se ci compare un esadecimale.
-
-   La misura: a riposo un campione e' largo una settantina di pixel, e i testi
-   mono ci stanno appena. Non e' un problema da risolvere, e' il patto: la
-   camera arretra da 3,69 a 1 durante lo scorrimento, quindi questi disegni si
-   leggono benissimo quando il tavolo e' ingrandito e diventano texture quando
-   e' fermo. Sono un premio per chi guarda mentre scorre, non un'informazione
-   che qualcuno deve riuscire a leggere. */
-
-/* La scatola del campione pende da [data-desk-piece], come i materiali: e' il
-   pezzo disegnato a dire dove sta il suo frammento, non il posto in cui il
-   pezzo si trova. Sul tavolo il pezzo e' il <li>; nelle consegne di «Come
-   lavoro» e' il disegno, e la struttura dentro e' la stessa: la sagoma, e il
-   campione suo fratello. Senza questo il campione si impaginava DOPO la
-   sagoma invece che dentro: le marche in percentuale collassavano e quelle
-   assolute coprivano tutto il disegno. */
+/* Pende da [data-desk-piece] come i materiali: senza, nei disegni fuori dal
+   tavolo il campione si impaginava dopo la sagoma invece che dentro. */
 [data-desk-piece] [data-desk-sample] {
   position: absolute;
-  /* Il rettangolo utile dentro la sagoma. Il pezzo e' alto quanto il disegno
-     (l'etichetta e' assoluta e non lo alza), quindi questi inset misurano la
-     sagoma. Il default va bene per foglio e scheda; chi ha un corpo diverso lo
-     ridichiara qui sotto: sono i margini interni del disegno, non stile. */
+  /* Inset sui margini interni del disegno: il pezzo e' alto quanto la sagoma,
+     perche' l'etichetta e' assoluta. */
   inset: 9% 8%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 7%;
   overflow: hidden;
-  /* Nessun filtro: l'ombra sta su [data-desk-shape], e queste marche sono
-     troppo piccole per reggerne una: a 98px impasterebbero. */
+  /* Nessun filtro: a 98px un'ombra sulle marche impasterebbe. */
 }
 
-/* La linguetta della scheda occupa le prime 16 unita' del suo viewBox: il
-   campione comincia sotto, o gli finirebbe dentro. */
+/* La linguetta della scheda occupa le prime 16 unita' del viewBox. */
 [data-desk-piece][data-shape="card"] [data-desk-sample] { inset: 28% 9% 11%; }
-/* Il telefono ha lo schermo, non il corpo: 9 unita' di scocca su 74x148. */
+/* Lo schermo, non il corpo: 9 unita' di scocca su 74x148. */
 [data-desk-piece][data-shape="phone"] [data-desk-sample] { inset: 8% 14%; gap: 6%; }
 [data-desk-piece][data-shape="rack"] [data-desk-sample] { inset: 11% 9%; gap: 5%; }
 [data-desk-piece][data-shape="plate"] [data-desk-sample] { inset: 20%; }
-/* Il post-it lascia libero l'angolo che si solleva, in basso a destra. */
+/* Libero l'angolo che si solleva, in basso a destra. */
 [data-desk-piece][data-shape="postit"] [data-desk-sample] { inset: 14% 16% 22% 14%; }
 
-/* ── Le marche ──────────────────────────────────────────────────────────── */
 [data-desk-sample] i { display: block; }
 
 [data-desk-sample] [data-m="line"] {
@@ -693,9 +464,6 @@
   background-color: color-mix(in oklab, var(--desk-stroke) 62%, transparent);
 }
 
-/* La scheda prodotto: un'immagine a sinistra, il dettaglio a destra, e il
-   prezzo in accento. Il prezzo e' l'unico segno che distingue un catalogo da
-   una galleria: senza, questo campione sarebbe "Le immagini" con del testo. */
 [data-desk-sample] [data-m="card"] { display: flex; gap: 8%; flex: 1; }
 [data-desk-sample] [data-m="tile"] {
   border-radius: 1px;
@@ -716,8 +484,6 @@
   background-color: var(--accent);
 }
 
-/* Il gestionale: il codice sopra, la descrizione, e la quantita' in fondo a
-   destra dove sta su ogni riga d'ordine che sia mai esistita. */
 [data-desk-sample] [data-m="qty"] {
   display: flex;
   align-items: center;
@@ -726,9 +492,6 @@
 }
 [data-desk-sample] [data-m="mono"][data-small] { font-size: 0.62cqw; }
 
-/* Farsi trovare: tre risultati, e il primo in accento. La riga in accento e'
-   il titolo del primo, cioe' l'unica cosa che "farsi trovare" aggiunge a
-   "esistere in una lista". */
 [data-desk-sample] [data-m="result"] {
   display: flex;
   flex-direction: column;
@@ -741,9 +504,6 @@
   height: 0.5em;
 }
 
-/* La ricevuta. La linea di strappo e' un fondo tratteggiato e non un elemento:
-   e' una sola riga di CSS invece di dodici <i>, e a 98px la differenza fra i
-   due modi non esiste. */
 [data-desk-sample] [data-m="receipt"] {
   display: flex;
   flex-direction: column;
@@ -774,14 +534,11 @@
   flex: none;
   background-color: color-mix(in oklab, var(--desk-stroke) 55%, transparent);
 }
-/* Il totale e' l'unica cosa in accento: e' il numero che si guarda. */
 [data-desk-sample] [data-m="item"][data-total] [data-m="amount"] {
   background-color: var(--accent);
   height: 0.44em;
 }
 
-/* Il mese: sei colonne per tre righe, e un giorno preso. Quel giorno e' l'unica
-   cosa che una prenotazione aggiunge a un calendario, ed e' l'unico in accento. */
 [data-desk-sample] [data-m="month"] {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -806,8 +563,6 @@
   background-color: color-mix(in oklab, var(--desk-stroke) 26%, transparent);
 }
 
-/* Le copie: la stessa sagoma tre volte, sfalsata. Non e' un'icona di un backup,
-   e' letteralmente una cosa ripetuta, che e' quello che un backup e'. */
 [data-desk-piece] [data-desk-sample="copie"] { display: block; }
 [data-desk-sample] [data-m="copy"] {
   position: absolute;
@@ -836,7 +591,6 @@
   align-items: center;
   justify-content: space-between;
   flex: 1;
-  /* Il filo fra i nodi: un fondo, non tre elementi. */
   background-image: linear-gradient(
     to right,
     color-mix(in oklab, var(--desk-stroke) 45%, transparent) 0 100%
@@ -866,10 +620,6 @@
 }
 [data-desk-sample] [data-m="bar"]:last-child { background-color: var(--accent); }
 
-/* L'immagine: un cielo, un sole, un profilo. E' il campione meno letterale dei
-   ventidue (un'immagine non ha un contenuto proprio da mostrare) e resta
-   dentro la regola solo perche' e' quello che si vede in un posto dove
-   un'immagine non e' ancora arrivata. */
 [data-desk-piece] [data-desk-sample="immagini"] { display: block; }
 [data-desk-sample] [data-m="sky"] {
   position: absolute;
@@ -892,10 +642,7 @@
   clip-path: polygon(0 100%, 34% 12%, 62% 62%, 78% 40%, 100% 100%);
 }
 
-/* I tre colori veri del brand. Sono gli unici token "crudi" del tavolo: non
-   --fg e --bg, che si invertono col tema, ma le tinte come sono: e' il senso
-   del campione. Mostrare i colori del sito girati al buio sarebbe mostrare
-   altri colori. Il bordo li stacca dal materiale sotto. */
+/* Token crudi e non --fg/--bg: i colori del brand non si invertono col tema. */
 [data-desk-sample] [data-m="swatch"] {
   flex: 1;
   width: 100%;
@@ -907,7 +654,6 @@
 [data-desk-sample] [data-m="swatch"][data-t="accent"] { background-color: var(--orange); }
 [data-desk-sample] [data-m="swatch"][data-t="ink"] { background-color: var(--ink); }
 
-/* Il carattere dei titoli, nel suo peso. Non una A stilizzata: proprio quella. */
 [data-desk-sample] [data-m="aa"] {
   font-family: var(--font-display), var(--font-body), sans-serif;
   font-weight: 400;
@@ -917,24 +663,16 @@
   color: color-mix(in oklab, var(--desk-stroke) 88%, transparent);
 }
 
-/* I tre campioni che sono testo perche' la cosa che mostrano E' testo: un
-   dominio, uno schema di connessione, un numero di secondi. */
 [data-desk-sample] [data-m="mono"] {
   font-family: var(--font-mono), monospace;
   font-weight: 400;
-  /* Tarato sul campione PIU' LUNGO, non su quello medio: "v2.4 → v2.5" sono
-     undici caratteri, e a 0,6em di avanzamento per carattere occupano 51px
-     dentro i 57 che un post-it lascia liberi. Gli altri tre (nome.it, https://,
-     0,4 s) hanno percio' aria di avanzo, che e' il verso giusto in cui
-     sbagliare: un campione un po' piccolo si legge come texture, uno tagliato a
-     meta' si legge come un difetto. */
+  /* Tarato sul piu' lungo: "v2.4 → v2.5" a 0,6em per carattere occupa 51px
+     dei 57 che un post-it lascia liberi. */
   font-size: 0.78cqw;
   line-height: 1.2;
   text-align: center;
   letter-spacing: -0.02em;
-  /* Mai a capo: queste stringhe sono una cosa sola. Un dominio spezzato su due
-     righe non e' piu' un dominio. Se un giorno una non ci sta, deve sbordare e
-     farsi vedere, non accartocciarsi in silenzio. */
+  /* Mai a capo: se un giorno non ci sta, deve sbordare e farsi vedere. */
   white-space: nowrap;
   color: color-mix(in oklab, var(--desk-stroke) 82%, transparent);
 }
@@ -944,26 +682,14 @@
 [data-desk-piece] [data-desk-sample="manutenzione"],
 [data-desk-piece] [data-desk-sample="caratteri"] { justify-content: center; }
 
-/* ── La camera ──────────────────────────────────────────────────────────────
-   Da qui in giu' e' tutto movimento, e ha due chiavi per la stessa porta:
-   `prefers-reduced-motion: no-preference` e [data-motion="full"], che scrive
-   DeskStage. Chi non ha chiesto lo spettacolo non prende UNA SOLA di queste
-   regole: il tavolo fermo qui sopra resta quello che era, senza niente da
-   disfare a colpi di !important. E siccome useMotionLevel dice "none" in SSR e
-   al primo render, fermo e completo e' anche quello che si vede prima che il
-   JavaScript arrivi. */
+/* Due chiavi per la stessa porta: la media query e [data-motion="full"].
+   A "none" (anche in SSR e al primo render) non si applica una regola. */
 
 @media (prefers-reduced-motion: no-preference) {
   [data-desk][data-motion="full"] [data-desk-track] { height: 380vh; }
 
-  /* Il palco e' sticky dentro il track: 280vh di scorrimento passano sotto uno
-     schermo fermo. Niente `pin` di ScrollTrigger, cosi' non c'e' un pin-spacer
-     da far litigare con Lenis.
-
-     I tre blocchi smettono di stare in colonna e vanno tutti nella stessa
-     cella: il titolo sta SOPRA il laptop mentre lo riempie, la tesi arriva
-     sopra il tavolo finito. In colonna non ci starebbero: il solo mondo e'
-     alto 824px, e questo palco e' alto quanto lo schermo. */
+  /* Sticky dentro il track, niente pin di ScrollTrigger contro Lenis. I tre
+     blocchi vanno nella stessa cella: in colonna il solo mondo e' alto 824px. */
   [data-desk][data-motion="full"] [data-desk-stage] {
     position: sticky;
     top: 0;
@@ -971,62 +697,23 @@
     padding-block: 0;
     display: grid;
     place-items: center;
-    /* clip e non hidden: hidden creerebbe un contenitore di scorrimento e
-       romperebbe lo sticky qui sopra. Al primo fotogramma il piano e' quattro
-       volte lo schermo, e senza questo sborda sulle sezioni vicine. */
+    /* clip e non hidden, per lo sticky: al primo fotogramma il piano e' quattro
+       volte lo schermo e sborderebbe sulle sezioni vicine. */
     overflow: clip;
   }
 
   [data-desk][data-motion="full"] [data-desk-stage] > * { grid-area: 1 / 1; }
 
-  /* La camera vera. Il piano e le quattro <ul> degli oggetti sono lo stesso
-     rettangolo, sovrapposto: si ingrandiscono INSIEME o il disegno si strappa,
-     le sagome da una parte e il laptop dall'altra. --s la scrive il palco una
-     volta per fotogramma; senza JavaScript non e' scritta, vale 1, e questa
-     riga non fa niente. Sono cinque elementi trasformati dal CSS: il palco non
-     ne tocca nessuno. */
+  /* Piano e oggetti si ingrandiscono insieme o il disegno si strappa. Senza
+     JavaScript --s vale 1 e la riga non fa niente. */
   [data-desk][data-motion="full"] [data-desk-surface],
   [data-desk][data-motion="full"] [data-desk-layer] > ul {
     transform: scale(var(--s, 1));
   }
 
-  /* Il titolo se ne va prima che entri il primo foglio; la tesi arriva a tavolo
-     completo. Le due finestre sono TITLE_BEAT e PUNCH_BEAT di layers.ts: il CSS
-     una costante non la sa importare, quindi i numeri stanno anche qui, e un
-     test rilegge QUESTO file per tenere i due posti uguali.
-     z-index perche' nella stessa cella vince chi e' scritto dopo, e il titolo
-     nel DOM viene prima del mondo. */
-  /* Il titolo sta sopra il laptop mentre lo riempie, ed e' voluto. Quello che
-     non era voluto e' che a tema chiaro fosse inchiostro SU inchiostro: al
-     primo fotogramma il piano e' quattro volte lo schermo, quindi dietro a
-     queste tre righe c'e' la scocca scura del laptop, e il contrasto misurato
-     era 1,00:1. Cioe' il titolo non c'era. A tema scuro il testo e' carta e si
-     salvava da solo, ed e' per questo che il difetto si vedeva da una parte
-     sola.
-
-     Il fondo e' PIENO e non un velo. Un velo parziale sembra la risposta
-     elegante e invece peggiora: al 72% il fondo diventa un grigio medio, e il
-     sottotitolo e' anche lui un grigio medio, quindi scende a 2,68:1, peggio
-     dei 3,34:1 che aveva sul laptop nudo. (Niente valori scritti a mano qui
-     dentro nemmeno nei commenti: una prova legge questo file e pretende che
-     ogni esadecimale venga dalla tavolozza, commenti compresi. Giusto cosi'.) Con il fondo pieno
-     ognuna delle due righe torna al contrasto che ha sul resto della pagina:
-     16,59:1 il titolo e 4,97:1 il sottotitolo.
-
-     E' anche la stessa risposta che ha gia' la didascalia degli strati, che
-     vive nello stesso posto e aveva lo stesso problema: un blocco di carta
-     posato sul tavolo. */
-  /* Il fondo non e' piu' una scheda posata sul laptop: riempie tutta la cella
-     del palco, cioe' esattamente il rettangolo dove poi comparira' il tavolo.
-     Una scheda da 34rem su un piano che al primo fotogramma e' quattro volte
-     lo schermo lasciava scoperta tutta la scocca intorno, e l'occhio leggeva
-     due piani sovrapposti invece di una pagina che si apre. Presa la cella
-     intera, la stessa dissolvenza diventa un foglio che si alza e scopre la
-     scena, che e' la cosa che la sezione racconta.
-
-     `place-self: stretch` vince sul `place-items: center` del palco senza
-     toccarlo: le altre celle restano centrate. Il raggio va a zero perche' un
-     angolo arrotondato a filo di schermo non si vede e basta. */
+  /* Finestra = TITLE_BEAT di layers.ts, riletta da un test. Fondo pieno su tutta
+     la cella: sul laptop scuro il titolo a tema chiaro aveva contrasto 1,00:1.
+     z-index: nella stessa cella vince chi e' scritto dopo. */
   [data-desk][data-motion="full"] [data-desk-title] {
     z-index: 1;
     opacity: clamp(0, 1 - (var(--p, 1) - 0.02) / 0.08, 1);
@@ -1040,25 +727,13 @@
     border-radius: 0;
   }
 
-  /* Il fondo si allarga, la riga di testo no: le tre righe restano sulla misura
-     di lettura che avevano quando il riquadro era una scheda. Senza, il
-     sottotitolo si stenderebbe su tutta la larghezza dello schermo e l'occhio
-     perderebbe l'inizio della riga dopo. */
+  /* Il fondo si allarga, la misura di lettura no. */
   [data-desk][data-motion="full"] [data-desk-title] > * {
     max-width: 34rem;
   }
 
-  /* La tesi non sta al centro: al centro c'e' lo schermo che la frase indica,
-     e coprirlo mentre la si legge sarebbe togliere la battuta. */
-  /* Dentro la camera la tesi non chiude una colonna: galleggia sul tavolo
-     finito, quindi il filo e lo stacco di sopra non servono e anzi sarebbero
-     una riga per aria.
-
-     Il margine sotto invece sale da 3vh a 9vh, e non e' gusto: qui il palco
-     azzera il proprio `padding-block`, quindi quei 3vh erano TUTTO lo spazio
-     fra la tesi e la scena successiva. Su uno schermo da 900px facevano
-     ventisette pixel, ed e' il motivo per cui sembrava incollata a quello che
-     viene dopo. */
+  /* Qui il palco azzera il suo padding-block: i 9vh sotto sono tutto lo
+     spazio fra la tesi e la sezione dopo. */
   [data-desk][data-motion="full"] [data-desk-punch] {
     align-self: end;
     margin-bottom: 9vh;
@@ -1068,29 +743,19 @@
     opacity: clamp(0, (var(--p, 1) - 0.9) / 0.07, 1);
   }
 
-
-  /* Le didascalie escono dal flusso: cosi' il mondo e' alto quanto il piano e
-     il tavolo ci sta in uno schermo. In colonna il mondo sarebbe alto 824px.
-     Non si posiziona [data-desk-layers]: se diventasse un elemento posizionato,
-     le <ul> degli oggetti si aggancerebbero a LUI invece che al mondo e i
-     ventiquattro oggetti finirebbero tutti in un angolo. Basta svuotarlo. */
+  /* Non si posiziona [data-desk-layers]: le <ul> degli oggetti si
+     aggancerebbero a lui invece che al mondo. */
   [data-desk][data-motion="full"] [data-desk-layers] {
     display: block;
     margin-top: 0;
   }
 
-  /* Il margine che tiene la fascia della didascalia. Il mondo e' centrato per
-     la sua scatola di margine, quindi il piano sale di meta' di questo e sotto
-     resta la striscia dove la parola non finisce mai addosso a un oggetto.
-     Senza, l'unico posto libero sarebbe dentro il tavolo, e il fondo pagina
-     della didascalia mangerebbe l'etichetta di chi ci sta sotto. */
+  /* Il mondo e' centrato col margine: sotto il piano resta la fascia dove la
+     didascalia non copre etichette. */
   [data-desk][data-motion="full"] [data-desk-world] { margin-bottom: 6.5rem; }
 
-  /* Una alla volta, sotto l'angolo sinistro del piano, come il sottotitolo di
-     un documentario: entra con il suo strato ed esce quando comincia il
-     successivo. I due estremi arrivano inline da CAPTION_BEATS. Il fondo pagina
-     dietro la parola e' lo stesso trucco delle etichette: finche' la camera e'
-     arretrata il piano ingrandito passa di qui, e senza non si leggerebbe. */
+  /* Il fondo pagina dietro la parola, come per le etichette: la camera
+     arretrata ci passa sotto. */
   [data-desk][data-motion="full"] [data-desk-caption] {
     position: absolute;
     left: 0;
@@ -1098,18 +763,8 @@
     margin-top: 0.75rem;
     z-index: 1;
     max-width: 32rem;
-    /* Un cartellino posato sul tavolo, non un fondo. Il fondo serve comunque,
-       per la ragione detta qui sopra, ma da solo era una lastra che abbracciava
-       il testo: larga quanto la frase, quindi di forma diversa per ognuna delle
-       quattro, e con il padding sinistro a zero cominciava esattamente sul
-       primo carattere, allineata a niente. Adesso e' un oggetto, con lo stesso
-       vocabolario dei tesserini di «Dove ho imparato»: contorno da 1,5px,
-       raggio 4px, ombra secca da 2px.
-
-       --fg/--bg e non --ink/--paper come i tesserini: quelli stanno sull'arancio,
-       dove la scala dei toni non si ribalta col tema. Qui siamo sul fondo di
-       pagina, che si ribalta eccome, e con --ink il cartellino sarebbe nero di
-       notte. */
+    /* --fg/--bg e non --ink/--paper come i tesserini: qui il fondo si ribalta
+       col tema, e con --ink il cartellino sarebbe nero di notte. */
     padding: 0.85rem 1.1rem 0.95rem;
     background-color: var(--bg);
     border: 1.5px solid color-mix(in oklab, var(--fg) 45%, transparent);

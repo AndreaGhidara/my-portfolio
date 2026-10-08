@@ -26,24 +26,10 @@ import { useDrag } from "./useDrag";
 const WIDTH = 1200;
 const HEIGHT = 820;
 
-/**
- * La mappa della cassetta: nove pezze di stoffa, gli attrezzi cuciti sopra
- * come etichette, i fili fra chi lavora con chi, e a destra l'etichetta di
- * quello che si e' aperto.
- *
- * Il server la rende gia' finita, nella sua scatola con le proporzioni del
- * banco: niente misure nel browser, niente scambio di vista dopo il montaggio,
- * e la sezione ha la stessa altezza prima e dopo il JavaScript.
- *
- * Tutto il movimento e' a "full": l'entrata dei nodi, il trascinamento con la
- * molla e l'ago che cuce. A "reduced" e a "none" la mappa sta ferma e il filo
- * di un capo e' gia' cucito. Il passaggio del mouse che accende la strada
- * fino al cartellino non e' movimento, e vale sempre.
- *
- * La mappa e' fuori dall'ordine di tabulazione e nascosta agli screen reader:
- * il percorso da tastiera sono i bottoni «cuci per» e l'etichetta qui accanto,
- * che da ogni nodo porta ai suoi vicini; chi legge ha l'elenco per scomparti.
- */
+// Il server la rende gia' finita: niente misure nel browser, stessa altezza
+// prima e dopo il JavaScript. Entrata, molla e ago solo a "full"; l'accensione
+// al passaggio del mouse non e' movimento e vale sempre. Fuori dai Tab e
+// nascosta agli screen reader: da tastiera si passa dall'etichetta.
 export function ToolboxMap({
   copy,
   garment,
@@ -61,7 +47,7 @@ export function ToolboxMap({
   onGarment: (id: string) => void;
   actions: ReactNode;
   level: MotionLevel;
-  /** Se e' la vista che il CSS mostra adesso: l'altra non si anima. */
+  /** La vista che il CSS mostra adesso: l'altra non si anima. */
   active: boolean;
 }) {
   const bench = useRef<HTMLDivElement | null>(null);
@@ -76,8 +62,8 @@ export function ToolboxMap({
     [stops],
   );
 
-  // GSAP arriva dopo la prima pittura: la mappa lo tiene a portata di mano
-  // per la molla e per l'ago, che partono da un clic e non da una build.
+  // GSAP arriva dopo la prima pittura e si tiene in un ref: molla e ago
+  // partono da un clic, non da una build.
   useSectionAnimation(({ gsap }) => {
     gsapRef.current = gsap;
     return () => {
@@ -107,8 +93,7 @@ export function ToolboxMap({
       },
     });
 
-  /* La strada fino al cartellino, e i vicini: solo senza un capo scelto,
-     perche' con un capo la mappa racconta gia' un'altra cosa. */
+  // Solo senza un capo scelto: con un capo la mappa racconta gia' il suo percorso.
   const lit = !garment && hovered ? hovered : null;
   const litPath = lit ? pathTo(lit) : [];
   const litNodes = new Set(lit ? [...litPath, ...neighbours(lit)] : []);
@@ -347,7 +332,7 @@ export function ToolboxMap({
   );
 }
 
-/** La trama di ogni pezza: pieni e vuoti, righe, punti, quadretti. Il colore lo decide il CSS. */
+// Il colore della trama lo decide il CSS.
 const TEXTURE: Record<ZoneId, "lines" | "dots" | "grid" | null> = {
   front: null,
   stili: "dots",

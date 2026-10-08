@@ -13,7 +13,6 @@ const bench = (container: HTMLElement) => container.querySelector('[data-game-le
 const tool = (k: (typeof TOOLS)[number]) =>
   within(screen.getByRole("group", { name: t.attrezzi })).getByRole("button", { name: new RegExp(t.attrezzo[k].nome) });
 
-/** Le scelte del cassetto aperto: il gruppo porta il titolo dell'attrezzo. */
 const choices = (k: (typeof TOOLS)[number]) =>
   within(screen.getByRole("group", { name: t.attrezzo[k].titolo })).getAllByRole("button");
 
@@ -22,8 +21,7 @@ const screws = () => screen.queryAllByRole("button", { name: /svita la vite/ });
 const advance = (ms: number) => act(() => vi.advanceTimersByTime(ms));
 const click = (el: HTMLElement) => fireEvent.click(el);
 
-/** Apre ogni attrezzo e ne prova una scelta. Il telefono si prova e si torna
- *  al computer, perche' le viti stanno sul portatile. */
+// Il telefono si prova e si torna al computer: le viti stanno sul portatile.
 function tryAll() {
   for (const k of TOOLS) {
     click(tool(k));

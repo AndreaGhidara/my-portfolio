@@ -17,21 +17,10 @@ export type DeskLayerData = {
   objects: { id: string; shape: DeskShape; label: string | null; sample?: SampleId }[];
 };
 
-/**
- * Il mondo. Il DOM non e' una tela di etichette che galleggiano: e' una <ol> di
- * quattro strati, ognuno con il suo <h3> e la sua <ul> di oggetti. Uno screen
- * reader legge "Il sito: i colori, i caratteri, le sezioni...", in ordine e per
- * intero. Non c'e' una versione accessibile parallela da tenere allineata: c'e'
- * una cosa sola, guardata in due modi.
- *
- * Il mondo si disegna solo largo, da desktop. Sotto i 1024px la sezione e' il
- * gioco (game/Game.tsx) e il CSS toglie questo mondo dall'impaginato.
- *
- * Sotto il piano ci sono le didascalie dei quattro strati, in quattro
- * colonne. Il piano e' un elemento a se':
- * gli oggetti contano le loro percentuali su quello, non sul blocco intero, o
- * ogni riga di testo in piu' sposterebbe il tavolo.
- */
+// La lista e' il disegno: niente versione accessibile parallela da allineare.
+// Il piano e' un elemento a se' perche' le percentuali degli oggetti si
+// contano su di lui: sul blocco intero ogni riga di didascalia sposterebbe il
+// tavolo. Sotto i 1024px il CSS lo toglie e resta il gioco (game/Game.tsx).
 export function DeskTable({
   layers,
   centre,
@@ -40,16 +29,13 @@ export function DeskTable({
 }: {
   layers: DeskLayerData[];
   centre: string;
-  /** Il nome del comando sul post-it bianco: l'unico oggetto che si preme. */
   blank: string;
-  /** Quello che c'e' scritto sul post-it prima che lo si prema. */
   note: string;
 }) {
   return (
     <div
       data-desk-world
-      // Il formato e' uno solo, ma l'attributo resta: e' quello che la camera
-      // di DeskStage e il CSS cercano per trovare il mondo.
+      // Il formato e' uno solo, ma la camera di DeskStage e il CSS cercano questo.
       data-layout="wide"
       style={
         {
@@ -61,23 +47,11 @@ export function DeskTable({
       <div data-desk-surface>
 
         <div data-desk-centre style={{ width: `${CENTRE.width}%` }}>
-          {/* Due strati come ogni altra sagoma, ed e' il pieno scuro della
-              scocca che fa leggere acceso lo schermo qui sotto: un sito chiaro
-              dentro un contorno vuoto era un disegno appoggiato sul tavolo. */}
           <DeskShapeArt drawing="laptop" />
 
-          {/* Il sito finito, dentro lo schermo. La sezione si apre su "un sito
-              finito riempie lo schermo" e si chiude dicendo che quello schermo
-              e' UNA delle cose sul tavolo: se al centro c'e' una cornice vuota,
-              la frase indica un rettangolo nero e non dice piu' niente.
-
-              Non puo' stare dentro laptop.svg: le sagome sono maschere a un
-              colore solo, e una maschera l'arancio non lo sa portare. Qui e'
-              DOM vero, appoggiato sopra il disegno e misurato sulla scatola del
-              laptop (lo schermo, nel viewBox 360x240, va da 9,9 a 351,209).
-
-              E' decorazione e basta: nessun testo, niente da annunciare. Il nome
-              del centro e' gia' la didascalia "il progetto" qui sotto. */}
+          {/* DOM e non laptop.svg: una maschera porta un colore solo, e qui
+              serve l'arancio. Misurato sul viewBox 360x240 (schermo da 9,9 a
+              351,209). Decorazione: il nome del centro e' la didascalia. */}
           <span data-desk-screen aria-hidden="true">
             <span data-desk-screen-bar />
             <span data-desk-screen-head />
@@ -94,10 +68,8 @@ export function DeskTable({
       <ol data-desk-layers>
         {layers.map((layer, index) => (
           <li key={layer.id} data-desk-layer={layer.id}>
-            {/* La finestra viene da CAPTION_BEATS, non ricalcolata a mano: il
-                conteggio delle fasi vive in un posto solo. Ha due estremi e non
-                uno: sotto la camera le quattro didascalie stanno tutte nello
-                stesso posto, e si danno il cambio. */}
+            {/* Due estremi e non uno: sotto la camera le didascalie stanno
+                nello stesso posto e si danno il cambio. */}
             <div
               data-desk-caption
               style={
@@ -120,11 +92,8 @@ export function DeskTable({
                   sample={object.sample}
                   placement={placeObject(index, i)}
                   beat={objectBeat(index, i, OBJECTS_PER_LAYER)}
-                  // L'oggetto senza etichetta e' il post-it bianco, e non ce
-                  // n'e' un altro: e' il posto per la cosa che non e' ancora
-                  // stata raccontata, quindi porta dove la si racconta. Il
-                  // segnale e' l'etichetta che manca, che e' lo stesso `mute`
-                  // di content/desk.ts arrivato fin qui.
+                  // L'etichetta che manca e' il `mute` di content/desk.ts:
+                  // l'unico oggetto senza e' il post-it bianco, il comando.
                   href={object.label === null ? "#contact" : undefined}
                   action={object.label === null ? blank : undefined}
                   note={object.label === null ? note : undefined}

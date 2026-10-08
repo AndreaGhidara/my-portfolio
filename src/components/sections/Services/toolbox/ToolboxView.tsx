@@ -2,10 +2,6 @@ import { Reveal } from "@/animations/components/Reveal";
 import { Toolbox } from "./Toolbox";
 import type { ToolboxCopy } from "./types";
 
-/**
- * Gli attrezzi: dove stava «E in pratica?», subito dopo il tavolo. Il tavolo
- * dice cosa c'e' sotto un sito, questa dice con cosa lo cucio.
- */
 export function ToolboxView({
   eyebrow,
   title,

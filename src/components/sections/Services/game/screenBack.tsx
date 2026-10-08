@@ -5,15 +5,8 @@ import { useTranslations } from "next-intl";
 import { Icon, type NodeIcon } from "./icons";
 import { levelNumber } from "./levels";
 
-/**
- * L'anteprima del livello 2: lo schermo e' caduto e si vede il circuito che
- * c'era dietro. Dura il tempo del passaggio da solo al livello dopo.
- *
- * Nel prototipo i nodi erano posati sopra il disegno in percentuale, e con
- * un banco piu' stretto del disegno scivolavano via dai fili. Qui stanno
- * dentro lo stesso svg, nelle stesse coordinate: restano sui fili a ogni
- * larghezza.
- */
+// I nodi stanno nello stesso svg dei fili, nelle stesse coordinate: posati
+// sopra in percentuale, come nel prototipo, su un banco stretto scivolavano via.
 
 const NODES: Record<NodeIcon, [number, number]> = {
   contatti: [70, 110],
@@ -45,10 +38,8 @@ const wirePath = ([a, b]: [Point, Point]) => {
   return `M${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`;
 };
 
-/** Le scintille che corrono sui fili: tre colori a giro. */
 const SPARKS = ["var(--bulb)", "var(--orange)", "var(--screen-light-green)"];
 
-/** Il lato della tessera di un nodo, in unita' del disegno. */
 const SIDE = 28;
 
 export function ScreenBack({ onRestart }: { onRestart: () => void }) {

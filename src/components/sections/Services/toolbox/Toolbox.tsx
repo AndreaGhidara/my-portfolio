@@ -8,18 +8,14 @@ import { toolsIn, garmentById } from "./graph";
 import { ToolboxMap } from "./ToolboxMap";
 import type { ToolboxStep, ToolboxCopy } from "./types";
 
-/**
- * Dove si vede la mappa: con il mouse, e da 1280px in su. Sotto, o con il
- * dito, l'editor. La stessa condizione sta in sezioni/cassetta.css, che e' chi sceglie
- * davvero quale delle due scatole si vede: qui serve solo a sapere quale
- * animare.
- */
+// La stessa condizione sta in styles/sections/toolbox.css, che sceglie davvero
+// quale vista si vede: qui serve solo a sapere quale animare.
 export const MAP_QUERY = "(pointer: fine) and (min-width: 1280px)";
 
 type State = {
   history: ToolboxStep[];
   garment: string | null;
-  /** Da quale passo della storia e' partito il foglio del telefono, se e' aperto. */
+  /** Il passo da cui e' partito il foglio del telefono: indietro non scende sotto. */
   sheet: number | null;
 };
 
@@ -40,15 +36,9 @@ function push(history: ToolboxStep[], p: ToolboxStep): ToolboxStep[] {
   return sameStep(history[history.length - 1], p) ? history : [...history, p];
 }
 
-/**
- * Il capo scelto e la cronologia stanno qui, nel genitore delle due viste:
- * girando il tablet o allargando la finestra si passa dall'una all'altra e si
- * ritrova lo stesso lavoro e la stessa etichetta.
- *
- * La cronologia parte sempre dal cartellino, che e' il punto a cui
- * «indietro» riporta per ultimo. Tornando su un capo la mappa lo ricuce; tornando
- * al cartellino con un capo scelto, torna la cassetta intera.
- */
+// Nel genitore delle due viste: girando il tablet si passa dall'una all'altra
+// e si ritrova lo stesso lavoro. Tornando su un capo lo si ricuce; tornando al
+// cartellino torna la cassetta intera.
 export function toolboxReducer(s: State, action: Action): State {
   switch (action.type) {
     case "node":
@@ -90,13 +80,10 @@ function useMapView(): boolean | null {
   return isMap;
 }
 
-/**
- * La cassetta: «cuci per», e sotto la mappa o l'editor. Tutte e due le scatole
- * sono nel markup del server, e il CSS ne mostra una: nessuno scambio dopo il
- * montaggio, quindi la sezione ha la stessa altezza prima e dopo il JavaScript.
- * L'elenco per scomparti e' quello che legge uno screen reader, e quello che si
- * vede senza JavaScript.
- */
+// Mappa ed editor sono tutti e due nel markup del server e il CSS ne mostra
+// uno: nessuno scambio dopo il montaggio, stessa altezza prima e dopo il
+// JavaScript. L'elenco per scomparti e' per gli screen reader e per chi non ha
+// JavaScript.
 export function Toolbox({ copy }: { copy: ToolboxCopy }) {
   const level = useMotionLevel();
   const mapView = useMapView();

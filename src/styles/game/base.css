@@ -1,34 +1,14 @@
-/* ── Il gioco del metodo: il guscio e i pezzi comuni ───────────────────────
-   Sotto i 1024px la sezione «Tutto quello che non si vede» non e' il tavolo:
-   e' un gioco a quattro livelli (Services/gioco/). Questo file e' l'unico con
-   selettori comuni, tutti sotto [data-gioco]. Ogni livello ha il suo file e
-   ci scrive solo sotto la sua radice, [data-gioco-livello="<nome>"]: quattro
-   persone ci lavorano insieme, e una classe comune ridefinita in un livello
-   cambierebbe gli altri tre.
-
-   I COLORI. Solo i token fissi della palette, mai quelli del tema (--bg, --fg,
-   --line, --superficie): il banco e' un oggetto, e ha lo stesso aspetto di
-   giorno e di notte. I toni in piu' dei prototipi sono miscele dei token,
-   dichiarate qui sotto una volta per tutti. --mutedDark, --green e
-   --greenDark non esistono fra le variabili globali (c'e' solo --verde, che
-   col tema cambia): li scrive Gioco.tsx sulla radice, presi da palette.ts.
-
-   Le classi comuni: .banco, .sopra (.reticolo), .testa (.livello, .destra),
-   .console (.mono, h3, .spiega, .capo .chip), .palco, .azioni (.due, .solo,
-   .giallo, .rompi, .verde, .arancio), .ic, .lista, .riga (.corta, .interr,
-   .si, .no), e le .stelle del cielo di notte (livello 4 e finale). Le
-   animazioni: gioco-entra, gioco-scuoti, gioco-lampeggia,
-   gioco-timbra. */
+/* L'unico file con selettori comuni, sotto [data-game]: ogni livello scrive solo
+   sotto [data-game-level="<id>"], perche' una classe comune ridefinita in un
+   livello cambierebbe gli altri tre. Solo token fissi, mai del tema: il banco ha
+   lo stesso aspetto di giorno e di notte. */
 
 [data-game] {
-  /* Il fondo scuro della parte di sopra, e i suoi due gradini. */
   --game-dark: color-mix(in oklab, var(--ink) 94%, var(--paper));
   --game-dark-2: color-mix(in oklab, var(--ink) 88%, var(--paper));
   --game-grid: color-mix(in oklab, var(--ink) 85%, var(--paper));
   --game-dark-border: color-mix(in oklab, var(--ink) 72%, var(--paper));
-  /* Il fondo di una cosa scelta: carta appena scaldata dal giallo. */
   --game-cream: color-mix(in oklab, var(--bulb) 18%, var(--paper));
-  /* L'ombra piena sotto i pulsanti colorati. */
   --game-green-shadow: color-mix(in oklab, var(--green) 62%, var(--ink));
   --game-orange-shadow: color-mix(in oklab, var(--orange) 58%, var(--ink));
 
@@ -51,15 +31,13 @@
   --game-out-track: color-mix(in oklab, var(--paper) 22%, var(--ink));
 }
 
-/* Da desktop la sezione e' il tavolo con la camera, e il gioco non c'e':
-   display:none lo toglie anche dall'albero di accessibilita', quindi i suoi
-   pulsanti non sono fermate del Tab che nessuno vede. E' lo stesso patto del
-   mondo largo, che sotto i 1024px fa il contrario (sezioni/tavolo.css). */
+/* display:none toglie il gioco anche dall'albero di accessibilita': i suoi
+   pulsanti non sono fermate del Tab che nessuno vede. desk.css fa il contrario
+   sotto i 1024px. */
 @media (min-width: 1024px) {
   [data-game] { display: none; }
 }
 
-/* ── Le quattro barrette: dove sei, e quelli fatti si riaprono ──────────── */
 [data-game-bars] {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -95,8 +73,7 @@
 [data-game-bars] button[data-state="current"] i { background: var(--orange); }
 [data-game-bars] button:is(:disabled, [aria-disabled="true"]) { cursor: default; }
 
-/* La riga del livello. Alta tre righe sempre, qualunque livello: cambia il
-   testo, non l'altezza della pagina. */
+/* Alta sempre tre righe: cambia il testo, non l'altezza della pagina. */
 [data-game-line] {
   margin-block-start: 0.8rem;
   block-size: 4.65em;
@@ -107,7 +84,6 @@
 
 [data-game-line] > p { animation: game-enter 0.35s ease backwards; }
 
-/* ── Il banco: sopra lo scuro, sotto la console. Alto uguale per tutti ──── */
 [data-game] .bench {
   position: relative;
   block-size: 38rem;
@@ -119,7 +95,6 @@
   overflow: hidden;
   background: var(--game-dark);
   color: var(--ink);
-  /* Cambiando livello il banco si rimonta, e questa e' la sua dissolvenza. */
   animation: game-enter 0.35s ease backwards;
 }
 
@@ -130,7 +105,6 @@
   color: var(--paper);
 }
 
-/* Il reticolo del circuito, per chi lo vuole sotto la scena. */
 [data-game] .above.lattice::before {
   content: "";
   position: absolute;
@@ -170,12 +144,10 @@
   color: var(--bulb);
 }
 
-/* Al cambio di livello il fuoco arriva sul banco via codice (Gioco.tsx): li'
-   l'anello attorno a tutto il banco non dice niente a chi usa il dito. Da
-   tastiera resta, perche' li' e' il segno di dove si e'. */
+/* Il fuoco arriva sul banco via codice (Game.tsx): l'anello attorno al banco
+   non dice niente a chi usa il dito, da tastiera invece resta. */
 [data-game] [data-game-level]:focus:not(:focus-visible) { outline: none; }
 
-/* ── La console: quello che si fa adesso ───────────────────────────────── */
 [data-game] .console {
   position: relative;
   min-block-size: 0;
@@ -235,15 +207,13 @@
 
 [data-game] .garment .chip svg { inline-size: 100%; block-size: 100%; }
 
-/* Il palco: la scena del livello. Prende quello che resta fra il testo e i
-   pulsanti, e quello che non ci sta non scivola sotto i pulsanti. */
+/* Quello che non ci sta non deve scivolare sotto i pulsanti. */
 [data-game] .stage {
   position: relative;
   min-block-size: 0;
   overflow: hidden;
 }
 
-/* ── I pulsanti, in fondo, nel flusso ──────────────────────────────────── */
 [data-game] .actions {
   display: grid;
   grid-template-columns: 1fr;
@@ -309,11 +279,9 @@
   transform: none;
 }
 
-/* ── Le icone a tratto (icone.tsx): misurate da chi le contiene ─────────── */
 [data-game] .ic { display: block; }
 [data-game] .ic svg { display: block; inline-size: 100%; block-size: 100%; }
 
-/* ── Le righe di un elenco, e l'interruttore ───────────────────────────── */
 [data-game] .list {
   display: grid;
   align-content: start;
@@ -394,7 +362,6 @@
 [data-game] .line[aria-pressed="true"] .interr { background: var(--green); }
 [data-game] .line[aria-pressed="true"] .interr::after { transform: translateX(0.88rem); }
 
-/* ── Il cielo di notte: le stelle del livello 4 e del finale ────────────── */
 [data-game] :where([data-game-level="notte"], [data-game-level="finale"]) .stars {
   position: absolute;
   inset: 0;
@@ -410,8 +377,7 @@
     radial-gradient(1.2px 1.2px at 66% 48%, var(--star) 50%, transparent 51%);
 }
 
-/* ── Le animazioni comuni ──────────────────────────────────────────────────
-   Con prefers-reduced-motion le azzera la regola globale di globals.css. */
+/* Con prefers-reduced-motion le azzera la regola globale di globals.css. */
 @keyframes game-enter {
   from { opacity: 0; transform: translateY(8px); }
 }

@@ -15,11 +15,9 @@ const tail = (c: HTMLElement) => bench(c).querySelector(".tail") as HTMLElement;
 const moduleButton = (name: string) => screen.getByRole("button", { name: name });
 const switchOn = () => screen.getByRole("button", { name: new RegExp(p.spento.accendi) });
 
-/** Il clic sincrono: userEvent con i timer finti farebbe correre il battito
- *  fra un evento e l'altro, e i conti del tempo non tornerebbero piu'. */
+// Clic sincrono: userEvent coi timer finti farebbe correre il battito fra un evento e l'altro.
 const tap = (el: HTMLElement) => fireEvent.click(el);
 
-/** Avanza il tempo finto dentro act, perche' i battiti aggiornano lo stato. */
 const advance = (ms: number) => act(() => vi.advanceTimersByTime(ms));
 
 beforeEach(() => {
@@ -78,8 +76,7 @@ describe("il pannello, acceso e spento", () => {
     expect(screen.getByText(p.acceso.spia.titolo)).toBeInTheDocument();
     expect(moduleButton(p.servizi.manutenzione)).toHaveClass("alarm");
 
-    // 1,2 punti ogni 400 ms, e con lo StrictMode un intervallo solo: 4 s
-    // fanno 12 punti, non 24.
+    // 1,2 punti ogni 400 ms, e in StrictMode un intervallo solo: 12 punti, non 24.
     advance(4000);
     expect(health(container)).toBe(88);
   });

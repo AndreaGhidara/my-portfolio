@@ -4,15 +4,9 @@ import { THREADS, toMapPoint, pastThreshold, restPositions, type MapPoint } from
 
 type Gsap = typeof import("gsap").gsap;
 
-/**
- * Il trascinamento: a "full" un'etichetta si prende e si sposta, e al
- * rilascio torna al suo posto con una molla di GSAP. Niente ciclo sempre
- * acceso: si lavora solo mentre qualcosa si muove, e si riscrivono solo i
- * fili del nodo preso. Sotto la soglia il gesto e' un clic, e va a onTap.
- *
- * Restituisce i ref da appendere a nodi e fili, i gestori del puntatore e la
- * presa in corso, che il passaggio del mouse deve rispettare.
- */
+// Niente ciclo sempre acceso: si lavora solo mentre qualcosa si muove. Sotto
+// la soglia il gesto e' un clic e va a onTap. `grab` e' esposto perche' il
+// passaggio del mouse non deve accendere altri nodi durante una presa.
 export function useDrag({
   svg,
   gsapRef,
@@ -38,7 +32,7 @@ export function useDrag({
     moved: boolean;
   } | null>(null);
 
-  /** Riscrive solo i fili del nodo che si muove, non tutti e ottanta. */
+  // Solo i fili del nodo che si muove, non tutti e ottanta.
   const redraw = (id: string) => {
     const pos = positions.current;
     THREADS.forEach((f, i) => {
@@ -148,7 +142,7 @@ export function useDrag({
     if (pr?.moved) spring(pr.id);
   };
 
-  // Rimesso tutto al suo posto quando il movimento si spegne a meta' presa.
+  // Il movimento puo' spegnersi a meta' presa: tutto torna al suo posto.
   useEffect(() => {
     if (full) return;
     for (const [id, r] of restPositions) {

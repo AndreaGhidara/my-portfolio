@@ -5,12 +5,8 @@ import { rules } from "@/test/css";
 import { DeskStage } from "../DeskStage";
 import { cameraScale } from "../layers";
 
-/**
- * jsdom risponde a matchMedia con il mock di vitest.setup.ts, che dice sempre
- * "movimento ridotto": qui serve poterlo cambiare query per query. Restituisce
- * la manopola per cambiare idea a pagina aperta, che e' quello che fa un utente
- * vero quando accende la riduzione del movimento o stringe la finestra.
- */
+// Il mock di vitest.setup.ts dice sempre "movimento ridotto". Restituisce la
+// funzione per cambiare le risposte a pagina aperta.
 function mockMedia(matches: (q: string) => boolean) {
   const listeners = new Set<() => void>();
   let answer = matches;
@@ -35,9 +31,7 @@ const layers = [0, 1, 2, 3].map((i) => ({
   objects: Array.from({ length: 6 }, (_, j) => ({
     id: `l${i}-${j}`,
     shape: "sheet" as const,
-    // Il quarto dell'ultimo strato e' il post-it bianco: senza etichetta, e
-    // quindi con il comando. Serve qui perche' il palco porta un ascoltatore
-    // che vive solo per lui.
+    // Il post-it bianco: il palco gli appende un ascoltatore del fuoco.
     label: i === 3 && j === 3 ? null : `oggetto ${j}`,
   })),
 }));
@@ -56,21 +50,9 @@ const props = {
 const stageOf = (container: HTMLElement) =>
   container.querySelector("[data-desk-stage]") as HTMLElement;
 
-/**
- * Gli ascoltatori di `focusin` vivi sul palco, in un insieme che si svuota da
- * solo quando vengono staccati.
- *
- * E' una prova che guarda dentro, e non e' pigrizia: misura QUANTO VIVE
- * l'ascoltatore, ed e' esattamente li' che il difetto stava: attaccato dentro
- * la build della camera, si staccava solo al revert di gsap.context, che al
- * cambio di livello non arriva mai.
- *
- * La vita non la misura la prova qui sotto, che pure c'e' e guarda dall'esterno:
- * quella esercita un percorso solo (il fuoco sul post-it dopo l'uscita da
- * «full») e dello smontaggio, e del livello in cui l'ascoltatore non deve
- * nascere proprio, non dice niente. Sono le due guardie in fondo, e poggiano
- * tutte e due su questo conto.
- */
+// Gli ascoltatori di focusin vivi sul palco. Misura quanto vive l'ascoltatore:
+// attaccato nella build della camera si staccava solo al revert di gsap.context,
+// che al cambio di livello non arriva.
 function focusListeners() {
   const live = new Set<unknown>();
   const onStage = (el: HTMLElement, type: string) =>
@@ -135,7 +117,7 @@ describe("il palco dichiara il livello", () => {
   });
 
   it("su touch il tavolo non si aggancia: reduced, non full", () => {
-    // Schermo largo, ma puntatore non fine: e' un tablet, e il tavolo resta fermo.
+    // Schermo largo ma puntatore non fine: un tablet.
     mockMedia((q) => q.includes("min-width"));
     const { container } = renderWithMessages(<DeskStage {...props} />);
     expect(container.querySelector("[data-desk]")).toHaveAttribute("data-motion", "reduced");
@@ -156,27 +138,20 @@ describe("la camera", () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = renderWithMessages(<DeskStage {...props} />);
     const stage = stageOf(container);
-    // La camera non parte piu' durante il render: GSAP si carica al volo dopo
-    // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
+    // GSAP si carica dopo la prima pittura (useSectionAnimation): si aspetta.
     await waitFor(() => expect(stage.style.getPropertyValue("--p")).toBe("0.0000"));
-    // La camera parte arretrata: --s e' la scala d'apertura, non 1.
     expect(Number(stage.style.getPropertyValue("--s"))).toBeGreaterThan(1);
   });
 
   it("scrive due property e non tocca un elemento: le opacita' le fa il CSS", async () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = renderWithMessages(<DeskStage {...props} />);
-    // Il palco porta solo --p e --s. Se un giorno la camera cominciasse a
-    // scrivere opacita' o transform, questo conto cambia, ed e' il punto.
-    // La camera non parte piu' durante il render: GSAP si carica al volo dopo
-    // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
+    // GSAP si carica dopo la prima pittura (useSectionAnimation): si aspetta.
     await waitFor(() => {
       const written = [...stageOf(container).style].filter((p) => p.startsWith("--"));
       expect(written.sort()).toEqual(["--p", "--s"]);
     });
 
-    // Gli oggetti restano quelli che React ha reso: l'opacita' e' ancora la
-    // formula col default 1, non un numero calcolato per fotogramma.
     for (const el of container.querySelectorAll("[data-desk-object]")) {
       expect((el as HTMLElement).style.opacity).toContain("var(--p, 1)");
     }
@@ -185,27 +160,18 @@ describe("la camera", () => {
   it("chi accende la riduzione del movimento a meta' strada ritrova il tavolo intero", async () => {
     const changeMind = mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = renderWithMessages(<DeskStage {...props} />);
-    // La camera non parte piu' durante il render: GSAP si carica al volo dopo
-    // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
+    // GSAP si carica dopo la prima pittura (useSectionAnimation): si aspetta.
     await waitFor(() => expect(stageOf(container).style.getPropertyValue("--p")).not.toBe(""));
 
     changeMind((q) => q.includes("prefers-reduced-motion"));
 
     expect(container.querySelector("[data-desk]")).toHaveAttribute("data-motion", "none");
-    // Il CSS del movimento si spegne da solo, ma l'opacita' degli oggetti legge
-    // --p SEMPRE: lasciarla appiccicata all'ultimo valore vorrebbe dire un
-    // tavolo fermo e mezzo trasparente, che e' peggio di tutti e due gli stati.
     expect(stageOf(container).style.getPropertyValue("--p")).toBe("");
     expect(stageOf(container).style.getPropertyValue("--s")).toBe("");
   });
 
   it("chi esce dal movimento pieno non si porta dietro il salto al fuoco", () => {
-    // Il salto al fotogramma di riposo esiste perche' sotto la camera l'oggetto
-    // che prende il fuoco e' ingrandito e ritagliato via. Fuori da "full" la
-    // camera non c'e', il track torna alto quanto il suo contenuto, e quello
-    // stesso salto diventa una pagina che si muove senza che nessuno l'abbia
-    // chiesto: nei due stati in cui questa sezione deve stare ferma, e sotto i
-    // 1024px per una fermata del Tab che nemmeno si vede.
+    // Fuori da "full" il salto al fuoco muoverebbe una pagina che deve stare ferma.
     const live = focusListeners();
     const changeMind = mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = renderWithMessages(<DeskStage {...props} />);
@@ -218,11 +184,6 @@ describe("la camera", () => {
   });
 
   it("il fuoco da tastiera sul post-it porta la pagina al fotogramma di riposo, e smette all'uscita da «full»", () => {
-    // La prova di sopra misura quanti ascoltatori vivono; questa misura cosa
-    // sente un utente. Servono tutte e due: la prima passerebbe anche con una
-    // correzione sbagliata (l'ascoltatore lasciato dentro la build della camera
-    // e un removeEventListener appiccicato a teardown()) e non guarda ne' la
-    // guardia del :focus-visible ne' dove si va a finire.
     const jump = vi.fn();
     vi.stubGlobal("scrollTo", jump);
     const changeMind = mockMedia((q) => !q.includes("prefers-reduced-motion"));
@@ -232,30 +193,22 @@ describe("la camera", () => {
     ) as HTMLElement;
 
     postit.focus();
-    // Che la guardia sia passata davvero, e non che l'evento non sia mai
-    // arrivato: senza questa riga il verde qui sotto non direbbe niente.
+    // Senza questa riga il verde qui sotto non direbbe niente.
     expect(postit.matches(":focus-visible")).toBe(true);
     expect(jump).toHaveBeenCalledTimes(1);
 
     changeMind((q) => q.includes("prefers-reduced-motion"));
 
-    // Fuori da "full" il track e' tornato alto quanto il suo contenuto: lo stesso
-    // salto diventa una pagina che si muove senza che nessuno l'abbia chiesto.
     const arrived: Event[] = [];
     stageOf(container).addEventListener("focusin", (e) => arrived.push(e));
     postit.blur();
     postit.focus();
-    // Il fuoco c'e' ancora e il focusin arriva ancora al palco: quello che manca
-    // e' solo chi lo ascoltava.
     expect(arrived).toHaveLength(1);
     expect(postit.matches(":focus-visible")).toBe(true);
     expect(jump).toHaveBeenCalledTimes(1);
   });
 
-  // Le due che seguono non provano la correzione: erano gia' vere prima, perche'
-  // lo smontaggio passa dal revert di gsap.context e a livello ridotto la build
-  // non gira nemmeno. Sono guardie: tengono i due lati che la correzione avrebbe
-  // potuto rompere spostando l'ascoltatore in un effetto suo.
+  // Guardie: erano gia' vere prima della correzione, e la correzione poteva romperle.
   it("guardia: smontando il palco l'ascoltatore se ne va con lui", () => {
     const live = focusListeners();
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
@@ -276,11 +229,9 @@ describe("la camera", () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container, unmount } = renderWithMessages(<DeskStage {...props} />);
     const stage = stageOf(container);
-    // La camera non parte piu' durante il render: GSAP si carica al volo dopo
-    // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
+    // GSAP si carica dopo la prima pittura (useSectionAnimation): si aspetta.
     await waitFor(() => expect(stage.style.getPropertyValue("--p")).not.toBe(""));
     unmount();
-    // Restassero appiccicate a --p = 0, il tavolo resterebbe vuoto per sempre.
     expect(stage.style.getPropertyValue("--p")).toBe("");
     expect(stage.style.getPropertyValue("--s")).toBe("");
   });
@@ -304,12 +255,8 @@ describe("cameraScale e' una camera, non una curva qualsiasi", () => {
 
 describe("il post-it dice una cosa sola per volta", () => {
   it("a tavolo fermo la nota si toglie, come si toglie al passaggio del mouse", () => {
-    // Sul post-it ci stanno due scritte nello stesso punto: il conto dei caffe'
-    // e la domanda che e' il nome del comando. Si danno il cambio. La domanda
-    // pero' resta scritta ANCHE a tavolo fermo (chi ha chiesto niente
-    // movimento, chi arriva con un puntatore grosso), e li' l'hover non
-    // succede mai: senza una regola che spenga la nota nello stesso caso, le
-    // due scritte si leggono una sopra l'altra.
+    // A tavolo fermo l'hover non arriva mai: senza questa regola nota e domanda
+    // si leggono una sopra l'altra.
     const still = rules(/\[data-desk\]:not\(\[data-motion="full"\]\)/).find((r) =>
       /\[data-desk-note\]/.test(r.selector),
     );

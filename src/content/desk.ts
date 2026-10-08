@@ -1,28 +1,10 @@
-/**
- * Il tavolo: cosa c'e' sopra, e con che sagoma e' disegnato.
- * Qui non c'e' testo. Le etichette stanno in messages/*.json sotto
- * services.layers.<layer>.objects.<object>, come per services.ts:
- * il contenuto e' bilingue, e un id non lo e'.
- */
+// Niente testo qui: le etichette stanno in messages/*.json sotto
+// services.layers.<layer>.objects.<object>, perche' un id non e' bilingue.
 export type DeskShape = "sheet" | "phone" | "card" | "rack" | "plate" | "postit";
 
-/**
- * Il campione che un oggetto porta dentro la sua sagoma.
- *
- * Un campione non e' un'icona: e' un FRAMMENTO della cosa. "I colori" non sono
- * una tavolozza stilizzata, sono i tre colori veri del brand; "Il dominio" non
- * e' un globo, e' un dominio scritto. La differenza non e' estetica: un simbolo
- * dice "questo significa sicurezza", un campione fa vedere com'e' fatta. Ed e'
- * l'unica regola che tiene questi ventidue disegni lontani dal catalogo di
- * icone che il tavolo non vuole essere.
- *
- * Il tipo sta qui, col contenuto, e non col componente che lo disegna: e' il
- * tavolo a dichiarare cosa ha da mostrare, non il disegnatore a decidere cosa
- * gli va di disegnare. Il verso di questa dipendenza e' anche quello che rende
- * la copertura una questione di compilazione invece che di attenzione: la
- * tavola dei disegni e' un Record su questo tipo, e un campione senza disegno
- * non compila.
- */
+// Un campione e' un frammento della cosa, mai un suo simbolo. Il tipo sta col
+// contenuto perche' SPECIMENS e' un Record su di lui: un campione senza
+// disegno non compila.
 export type SampleId =
   | "colori"
   | "caratteri"
@@ -50,39 +32,17 @@ export type SampleId =
 export type DeskObject = {
   id: string;
   shape: DeskShape;
-  /**
-   * Il frammento che questo oggetto mostra di se'. Due oggetti non ce l'hanno,
-   * e in tutti e due i casi e' una scelta dichiarata e non una dimenticanza;
-   * la prova in DeskSpecimen.test.tsx tiene la lista e la ragione di ognuno:
-   *
-   * - `hosting` ("Dove sta") perche' l'hosting non ha una faccia, e qualunque
-   *   cosa gli si metta dentro sarebbe un simbolo travestito da campione. Il
-   *   primo che sfonda la regola la sfonda per tutti;
-   * - `blank`, il post-it grigio, per una ragione tecnica e non di regola: sopra
-   *   ci sta scritto qualcosa (il conto dei caffe'), ma quel testo va TRADOTTO,
-   *   e i campioni sono disegni fissi dentro un componente. Arriva quindi dalle
-   *   traduzioni come `blank` e `note`, non da SPECIMENS. Se un giorno un altro
-   *   oggetto avesse bisogno di un campione con del testo tradotto, la strada e'
-   *   quella, non un'eccezione in piu' in questa lista.
-   */
+  // Manca a `hosting` (non ha una faccia) e a `blank` (il suo testo va tradotto).
+  // La lista con le ragioni sta in DeskSpecimen.test.tsx.
   sample?: SampleId;
-  /**
-   * Il post-it grigio. E' l'unico oggetto senza ETICHETTA, e senza apposta: gli
-   * altri ventitre' sono pezzi di lavoro e portano il loro nome sotto, questo e'
-   * l'unica cosa sul tavolo che non e' lavoro (ci sta scritto il conto dei
-   * caffe') ed e' l'unica che si preme. Quello che ci sta sopra arriva dalle
-   * traduzioni (`note`), e la domanda che compare al passaggio del mouse e' il
-   * nome del comando (`blank`).
-   */
+  // L'unico oggetto senza etichetta, ed e' un comando: il suo nome e' `blank`
+  // nei messaggi, quello che ci sta scritto sopra e' `note`.
   mute?: true;
 };
 
 export type DeskLayer = { id: string; objects: DeskObject[] };
 
-/**
- * L'ordine e' il movimento della telecamera: dal piu' vicino al laptop al piu'
- * lontano. Non e' un ordine di importanza, e' un ordine di distanza.
- */
+// L'ordine e' la distanza dal laptop, cioe' il movimento della camera.
 export const deskLayers: DeskLayer[] = [
   {
     id: "site",
@@ -109,11 +69,7 @@ export const deskLayers: DeskLayer[] = [
   {
     id: "infra",
     objects: [
-      // Senza campione, e non per dimenticanza: l'hosting non ha una faccia.
-      // Una nuvola, un globo, un server sarebbero simboli travestiti da
-      // frammenti, e la regola dei campioni vale finche' non la si sfonda una
-      // volta sola. Un vuoto dichiarato in mezzo a ventidue prove si legge come
-      // una scelta; la prova in DeskSpecimen.test.tsx lo tiene tale.
+      // Senza campione apposta: ogni disegno dell'hosting sarebbe un simbolo.
       { id: "hosting", shape: "rack" },
       { id: "database", shape: "rack", sample: "dati" },
       { id: "backups", shape: "rack", sample: "copie" },
@@ -128,9 +84,8 @@ export const deskLayers: DeskLayer[] = [
       { id: "ai", shape: "postit", sample: "assistente" },
       { id: "automation", shape: "postit", sample: "automazioni" },
       { id: "analytics", shape: "postit", sample: "numeri" },
-      // Il post-it bianco: l'unico oggetto del tavolo che porta da qualche
-      // parte. L'ordine qui e' l'ordine del disegno, e dal suo indice dipende
-      // dove cade sull'anello: spostarlo vuol dire ritarare il tavolo.
+      // Dall'indice dipende dove cade sull'anello: spostarlo vuol dire ritarare
+      // il tavolo (vedi ANGLE_OFFSET in layers.ts).
       { id: "blank", shape: "postit", mute: true },
       { id: "seo", shape: "postit", sample: "trovare" },
       { id: "care", shape: "postit", sample: "manutenzione" },

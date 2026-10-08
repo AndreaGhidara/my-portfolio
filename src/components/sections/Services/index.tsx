@@ -10,10 +10,8 @@ export async function Services() {
   const tMetrics = await getTranslations("metrics");
   const tc = await getTranslations("cassetta");
 
-  // Il numero sta in content/metrics.ts come tutti gli altri numeri inventati
-  // del sito, l'unita' nelle traduzioni come tutte le altre etichette di
-  // metrica: "caffe'" in inglese e' "coffees", e un campione scritto a mano nel
-  // componente sarebbe l'unico del tavolo che non sa girare lingua.
+  // Numero inventato da content/metrics.ts, unita' dalle traduzioni: scritto
+  // qui sarebbe l'unico testo del tavolo che non cambia lingua.
   const coffees = metricById("coffees");
 
   const layers: DeskLayerData[] = deskLayers.map((layer) => ({
@@ -24,8 +22,7 @@ export async function Services() {
       id: object.id,
       shape: object.shape,
       sample: object.sample,
-      // Il post-it bianco e' muto: nessuna chiave da cercare, e cercarla
-      // solleverebbe. Il buco nelle traduzioni e' voluto.
+      // Il post-it bianco non ha chiave: cercarla solleverebbe.
       label: object.mute ? null : t(`layers.${layer.id}.objects.${object.id}`),
     })),
   }));

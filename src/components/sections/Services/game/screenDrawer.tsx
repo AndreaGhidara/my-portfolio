@@ -14,13 +14,13 @@ import {
   type MiniTone,
 } from "./fakeSite";
 
-/** I sei attrezzi, nell'ordine delle linguette. Sono anche i nomi delle icone. */
+// Sono anche i nomi delle icone e le chiavi dei messaggi.
 export const DRAWER_TOOLS = ["colori", "caratteri", "testi", "sezioni", "immagini", "telefono"] as const;
 export type DrawerToolId = (typeof DRAWER_TOOLS)[number];
 
 export type Viewport = "pc" | "cell";
 
-/** Quello che gli attrezzi hanno scelto: indici nelle liste di fakeSite.ts. */
+// Indici nelle liste di fakeSite.ts.
 export type Choices = {
   palette: number;
   fonts: number;
@@ -37,7 +37,6 @@ const TONES: Record<MiniTone, string> = {
   orange: "var(--orange)",
 };
 
-/** Il disegnino di un'impaginazione, sul suo pulsante. */
 function Mini({ mini }: { mini: MiniLayout }) {
   return (
     <span
@@ -69,12 +68,11 @@ type DrawerProps = {
   active: DrawerToolId;
   choices: Choices;
   tried: boolean;
-  /** La riga scura in fondo: le viti, o il ritorno al computer. */
+  // La riga scura in fondo: le viti, o il ritorno al computer.
   message: ReactNode;
   onChoose: <C extends keyof Choices>(field: C, value: Choices[C]) => void;
 };
 
-/** Il cassetto dell'attrezzo aperto: cosa fa, e le sue scelte. */
 export function Drawer({ active, choices, tried, message, onChoose }: DrawerProps) {
   const t = useTranslations("services.gioco.schermo");
   const title = t(`attrezzo.${active}.titolo`);

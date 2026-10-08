@@ -11,11 +11,8 @@ import {
   type ZoneId,
 } from "@/content/toolbox";
 
-/**
- * Le domande che la mappa, l'editor e l'etichetta fanno alla cassetta. Sono
- * funzioni pure sui dati di content/cassetta.ts: la parte che si sbaglia si
- * prova in un test, e i componenti restano disegno.
- */
+// Funzioni pure sui dati di content/toolbox.ts, tenute fuori dai componenti
+// per provarle in un test.
 
 type NodeKind = "root" | "junction" | "tool";
 
@@ -64,7 +61,7 @@ export function toolsIn(zone: ZoneId): Tool[] {
   return TOOLS.filter((a) => a.zone === zone);
 }
 
-/** Tutti quelli con cui un nodo ha un filo, rami e incroci insieme. */
+/** Rami e incroci insieme. */
 export function neighbours(id: string): string[] {
   const out: string[] = [];
   for (const [a, b] of [...BRANCHES, ...CROSSINGS]) {
@@ -74,7 +71,7 @@ export function neighbours(id: string): string[] {
   return out;
 }
 
-/** Il padre di ogni nodo nell'albero: il primo ramo che lo nomina come figlio. */
+// Vale il primo ramo che nomina il nodo come figlio.
 const parents = new Map<string, string>();
 for (const [a, b] of BRANCHES) if (!parents.has(b)) parents.set(b, a);
 
@@ -82,7 +79,7 @@ export function parentOf(id: string): string | undefined {
   return parents.get(id);
 }
 
-/** Dal nodo su fino al cartellino (o fino a dove l'albero finisce). */
+/** Fino al cartellino, o a dove l'albero finisce: i nodi sciolti non ci arrivano. */
 export function pathTo(id: string): string[] {
   const s = [id];
   let up = parents.get(id);
@@ -93,22 +90,17 @@ export function pathTo(id: string): string[] {
   return s;
 }
 
-/** I capi in cui un attrezzo entra. */
 export function garmentsWith(id: string): Garment[] {
   return GARMENTS.filter((c) => c.uses.includes(id));
 }
 
-/** Le zone di un capo, dalla piu' pesante. */
 export function sortedWeights(c: Garment): [ZoneId, number][] {
   return (Object.entries(c.weight) as [ZoneId, number][]).sort(
     (a, b) => b[1] - a[1],
   );
 }
 
-/**
- * L'ordine in cui l'ago passa: dal cartellino in giu', riga per riga, da
- * sinistra a destra. E' l'ordine in cui si legge la mappa.
- */
+/** Dal cartellino in giu', da sinistra a destra: l'ordine in cui si legge la mappa. */
 export function garmentStops(c: Garment): string[] {
   const used = c.uses
     .map((id) => nodesById.get(id))
@@ -118,7 +110,6 @@ export function garmentStops(c: Garment): string[] {
   return [ROOT.id, ...used];
 }
 
-/** Gli scomparti di un capo nell'ordine delle zone, con i loro attrezzi. */
 export function byZone(c: Garment): { zone: ZoneId; tools: string[] }[] {
   return ZONES.map((z) => ({
     zone: z.id,
@@ -126,12 +117,8 @@ export function byZone(c: Garment): { zone: ZoneId; tools: string[] }[] {
   })).filter((g) => g.tools.length > 0);
 }
 
-/**
- * La larghezza di un'etichetta cucita, in unita' della mappa. Il carattere e'
- * monospazio, quindi si conta: e' il conto del prototipo, e tiene i nomi
- * dentro il bordo a punti senza misurare niente nel browser (il server rende
- * la mappa gia' finita).
- */
+// Il carattere e' monospazio, quindi la larghezza si conta invece di misurarla:
+// il server rende la mappa gia' finita, senza un browser.
 export function nodeWidth(kind: NodeKind, text: string): number {
   if (kind === "root") return 170;
   return Math.max(70, text.length * (kind === "junction" ? 7.6 : 7.3) + 24);
@@ -141,7 +128,6 @@ export function nodeHeight(kind: NodeKind): number {
   return kind === "root" ? 46 : kind === "junction" ? 26 : 30;
 }
 
-/** Il filo fra due nodi: una cubica con i controlli a meta' altezza. */
 export function curve(
   a: { x: number; y: number },
   b: { x: number; y: number },
@@ -150,11 +136,8 @@ export function curve(
   return `M${a.x} ${a.y} C${a.x} ${my} ${b.x} ${my} ${b.x} ${b.y}`;
 }
 
-/**
- * La cucitura dell'ago: una curva morbida da tappa a tappa, che ondeggia su e
- * giu' come un punto a mano. Restituisce anche le curve parziali, perche'
- * sapere dove sta ogni tappa lungo il filo serve a dire quando l'ago ci passa.
- */
+// Le curve parziali servono a sapere dove sta ogni tappa lungo il filo, cioe'
+// quando l'ago ci passa.
 export function seam(points: { x: number; y: number }[]): {
   d: string;
   partials: string[];

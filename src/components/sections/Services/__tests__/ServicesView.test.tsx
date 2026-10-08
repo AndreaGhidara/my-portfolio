@@ -6,7 +6,6 @@ import type { ServicesViewProps } from "../ServicesView";
 import { LABEL, drawWidth } from "../layers";
 import { copyFor } from "../toolbox/__tests__/fixture";
 
-/** Il quarto, come nel tavolo vero. */
 const MUTE_INDEX = 3;
 
 const layer = (id: string, n: number, mute = false) => ({
@@ -20,7 +19,6 @@ const layer = (id: string, n: number, mute = false) => ({
   })),
 });
 
-/** Gli oggetti del tavolo. */
 const OBJECTS = "[data-desk-object]";
 
 const props: ServicesViewProps = {
@@ -41,7 +39,6 @@ const props: ServicesViewProps = {
 };
 
 describe("la sezione del tavolo", () => {
-
   it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
     render(<ServicesView {...props} />);
     const section = screen.getByRole("region", { name: props.stageTitle });
@@ -106,10 +103,6 @@ describe("il tavolo è la lista", () => {
     const { container } = render(<ServicesView {...props} />);
     const objects = container.querySelectorAll(OBJECTS);
     expect(objects).toHaveLength(24);
-    // Ventitre' etichette e un post-it. Quella che manca non e' una traduzione
-    // dimenticata: e' l'unico oggetto che non si legge, si preme, e il nome
-    // che uno screen reader annuncia e' il nome del comando, non una voce
-    // dell'elenco. Per questo il conteggio delle etichette resta ventitre'.
     const unlabelled = [...objects].filter((el) => !el.querySelector("[data-desk-label]"));
     expect(unlabelled).toHaveLength(1);
     expect(within(unlabelled[0] as HTMLElement).getByRole("link")).toHaveAccessibleName(
@@ -131,17 +124,12 @@ describe("il tavolo è la lista", () => {
   it("le sagome sono decorative: il significato sta nell'etichetta, non nel disegno", () => {
     const { container } = render(<ServicesView {...props} />);
     for (const object of container.querySelectorAll(OBJECTS)) {
-      // La sagoma e' una maschera CSS: dentro un oggetto non c'e' niente che
-      // uno screen reader possa annunciare oltre alla sua etichetta.
       const announceable = object.querySelectorAll("img, svg, [alt], [role], [aria-label], [title]");
       expect(announceable).toHaveLength(0);
     }
   });
 
   it("il disegno e' quello che la geometria dice: la larghezza arriva da layers.ts", () => {
-    // Senza questa, si potrebbe togliere la larghezza inline e ogni prova di
-    // layers.test.ts continuerebbe a passare, dimostrando cose su un mondo che
-    // nessuno disegna piu'.
     const { container } = render(<ServicesView {...props} />);
     const first = container.querySelector(OBJECTS) as HTMLElement;
     expect(first.style.width).toBe(`${drawWidth("sheet")}%`);
@@ -165,8 +153,6 @@ describe("lo schermo al centro", () => {
     ) as HTMLElement;
     const laptopScreen = centre.querySelector("[data-desk-screen]") as HTMLElement;
     expect(laptopScreen).not.toBeNull();
-    // La barra in cima, il titolo, le righe di testo e il bottone: e' quello che
-    // fa leggere un rettangolo come un sito e non come un foglio.
     expect(laptopScreen.querySelector("[data-desk-screen-bar]")).not.toBeNull();
     expect(laptopScreen.querySelector("[data-desk-screen-head]")).not.toBeNull();
     expect(laptopScreen.querySelectorAll("[data-desk-screen-line]").length).toBeGreaterThanOrEqual(2);
@@ -185,13 +171,6 @@ describe("lo schermo al centro", () => {
   });
 });
 
-/**
- * I materiali. Una maschera CSS dipinge un colore solo: finche' la sagoma era
- * un file solo, foglio, scheda e telefono erano lo stesso grigio identico e i
- * quattro strati si leggevano come quattro contorni della stessa famiglia. Due
- * strati sono due superfici da colorare, ed e' il DOM a doverli portare,
- * perche' nel CSS un pieno che non ha dove appoggiarsi non esiste.
- */
 describe("i materiali", () => {
   it("ogni oggetto e' due strati: la superficie sotto, il tracciato sopra", () => {
     const { container } = render(<ServicesView {...props} />);
@@ -202,8 +181,6 @@ describe("i materiali", () => {
       expect(shape, "un oggetto senza sagoma").not.toBeNull();
       expect(shape.querySelector("[data-desk-fill]")).not.toBeNull();
       expect(shape.querySelector("[data-desk-line]")).not.toBeNull();
-      // L'ordine e' il disegno: il pieno viene PRIMA, o coprirebbe il tracciato
-      // che dovrebbe stargli sopra. Nessuno z-index: l'ordine e' quello del DOM.
       expect(shape.children[0]).toHaveAttribute("data-desk-fill");
       expect(shape.children[1]).toHaveAttribute("data-desk-line");
     }
@@ -219,13 +196,8 @@ describe("i materiali", () => {
   });
 
   it("l'etichetta non e' dentro la sagoma: e' li' che l'ombra non la prende", () => {
-    // L'unico divieto esplicito di §4.4 bis: «un'ombra portata sulle sole
-    // superfici, MAI sull'etichetta». Il filtro sta su [data-desk-shape] (lo
-    // verifica il contratto in materials.test.ts) e non tocca l'etichetta
-    // soltanto perche' questa e' una SORELLA della sagoma, non una figlia.
-    // Portarla dentro (per esempio per farla ruotare insieme al disegno)
-    // lascerebbe verde tutto il resto e metterebbe un'ombra sotto ogni parola
-    // del tavolo, che non e' un tavolo: e' un banner.
+    // L'ombra sta su [data-desk-shape]: l'etichetta ne e' sorella e non figlia, o
+    // prenderebbe l'ombra anche lei.
     const { container } = render(<ServicesView {...props} />);
     const labels = container.querySelectorAll("[data-desk-label]");
     expect(labels.length).toBeGreaterThan(0);
@@ -235,9 +207,6 @@ describe("i materiali", () => {
   });
 
   it("i led stanno sul rack e su nient'altro: sono colore vero, non una maschera", () => {
-    // Il colore non puo' venire dal file: una maschera porta una forma, non un
-    // colore. I led sono l'unico posto del tavolo dove serve dipingere qualcosa
-    // dentro un oggetto, e quindi l'unico che ha uno strato in piu'.
     const { container } = render(
       <ServicesView
         {...props}
@@ -257,12 +226,8 @@ describe("i materiali", () => {
   });
 
   it("la sagoma sa che disegno e': la maschera pende da lei, non dall'oggetto", () => {
-    // Perche' questa prova esiste: le stesse sagome si usano fuori dal tavolo
-    // (le consegne di «Come lavoro», e prima «E in pratica?»). Finche' le
-    // maschere pendevano da [data-desk-object], un disegno la' non le
-    // prendeva, e dargli data-desk-object avrebbe rotto il conteggio dei
-    // ventiquattro, che e' una prova giusta. La sagoma sa gia' che disegno e':
-    // glielo si chiede.
+    // Le sagome si usano anche fuori dal tavolo, senza data-desk-object: la
+    // maschera deve pendere dalla sagoma.
     const { container } = render(<ServicesView {...props} />);
     const shape = container.querySelector(`${OBJECTS} [data-desk-shape]`) as HTMLElement;
     expect(shape).toHaveAttribute("data-shape", "sheet");

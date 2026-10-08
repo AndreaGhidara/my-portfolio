@@ -10,15 +10,9 @@ import {
 } from "./graph";
 import type { ToolboxStep, ToolboxCopy } from "./types";
 
-/**
- * L'etichetta cucita dentro il capo: marca, composizione, fibre, cura, e in
- * fondo «made to measure». E' la stessa sul computer (il pannello accanto alla
- * mappa) e sul telefono (il foglio che sale dal basso): cambia solo dove sta.
- *
- * Tutto quello che nomina un altro nodo o un capo e' un bottone, ed e' anche
- * il percorso da tastiera per la cassetta intera: dal cartellino si scende
- * agli scomparti, dagli scomparti agli attrezzi, dagli attrezzi a chi li usa.
- */
+// La stessa nel pannello della mappa e nel foglio del telefono. Ogni nodo o
+// capo nominato e' un bottone: e' il percorso da tastiera per la cassetta
+// intera, perche' la mappa e' fuori dal giro dei Tab.
 export function NodeLabel({
   step,
   copy,

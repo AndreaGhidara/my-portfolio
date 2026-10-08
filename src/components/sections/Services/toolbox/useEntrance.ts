@@ -2,10 +2,7 @@ import { useEffect, useState, type RefObject } from "react";
 import { ROOT, BRANCHES } from "@/content/toolbox";
 import { NODES } from "./graph";
 
-/**
- * L'ordine dell'entrata: dal cartellino in giu', per rami, come un albero che
- * si apre. Ogni nodo parte dal punto in cui sta suo padre.
- */
+// Dal cartellino in giu', ramo per ramo; i nodi sciolti vanno in coda.
 export const ENTRANCE = (() => {
   const order: string[] = [ROOT.id];
   for (let i = 0; i < order.length; i++) {
@@ -18,14 +15,10 @@ export const ENTRANCE = (() => {
 
 type Entrance = "waiting" | "entering" | null;
 
-/**
- * L'entrata, una volta sola e solo se la mappa non e' gia' in vista: chi
- * ricarica a meta' pagina la trova ferma e completa. Restituisce il valore di
- * data-entrata: "attesa" finche' la mappa e' sotto, "entra" quando arriva.
- *
- * Senza movimento pieno l'entrata non c'e', e lo stato si azzera: se il
- * movimento torna, si riparte da capo come al primo montaggio.
- */
+// Il valore di data-entrance: "waiting" finche' la mappa e' sotto, "entering"
+// quando arriva. Solo se la mappa non e' gia' in vista: chi ricarica a meta'
+// pagina la trova completa. Senza movimento pieno si azzera, e al ritorno
+// si riparte come al primo montaggio.
 export function useEntrance(
   bench: RefObject<HTMLElement | null>,
   full: boolean,

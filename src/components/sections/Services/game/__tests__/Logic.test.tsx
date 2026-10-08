@@ -19,10 +19,8 @@ const mount = (onNext = vi.fn(), locale: "it" | "en" = "it") => {
   return { user, onNext, ...rendered };
 };
 
-/** Il pulsante che porta al nodo dopo, col nome di quel nodo. */
 const nextTo = (name: string) => copy.avanti.replace("{nome}", name);
 
-/** Dalla partenza al primo nodo: il pulsante del sito finto. */
 const start = (user: ReturnType<typeof userEvent.setup>) =>
   user.click(button(copy.partenza.prenota));
 

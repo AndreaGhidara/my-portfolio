@@ -8,26 +8,15 @@ export type ServicesViewProps = {
   stageTitle: string;
   stageLead: string;
   centre: string;
-  /** Il nome del comando sul post-it bianco. Non e' un'etichetta del tavolo:
-   *  e' la ventiquattresima cosa, quella che si preme. */
+  /** Il nome del comando sul post-it bianco. */
   blank: string;
-  /** La nota scritta sul post-it grigio: quello che c'e' scritto sopra prima
-   *  che qualcuno lo prema. */
+  /** Il testo scritto sul post-it, che non e' il nome del comando. */
   note: string;
   punch: string;
   layers: DeskLayerData[];
   toolbox: { eyebrow: string; title: string; lead: string; copy: ToolboxCopy };
 };
 
-/**
- * Il tavolo: tutto quello che sta sotto un sito finito. I quattro servizi, uno
- * per uno, li stampa la stampante della sezione sopra.
- *
- * Sotto il tavolo c'era «E in pratica?», le quattro voci con i loro disegni e
- * una freccia che le attraversava. E' stata tolta: le quattro descrizioni
- * adesso si leggono sullo scontrino. Al suo posto c'e' la cassetta degli
- * attrezzi, cioe' con cosa lo costruisco.
- */
 export function ServicesView({
   eyebrow,
   stageTitle,
@@ -40,10 +29,8 @@ export function ServicesView({
   toolbox,
 }: ServicesViewProps) {
   return (
-    // Il nome della sezione e' il titolo del tavolo: l'id sta in DeskStage.
-    // Scritto a mano in tutti e due i posti perche' DeskStage e' un modulo
-    // client, e una costante esportata da li' qui arriverebbe come riferimento
-    // client invece che come stringa.
+    // L'id del titolo e' scritto a mano anche in DeskStage: una costante
+    // esportata da un modulo client qui arriverebbe come riferimento, non stringa.
     <section id="services" aria-labelledby="titolo-services" className="relative">
       <DeskStage
         eyebrow={eyebrow}

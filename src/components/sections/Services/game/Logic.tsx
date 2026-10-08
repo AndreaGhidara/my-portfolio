@@ -7,16 +7,8 @@ import { Icon, type NodeIcon } from "./icons";
 import { SHOP_PALETTE, ILLUSTRATIONS, ILLUSTRATION_VIEWBOX, siteVariables } from "./fakeSite";
 import { FULL_DAY, LogicScene, CAKE_DONE, type NodeState, type SceneCopy } from "./logicScenes";
 
-/**
- * Livello 2, dietro lo schermo. Si parte dalla schermata del Forno Aurora
- * costruita al livello 1: premendo «Prenota la torta» l'ordine (il pacco)
- * corre in un circuito di sei nodi, e a ogni nodo lo porta avanti chi gioca.
- * Oppure prova a rompere il sito, e vede la regola che lo salva.
- *
- * Nessun timer: il pacco si sposta con una transizione CSS, e il suo
- * pulsare riparte a ogni nodo perche' l'onda ha per chiave il nodo. Per
- * questo `visible` qui non serve.
- */
+// Nessun timer: il pacco si sposta con una transizione CSS, e l'onda ha per
+// chiave il nodo perche' il pulsare riparta. Per questo `visible` non serve.
 
 type LogicNode = {
   nome: string;
@@ -30,7 +22,6 @@ type LogicNode = {
 
 const ICONS: readonly NodeIcon[] = ["area", "catalogo", "prenotazioni", "pagamenti", "contatti", "gestionale"];
 
-/** Dove stanno i sei nodi nel circuito, in percentuale: un anello. */
 const POS: readonly (readonly [number, number])[] = [
   [16, 34],
   [50, 30],
@@ -43,7 +34,6 @@ const POS: readonly (readonly [number, number])[] = [
 const START = -1;
 const END = ICONS.length;
 
-/** Il pacco prima di partire sta sopra il circuito, alla fine sotto. */
 const parcelPosition = (n: number): readonly [number, number] =>
   n === START ? [50, -10] : n === END ? [50, 112] : POS[n];
 
@@ -58,7 +48,7 @@ export function Logic({ onNext }: LevelProps) {
   const nodes = t.raw("nodi") as LogicNode[];
   const sceneCopy = t.raw("scene") as SceneCopy;
 
-  // `n` e' dove sta l'ordine: PARTENZA, un nodo (0..5) o FINE.
+  // `n` e' dove sta l'ordine: START, un nodo (0..5) o END.
   const [n, setN] = useState(START);
   const [states, setStates] = useState<NodeState[]>(emptyStates);
   // Rotto in questa visita: su un nodo gia' fatto l'incidente si vede solo
@@ -275,7 +265,6 @@ export function Logic({ onNext }: LevelProps) {
   );
 }
 
-/** La partenza: lo schermo costruito al livello 1, e sotto l'appunto. */
 function Start({ onGo }: { onGo: () => void }) {
   const t = useTranslations("services.gioco.logiche.partenza");
   return (

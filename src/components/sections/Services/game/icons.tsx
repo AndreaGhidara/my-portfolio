@@ -1,19 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 
-/**
- * Le icone a tratto dei quattro livelli, tutte nello stesso disegno: viewBox
- * 100x100, tratto d'inchiostro da 3, angoli tondi. Vengono dai prototipi
- * approvati, una per una.
- *
- * I colori passano da `style` e non dagli attributi `fill`/`stroke`: un var()
- * dentro un attributo di presentazione non lo leggono tutti i browser, dentro
- * style si'. Sono i token fissi della palette, non quelli del tema: il gioco
- * ha lo stesso aspetto di giorno e di notte. --green lo mette il guscio del
- * gioco sulla sua radice (vedi Game.tsx), perche' fra le variabili globali
- * c'e' solo --verde, che col tema cambia.
- *
- * Decorative per intero: il nome della cosa lo dice sempre il testo accanto.
- */
+// I colori passano da `style`: un var() dentro un attributo di presentazione
+// non lo leggono tutti i browser. Sono token fissi e non del tema; --green lo
+// scrive il guscio sulla sua radice (vedi Game.tsx).
 
 const INK = "var(--ink)";
 const PAPER = "var(--paper)";
@@ -34,7 +23,6 @@ const STROKE: CSSProperties = {
 const filled = (fill: string): CSSProperties => ({ fill });
 const stroked = (stroke: string): CSSProperties => ({ stroke });
 
-/** Gli attrezzi del livello 1. */
 const TOOLS = {
   colori: (
     <g style={STROKE}>
@@ -96,7 +84,6 @@ const TOOLS = {
   ),
 } satisfies Record<string, ReactNode>;
 
-/** I sei nodi dietro lo schermo, livello 2 (e l'anteprima alla fine del livello 1). */
 const NODES = {
   area: (
     <g style={STROKE}>
@@ -162,7 +149,6 @@ const NODES = {
   ),
 } satisfies Record<string, ReactNode>;
 
-/** I cinque servizi del pannello, livello 3. */
 const SERVICES = {
   assistenza: (
     <g style={STROKE}>
@@ -210,7 +196,6 @@ const SERVICES = {
   ),
 } satisfies Record<string, ReactNode>;
 
-/** Le sei voci dell'infrastruttura, livello 4. */
 const CLOUD = {
   dove: (
     <g style={STROKE}>
@@ -282,10 +267,7 @@ export type IconName = ToolIcon | NodeIcon | ServiceIcon | CloudIcon;
 
 const DRAWINGS: Record<IconName, ReactNode> = { ...TOOLS, ...NODES, ...SERVICES, ...CLOUD };
 
-/**
- * Un'icona, misurata da chi la contiene: l'svg riempie il suo genitore (la
- * classe `.ic` di base.css, o la scatola del livello).
- */
+// L'svg riempie il genitore: la misura la decide chi lo contiene.
 export function Icon({ name, className }: { name: IconName; className?: string }) {
   return (
     <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false" className={className}>

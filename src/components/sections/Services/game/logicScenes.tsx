@@ -1,10 +1,6 @@
 import type { CSSProperties } from "react";
 
-/**
- * Le sei scene del livello 2: quello che si vede nel palco a ogni nodo,
- * finche' non lo copre l'incidente. Sono solo disegno: lo stato e i testi
- * arrivano da Logic.tsx.
- */
+// Solo disegno: lo stato e i testi arrivano da Logic.tsx.
 
 export type NodeState = { ok?: boolean; broken?: boolean; choice?: number; day?: number };
 
@@ -26,10 +22,10 @@ export type SceneCopy = {
   nuovo: string[];
 };
 
-/** Quanto e' gia' prenotato ogni giorno, da lunedi' a domenica. */
+// Percentuale gia' prenotata per giorno, da lunedi' a domenica.
 const BOOKED = [20, 35, 40, 30, 60, 85, 100];
 
-/** La torta che non c'e' piu' e il giorno tutto pieno: toccarli e' rompere. */
+// La torta finita e il giorno pieno: toccarli e' rompere.
 export const CAKE_DONE = 2;
 export const FULL_DAY = 6;
 

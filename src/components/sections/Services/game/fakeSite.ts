@@ -1,19 +1,7 @@
-/**
- * Il sito del Forno Aurora: quello che si costruisce al livello 1 e da cui
- * parte il livello 2.
- *
- * QUESTI NON SONO I COLORI DEL PORTFOLIO. Sono i colori del sito di un
- * cliente immaginario, cioe' contenuto, come lo sarebbe la foto di un lavoro:
- * il gioco fa scegliere fra sei palette proprio per far vedere che cambiano.
- * Per questo e' l'unico posto del sito con esadecimali fuori dalla tavolozza
- * (src/styles/palette.ts), e non deve diventarne una seconda: niente di
- * quello che c'e' qui va usato fuori dal sito finto.
- *
- * Nei componenti il sito finto legge cinque variabili, scritte sul suo
- * contenitore con `siteVariables`: --sf fondo, --ss superficie, --st testo,
- * --sa accento, --sm grigio. Le illustrazioni le seguono, cosi' cambiando
- * palette cambiano anche loro.
- */
+// Non sono i colori del portfolio: sono contenuto, il sito di un cliente
+// immaginario. E' l'unico posto con esadecimali fuori da src/styles/palette.ts,
+// e niente di qui va usato fuori dal sito finto. Il sito legge --sf fondo,
+// --ss superficie, --st testo, --sa accento, --sm grigio.
 
 export type FakeColors = {
   background: string;
@@ -32,7 +20,7 @@ const makePalette = (id: PaletteId, [background, surface, text, accent, grey]: s
   colors: { background, surface, text, accent, grey },
 });
 
-/** Le sei palette, nell'ordine dell'attrezzo «colori». La prima e' quella di partenza. */
+// La prima e' quella di partenza.
 export const FAKE_PALETTES: readonly FakePalette[] = [
   makePalette("bottega", ["#F5F1E8", "#E9E1D2", "#14120F", "#E4572E", "#6E6759"]),
   makePalette("notte", ["#16140F", "#26221B", "#F3EDE0", "#F2C94C", "#A79E8C"]),
@@ -42,28 +30,18 @@ export const FAKE_PALETTES: readonly FakePalette[] = [
   makePalette("terracotta", ["#F4E7D9", "#E7D0B8", "#3A1F12", "#B8532A", "#7A5A45"]),
 ];
 
-/** La palette con cui il Forno Aurora nasce, e con cui il livello 2 lo mostra. */
 export const SHOP_PALETTE = FAKE_PALETTES[0];
 
 export type SiteVariables = Record<"--sf" | "--ss" | "--st" | "--sa" | "--sm", string>;
 
-/** Le cinque variabili da scrivere sul contenitore del sito finto (style). */
 export function siteVariables(c: FakeColors): SiteVariables {
   return { "--sf": c.background, "--ss": c.surface, "--st": c.text, "--sa": c.accent, "--sm": c.grey };
 }
 
 export type FontPairId = "archivo" | "fraunces" | "grotesk" | "playfair";
 
-/**
- * Le coppie di caratteri: uno per i titoli, uno per leggere. I valori sono
- * font-family pronti, con le variabili che next/font mette su <body>
- * (layout.tsx). Il paragrafo e' sempre Archivo: nel prototipo era Inter, che
- * il sito non carica, e un quinto carattere solo per tre righe finte non vale
- * il suo peso.
- *
- * `weight` e' il peso del titolo, ed e' quello caricato: chiederne un altro
- * vorrebbe dire un grassetto finto disegnato dal browser.
- */
+// Il paragrafo e' sempre Archivo: Inter del prototipo il sito non lo carica.
+// `weight` e' il peso caricato: un altro sarebbe un grassetto finto del browser.
 export type FakeFontPair = { id: FontPairId; name: string; heading: string; weight: number; body: string };
 
 const BODY_FONT = "var(--font-body), system-ui, sans-serif";
@@ -77,10 +55,8 @@ export const FAKE_FONTS: readonly FakeFontPair[] = [
 
 export type ScaleId = "compatta" | "equilibrata" | "generosa";
 
-/**
- * Le tre scale dei testi. `k` moltiplica le misure del sito finto; h1, h2 e p
- * sono i pixel che il campione dell'attrezzo dichiara.
- */
+// `k` moltiplica le misure del sito finto; h1, h2 e p sono i pixel che il
+// campione dell'attrezzo dichiara.
 export type FakeScale = { id: ScaleId; k: number; h1: number; h2: number; p: number };
 
 export const FAKE_SCALES: readonly FakeScale[] = [
@@ -89,16 +65,12 @@ export const FAKE_SCALES: readonly FakeScale[] = [
   { id: "generosa", k: 1.2, h1: 60, h2: 34, p: 18 },
 ];
 
-/** La scala di partenza. */
 export const INITIAL_SCALE = FAKE_SCALES[1];
 
 export type LayoutId = "classica" | "manifesto" | "copertina" | "bento";
 
-/**
- * Il disegnino di un'impaginazione, sul pulsante dell'attrezzo «sezioni».
- * Non e' il sito finto: e' interfaccia del gioco, quindi i suoi toni sono i
- * token del portfolio (una cella senza tono e' --graph).
- */
+// Il disegnino sul pulsante e' interfaccia del gioco, non sito finto: i toni
+// sono token del portfolio (una cella senza tono e' --graph).
 export type MiniTone = "ink" | "muted" | "mutedDark" | "orange";
 export type MiniCell = {
   tone?: MiniTone;
@@ -111,7 +83,6 @@ export type MiniLayout = {
   columns?: string;
   rows?: string;
   background?: MiniTone;
-  /** Le celle in fondo al riquadro invece che a riempirlo. */
   atBottom?: boolean;
   cells: MiniCell[];
 };
@@ -149,7 +120,6 @@ export const FAKE_LAYOUTS: readonly FakeLayout[] = [
 
 export type IllustrationId = "pane" | "vetrina" | "torta" | "cornetto";
 
-/** Le illustrazioni si disegnano in un svg con questo viewBox. */
 export const ILLUSTRATION_VIEWBOX = "0 0 120 90";
 
 // Il riempimento segue la palette; il tratto d'inchiostro passa da
@@ -159,13 +129,8 @@ const f = (v: string) => `style="fill:var(--${v})"`;
 const t = (v = "st") => (v === "st" ? `stroke="currentColor"` : `style="stroke:var(--${v})"`);
 const CRUMB = "color-mix(in oklab, var(--sa) 22%, #FFF8EC)";
 
-/**
- * Le quattro illustrazioni del sito finto, come markup SVG da mettere dentro
- * un <svg viewBox={ILLUSTRATION_VIEWBOX}>. Sono stringhe fisse scritte qui,
- * nessun dato da fuori: dangerouslySetInnerHTML su di loro e' sicuro.
- *
- * `pane` e' anche la foto della schermata di partenza del livello 2.
- */
+// Stringhe fisse scritte qui, nessun dato da fuori: dangerouslySetInnerHTML e'
+// sicuro. `pane` e' anche la foto della partenza del livello 2.
 export const ILLUSTRATIONS: Record<IllustrationId, string> = {
   pane: `<rect width="120" height="90" ${f("ss")}/><circle cx="60" cy="44" r="36" ${f("sf")} opacity=".55"/>
     <rect y="72" width="120" height="18" ${f("sm")} opacity=".28"/><line x1="0" y1="72" x2="120" y2="72" ${t()} stroke-width="1.4"/>
@@ -279,5 +244,4 @@ export const ILLUSTRATIONS: Record<IllustrationId, string> = {
     <path d="M90 44 q-3 -4 0 -8 t0 -8 M96 42 q-3 -4 0 -8 t0 -8 M102 44 q-3 -4 0 -8 t0 -8" fill="none" ${t("sm")} stroke-width="1.5" stroke-linecap="round" opacity=".85"/>`,
 };
 
-/** Le illustrazioni nell'ordine dell'attrezzo «immagini». */
 export const ILLUSTRATION_ORDER: readonly IllustrationId[] = ["pane", "vetrina", "torta", "cornetto"];

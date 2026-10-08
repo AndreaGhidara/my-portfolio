@@ -1,18 +1,7 @@
-/* ── Il gioco del metodo: livello 1, lo schermo ─────────────────────────────
-   Ogni selettore di questo file sta sotto [data-gioco-livello="schermo"]: i pezzi
-   comuni (banco, testa, console, azioni, righe) sono in base.css e qui non si
-   ridefiniscono. Le animazioni nuove si chiamano gioco-schermo-*.
-
-   Questo livello non e' «sopra scuro, sotto console» come gli altri: e' un
-   tavolo chiaro con un portatile, sei linguette e il cassetto dell'attrezzo
-   aperto, posati come nel prototipo (costruisci-schermo). Il prototipo era
-   alto 35rem; il banco qui e' 38rem. Portatile, telefono e linguette stanno
-   dove stavano, e i tre rem in piu' vanno tutti al cassetto, che arriva fino
-   in fondo: deve tenere le scelte e la riga scura insieme anche a 360px.
-
-   Il sito finto dentro lo schermo legge --sf, --ss, --st, --sa, --sm: sono
-   i colori del Forno Aurora (sitoFinto.ts), non quelli del portfolio, e il
-   livello li scrive sul banco. Tutto il resto sono token fissi. */
+/* Tutto sotto [data-game-level="schermo"]; i pezzi comuni stanno in base.css.
+   Il banco e' alto 38rem contro i 35 del prototipo: i tre rem in piu' vanno al
+   cassetto, che deve tenere le scelte e la riga scura insieme anche a 360px.
+   Il sito finto legge --sf..--sm, i colori del Forno Aurora (fakeSite.ts). */
 
 [data-game] .bench[data-game-level="schermo"] {
   --screen-desk: color-mix(in oklab, var(--paper) 78%, var(--graph));
@@ -29,7 +18,6 @@
   background: var(--screen-desk);
 }
 
-/* La carta puntinata del tavolo. */
 [data-game-level="schermo"]::before {
   content: "";
   position: absolute;
@@ -38,7 +26,6 @@
   pointer-events: none;
 }
 
-/* ── I due passi: il tavolo, e il circuito quando lo schermo e' caduto ───── */
 [data-game-level="schermo"] :is(.step-1, .step-2) {
   position: absolute;
   inset: 0;
@@ -86,7 +73,6 @@
   background: var(--orange);
 }
 
-/* ── Il portatile ─────────────────────────────────────────────────────── */
 [data-game-level="schermo"] .laptop {
   position: absolute;
   left: 50%;
@@ -152,7 +138,6 @@
   pointer-events: none;
 }
 
-/* ── Il telefono ──────────────────────────────────────────────────────── */
 /* Centrato col calcolo e non con translate: accanto a transform nella stessa
    regola, il translate non arriva al browser (la pipeline CSS lo perde). */
 [data-game-level="schermo"] .cell {
@@ -171,7 +156,6 @@
   transition: opacity 0.45s, transform 0.6s cubic-bezier(0.3, 1.3, 0.4, 1);
 }
 
-/* La tacca della fotocamera. */
 [data-game-level="schermo"] .cell::before {
   content: "";
   position: absolute;
@@ -196,8 +180,7 @@
   border-radius: 1.1rem;
 }
 
-/* ══ La landing del Forno Aurora, che cambia davvero ══════════════════════
-   Le misure sono minuscole perche' e' un sito intero dentro uno schermo di
+/* Le misure sono minuscole perche' e' un sito intero dentro uno schermo di
    venti rem; --k e' la scala dei testi scelta, --ft/--fw il carattere dei
    titoli, --fp quello dei paragrafi. */
 [data-game-level="schermo"] .site {
@@ -269,7 +252,6 @@
   color: var(--sm);
 }
 
-/* ── A · classica: testo e immagine affiancati, tre schede ── */
 [data-game-level="schermo"] .l-classic {
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -309,7 +291,6 @@
 [data-game-level="schermo"] .l-classic .cards b { display: block; font-size: calc(0.45rem * var(--k)); }
 [data-game-level="schermo"] .l-classic .cards span { font-size: calc(0.32rem * var(--k)); color: var(--sm); }
 
-/* ── B · manifesto: il titolo occupa lo schermo, una fascia che scorre ── */
 [data-game-level="schermo"] .l-poster {
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -389,7 +370,6 @@
   animation: game-screen-scroll 9s linear infinite;
 }
 
-/* ── C · copertina: come la copertina di una rivista ── */
 [data-game-level="schermo"] .l-cover {
   position: relative;
   block-size: 100%;
@@ -511,7 +491,6 @@
 
 [data-game-level="schermo"] .l-cover .sticker b { font-size: 0.75rem; }
 
-/* ── D · bento: tessere diverse, ognuna con una cosa da dire ── */
 [data-game-level="schermo"] .l-bento {
   display: grid;
   grid-template-rows: auto 1fr;
@@ -652,7 +631,6 @@
   text-decoration: line-through;
 }
 
-/* ── Sul telefono ogni impaginazione va in colonna ── */
 [data-game-level="schermo"] .cell .s-nav { padding: 1.3rem 0.5rem 0.35rem; }
 [data-game-level="schermo"] .cell .s-nav span { display: none; }
 
@@ -682,10 +660,9 @@
 [data-game-level="schermo"] .cell .l-bento .t-time { display: none; }
 [data-game-level="schermo"] .cell .l-bento .t-title .s-title { font-size: calc(0.9rem * var(--k)); }
 
-/* Il punto appena cambiato lampeggia (la classe la mette Schermo.tsx). */
+/* La classe la mette Screen.tsx. */
 [data-game-level="schermo"] .flash { animation: game-screen-flash 0.9s ease-out; }
 
-/* ── Le viti: compaiono quando lo schermo e' finito ─────────────────────── */
 [data-game-level="schermo"] .screw {
   position: absolute;
   z-index: 4;
@@ -707,7 +684,6 @@
     game-screen-invite 1.4s ease-in-out 0.5s infinite;
 }
 
-/* Il taglio della testa, storto in modo diverso per ogni vite. */
 [data-game-level="schermo"] .screw::after {
   content: "";
   position: absolute;
@@ -730,7 +706,6 @@
   animation: game-screen-fall 0.9s cubic-bezier(0.6, 0, 0.4, 1) forwards;
 }
 
-/* ── Le sei linguette, e il cassetto dell'attrezzo aperto ───────────────── */
 [data-game-level="schermo"] .tools {
   position: absolute;
   left: 0.6rem;
@@ -965,7 +940,6 @@
 [data-game-level="schermo"] .ok[data-lit] { opacity: 1; transform: none; }
 [data-game-level="schermo"] .ok b { color: var(--bulb); }
 
-/* ── Passo 2, l'anteprima: dietro lo schermo ────────────────────────────── */
 [data-game-level="schermo"] .circuit {
   position: absolute;
   inset: 0;

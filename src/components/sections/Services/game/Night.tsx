@@ -20,20 +20,11 @@ import {
 
 type NightCopy = Record<NightItem, { fatto: string; parato: string }>;
 
-/** Le ore scritte sotto la striscia: una ogni due, dalle 23 alle 7. */
 const HOURS = [23, 1, 3, 5, 7];
 
-/**
- * Livello 4, il cloud: la notte del forno. Alle 23 si sceglie cosa preparare,
- * poi la notte corre da sola fino alle 7 e succedono sei cose; quello che era
- * pronto le para, il resto manda giu' il sito e la striscia diventa rossa. La
- * mattina il resoconto, e si puo' rifare la notte con le scelte di prima.
- *
- * Tutto quello che si vede discende da `step`: la cronaca, gli esiti, la
- * striscia e la luna si ricalcolano, e l'intervallo non fa altro che contare.
- * Per questo fermarlo e farlo ripartire (fuori dallo schermo, in StrictMode)
- * non perde niente e non conta doppio.
- */
+// Tutto discende da `step` e l'intervallo non fa che contare: fermarlo e
+// farlo ripartire (fuori dallo schermo, in StrictMode) non perde niente e
+// non conta doppio.
 export function Night({ onNext, visible }: LevelProps) {
   const t = useTranslations("services.gioco.notte");
   const common = useTranslations("services.gioco.comune");

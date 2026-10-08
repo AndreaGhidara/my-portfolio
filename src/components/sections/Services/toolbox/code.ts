@@ -2,14 +2,8 @@ import type { Garment, ZoneId } from "@/content/toolbox";
 import { toolsIn, toolById, byZone } from "./graph";
 import type { ToolboxCopy } from "./types";
 
-/**
- * Il codice finto dell'editor, come dati: ogni riga e' una fila di pezzi con
- * il loro colore di sintassi. Il componente li disegna e basta; qui si decide
- * cosa c'e' scritto, e si prova senza un browser.
- *
- * - `k` parola chiave, `p` nome, `s` stringa, `c` commento, `n` nota a margine
- * - `a` un attrezzo: la stringa col suo nome, che si tocca e apre l'etichetta
- */
+// kind finisce in data-syntax: `k` parola chiave, `p` nome, `s` stringa,
+// `c` commento, `n` nota a margine, `a` attrezzo toccabile che apre l'etichetta.
 type Piece =
   | { kind: "t" | "k" | "p" | "s" | "c" | "n"; text: string }
   | { kind: "a"; id: string; text: string };
@@ -25,7 +19,6 @@ const tool = (id: string): Piece => ({
   text: `"${nameOf(id)}"`,
 });
 
-/** Il file del sito: vuoto finche' non si sceglie un lavoro, poi riscritto con i suoi attrezzi. */
 export function configLines(garment: Garment | null, copy: ToolboxCopy): CodeLine[] {
   const e = copy.editor;
   const lines: CodeLine[] = [
@@ -102,7 +95,6 @@ export function configLines(garment: Garment | null, copy: ToolboxCopy): CodeLin
   return lines;
 }
 
-/** Il file di uno scomparto: la sua descrizione, e i suoi attrezzi con quello che fanno. */
 export function zoneLines(
   zone: ZoneId,
   garment: Garment | null,

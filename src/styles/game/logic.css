@@ -1,22 +1,13 @@
-/* ── Il gioco del metodo: livello 2, le logiche ─────────────────────────────
-   Ogni selettore di questo file sta sotto [data-gioco-livello="logiche"]: i pezzi
-   comuni (banco, testa, console, azioni, righe) sono in base.css e qui non si
-   ridefiniscono. Le animazioni nuove si chiamano gioco-logiche-*.
-
-   Sopra il circuito con i sei nodi e il pacco (l'ordine della torta) che
-   corre; sotto la console del nodo. Alla partenza la console e' la schermata
-   del Forno Aurora: li' i colori sono quelli del sito finto (--sf, --ss, --st,
-   --sa, --sm, scritti da Logiche.tsx con variabiliSito), non del portfolio. */
+/* Tutto sotto [data-game-level="logiche"]; i pezzi comuni stanno in base.css.
+   Alla partenza i colori sono quelli del sito finto (--sf..--sm, scritti da
+   Logic.tsx con siteVariables), non del portfolio. */
 
 [data-game-level="logiche"] {
-  /* Il verde chiaro del bordo di un nodo fatto. */
   --logic-green: color-mix(in oklab, var(--green) 45%, var(--paper));
-  /* L'errore: rosa e mattone, tutti e due dall'arancio. */
   --logic-pink: color-mix(in oklab, var(--orange) 16%, var(--paper));
   --logic-brick: color-mix(in oklab, var(--orange) 62%, var(--ink));
 }
 
-/* ── Il circuito ───────────────────────────────────────────────────────── */
 [data-game-level="logiche"] .threads {
   position: absolute;
   inset: 0;
@@ -51,7 +42,6 @@
 
 [data-game-level="logiche"] .rules i.yes { background: var(--bulb); }
 
-/* I nodi: pulsanti, ma quelli non ancora raggiunti non si aprono. */
 [data-game-level="logiche"] .node {
   position: absolute;
   z-index: 2;
@@ -164,8 +154,7 @@
   font-size: 0.5rem;
 }
 
-/* Il pacco: l'ordine della torta che corre da un nodo all'altro. L'onda ha
-   per chiave il nodo, quindi riparte a ogni arrivo, dopo il viaggio. */
+/* L'onda ha per chiave il nodo: riparte a ogni arrivo, dopo il viaggio. */
 [data-game-level="logiche"] .parcel {
   position: absolute;
   z-index: 4;
@@ -198,7 +187,6 @@
   50% { box-shadow: 0 0 0 9px color-mix(in oklab, var(--orange) 12%, transparent); }
 }
 
-/* ── Il palco: la scena, o l'incidente al suo posto ────────────────────── */
 [data-game-level="logiche"] .incident {
   display: grid;
   align-content: start;
@@ -250,7 +238,6 @@
   color: var(--green);
 }
 
-/* La regola gia' trovata, quando il nodo e' fatto. */
 [data-game-level="logiche"] .found {
   position: absolute;
   inset-inline-end: 0.3rem;
@@ -263,7 +250,6 @@
   font-size: 0.5rem;
 }
 
-/* ── Le sei scene ──────────────────────────────────────────────────────── */
 [data-game-level="logiche"] .field {
   display: flex;
   align-items: center;
@@ -406,7 +392,6 @@
   font-size: 0.6rem;
 }
 
-/* Il chip della carta. */
 [data-game-level="logiche"] .paper::before {
   content: "";
   position: absolute;
@@ -499,7 +484,6 @@
   animation: game-enter 0.6s cubic-bezier(0.3, 1.4, 0.5, 1);
 }
 
-/* ── La fine: si stampa il foglietto d'ordine ──────────────────────────── */
 [data-game-level="logiche"] .slip {
   display: grid;
   inline-size: 72%;
@@ -532,7 +516,6 @@
   from { clip-path: inset(0 0 100% 0); }
 }
 
-/* ── La partenza: lo schermo del livello 1, e sotto l'appunto ──────────── */
 [data-game-level="logiche"] .start {
   grid-row: 1 / -1;
   display: grid;
@@ -703,7 +686,6 @@
   45% { transform: translate(-3px, -4px) scale(0.92); }
 }
 
-/* L'appunto: un secondo schermino che dice cosa succede premendo. */
 [data-game-level="logiche"] .note {
   display: grid;
   grid-template-columns: auto 1fr auto;

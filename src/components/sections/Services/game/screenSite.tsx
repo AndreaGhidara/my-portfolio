@@ -11,10 +11,7 @@ import {
   type FakeScale,
 } from "./fakeSite";
 
-/**
- * Un'illustrazione del sito finto. Il markup e' una stringa fissa di
- * fakeSite.ts, nessun dato da fuori: dangerouslySetInnerHTML qui e' sicuro.
- */
+// Il markup e' una stringa fissa di fakeSite.ts: dangerouslySetInnerHTML e' sicuro.
 export function Illustration({ id }: { id: IllustrationId }) {
   return (
     <svg
@@ -35,15 +32,9 @@ type SiteProps = {
   ref?: Ref<HTMLDivElement>;
 };
 
-/**
- * La landing del Forno Aurora, quella che gli attrezzi cambiano davvero. I
- * colori arrivano dalle variabili --sf..--sm che il livello scrive sul banco;
- * qui si scrivono solo carattere e scala.
- *
- * Il titolo non e' un heading: e' il disegno di un sito dentro la pagina, e
- * chi naviga per titoli non deve trovarci il pane fra le sezioni del
- * portfolio. `data-title` e `data-img` sono i bersagli del lampo.
- */
+// I colori arrivano dalle variabili --sf..--sm scritte sul banco. Il titolo non
+// e' un heading: chi naviga per titoli non deve trovarci il pane fra le
+// sezioni del portfolio.
 export function FakeSite({ layout, illustration, pair, scale, ref }: SiteProps) {
   const t = useTranslations("services.gioco.schermo.sito");
 

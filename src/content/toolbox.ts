@@ -1,29 +1,16 @@
-/**
- * La cassetta del sarto: tutto quello che so usare, diviso per scomparti, e i
- * capi, cioe' cosa ne prenderei per un tipo di lavoro. Niente testo qui: nomi
- * degli scomparti, descrizioni e perche' stanno in messages, sotto `cassetta`.
- * I nomi degli attrezzi invece sono dati, perche' sono marchi e non si
- * traducono.
- *
- * Le coordinate sono quelle della mappa del prototipo
- * (docs/prototipi/2026-09-27-cassetta-sarto.html), in unita' di un viewBox
- * 1200 x 820. I collegamenti sono quelli della versione rivista del
- * 2026-09-27: fratelli dove prima c'era una catena, figli dove uno gira
- * sull'altro.
- */
+// I testi stanno in messages sotto `cassetta`; i nomi degli attrezzi restano
+// qui perche' sono marchi e non si traducono. Coordinate in unita' del viewBox
+// 1200 x 820 della mappa.
 
 export type ZoneId = "front" | "stili" | "mezzo" | "back" | "auth" | "dati" | "casa" | "ovunque" | "ai";
 
 export type Zone = {
   id: ZoneId;
-  /** Il rettangolo della pezza: x, y, larghezza, altezza. */
+  /** x, y, larghezza, altezza. */
   r: readonly [number, number, number, number];
 };
 
-/**
- * L'ordine e' quello dell'editor e dell'elenco: prima quello che si vede, poi
- * quello che sta sotto, e in fondo cio' che attraversa tutto.
- */
+// L'ordine e' quello dell'editor e dell'elenco per scomparti.
 export const ZONES: readonly Zone[] = [
   { id: "front", r: [40, 150, 400, 150] },
   { id: "stili", r: [40, 330, 400, 170] },
@@ -36,18 +23,13 @@ export const ZONES: readonly Zone[] = [
   { id: "ovunque", r: [40, 540, 230, 250] },
 ];
 
-/**
- * Dove l'attrezzo e' stato usato davvero. `lavoro` se compare nei lavori, nel
- * CV, nella scheda del colloquio o in questo sito; altrimenti `conosciuto`:
- * lo so usare, ma nessun lavoro lo prova. L'etichetta lo dice, perche' una
- * cassetta che non distingue le due cose promette piu' di quello che ha.
- */
+// `work` se compare nei lavori, nel CV, nella scheda del colloquio o in questo
+// sito; altrimenti `known`. L'etichetta li distingue per non promettere troppo.
 export type Experience = "work" | "known";
 
 export type Tool = {
-  /** Lo slug: e' anche la chiave di traduzione, cassetta.attrezzi.<id>. */
+  /** Anche la chiave di traduzione: cassetta.attrezzi.<id>. */
   id: string;
-  /** Il nome come si scrive: e' un marchio, non si traduce. */
   name: string;
   zone: ZoneId;
   x: number;
@@ -97,13 +79,9 @@ export const TOOLS: readonly Tool[] = [
   { id: "pgvector", name: "pgvector", zone: "ai", x: 1045, y: 750, experience: "known" },
 ];
 
-/** Il cartellino in cima: il capo finito, da cui scende tutto. */
 export const ROOT = { id: "sito", x: 600, y: 62 } as const;
 
-/**
- * Gli snodi dei rami, uno per scomparto: l'id e' quello dello scomparto. Non
- * sono attrezzi: sono il punto da cui i rami di una zona si aprono.
- */
+// Uno per scomparto, con l'id dello scomparto: il punto da cui si aprono i rami della zona.
 export const JUNCTIONS: readonly { id: ZoneId; x: number; y: number }[] = [
   { id: "front", x: 240, y: 178 },
   { id: "mezzo", x: 600, y: 178 },
@@ -116,7 +94,7 @@ export const JUNCTIONS: readonly { id: ZoneId; x: number; y: number }[] = [
   { id: "ai", x: 1045, y: 568 },
 ];
 
-/** I rami dell'albero, dal padre al figlio. Ogni nodo ha un padre solo: il primo. */
+/** Dal padre al figlio. Se un nodo compare piu' volte come figlio, vale il primo padre. */
 export const BRANCHES: readonly (readonly [string, string])[] = [
   ["sito", "front"], ["sito", "mezzo"], ["sito", "back"],
   ["front", "nextjs"], ["front", "react"], ["nextjs", "stili"], ["react", "stili"],
@@ -135,11 +113,8 @@ export const BRANCHES: readonly (readonly [string, string])[] = [
   ["back", "ai"], ["ai", "langchain"], ["ai", "vercel-ai-sdk"], ["ai", "pgvector"],
 ];
 
-/**
- * Gli incroci fra scomparti, tratteggiati: chi parla con chi senza stargli
- * sotto. «Ovunque» non ha un padre nell'albero, e i suoi due incroci sono il
- * modo in cui si attacca al resto (vedi SCIOLTI).
- */
+// Fili tratteggiati fuori dall'albero. «ovunque» non ha padre: si attacca al
+// resto solo con i suoi due incroci (vedi LOOSE).
 export const CROSSINGS: readonly (readonly [string, string])[] = [
   ["nextjs", "graphql"], ["nextjs", "trpc"], ["react", "rest"], ["graphql", "nestjs"], ["rest", "express"], ["trpc", "nodejs"],
   ["redis", "nodejs"], ["websocket", "nodejs"], ["tailwind", "shadcn-ui"], ["framer-motion", "react"],
@@ -150,36 +125,24 @@ export const CROSSINGS: readonly (readonly [string, string])[] = [
   ["ovunque", "front"], ["ovunque", "back"],
 ];
 
-/**
- * I nodi che non scendono dal cartellino, dichiarati: «ovunque» attraversa
- * tutte le zone, e appenderlo sotto una sola vorrebbe dire che le serve.
- * Ci si arriva dagli incroci. I suoi attrezzi scendono da lui.
- */
+// I nodi che non scendono dal cartellino: «ovunque» attraversa tutte le zone,
+// e appenderlo sotto una sola direbbe che serve solo a quella.
 export const LOOSE: readonly string[] = ["ovunque"];
 
-/** Un'alternativa: `a` al posto di `da`, con il perche' in messages. */
+/** `to` al posto di `from`, con il perche' in messages. */
 export type Alternative = { from: string; to: string };
 
 export type Garment = {
   /** Anche la chiave di traduzione: cassetta.capi.<id>. */
   id: string;
-  /** Gli attrezzi che prenderei, per slug. */
+  /** Slug degli attrezzi. */
   uses: readonly string[];
-  /**
-   * Quanto pesa ogni scomparto in questo lavoro, in percentuale: e' la
-   * composizione dell'etichetta, come le fibre di un tessuto. Sono stime di chi
-   * costruisce, e lo dichiarano: la pagina scrive «stima» accanto.
-   */
+  /** Percentuale per scomparto: stime dichiarate, la pagina scrive «stima» accanto. */
   weight: Partial<Record<ZoneId, number>>;
   estimated: true;
   alt: readonly Alternative[];
 };
 
-/**
- * Per ogni tipo di lavoro, gli attrezzi che prenderei dalla cassetta, e
- * l'alternativa che terrei pronta. E' un punto di partenza, non una ricetta
- * fissa, e la pagina lo dice.
- */
 export const GARMENTS: readonly Garment[] = [
   {
     id: "vetrina",

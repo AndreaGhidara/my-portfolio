@@ -2,14 +2,11 @@ import { TOOLS, GARMENTS, ZONES } from "@/content/toolbox";
 import { toolsIn } from "./graph";
 import type { ToolboxCopy } from "./types";
 
-/** Quello che serve per tradurre: la `t` di next-intl, sul namespace `cassetta`. */
+/** La `t` di next-intl sul namespace `cassetta`. */
 type Translate = (key: string, values?: Record<string, number>) => string;
 
-/**
- * Tutti i testi della cassetta, dal namespace `cassetta` di messages. Sta fuori
- * dal componente server perche' le prove lo costruiscono dagli stessi file di
- * lingua, con lo stesso codice: una chiave che manca si vede nei test.
- */
+// Fuori dal componente server perche' i test lo costruiscono dagli stessi file
+// di lingua: una chiave che manca si vede li'.
 export function toolboxCopy(tc: Translate): ToolboxCopy {
   return {
     sewFor: tc("cuciPer"),

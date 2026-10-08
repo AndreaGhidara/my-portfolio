@@ -4,15 +4,9 @@ import { advance, needleDuration, needlePose, sewnStops } from "./motion";
 
 type Gsap = typeof import("gsap").gsap;
 
-/**
- * L'ago. Parte a ogni capo nuovo, solo a "full": il filo si scopre dietro di
- * lui e le etichette si accendono quando ci passa. Altrimenti il capo e' gia'
- * cucito. In fase di layout: il capo nuovo non deve mostrarsi gia' cucito per
- * un fotogramma prima che l'ago parta.
- *
- * Restituisce i ref da appendere a maschera, filo e ago, e quante tappe del
- * percorso sono cucite (tutte, a riposo).
- */
+// Solo a "full"; altrimenti il capo e' gia' cucito e `sewn` vale infinito.
+// In fase di layout: il capo nuovo non deve mostrarsi cucito per un
+// fotogramma prima che l'ago parta.
 export function useNeedle({
   garment,
   full,
@@ -23,9 +17,7 @@ export function useNeedle({
 }: {
   garment: Garment | null;
   full: boolean;
-  /** La cucitura del capo, con le curve parziali fino a ogni tappa. */
   seam: { d: string; partials: string[] };
-  /** Quante tappe ha il percorso. */
   stops: number;
   svg: RefObject<SVGSVGElement | null>;
   gsapRef: RefObject<Gsap | null>;
@@ -58,8 +50,7 @@ export function useNeedle({
     }
 
     const length = thread.getTotalLength();
-    // Dove sta ogni tappa lungo il filo: le curve parziali misurate da un
-    // tracciato di servizio, dentro l'SVG perche' fuori il browser non misura.
+    // Il tracciato di servizio sta dentro l'SVG: fuori il browser non misura.
     const probe = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "path",

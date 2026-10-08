@@ -1,10 +1,7 @@
 import type { ZoneId } from "@/content/toolbox";
 
-/**
- * Tutti i testi della cassetta, gia' tradotti dal server. Passano al client
- * una volta sola: la mappa, l'editor e l'etichetta leggono da qui, e nessuno
- * dei tre ne tiene una copia sua.
- */
+// Tradotti dal server e passati al client una volta sola: mappa, editor ed
+// etichetta leggono tutti da qui.
 export type ToolboxCopy = {
   sewFor: string;
   whole: string;
@@ -52,7 +49,7 @@ export type ToolboxCopy = {
     tried: string;
     atWork: string;
     known: string;
-    /** «MADE TO MEASURE · 1 PEZZO»: quella di un attrezzo o di uno scomparto. */
+    /** La taglia di un attrezzo o di uno scomparto, che e' sempre un pezzo. */
     sizeOne: string;
     back: string;
     close: string;
@@ -72,5 +69,5 @@ export type ToolboxCopy = {
   };
 };
 
-/** Un passo della cronologia: un nodo della mappa (attrezzo, snodo, cartellino) o un capo. */
+/** `node` vale per attrezzi, snodi e cartellino. */
 export type ToolboxStep = { kind: "node"; id: string } | { kind: "garment"; id: string };

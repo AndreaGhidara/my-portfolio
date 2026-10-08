@@ -1,14 +1,10 @@
-/* ── Il gioco del metodo: livello 3, i servizi ─────────────────────────────
-   Ogni selettore di questo file sta sotto [data-gioco-livello="pannello"]: i pezzi
-   comuni (banco, testa, console, azioni, righe) sono in base.css e qui non si
-   ridefiniscono. Le animazioni nuove si chiamano gioco-pannello-*. */
+/* Tutto sotto [data-game-level="pannello"]; i pezzi comuni stanno in base.css. */
 
 [data-game-level="pannello"] {
   /* Il bordo dei moduli e il fondo del tubo, poi le viti: gradini piu'
      chiari dello scuro del banco. */
   --panel-border: color-mix(in oklab, var(--ink) 82%, var(--paper));
   --panel-screw: color-mix(in oklab, var(--ink) 76%, var(--paper));
-  /* Il rosso cupo da cui parte il tubo quando la salute scende. */
   --panel-deep-red: color-mix(in oklab, var(--orange) 65%, var(--ink));
   /* L'arancio come testo sulla carta: pieno ci fa 3,27:1, poco per
      un'etichetta di mezzo rem. */
@@ -17,7 +13,6 @@
   --panel-solved: color-mix(in oklab, var(--green) 10%, var(--paper));
 }
 
-/* ── Sopra: la salute, la coda degli avvisi, i cinque moduli ───────────── */
 [data-game-level="pannello"] .health {
   position: absolute;
   inset-inline: 0.7rem;
@@ -71,9 +66,8 @@
   color: var(--mutedDark);
 }
 
-/* La coda: l'ultimo avviso arrivato. Va a capo invece di tagliarsi con i
-   puntini come nel prototipo: e' la prima cosa che si legge, e due righe
-   ci stanno. */
+/* Va a capo invece di tagliarsi coi puntini come nel prototipo: e' la prima
+   cosa che si legge, e due righe ci stanno. */
 [data-game-level="pannello"] .tail {
   position: absolute;
   inset-inline: 0.7rem;
@@ -184,7 +178,6 @@
 [data-game-level="pannello"] [data-form] .screws::before { inset-inline-start: 0.3rem; }
 [data-game-level="pannello"] [data-form] .screws::after { inset-inline-end: 0.3rem; }
 
-/* ── Sotto: il palco della console ─────────────────────────────────────── */
 [data-game-level="pannello"] .calm {
   display: grid;
   place-items: center;
@@ -230,9 +223,8 @@
 
 [data-game-level="pannello"] .problem.solved small { color: var(--green); }
 
-/* Il resoconto: un servizio per riga. Righe piu' basse che nel prototipo:
-   con la salute sotto 90 il titolo va su due righe, e cinque righe alte
-   uscivano dal palco. */
+/* Righe piu' basse che nel prototipo: con la salute sotto 90 il titolo va su
+   due righe, e cinque righe alte uscivano dal palco. */
 [data-game-level="pannello"] .report {
   display: grid;
   gap: 0.22rem;

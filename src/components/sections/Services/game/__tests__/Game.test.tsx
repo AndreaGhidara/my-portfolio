@@ -8,12 +8,7 @@ import en_ from "../../../../../../messages/en.json";
 import { Game } from "../Game";
 import type { LevelId, LevelProps } from "../levels";
 
-/**
- * Qui si prova il guscio, non i livelli: ognuno ha le sue prove. Al posto dei
- * quattro livelli veri c'e' un banco finto con la stessa radice, un pulsante
- * che chiama onNext e `visible` scritto in chiaro, cosi' si vede anche che
- * il guscio lo passa giu'. Il finale resta quello vero: e' del guscio.
- */
+// Si prova il guscio: i quattro livelli sono finti, con la stessa radice e `visible` in chiaro.
 const { fakeLevel } = vi.hoisted(() => ({
   fakeLevel: (id: LevelId) =>
     function FakeLevel({ onNext, visible }: LevelProps) {
@@ -42,16 +37,10 @@ const bench = (container: HTMLElement) =>
 const bars = (name = common.barrette) =>
   within(screen.getByRole("group", { name })).getAllByRole("button");
 
-/** Il pulsante del livello finto che chiama onNext. */
 const nextButton = (container: HTMLElement) =>
   within(bench(container)).getByRole("button", { name: "avanti finto" });
 
-/**
- * Il guscio ignora un secondo tocco sui pulsanti del banco che arriva entro
- * 350 ms dal primo (il doppio tocco). Le prove del giro premono come una
- * persona che legge: l'orologio va avanti di 400 ms prima di ogni tocco. E'
- * finto solo Date, da cui jsdom prende il timeStamp degli eventi.
- */
+// Il guscio ignora un secondo tocco entro 350 ms: Date avanza di 400 ms prima di ogni tocco.
 const press = async (user: ReturnType<typeof userEvent.setup>, el: Element) => {
   vi.setSystemTime(Date.now() + 400);
   await user.click(el);
@@ -206,8 +195,7 @@ describe("il cambio di livello si sente", () => {
     const line = container.querySelector("[data-game-line]") as HTMLElement;
     expect(line).toHaveAttribute("aria-live", "polite");
     await press(user, nextButton(container));
-    // La stessa regione, col testo nuovo: una regione appena nata non la
-    // annuncia nessuno.
+    // La stessa regione col testo nuovo: una regione appena nata non si annuncia.
     expect(container.querySelector("[data-game-line]")).toBe(line);
     expect(line).toHaveTextContent(common.righe.logiche);
   });

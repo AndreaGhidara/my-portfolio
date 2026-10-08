@@ -1,31 +1,13 @@
-/* La cassetta degli attrezzi: cuci per, la mappa, l'etichetta, l'editor e l'elenco. */
-
-/* ══════════════════════════════════════════════════════════════════════════
-   LA CASSETTA DEGLI ATTREZZI
-
-   Dentro i Servizi, subito dopo il tavolo. Due viste nella stessa sezione,
-   tutte e due nel markup del server: la mappa con il mouse da 1280px in su,
-   l'editor altrove. Le sceglie questo foglio, con la stessa condizione che
-   Cassetta.tsx usa per sapere quale animare: nessuno scambio dopo il
-   montaggio, e la sezione ha la stessa altezza prima e dopo il JavaScript.
-
-   I colori sono quelli della famiglia, e basta: le nove zone si distinguono
-   per tono (quanto arancio o quanto inchiostro dentro il fondo), per trama
-   (vuota, a righe, a punti, a quadretti) e per il passo dell'orlo cucito.
-   Il verde e il giallo della tavolozza qui non entrano.
-
-   I numeri sono quelli del prototipo (docs/prototipi/2026-09-27-cassetta-
-   sarto.html per la mappa e l'etichetta, 2026-09-27-cassetta-tech.html,
-   proposta T3, per l'editor).
-   ══════════════════════════════════════════════════════════════════════════ */
+/* Mappa ed editor sono tutti e due nel markup del server: li sceglie questo
+   foglio, con la stessa condizione di MAP_QUERY in Toolbox.tsx. Le nove zone
+   si distinguono per tono, trama e passo dell'orlo, senza il verde e il
+   giallo della tavolozza. */
 [data-toolbox-section] {
   position: relative;
   max-width: 90rem;
   margin-inline: auto;
-  /* Sopra non si aggiunge niente: il tavolo fermo chiude gia' con il suo
-     --section-y, e sommarne un altro faceva sedici rem di vuoto. A "full" il
-     tavolo chiude sulla tesi con 9vh sotto, e la cassetta ne aggiunge meta'
-     (vedi sotto, dentro no-preference). */
+  /* Niente sopra: il tavolo chiude gia' con il suo --section-y, e sommarne un
+     altro faceva sedici rem di vuoto. A "full" ne aggiunge meta', sotto. */
   padding: 0 var(--gutter) var(--section-y);
 }
 
@@ -44,10 +26,9 @@
 /* La barra alta del sito, 60px misurati come nel percorso e nell'archivio. */
 [data-toolbox] { --header: 3.75rem; margin-top: 1.75rem; }
 
-/* I toni delle zone. `--c` e' il colore della zona (i bordi a punti, le barre
-   della composizione, lo snodo), `--f` il fondo della pezza, `--su` il testo
-   sopra lo snodo pieno, `--orlo` il passo della cucitura. Tutto misto con
-   --bg e --fg, cosi' nel tema scuro le pezze restano pezze e non macchie. */
+/* `--c` colore della zona, `--f` fondo della pezza, `--on-c` testo sopra lo
+   snodo pieno, `--hem` passo dell'orlo. Tutto misto con --bg e --fg, cosi' nel
+   tema scuro le pezze restano pezze e non macchie. */
 [data-toolbox] [data-zone="front"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 22%, var(--bg)); --on-c: var(--on-accent); --hem: 7 5; }
 [data-toolbox] [data-zone="stili"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 11%, var(--bg)); --on-c: var(--on-accent); --hem: 3 3; }
 [data-toolbox] [data-zone="mezzo"] { --c: var(--fg-muted); --f: color-mix(in oklab, var(--fg) 7%, var(--bg)); --on-c: var(--bg); --hem: 7 5; }
@@ -58,7 +39,6 @@
 [data-toolbox] [data-zone="ai"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 6%, var(--bg)); --on-c: var(--on-accent); --hem: 12 4; }
 [data-toolbox] [data-zone="ovunque"] { --c: var(--fg-muted); --f: var(--bg); --on-c: var(--bg); --hem: 4 3; }
 
-/* ── Cuci per ── */
 [data-toolbox-sew] {
   display: flex;
   flex-wrap: wrap;
@@ -104,9 +84,8 @@
   color: var(--fg-muted);
 }
 
-/* Sul telefono i cinque bottoni stanno su una riga che scorre di lato, come
-   nell'editor del prototipo: a capo diventavano tre righe di bottoni sopra la
-   cosa che comandano. */
+/* Una riga che scorre di lato: a capo diventavano tre righe di bottoni sopra
+   la cosa che comandano. */
 @media (max-width: 767px) {
   [data-toolbox-sew] {
     flex-wrap: nowrap;
@@ -119,7 +98,6 @@
   [data-toolbox-sew]::-webkit-scrollbar { display: none; }
 }
 
-/* ── Le due viste ── */
 [data-toolbox-scene] { margin-top: 1.5rem; }
 [data-toolbox-map] { display: none; }
 
@@ -132,7 +110,6 @@
   [data-toolbox-view-editor] { display: none; }
 }
 
-/* ── La mappa ── */
 [data-toolbox-bench] {
   position: relative;
   aspect-ratio: 1200 / 820;
@@ -249,8 +226,7 @@ svg[data-state="chosen"] [data-node="junction"] { opacity: 0.45; }
   [data-node] { transition: opacity 0.3s; }
   [data-thread] { transition: opacity 0.3s, stroke 0.2s; }
 
-  /* L'entrata: ogni etichetta sboccia dal punto in cui sta suo padre, in
-     ordine di rami. Solo a "full", e solo se la mappa non era gia' in vista. */
+  /* Ogni etichetta parte dal punto del padre (--dx, --dy), in ordine di rami (--i). */
   svg[data-entrance="waiting"] [data-body] { opacity: 0; }
   svg[data-entrance="entering"] [data-body] {
     animation: toolbox-bloom 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) both;
@@ -261,9 +237,8 @@ svg[data-state="chosen"] [data-node="junction"] { opacity: 0.45; }
   from { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); }
 }
 
-/* La colonna dell'etichetta non conta nell'altezza della riga: la riga e'
-   alta quanto il banco, e il pannello ci sta dentro con il suo scorrimento.
-   Cliccare un capo con quattordici fibre non allunga la sezione. */
+/* La colonna non conta nell'altezza della riga, che resta quella del banco:
+   un capo con quattordici fibre non allunga la sezione. */
 [data-toolbox-column] { contain: size; }
 [data-toolbox-panel] {
   position: sticky;
@@ -274,7 +249,6 @@ svg[data-state="chosen"] [data-node="junction"] { opacity: 0.45; }
   scrollbar-width: thin;
 }
 
-/* ── L'etichetta: quella cucita dentro un vestito ── */
 [data-label] {
   position: relative;
   display: flex;
@@ -382,12 +356,10 @@ svg[data-state="chosen"] [data-node="junction"] { opacity: 0.45; }
   color: var(--fg-muted);
 }
 
-/* ── L'editor: scuro in tutti e due i temi, perche' e' una finestra di codice.
-   Le variabili del tema si ridichiarano qui dentro, cosi' i toni delle zone
-   (le cartelle, la composizione in basso) si risolvono sul fondo scuro. Il
-   foglio che sale sta fuori da questa scatola e segue il tema della pagina.
-   I commenti che portano contenuto (il perche', le alternative) sono in
-   mutedDark, mai in muted: sull'inchiostro muted fa 3,34:1. ── */
+/* Scuro in tutti e due i temi: le variabili del tema si ridichiarano qui,
+   cosi' i toni delle zone si risolvono sul fondo scuro. Il foglio sta fuori
+   e segue la pagina. Testo secondario in mutedDark: muted sull'inchiostro fa
+   3,34:1. */
 [data-toolbox-editor] {
   --bg: var(--ink);
   --fg: var(--paper);
@@ -510,8 +482,7 @@ svg[data-state="chosen"] [data-node="junction"] { opacity: 0.45; }
 }
 [data-editor-mix] i { height: 100%; background: var(--c); box-shadow: inset -1px 0 0 var(--ink); }
 
-/* ── Il foglio del telefono: l'etichetta che sale dal basso ──
-   Niente `display` sul selettore nudo: toglierebbe al <dialog> chiuso il suo
+/* Niente `display` sul selettore nudo: toglierebbe al <dialog> chiuso il suo
    display:none, come e' successo al dossier dei Lavori. */
 [data-toolbox-sheet]:not([open]) { display: none; }
 [data-toolbox-sheet] {
@@ -547,8 +518,7 @@ svg[data-state="chosen"] [data-node="junction"] { opacity: 0.45; }
   from { transform: translateY(100%); }
 }
 
-/* ── L'elenco per scomparti: quello che legge uno screen reader, e quello che
-   si vede senza JavaScript, quando la mappa e l'editor non farebbero niente. ── */
+/* L'elenco e' per gli screen reader, e si vede solo senza JavaScript. */
 [data-toolbox-list] {
   position: absolute;
   width: 1px;

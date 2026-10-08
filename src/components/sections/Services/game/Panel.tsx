@@ -5,32 +5,15 @@ import { useTranslations } from "next-intl";
 import { levelNumber, type LevelProps } from "./levels";
 import { Icon, type ServiceIcon } from "./icons";
 
-/**
- * Livello 3, i servizi: il pannello del sito un mese dopo il lancio, in un
- * minuto. Si accende, le spie arrivano da sole una alla volta, si tocca il
- * modulo rosso e si interviene. Finche' una spia resta accesa la salute del
- * sito scende. Alla fine il resoconto del mese, servizio per servizio.
- *
- * IL TEMPO. Un battito solo, ogni 200 ms, muove tutto: la salute (1,2 punti
- * ogni due battiti, cioe' ogni 400 ms, come nel prototipo) e l'attesa del
- * prossimo avviso (1,4 s la prima, 2,6 s dopo un intervento). L'attesa e' un
- * conto alla rovescia dentro lo stato, non un setTimeout: quando il gioco esce
- * dallo schermo il battito si ferma, e al rientro riparte dal punto in cui
- * era, senza un orologio da leggere.
- *
- * Lo stato vive in un reducer puro e il battito e' l'unico timer, con la sua
- * pulizia nell'effetto: lo StrictMode monta l'effetto due volte, ma ne resta
- * acceso uno solo.
- */
+// Un battito ogni 200 ms muove tutto: la salute cala ogni due battiti e
+// l'attesa del prossimo avviso e' un conto alla rovescia nello stato, non un
+// setTimeout. Fuori dallo schermo il battito si ferma e al rientro riparte da
+// li'; con lo StrictMode resta acceso un intervallo solo.
 
-/** I cinque moduli, nell'ordine del pannello. */
 const SERVICES = ["assistenza", "automazioni", "numeri", "trovare", "manutenzione"] as const satisfies readonly ServiceIcon[];
 
-/**
- * Di chi e' ogni avviso, nell'ordine in cui arrivano. I testi stanno nei
- * messaggi (pannello.eventi), uno per voce e nello stesso ordine: la prova
- * controlla che siano tanti quanti questi.
- */
+// I testi stanno in pannello.eventi, uno per voce e nello stesso ordine: un
+// test controlla che siano tanti quanti questi.
 export const SEQUENCE: readonly ServiceIcon[] = [
   "manutenzione",
   "assistenza",
@@ -45,9 +28,8 @@ const DROP = 1.2;
 const MIN_HEALTH = 40;
 const FIRST_WAIT = 1400;
 const WAIT_AFTER = 2600;
-/** Sotto questa soglia il numero e il tubo diventano rossi. */
 const LOW_THRESHOLD = 80;
-/** Da qui in su, a fine mese, «il sito non se n'e' accorto». */
+// Da qui in su, a fine mese, «il sito non se n'e' accorto».
 const GOOD_THRESHOLD = 90;
 
 type PanelEvent = { testo: string; intervento: string; esito: string };
@@ -56,15 +38,13 @@ type State = {
   phase: "off" | "on" | "done";
   health: number;
   ticks: number;
-  /** Il prossimo avviso da accendere, indice in SEQUENCE. */
   next: number;
-  /** L'avviso con la spia accesa adesso. */
   active: number | null;
-  /** L'ultimo avviso risolto: lo dice la coda, e la console finche' `done`. */
+  // Lo mostra la coda, e la console finche' `done`.
   solved: number | null;
   done: boolean;
   chosen: ServiceIcon | null;
-  /** Millisecondi al prossimo avviso; null se non se ne aspetta uno. */
+  // null quando non si aspetta nessun avviso.
   wait: number | null;
 };
 
@@ -281,7 +261,6 @@ export function Panel({ onNext, visible }: LevelProps) {
   );
 }
 
-/** Il palco tranquillo: un segno e una riga, al centro. */
 function Calm({ sign, text }: { sign: string; text: string }) {
   return (
     <div className="calm">
@@ -293,10 +272,6 @@ function Calm({ sign, text }: { sign: string; text: string }) {
   );
 }
 
-/**
- * La console di un modulo toccato: il suo avviso se la spia e' la sua, il
- * «fatto» dopo l'intervento, altrimenti che li' e' tutto a posto.
- */
 function ServiceModule({
   chosen,
   name,

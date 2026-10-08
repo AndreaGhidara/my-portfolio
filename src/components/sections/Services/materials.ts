@@ -1,37 +1,17 @@
 import { palette } from "@/styles/palette";
 import { contrastRatio } from "@/styles/contrast";
 
-/**
- * La scala dei materiali del tavolo: quale pieno e quale tratto tocca a ogni
- * superficie, in ognuno dei due temi.
- *
- * Perche' esista un modulo e non solo il foglio di stile: la prima stesura
- * dichiarava UNA tavola sola per tutti e due i temi, e in tema scuro il
- * cartoncino (`--fg` 15% su `--bg`) e la scocca (`--ink` 78% con `--fg-muted`)
- * finivano sullo stesso identico colore: 1.00:1. Non era un valore sbagliato,
- * era strutturale: la carta segue il tema e in scuro SALE, l'apparecchio e'
- * fisso ma schiarito per non fare nero-su-nero e in scuro sale anche lui. Le
- * due famiglie si incrociano, e nessuna tavolozza unica puo' impedirlo.
- *
- * Il difetto era numerico, non testuale: una suite da 210 prove non lo ha visto,
- * e una prova che leggesse il CSS come stringa non lo avrebbe visto lo stesso.
- * Qui le ricette sono NUMERI, la miscelazione in oklab e' calcolabile, e le
- * distanze fra le superfici diventano soglie che una prova puo' guardare.
- * Il foglio di stile resta l'unico che dipinge: una seconda prova verifica che
- * dichiari esattamente queste ricette, cosi' i due file non possono divergere.
- */
+// Le ricette sono numeri perche' il difetto era numerico: in tema scuro
+// cartoncino e scocca cadevano sullo stesso colore (1.00:1), e nessuna prova
+// testuale lo vedeva. Il CSS resta l'unico che dipinge, e una prova verifica
+// che dichiari esattamente queste ricette.
 
 export type Theme = "light" | "dark";
 
-/** I soli token che i materiali hanno il permesso di spendere. */
 export type Token = "bg" | "fg" | "fg-muted" | "ink" | "bulb";
 
-/**
- * I token risolti, tema per tema: e' la stessa inversione che `tokens.css`
- * dichiara su `:root` e su `[data-theme="dark"]` (una prova verifica che i due
- * file dicano la stessa cosa). E' questa tabella a rendere calcolabile il
- * difetto: senza di lei "la carta sale in scuro" resta una frase.
- */
+// La stessa inversione di tokens.css su :root e [data-theme="dark"], e una
+// prova verifica che i due file coincidano.
 export const THEME_TOKENS: Record<Theme, Record<Token, string>> = {
   light: {
     bg: palette.paper,
@@ -49,27 +29,20 @@ export const THEME_TOKENS: Record<Theme, Record<Token, string>> = {
   },
 };
 
-/** Un token nudo, oppure una miscela in oklab fra due token. Mai un hex. */
 export type Recipe = { token: Token } | { a: Token; pct: number; b: Token };
 
 export type Family = "paper" | "device" | "fixed";
 
 export type Coat = {
-  /** `--desk-pieno`: la superficie. */
   fill: Recipe;
-  /** `--desk-tratto`: il contorno. `null` = non lo dichiara, lo eredita. */
+  /** `null`: non lo dichiara, lo eredita. */
   line: Recipe | null;
 };
 
 export type Surface = {
-  /**
-   * Il selettore della regola che porta la ricetta in `sections/desk.css`,
-   * come lo si scrive in testa alla regola: la graffa o la virgola in coda
-   * la prova del contratto le toglie, e cerca il selettore intero fra quelli
-   * della lista. La regola del tema scuro e' la stessa preceduta da
-   * `[data-theme="dark"] `. E' un ancoraggio per la prova, non un selettore
-   * da usare altrove.
-   */
+  // Il selettore come apre la regola in styles/sections/desk.css: la prova
+  // del contratto toglie graffa o virgola e lo cerca intero. In tema scuro e'
+  // lo stesso preceduto da `[data-theme="dark"] `.
   anchor: string;
   family: Family;
   light: Coat;
@@ -80,73 +53,50 @@ export type SurfaceName = "sheet" | "card" | "plate" | "shell" | "postit" | "bla
 
 const mix = (a: Token, pct: number, b: Token): Recipe => ({ a, pct, b });
 
-/**
- * La carta piu' chiara della famiglia. Sta in una costante perche' due
- * superfici la spendono (il foglio e il post-it bianco) e due copie a mano
- * dello stesso numero sono due copie che un giorno divergono.
- */
+// Due superfici la spendono, il foglio e il post-it bianco: una copia sola.
 const PALEST_PAPER: Record<Theme, Recipe> = {
   light: mix("fg", 9, "bg"),
   dark: mix("fg", 68, "bg"),
 };
 
-/**
- * La tavola. Il disegno, in una riga: in tema chiaro la carta sta appena sotto
- * il fondo e l'apparecchio precipita a nero; in tema scuro si scambiano i
- * mestieri: la carta e' la cosa che brilla, l'apparecchio resta basso vicino
- * al fondo e a tenerlo su sono il tratto e i led. In una stanza buia una
- * scatola nera su una scrivania scura non si legge per il suo pieno: si legge
- * per i suoi riflessi.
- *
- * L'ordine dentro la famiglia carta non cambia mai. Il foglio e' la carta piu'
- * chiara, la piastra la piu' scura: cambia il piano su cui appoggiano. E i
- * segni sulla carta sono scuri in tutti e due i temi, perche' una matita e' una
- * matita: in chiaro sono grafite tirata verso l'inchiostro, in scuro sono
- * inchiostro vero schiarito quel tanto che basta a non essere un buco.
- */
+// In chiaro la carta sta appena sotto il fondo e l'apparecchio va a nero; in
+// scuro la carta brilla e l'apparecchio resta basso, tenuto su da tratto e led.
+// I segni sulla carta restano scuri in tutti e due i temi.
 export const SURFACES: Record<SurfaceName, Surface> = {
-  /* Il foglio: la carta piu' chiara della famiglia, bordo grafite. */
   sheet: {
     anchor: '[data-desk-piece][data-shape="sheet"] {',
     family: "paper",
     light: { fill: PALEST_PAPER.light, line: { token: "fg-muted" } },
     dark: { fill: PALEST_PAPER.dark, line: mix("ink", 60, "fg-muted") },
   },
-  /* La scheda: cartoncino, e il bordo di inchiostro: e' stampata. */
   card: {
     anchor: '[data-desk-piece][data-shape="card"] {',
     family: "paper",
     light: { fill: mix("fg", 20, "bg"), line: mix("fg", 80, "bg") },
     dark: { fill: mix("fg", 58, "bg"), line: mix("ink", 85, "fg-muted") },
   },
-  /* La piastra: l'unica cosa di metallo sul tavolo. */
   plate: {
     anchor: '[data-desk-piece][data-shape="plate"] {',
     family: "paper",
     light: { fill: mix("fg-muted", 55, "bg"), line: mix("fg-muted", 80, "fg") },
     dark: { fill: mix("fg-muted", 75, "bg"), line: mix("ink", 62, "fg-muted") },
   },
-  /* La scocca: rack, telefono e laptop sono la stessa cosa, scatole scure. */
+  // Rack, telefono e laptop: la stessa scatola scura.
   shell: {
     anchor: '[data-desk-piece][data-shape="rack"],',
     family: "device",
     light: { fill: mix("ink", 78, "fg-muted"), line: mix("ink", 42, "fg-muted") },
     dark: { fill: mix("ink", 82, "fg-muted"), line: mix("ink", 30, "fg-muted") },
   },
-  /* Il post-it: fisso in tutti e due i temi. Un post-it giallo e' giallo di
-     notte, ed e' l'unico calore del tavolo che non sia arancio. */
+  // Fisso: un post-it giallo e' giallo anche di notte.
   postit: {
     anchor: '[data-desk-piece][data-shape="postit"] {',
     family: "fixed",
     light: { fill: { token: "bulb" }, line: mix("bulb", 55, "ink") },
     dark: { fill: { token: "bulb" }, line: mix("bulb", 55, "ink") },
   },
-  /* Il post-it BIANCO: la spec lo chiama cosi' (§3.2), ed e' il solo oggetto
-     del tavolo che si preme. Prende il pieno della carta piu' chiara (LO
-     STESSO del foglio, letto da li' e non ricopiato) e il tratto non lo
-     dichiara: eredita il giallo spento degli altri post-it. Resta un post-it,
-     ma vuoto, che e' quello che la spec chiede e che i pieni hanno smesso di
-     dire il giorno in cui sono arrivati. */
+  // Il pieno e' quello del foglio, letto e non ricopiato. Il tratto non lo
+  // dichiara: eredita il giallo spento degli altri post-it.
   blank: {
     anchor: '[data-desk-piece][data-shape="postit"] [data-desk-blank] {',
     family: "paper",
@@ -155,14 +105,8 @@ export const SURFACES: Record<SurfaceName, Surface> = {
   },
 };
 
-/**
- * I led del rack: l'unico strato che una maschera non sa portare, perche' una
- * maschera e' una forma e un led e' un colore. Tre accesi e uno spento, come un
- * rack vero, e fissi in tutti e due i temi: una spia accesa e' accesa di notte.
- */
+// Colore e non forma, quindi nessuna maschera li porta. Fissi nei due temi.
 export const LEDS = {
-  /** Le sagome che li portano. Il componente lo chiede qui invece di sapere a
-   *  memoria che il rack e' il rack. */
   shapes: ["rack"] as const,
   on: { token: "bulb" } as Recipe,
   off: mix("bulb", 20, "ink"),
@@ -171,23 +115,14 @@ export const LEDS = {
 export const hasLeds = (drawing: string): boolean =>
   (LEDS.shapes as readonly string[]).includes(drawing);
 
-/**
- * L'ombra portata. Era `--ink` al 26% in tutti e due i temi, e in tema scuro
- * `--bg` E' `--ink`: aveva esattamente la luminanza del fondo su cui cadeva,
- * cioe' matematicamente non c'era. Anche lei si dichiara due volte.
- */
+// Dichiarata per tema: in scuro --bg e' --ink, e un'ombra d'inchiostro avrebbe
+// la luminanza esatta del fondo.
 export const SHADOW: Record<Theme, { token: Token; pct: number }> = {
   light: { token: "ink", pct: 26 },
-  /* In tema scuro non esiste niente di piu' scuro del fondo da mettere sotto un
-     oggetto: --bg E' --ink, e il piu' nero della palette e' il piano stesso.
-     L'ombra diventa allora quello che in una stanza buia si vede davvero: il
-     contatto che schiarisce appena attorno alla sagoma, non il buio sotto. Sta
-     sotto il pieno della scocca (1.27 sul fondo) apposta: deve staccare
-     l'oggetto dal piano senza confondersi col suo bordo. */
+  // Niente e' piu' scuro del piano: l'ombra diventa un contatto che schiarisce,
+  // sotto il pieno della scocca (1.27 sul fondo) per non confondersi col bordo.
   dark: { token: "fg-muted", pct: 14 },
 };
-
-/* ── Il colore, calcolato ───────────────────────────────────────────────── */
 
 const toLinear = (v: number) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
 const toSrgb = (v: number) => (v <= 0.0031308 ? v * 12.92 : 1.055 * v ** (1 / 2.4) - 0.055);
@@ -204,7 +139,7 @@ function rgbToHex(rgb: number[]): string {
     .join("")}`;
 }
 
-/** sRGB → oklab, la trasformazione di Björn Ottosson. */
+// La trasformazione di Björn Ottosson.
 function toOklab([r, g, b]: [number, number, number]): [number, number, number] {
   const R = toLinear(r);
   const G = toLinear(g);
@@ -230,13 +165,9 @@ function fromOklab([L, a, b]: [number, number, number]): number[] {
   ];
 }
 
-/**
- * `color-mix(in oklab, a pct%, b)`, calcolato invece che letto.
- * Leggere il valore risolto dal browser NON funziona: le custom property
- * escono come `oklab(...)` non risolto, e a parsarle come stringa si ottengono
- * numeri falsi. Questa funzione e' stata verificata contro i pixel veri
- * (colore dipinto in un canvas 1x1 e riletto) su tutte le miscele del tavolo.
- */
+// `color-mix(in oklab, a pct%, b)` calcolato: dal browser le custom property
+// escono come oklab() non risolto. Verificata contro i pixel di un canvas 1x1
+// su tutte le miscele del tavolo.
 export function mixOklab(a: string, pct: number, b: string): string {
   const A = toOklab(hexToRgb(a));
   const B = toOklab(hexToRgb(b));
@@ -245,14 +176,12 @@ export function mixOklab(a: string, pct: number, b: string): string {
   return rgbToHex(fromOklab(mixed));
 }
 
-/** Il colore vero di una ricetta in un tema: quello che il browser dipinge. */
 export function tint(theme: Theme, recipe: Recipe): string {
   const token = THEME_TOKENS[theme];
   if ("token" in recipe) return token[recipe.token];
   return mixOklab(token[recipe.a], recipe.pct, token[recipe.b]);
 }
 
-/** Il colore dell'ombra composto sul fondo: e' li' che si vede o non si vede. */
 export function shadowOverBg(theme: Theme): string {
   const { token, pct } = SHADOW[theme];
   const shade = hexToRgb(THEME_TOKENS[theme][token]);
@@ -261,12 +190,9 @@ export function shadowOverBg(theme: Theme): string {
   return rgbToHex([0, 1, 2].map((i) => alpha * shade[i] + (1 - alpha) * bg[i]));
 }
 
-/** La distanza fra due ricette dello stesso tema, in rapporto di contrasto. */
 export function separation(theme: Theme, one: Recipe, other: Recipe): number {
   return contrastRatio(tint(theme, one), tint(theme, other));
 }
-
-/* ── Le ricette, come le scrive il foglio di stile ──────────────────────── */
 
 export function recipeCss(recipe: Recipe): string {
   return "token" in recipe
@@ -278,20 +204,13 @@ export function shadowCss(theme: Theme): string {
   return `color-mix(in oklab, var(--${SHADOW[theme].token}) ${SHADOW[theme].pct}%, transparent)`;
 }
 
-/**
- * Le soglie. Non sono gusto: sono il minimo perche' il tavolo resti quattro
- * tipi di cosa invece di quattro contorni della stessa famiglia.
- */
+// Il minimo perche' il tavolo resti quattro tipi di cosa e non quattro
+// contorni della stessa famiglia.
 export const THRESHOLD = {
-  /** Fra due famiglie diverse: la carta e l'apparecchio non si toccano mai. */
   families: 3.0,
-  /** Fra due gradini della stessa famiglia: foglio, scheda e piastra. */
   steps: 1.25,
-  /** Ogni pieno contro il fondo: una superficie che non si stacca non e' una
-   *  superficie. Il post-it giallo e' l'eccezione dichiarata (vedi la prova). */
+  // Ogni pieno contro il fondo. Il post-it giallo e' l'eccezione dichiarata.
   ground: 1.2,
-  /** Il tratto contro il suo pieno: e' il disegno, e deve restare visibile. */
   outline: 1.5,
-  /** L'ombra composta sul fondo: sotto questo valore non c'e'. */
   shadow: 1.15,
 } as const;

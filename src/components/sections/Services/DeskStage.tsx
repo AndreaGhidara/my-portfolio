@@ -11,80 +11,30 @@ import { CENTRE, FIRST_RING_REACH, SHAPE_BOX, cameraScale } from "./layers";
 /** Quanta parte dell'altezza del palco occupa il laptop al fotogramma zero. */
 const OPENING_FILL = 0.7;
 
-/**
- * Quanto e' alto il laptop, in frazione della LARGHEZZA del piano. Non e' un
- * numero scelto qui: e' la larghezza dichiarata da CENTRE per il rapporto della
- * sua scatola. Scriverlo a mano (240/920, o qualunque altra coppia che
- * somiglia) vorrebbe dire tenerne una seconda copia che il giorno in cui il
- * centro cambia misura nessuno aggiorna, e la camera aprirebbe sull'inquadratura
- * sbagliata senza che niente lo dica.
- */
+// Altezza del laptop in frazione della LARGHEZZA del piano, derivata da CENTRE
+// e SHAPE_BOX: una copia a mano resterebbe indietro quando il centro cambia.
 const LAPTOP_ON_SURFACE = (CENTRE.width / 100) * (SHAPE_BOX.laptop.h / SHAPE_BOX.laptop.w);
 
-/**
- * Quanto vale, in questa scena, "il primo anello arriva giusto al bordo mentre
- * compare": e' il PRODOTTO fra la scala d'apertura e il raggio verticale del
- * primo anello, ed e' quel prodotto, non la scala da sola, a restare costante
- * quando i raggi cambiano. La coppia da cui viene e' 4,2 su un raggio di 25,2,
- * cioe' l'apertura tarata a mano prima che gli anelli venissero separati.
- */
+// Resta costante il prodotto fra scala d'apertura e raggio del primo anello,
+// non la scala: 4,2 su un raggio di 25,2, la taratura fatta a mano.
 const OPENING_REACH = 4.2 * 25.2;
 
-/**
- * Gli estremi dell'inquadratura d'apertura. Il minimo perche' sotto non si
- * legge come una camera che arretra ma come un tavolo che sussulta; il massimo
- * perche' piu' in la' il primo anello comincia ad accendersi fuori dallo
- * schermo, e da li' in poi e' la camera che lo porta dentro.
- *
- * Il massimo non e' piu' una cifra scritta: e' OPENING_REACH diviso il raggio
- * che il primo anello ha ADESSO. Con gli anelli separati quel raggio e' passato
- * da 25,2 a 28,68, e il massimo scende di conseguenza da 4,2 a circa 3,69:
- * l'anello e' piu' in fuori, quindi per tenerlo allo stesso punto dello schermo
- * serve meno ingrandimento. Scritto a mano, il 4,2 sarebbe rimasto li' a far
- * accendere il primo strato oltre il bordo.
- */
+// Sotto il minimo la camera sussulta invece di arretrare; oltre il massimo il
+// primo anello si accende fuori dallo schermo. Il massimo segue il raggio vero.
 const OPENING = { min: 1.6, max: OPENING_REACH / FIRST_RING_REACH };
 
-/** La scala d'apertura quando non c'e' niente da misurare (jsdom, o un piano
- *  che non ha ancora una larghezza). */
+// Per jsdom o per un piano che non ha ancora una larghezza.
 const OPENING_FALLBACK = 3.3;
 
-/**
- * Dove si ferma la camera. A tavolo finito la tesi («quello che chiami un sito
- * e' lo schermo al centro») vive nella stessa cella del mondo, appoggiata in
- * fondo: su uno schermo alto le due cose non si toccano, su un portatile da
- * 1280x800 il piano arriva fin giu' e la frase finisce addosso ai disegni.
- *
- * Alzare la frase non basta, e non e' un'opzione: il palco ha `overflow: clip`,
- * quindi spostare il mondo in su gli taglia il bordo di sopra invece di
- * liberare spazio. L'unica leva che una fascia in fondo la libera davvero e'
- * fermare la camera un po' prima di 1.
- *
- * Non per tutti pero': dove il problema non c'e' il tavolo resta grande quanto
- * e' stato disegnato. La soglia e' sull'altezza del palco, che e' il viewport e
- * non lo schermo: su un monitor 1080p la finestra ne lascia sui 950, quindi
- * mille prende i portatili e i 1080p e lascia stare i pannelli piu' alti.
- */
+// Su un portatile da 1280x800 a camera ferma su 1 la tesi finisce sui disegni,
+// e alzarla non si puo' (il palco ha overflow: clip). Si ferma prima. Mille px
+// di viewport prendono portatili e 1080p, non i pannelli piu' alti.
 const CLOSING = { tall: 1, short: 0.88 };
 const SHORT_STAGE = 1000;
 
-/**
- * Il palco. Un solo ScrollTrigger, e non tocca un elemento: scrive due custom
- * property sul palco, --p (la progressione) e --s (la scala della camera), e
- * le ventiquattro opacita' le calcola il CSS.
- *
- * Niente `pin`: il palco e' sticky dentro un track alto 380vh, cosi' non c'e'
- * un pin-spacer da far litigare con Lenis.
- *
- * La scala d'apertura si rimisura solo su onRefresh, mai per fotogramma:
- * leggere clientWidth a ogni update vorrebbe dire un layout per fotogramma.
- *
- * `data-motion` porta il livello risolto fino al CSS, che e' l'unico posto dove
- * il movimento esiste: a "full" il track diventa alto 380vh e i tre blocchi si
- * sovrappongono, a "reduced" e a "none" non si applica una riga e resta il
- * tavolo fermo di prima. useMotionLevel dice "none" in SSR e al primo render,
- * quindi fermo e completo e' anche quello che si vede senza JavaScript.
- */
+// Un solo ScrollTrigger che scrive --p e --s, le opacita' le calcola il CSS.
+// Niente pin (sticky dentro un track di 380vh, niente pin-spacer contro Lenis).
+// La scala d'apertura si rimisura solo su onRefresh: mai un layout a fotogramma.
 export function DeskStage({
   eyebrow,
   title,
@@ -100,7 +50,6 @@ export function DeskStage({
   lead: string;
   centre: string;
   blank: string;
-  /** La nota sul post-it grigio. */
   note: string;
   punch: string;
   layers: DeskLayerData[];
@@ -111,16 +60,9 @@ export function DeskStage({
   const camera = useRef<ScrollTriggerType | null>(null);
   const level = useMotionLevel();
 
-  /**
-   * Smontare la camera e cancellare le due property. Serve una funzione sola
-   * perche' i modi di uscire da "full" sono tre (la finestra si stringe sotto
-   * i 1024, arriva un puntatore grosso, l'utente accende la riduzione del
-   * movimento) e in nessuno dei tre basta smettere di scrivere: --p resterebbe
-   * appiccicata all'ultimo valore, e siccome l'opacita' degli oggetti la legge
-   * SEMPRE (e' il patto del fallback, `var(--p, 1)`), il tavolo fermo si
-   * ritroverebbe mezzo trasparente. E il vecchio ScrollTrigger continuerebbe a
-   * riscriverla a ogni giro di rotellina.
-   */
+  // Si esce da "full" in tre modi, e in nessuno basta smettere di scrivere: --p
+  // resterebbe all'ultimo valore e l'opacita', che la legge sempre, lascerebbe
+  // il tavolo fermo mezzo trasparente.
   const teardown = useCallback(() => {
     camera.current?.kill();
     camera.current = null;
@@ -128,19 +70,9 @@ export function DeskStage({
     stage.current?.style.removeProperty("--s");
   }, []);
 
-  // Questo effetto nasce quando le animazioni passavano da useGSAP, che con
-  // delle dipendenze rimandava il revert allo smontaggio e non al cambio di
-  // livello: chi usciva da "full" non aveva nessuno a spegnergli la camera.
-  // Oggi useSectionAnimation pulisce anche al cambio di livello (e a "none" non
-  // chiama nemmeno la build); questo resta la rete che spegne la camera ogni
-  // volta che il livello non e' "full", comunque ci si arrivi.
-  //
-  // useLayoutEffect e non useEffect: il commit che porta via il CSS della camera
-  // e questa pulizia devono stare nello stesso giro. Passivo, si spegne DOPO che
-  // il browser ha gia' dipinto un fotogramma senza le regole di "full" ma con
-  // --p ancora appiccicata all'ultimo valore, e quel fotogramma e' un tavolo
-  // mezzo trasparente. In SSR non gira, e non e' un problema: un cambio di
-  // livello sul server non esiste.
+  // Rete che spegne la camera a ogni livello diverso da "full". Layout e non
+  // passivo: deve stare nel commit che toglie il CSS della camera, o il browser
+  // dipinge un fotogramma con --p ancora appiccicata.
   useLayoutEffect(() => {
     if (level !== "full") teardown();
   }, [level, teardown]);
@@ -150,14 +82,9 @@ export function DeskStage({
     const stageEl = stage.current;
     const trackEl = track.current;
 
-    /* Sotto il livello pieno la camera non scende: il tavolo sta fermo e la
-       testata comparirebbe e basta. Le si da' l'entrata che hanno tutte le
-       altre sezioni, e la sezione smette di essere l'unica che appare secca. */
+    // Senza camera la testata entra come quella di ogni altra sezione.
     if (resolved !== "full") {
-      /* Senza impaginazione non c'e' niente da animare, e ScrollTrigger non ha
-         metriche da cui partire: in jsdom ogni rettangolo e' alto zero e la
-         creazione del trigger scoppia. E' anche la risposta giusta nel browser:
-         un palco alto zero non e' sullo schermo di nessuno. */
+      // In jsdom ogni rettangolo e' alto zero e la creazione del trigger scoppia.
       if (!scope.current || scope.current.offsetHeight === 0) return;
 
       const header = scope.current?.querySelector<HTMLElement>("[data-desk-title]");
@@ -174,9 +101,8 @@ export function DeskStage({
 
     if (!stageEl || !trackEl) return;
 
-    // Il piano, non il mondo: le percentuali di layers.ts misurano il piano, e
-    // il mondo e' il piano PIU' le didascalie. Misurando il mondo, l'apertura
-    // sbaglierebbe di quanto e' alto un blocco di testo.
+    // Il piano e non il mondo: le percentuali di layers.ts misurano il piano, e
+    // il mondo comprende anche le didascalie.
     const surface = stageEl.querySelector<HTMLElement>(
       '[data-desk-world][data-layout="wide"] [data-desk-surface]',
     );
@@ -187,10 +113,7 @@ export function DeskStage({
       const laptop = (surface?.clientWidth ?? 0) * LAPTOP_ON_SURFACE;
       const wanted = (stageEl.clientHeight * OPENING_FILL) / laptop;
       from = laptop > 0 ? Math.min(Math.max(wanted, OPENING.min), OPENING.max) : OPENING_FALLBACK;
-      // Si rimisura insieme all'apertura, cosi' ruotare un portatile o aprire
-      // gli strumenti da sviluppatore ricalcola anche dove la camera si ferma.
-      // Il corpo della tesi si adatta da se' con un min() sull'altezza: qui non
-      // c'e' una soglia gemella da tenere allineata.
+      // Rimisurato con l'apertura: ruotare lo schermo ricalcola anche l'arrivo.
       to = stageEl.clientHeight < SHORT_STAGE ? CLOSING.short : CLOSING.tall;
     };
 
@@ -214,40 +137,15 @@ export function DeskStage({
       onUpdate: (self) => write(self.progress),
     });
 
-    // Anche lo smontaggio passa di qui: useSectionAnimation chiama quello che
-    // la build restituisce, allo smontaggio e a ogni cambio di livello. Le due property nessun altro le toglierebbe, e restassero
-    // appiccicate a --p = 0 il tavolo resterebbe vuoto per sempre.
+    // Chiamato allo smontaggio e a ogni cambio di livello: restasse --p = 0,
+    // il tavolo resterebbe vuoto per sempre.
     return teardown;
   }, scope);
 
-  /**
-   * Il Tab non e' una rotellina. L'unico comando del tavolo sta su un oggetto
-   * dell'anello piu' esterno, e al fotogramma zero quell'anello e' ingrandito
-   * quattro volte e ritagliato via dall'overflow del palco. Il browser porta
-   * "in vista" l'elemento che prende il fuoco leggendone il rettangolo, e il
-   * rettangolo del clip non sa niente: misurato a 1440, il fuoco finiva su un
-   * post-it a (-80, 251) che sotto quel punto non c'era, anello arancione
-   * compreso, cioe' nessun anello che si veda.
-   *
-   * Qui la pagina va al fotogramma di riposo, che di una scena guidata dallo
-   * scorrimento e' l'unico punto fisso: dove l'oggetto sta e' funzione di dove
-   * sta la pagina, e l'unico posto dove le due cose non si rincorrono e' la fine
-   * del track: li' il tavolo e' completo e ogni oggetto e' dov'e' disegnato.
-   * Con lo scrub, il tavolo si compone mentre il fuoco lo raggiunge.
-   *
-   * Sta in un effetto suo, con [level], e non dentro la build della camera:
-   * quella si disfa solo al revert di gsap.context, che al cambio di livello non
-   * arriva (e' la stessa mancanza che l'effetto qui sopra copre a mano per --p e
-   * --s). Restando attaccato, un ascoltatore appeso qui farebbe saltare la
-   * pagina proprio nei due stati in cui questa sezione deve stare ferma (la
-   * finestra che si stringe sotto i 1024 e il movimento ridotto acceso a meta'
-   * strada) e sotto i 1024 per una fermata del Tab che nemmeno si vede. React
-   * il suo cleanup lo chiama a ogni cambio di level, e questo e' tutto quello
-   * che serve.
-   *
-   * Solo da tastiera: :focus-visible e' falso per un click, e un click sul
-   * post-it deve andare ai contatti, non far saltare la pagina prima.
-   */
+  // Col Tab il post-it, ingrandito e ritagliato al fotogramma zero, prende il
+  // fuoco fuori vista: si salta al fotogramma di riposo, fine del track. Effetto
+  // suo con [level], perche' il revert di gsap.context al cambio di livello non
+  // arriva. Solo :focus-visible: un click deve andare ai contatti.
   useEffect(() => {
     const stageEl = stage.current;
     const trackEl = track.current;
@@ -257,10 +155,8 @@ export function DeskStage({
       const focused = event.target as HTMLElement | null;
       if (!focused?.closest("[data-desk-blank]") || !focused.matches(":focus-visible")) return;
       const restTop = trackEl.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
-      // "instant" e non "auto": auto vuol dire "quello che dice scroll-behavior",
-      // e il giorno che qualcuno scrive smooth su html questo salto diventerebbe
-      // un'animazione, proprio quella che chi ha ridotto il movimento non deve
-      // vedere. Qui non ci arriva, ma la riga deve reggere da sola.
+      // "instant" e non "auto": con scroll-behavior smooth su html diventerebbe
+      // un'animazione per chi ha chiesto meno movimento.
       window.scrollTo({ top: restTop, behavior: "instant" });
     };
 
@@ -284,10 +180,8 @@ export function DeskStage({
             blank={blank}
             note={note}
           />
-          {/* Sotto i 1024px il tavolo non c'e': c'e' il gioco, e il CSS fa il
-              cambio (display:none sopra e sotto soglia). Niente soglia in JavaScript: misurare lo
-              schermo prima di disegnare vorrebbe dire un primo fotogramma
-              sbagliato, e un buco fra le due soglie. */}
+          {/* Il cambio col tavolo lo fa il CSS: una soglia in JavaScript vorrebbe
+              dire un primo fotogramma sbagliato. */}
           <Game />
 
           <p data-desk-punch>{punch}</p>

@@ -20,35 +20,11 @@ import { Ending } from "./Ending";
 
 export { LEVELS, type LevelId, type LevelProps };
 
-/**
- * Il gioco del metodo: sotto i 1024px prende il posto del tavolo. Quattro
- * livelli in fila e un finale, in un banco alto uguale per tutti.
- *
- * Il guscio tiene solo il giro: dove sei, fin dove sei arrivato, le quattro
- * barrette e la riga che dice cosa si fa nel livello. Il resto e' dei livelli.
- *
- * IL CONTRATTO DEI LIVELLI (Schermo, Logiche, Pannello, Notte, Finale):
- *
- * - Props: `LevelProps = { onNext: () => void; visible: boolean }`, e
- *   nient'altro. onNext porta al livello dopo (nel finale ricomincia dal
- *   primo); visibile e' false quando il gioco e' uscito dallo schermo, e li'
- *   i timer del livello si fermano.
- * - Radice: un solo elemento `.bench` con `data-game-level="<id>"`
- *   (schermo, logiche, pannello, notte, finale). Ogni regola del suo CSS
- *   (un file per livello in src/styles/game/) sta sotto quell'attributo; i pezzi comuni
- *   sono in base.css, sotto [data-game].
- * - Testi: ognuno se li legge da se' con
- *   `useTranslations("services.gioco.<id>")`, e `t.raw` per le strutture.
- *   Il provider di layout.tsx passa gia' tutti i messaggi al client.
- * - Stato: cambiando livello il componente si rimonta (la key e' l'id), quindi
- *   riparte pulito ogni volta. Niente stato da tenere fra un'apertura e
- *   l'altra.
- * - Prove: `renderWithMessages` (src/test/renderWithMessages.tsx) per i testi veri,
- *   `installIntersectionObserver` (src/test/intersectionObserver.ts) per
- *   pilotare `visible` passando dal guscio.
- */
+// Contratto dei livelli: una sola radice `.bench` con `data-game-level="<id>"`,
+// e ogni regola del suo CSS sta sotto quell'attributo. Ogni livello legge da
+// se' i suoi testi. Al cambio di livello la key lo rimonta pulito: niente
+// stato da tenere fra un'apertura e l'altra.
 
-/** I quattro livelli e il finale, nell'ordine. Il finale e' il quinto passo. */
 type Step = LevelId | "finale";
 const STEPS: readonly Step[] = [...LEVELS, "finale"];
 const ENDING = LEVELS.length;
@@ -61,24 +37,18 @@ const COMPONENTS: Record<Step, ComponentType<LevelProps>> = {
   finale: Ending,
 };
 
-/**
- * I tre token fissi che fra le variabili globali non ci sono: tokens.css ha
- * --verde, che col tema cambia, e il grigio chiaro solo dentro --fg-muted del
- * tema scuro. Il banco non segue il tema, quindi li prende da palette.ts e li
- * scrive sulla sua radice, dove base.css e i livelli li trovano.
- */
+// Il banco non segue il tema: questi tre token fissi fra le variabili globali
+// non ci sono (il verde di tokens.css cambia col tema), quindi si scrivono
+// sulla radice da palette.ts.
 const FIXED_TOKENS = {
   "--mutedDark": palette.mutedDark,
   "--green": palette.green,
   "--greenDark": palette.greenDark,
 } as CSSProperties;
 
-/**
- * Quanto dura la guardia sul doppio tocco. Il banco e' alto uguale per tutti e
- * i pulsanti dello stato dopo compaiono nello stesso punto di quelli di prima:
- * il secondo tocco di un doppio tocco premerebbe quello appena comparso
- * («avanti» e poi «fai» del nodo dopo, «livello 4» e poi «vai a dormire»).
- */
+// I pulsanti dello stato dopo compaiono nello stesso punto di quelli di prima:
+// senza guardia il secondo tocco di un doppio tocco premerebbe quello appena
+// comparso.
 const DOUBLE_TAP = 350;
 
 export function Game() {
@@ -86,27 +56,19 @@ export function Game() {
   const root = useRef<HTMLDivElement | null>(null);
   const visible = useVisible(root);
 
-  // `current` e' il passo aperto (0..3 i livelli, 4 il finale); `reached` il
-  // piu' lontano a cui si e' arrivati, ed e' quello che decide cosa si riapre.
+  // `reached` e' il passo piu' lontano raggiunto: decide quali barrette si riaprono.
   const [current, setCurrent] = useState(0);
   const [reached, setReached] = useState(0);
 
   const step = STEPS[current];
   const Level = COMPONENTS[step];
 
-  // Il timeStamp dell'ultimo tocco accettato su un pulsante delle azioni, e se
-  // da allora il livello e' cambiato.
   const lastTap = useRef<number | null>(null);
   const justChanged = useRef(false);
 
-  /*
-   * In cattura sulla radice, prima che il pulsante lo senta. La guardia vale
-   * solo dove il doppio tocco fa danni: un pulsante delle azioni, oppure il
-   * primo tocco nel banco dopo un cambio di livello. Le scelte multiple (gli
-   * interruttori della notte, gli attrezzi del livello 1) restano libere, e
-   * cosi' le barrette, che non stanno nel banco. timeStamp e non Date: e'
-   * l'ora dell'evento, non quella in cui lo si guarda.
-   */
+  // In cattura, prima che il pulsante lo senta. Vale solo per i pulsanti delle
+  // azioni e per il primo tocco dopo un cambio di livello: le scelte multiple
+  // e le barrette restano libere. timeStamp e non Date: conta l'ora dell'evento.
   const guard = (e: MouseEvent<HTMLDivElement>) => {
     const pressed = (e.target as Element).closest("button, a");
     if (!pressed || !pressed.closest("[data-game-level]")) return;
@@ -121,12 +83,8 @@ export function Game() {
     if (isAction) lastTap.current = e.timeStamp;
   };
 
-  /*
-   * Al cambio di livello (non al primo montaggio: li' nessuno ha chiesto
-   * niente) il fuoco va sul banco nuovo. Il pulsante premuto non c'e' piu', e
-   * il fuoco finirebbe sul body: chi naviga da tastiera ripartirebbe dalla
-   * cima della pagina. preventScroll perche' il banco e' gia' dove si guarda.
-   */
+  // Il pulsante premuto non c'e' piu': senza questo il fuoco finirebbe sul body
+  // e la tastiera ripartirebbe dalla cima della pagina. Non al primo montaggio.
   const isFirst = useRef(true);
   useEffect(() => {
     justChanged.current = true;
@@ -145,7 +103,6 @@ export function Game() {
     setReached((r) => Math.max(r, i));
   };
 
-  // «Torna al sito»: il giro da capo, e i livelli dopo il primo si richiudono.
   const restart = () => {
     setCurrent(0);
     setReached(0);

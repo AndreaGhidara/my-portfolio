@@ -1,11 +1,7 @@
-/* ── Il gioco del metodo: livello 4, il cloud ─────────────────────────────
-   Ogni selettore di questo file sta sotto [data-gioco-livello="notte"]: i pezzi
-   comuni (banco, testa, console, azioni, righe) sono in base.css e qui non si
-   ridefiniscono. Le animazioni nuove si chiamano gioco-notte-*. */
+/* Tutto sotto [data-game-level="notte"]; i pezzi comuni stanno in base.css. */
 
-/* Il cielo. Nel prototipo era blu, e il blu nella tavolozza non c'e': e' lo
-   stesso inchiostro scaldato verso il grigio della notte del finale, cosi' il
-   finale parte da questo cielo e lo fa giorno. */
+/* Lo stesso inchiostro scaldato del finale, che parte da questo cielo e lo fa
+   giorno: il blu del prototipo non e' in tavolozza. */
 [data-game-level="notte"] .above {
   background: linear-gradient(var(--ink), color-mix(in oklab, var(--ink) 80%, var(--muted)));
 }
@@ -31,8 +27,7 @@
   color: var(--mutedDark);
 }
 
-/* La luna e' un'ombra dentro un cerchio vuoto: si vede solo la falce. La
-   posizione la scrive Notte.tsx a ogni passo, e la transizione la ammorbidisce. */
+/* La posizione la scrive Night.tsx a ogni passo: la transizione la ammorbidisce. */
 [data-game-level="notte"] .moon {
   position: absolute;
   inline-size: 1.6rem;
@@ -42,7 +37,6 @@
   transition: left 0.3s linear, top 0.3s linear;
 }
 
-/* La striscia delle otto ore: verde il sito c'e', rossa e' giu'. */
 [data-game-level="notte"] .trace {
   position: absolute;
   inset-inline: 0.7rem;
@@ -69,7 +63,6 @@
   color: var(--mutedDark);
 }
 
-/* La cronaca: le cose della notte, una riga ciascuna, dal basso. */
 [data-game-level="notte"] .log {
   position: absolute;
   inset: 7.9rem 0.7rem 0.55rem;
