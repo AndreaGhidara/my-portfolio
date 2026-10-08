@@ -1,146 +1,146 @@
 import { describe, it, expect } from "vitest";
-import { NO_DOSSIER, dossierReducer, type DossierEvent, type Dossier } from "../dossier";
+import { NO_DOSSIER, dossierReducer, type Dossier, type DossierEvent } from "../dossier";
 
 /** La cartella qui e' solo un nome: il reducer la porta e non la tocca. */
 type P = Dossier<string>;
 
-const passa = (s: P, ...eventi: DossierEvent<string>[]) => eventi.reduce(dossierReducer, s);
-const apri = (i: number, moto: "quattro-tempi" | "dissolvenza" = "quattro-tempi"): DossierEvent<string> => ({
-  type: "apri",
+const step = (s: P, ...events: DossierEvent<string>[]) => events.reduce(dossierReducer, s);
+const open = (i: number, motion: "four-beats" | "fade" = "four-beats"): DossierEvent<string> => ({
+  type: "open",
   i,
-  folder: `cartella ${i}`,
-  motion: moto,
+  folder: `folder ${i}`,
+  motion,
 });
 
 /** Un'apertura arrivata in fondo: cade, montata, tempi 3 e 4 finiti. */
-const aperta = (i = 0) => {
-  const s = passa(NO_DOSSIER, apri(i));
-  return passa(s, { type: "cade", gen: s.gen }, { type: "montata" }, { type: "aperta", gen: s.gen });
+const opened = (i = 0) => {
+  const s = step(NO_DOSSIER, open(i));
+  return step(s, { type: "fall", gen: s.gen }, { type: "mounted" }, { type: "opened", gen: s.gen });
 };
 
 describe("aprire la pratica", () => {
   it("il clic fa partire una pratica nuova, con una generazione nuova", () => {
-    const s = passa(NO_DOSSIER, apri(2));
+    const s = step(NO_DOSSIER, open(2));
     expect(s.gen).toBe(1);
-    expect(s.run).toMatchObject({ phase: "apre", i: 2, folder: "cartella 2", fall: false, mounted: false, started: false });
+    expect(s.run).toMatchObject({ phase: "opening", i: 2, folder: "folder 2", fall: false, mounted: false, started: false });
   });
 
   it("i tempi 3 e 4 partono solo quando ci sono la caduta e il contenuto, in qualunque ordine", () => {
-    const s = passa(NO_DOSSIER, apri(0));
-    const caduta = passa(s, { type: "cade", gen: s.gen });
-    expect(caduta.run?.started).toBe(false);
-    expect(passa(caduta, { type: "montata" }).run?.started).toBe(true);
+    const s = step(NO_DOSSIER, open(0));
+    const fallen = step(s, { type: "fall", gen: s.gen });
+    expect(fallen.run?.started).toBe(false);
+    expect(step(fallen, { type: "mounted" }).run?.started).toBe(true);
 
-    const montata = passa(s, { type: "montata" });
-    expect(montata.run?.started).toBe(false);
-    expect(passa(montata, { type: "cade", gen: s.gen }).run?.started).toBe(true);
+    const mounted = step(s, { type: "mounted" });
+    expect(mounted.run?.started).toBe(false);
+    expect(step(mounted, { type: "fall", gen: s.gen }).run?.started).toBe(true);
   });
 
   it("finiti i tempi 3 e 4 la pratica e' aperta", () => {
-    expect(aperta().run?.phase).toBe("aperta");
+    expect(opened().run?.phase).toBe("open");
   });
 
   it("un secondo clic durante l'apertura non si accavalla", () => {
-    const s = passa(NO_DOSSIER, apri(0));
-    expect(passa(s, apri(1))).toBe(s);
-    const a = aperta();
-    expect(passa(a, apri(1))).toBe(a);
+    const s = step(NO_DOSSIER, open(0));
+    expect(step(s, open(1))).toBe(s);
+    const a = opened();
+    expect(step(a, open(1))).toBe(a);
   });
 
   it("la dissolvenza passa dagli stessi stati: cambia solo il moto", () => {
-    const s = passa(NO_DOSSIER, apri(0, "dissolvenza"));
-    expect(s.run?.motion).toBe("dissolvenza");
-    expect(passa(s, { type: "cade", gen: s.gen }, { type: "montata" }, { type: "aperta", gen: s.gen }).run?.phase).toBe("aperta");
+    const s = step(NO_DOSSIER, open(0, "fade"));
+    expect(s.run?.motion).toBe("fade");
+    expect(step(s, { type: "fall", gen: s.gen }, { type: "mounted" }, { type: "opened", gen: s.gen }).run?.phase).toBe("open");
   });
 });
 
 describe("chiudere la pratica", () => {
   it("× a pratica aperta: si stringe, poi il close la fa risalire, poi e' ferma", () => {
-    const a = aperta();
-    const chiude = passa(a, { type: "chiudi" });
-    expect(chiude.run?.phase).toBe("chiude");
-    const risale = passa(chiude, { type: "chiusa" });
-    expect(risale.run?.phase).toBe("risale");
-    expect(passa(risale, { type: "ferma", gen: a.gen })).toEqual({ gen: a.gen, run: null });
+    const a = opened();
+    const closing = step(a, { type: "close" });
+    expect(closing.run?.phase).toBe("closing");
+    const rising = step(closing, { type: "closed" });
+    expect(rising.run?.phase).toBe("rising");
+    expect(step(rising, { type: "settled", gen: a.gen })).toEqual({ gen: a.gen, run: null });
   });
 
   it("× durante l'apertura non si perde: si chiude appena aperta", () => {
-    const s = passa(NO_DOSSIER, apri(0));
-    const dopo = passa(s, { type: "cade", gen: s.gen }, { type: "montata" }, { type: "chiudi" });
-    expect(dopo.run).toMatchObject({ phase: "apre", closeAfter: true });
-    expect(passa(dopo, { type: "aperta", gen: s.gen }).run?.phase).toBe("chiude");
+    const s = step(NO_DOSSIER, open(0));
+    const after = step(s, { type: "fall", gen: s.gen }, { type: "mounted" }, { type: "close" });
+    expect(after.run).toMatchObject({ phase: "opening", closeAfter: true });
+    expect(step(after, { type: "opened", gen: s.gen }).run?.phase).toBe("closing");
   });
 
   it("Esc prima che il dialog esista vale come ×, ma solo durante l'apertura", () => {
-    const s = passa(NO_DOSSIER, apri(0), { type: "esc" });
+    const s = step(NO_DOSSIER, open(0), { type: "esc" });
     expect(s.run?.closeAfter).toBe(true);
-    const a = aperta();
-    expect(passa(a, { type: "esc" })).toBe(a);
-    expect(passa(NO_DOSSIER, { type: "esc" })).toBe(NO_DOSSIER);
+    const a = opened();
+    expect(step(a, { type: "esc" })).toBe(a);
+    expect(step(NO_DOSSIER, { type: "esc" })).toBe(NO_DOSSIER);
   });
 
   it("chiudere a meta' chiusura non rifa' niente", () => {
-    const chiude = passa(aperta(), { type: "chiudi" });
-    expect(passa(chiude, { type: "chiudi" })).toBe(chiude);
+    const closing = step(opened(), { type: "close" });
+    expect(step(closing, { type: "close" })).toBe(closing);
   });
 
   it("il close del browser a meta' apertura o a meta' chiusura passa alla risalita", () => {
-    const s = passa(NO_DOSSIER, apri(0));
-    const meta = passa(s, { type: "cade", gen: s.gen }, { type: "montata" });
-    const risale = passa(meta, { type: "chiusa" });
-    expect(risale.run?.phase).toBe("risale");
+    const s = step(NO_DOSSIER, open(0));
+    const halfway = step(s, { type: "fall", gen: s.gen }, { type: "mounted" });
+    const rising = step(halfway, { type: "closed" });
+    expect(rising.run?.phase).toBe("rising");
     // L'apertura finisce dopo: non riapre niente.
-    expect(passa(risale, { type: "aperta", gen: s.gen })).toBe(risale);
+    expect(step(rising, { type: "opened", gen: s.gen })).toBe(rising);
 
-    expect(passa(aperta(), { type: "chiudi" }, { type: "chiusa" }).run?.phase).toBe("risale");
+    expect(step(opened(), { type: "close" }, { type: "closed" }).run?.phase).toBe("rising");
   });
 
   it("un secondo close durante la risalita non la fa ripartire", () => {
-    const risale = passa(aperta(), { type: "chiusa" });
-    expect(passa(risale, { type: "chiusa" })).toBe(risale);
+    const rising = step(opened(), { type: "closed" });
+    expect(step(rising, { type: "closed" })).toBe(rising);
   });
 
   it("senza pratica, chiudere e il close non fanno niente", () => {
-    expect(passa(NO_DOSSIER, { type: "chiudi" }, { type: "chiusa" }, { type: "montata" })).toBe(NO_DOSSIER);
+    expect(step(NO_DOSSIER, { type: "close" }, { type: "closed" }, { type: "mounted" })).toBe(NO_DOSSIER);
   });
 });
 
 describe("il rientro", () => {
   it("un clic durante la risalita si ricorda, vince l'ultimo, e resta li' fino a cartella ferma", () => {
-    const risale = passa(aperta(0), { type: "chiusa" });
-    const dopo = passa(risale, apri(1), apri(3, "dissolvenza"));
-    expect(dopo.run).toMatchObject({ phase: "risale", openAfter: { i: 3, folder: "cartella 3", motion: "dissolvenza" } });
+    const rising = step(opened(0), { type: "closed" });
+    const after = step(rising, open(1), open(3, "fade"));
+    expect(after.run).toMatchObject({ phase: "rising", openAfter: { i: 3, folder: "folder 3", motion: "fade" } });
   });
 
   it("ferma, la pratica dopo parte con una generazione nuova", () => {
-    const a = aperta(0);
-    const ferma = passa(a, { type: "chiusa" }, { type: "ferma", gen: a.gen });
-    const di_nuovo = passa(ferma, apri(1));
-    expect(di_nuovo.gen).toBe(a.gen + 1);
-    expect(di_nuovo.run).toMatchObject({ phase: "apre", i: 1, openAfter: null });
+    const a = opened(0);
+    const settled = step(a, { type: "closed" }, { type: "settled", gen: a.gen });
+    const again = step(settled, open(1));
+    expect(again.gen).toBe(a.gen + 1);
+    expect(again.run).toMatchObject({ phase: "opening", i: 1, openAfter: null });
   });
 });
 
 describe("le promesse in volo", () => {
   it("una caduta, un'apertura o una risalita di una pratica vecchia non toccano quella nuova", () => {
-    const vecchia = aperta(0);
-    const nuova = passa(vecchia, { type: "chiusa" }, { type: "ferma", gen: vecchia.gen }, apri(1));
-    expect(passa(nuova, { type: "cade", gen: vecchia.gen })).toBe(nuova);
-    expect(passa(nuova, { type: "aperta", gen: vecchia.gen })).toBe(nuova);
-    const risale = passa(nuova, { type: "cade", gen: nuova.gen }, { type: "montata" }, { type: "chiusa" });
-    expect(passa(risale, { type: "ferma", gen: vecchia.gen })).toBe(risale);
+    const old = opened(0);
+    const fresh = step(old, { type: "closed" }, { type: "settled", gen: old.gen }, open(1));
+    expect(step(fresh, { type: "fall", gen: old.gen })).toBe(fresh);
+    expect(step(fresh, { type: "opened", gen: old.gen })).toBe(fresh);
+    const rising = step(fresh, { type: "fall", gen: fresh.gen }, { type: "mounted" }, { type: "closed" });
+    expect(step(rising, { type: "settled", gen: old.gen })).toBe(rising);
   });
 
   it("smontata a meta', le promesse in volo non trovano piu' niente", () => {
-    const s = passa(NO_DOSSIER, apri(0));
-    const smontata = passa(s, { type: "smonta" });
-    expect(smontata.run).toBeNull();
-    expect(passa(smontata, { type: "cade", gen: s.gen })).toBe(smontata);
+    const s = step(NO_DOSSIER, open(0));
+    const unmounted = step(s, { type: "unmount" });
+    expect(unmounted.run).toBeNull();
+    expect(step(unmounted, { type: "fall", gen: s.gen })).toBe(unmounted);
   });
 
   it("la caduta arriva una volta sola", () => {
-    const s = passa(NO_DOSSIER, apri(0));
-    const caduta = passa(s, { type: "cade", gen: s.gen });
-    expect(passa(caduta, { type: "cade", gen: s.gen })).toBe(caduta);
+    const s = step(NO_DOSSIER, open(0));
+    const fallen = step(s, { type: "fall", gen: s.gen });
+    expect(step(fallen, { type: "fall", gen: s.gen })).toBe(fallen);
   });
 });

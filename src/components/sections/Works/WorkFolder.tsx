@@ -25,13 +25,13 @@ import type { WorkCaseData } from "./types";
 export function WorkFolder({
   data,
   index,
-  total: totale,
+  total,
   openLabel,
-  confidentialLabel: riservatoLabel,
-  putBackLabel: riportaLabel,
+  confidentialLabel,
+  putBackLabel,
   onOpen,
   onPreload,
-  onPutBack: onRiporta,
+  onPutBack,
 }: {
   data: WorkCaseData;
   index: number;
@@ -41,59 +41,59 @@ export function WorkFolder({
   confidentialLabel: string;
   /** Per chi legge a voce: la linguetta non apre il caso, lo riporta davanti. */
   putBackLabel: string;
-  onOpen: (cartella: Folder) => void;
+  onOpen: (folder: Folder) => void;
   /** Chiesto appena si capisce che questa cartella sta per aprirsi. */
   onPreload: () => void;
   /** La linguetta: questa cartella torna davanti. */
   onPutBack: () => void;
 }) {
   const li = useRef<HTMLLIElement | null>(null);
-  const linguetta = useRef<HTMLButtonElement | null>(null);
-  const dorso = useRef<HTMLDivElement | null>(null);
-  const foglio = useRef<HTMLDivElement | null>(null);
-  const faccia = useRef<HTMLDivElement | null>(null);
-  const bottone = useRef<HTMLButtonElement | null>(null);
+  const tab = useRef<HTMLButtonElement | null>(null);
+  const spine = useRef<HTMLDivElement | null>(null);
+  const sheet = useRef<HTMLDivElement | null>(null);
+  const face = useRef<HTMLDivElement | null>(null);
+  const openButton = useRef<HTMLButtonElement | null>(null);
 
-  const apri = () => {
-    if (!li.current || !linguetta.current || !dorso.current || !foglio.current || !faccia.current || !bottone.current) {
+  const open = () => {
+    if (!li.current || !tab.current || !spine.current || !sheet.current || !face.current || !openButton.current) {
       return;
     }
     onOpen({
       li: li.current,
-      tab: linguetta.current,
-      spine: dorso.current,
-      face: faccia.current,
-      sheet: foglio.current,
-      openButton: bottone.current,
+      tab: tab.current,
+      spine: spine.current,
+      face: face.current,
+      sheet: sheet.current,
+      openButton: openButton.current,
     });
   };
 
   return (
     <li ref={li} data-folder style={{ "--i": index } as CSSProperties}>
-      <button ref={linguetta} type="button" data-tab onClick={onRiporta}>
+      <button ref={tab} type="button" data-tab onClick={onPutBack}>
         <b>{data.name}</b>
         {/* Sul telefono la linguetta porta solo il nome: quattro in fila non
             ci starebbero con l'anno, e l'anno lo dice la faccia. */}
         <span data-tab-year> · {data.year}</span>
-        <span className="sr-only">, {riportaLabel}</span>
+        <span className="sr-only">, {putBackLabel}</span>
       </button>
 
       {/* Ad archivio acceso il dorso prende il puntatore (vedi sezioni/lavori.css) e
           non fa niente: e' la fascia fra le linguette e la faccia, e un click
           li' non deve arrivare alla faccia di una cartella coperta. */}
-      <div ref={dorso} data-spine aria-hidden="true" />
+      <div ref={spine} data-spine aria-hidden="true" />
       {/* Il foglio che spunta: e' lui che sfila quando la cartella si apre. */}
-      <div ref={foglio} data-sheet aria-hidden="true" />
+      <div ref={sheet} data-sheet aria-hidden="true" />
 
       {/* Un click sulla faccia apre il caso come il suo bottone: sono la
           stessa cosa. Il bottone c'e' per la tastiera e per chi legge a voce,
           e la faccia gli delega il puntatore. */}
       <div
-        ref={faccia}
+        ref={face}
         data-face
         onClick={(event) => {
           if ((event.target as Element).closest("button")) return;
-          apri();
+          open();
         }}
         // Tre segnali per la stessa cosa: sta per aprirsi. Il mouse che si posa
         // (desktop), il focus da tastiera, e il dito che scende (telefono, dove
@@ -104,7 +104,7 @@ export function WorkFolder({
       >
         <div>
           <p data-face-number>
-            {pad2(index + 1)} / {pad2(totale)}
+            {pad2(index + 1)} / {pad2(total)}
           </p>
           {/* Il titolo della cartella e' chi, non la frase: e' quello che
               distingue una cartella dall'altra nell'elenco dei titoli, ed e'
@@ -120,18 +120,18 @@ export function WorkFolder({
             {data.screenshot ? (
               <WorkShot shot={data.screenshot} alt={data.screenshotAlt} />
             ) : (
-              <p data-face-confidential>{riservatoLabel}</p>
+              <p data-face-confidential>{confidentialLabel}</p>
             )}
           </div>
         </div>
 
         <div data-face-foot>
           <ul data-face-tech>
-            {data.tech.map((voce) => (
-              <li key={voce}>{voce}</li>
+            {data.tech.map((item) => (
+              <li key={item}>{item}</li>
             ))}
           </ul>
-          <button ref={bottone} type="button" data-open-button aria-haspopup="dialog" onClick={apri}>
+          <button ref={openButton} type="button" data-open-button aria-haspopup="dialog" onClick={open}>
             {openLabel} <span aria-hidden="true">+</span>
             <span className="sr-only">: {data.name}</span>
           </button>

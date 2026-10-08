@@ -5,7 +5,7 @@ import { ProcessView, type ProcessDeliveryView } from "./ProcessView";
 /** Le tre cose che ogni consegna contiene. Numerate e non un array: con gli
  *  array next-intl chiede `t.raw`, che rinuncia al controllo sulle chiavi
  *  mancanti, e nel repo non lo usa nessuno. */
-const DENTRO = ["uno", "due", "tre"] as const;
+const INCLUDE_KEYS = ["uno", "due", "tre"] as const;
 
 export async function Process() {
   const t = await getTranslations("process");
@@ -18,7 +18,7 @@ export async function Process() {
     when: t(`list.${id}.quando`),
     title: t(`list.${id}.titolo`),
     lead: t(`list.${id}.lead`),
-    includes: DENTRO.map((k) => t(`list.${id}.dentro.${k}`)),
+    includes: INCLUDE_KEYS.map((k) => t(`list.${id}.dentro.${k}`)),
     excludes: t(`list.${id}.nonlo`),
     why: t(`list.${id}.perche`),
   }));

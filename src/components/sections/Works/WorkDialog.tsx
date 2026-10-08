@@ -20,7 +20,7 @@ export type WorkDialogProps = {
 };
 
 /** Il dominio dell'indirizzo, senza protocollo e senza www: come si dice a voce. */
-const dominio = (url: string) => new URL(url).hostname.replace(/^www\./, "");
+const domain = (url: string) => new URL(url).hostname.replace(/^www\./, "");
 
 /**
  * La pratica: il dossier aperto, un foglio di carta sopra la pagina velata.
@@ -37,13 +37,13 @@ const dominio = (url: string) => new URL(url).hostname.replace(/^www\./, "");
  * (vedi sezioni/lavori.css), e niente di quello che si ribalta col tema entra qui,
  * .eyebrow compreso.
  */
-export function WorkDialog({ dialog: dialogo, data, number: numero, total: totale, labels, onRequestClose: onChiudi, onClose }: WorkDialogProps) {
+export function WorkDialog({ dialog, data, number, total, labels, onRequestClose, onClose }: WorkDialogProps) {
   const titleId = useId();
-  const stato = data?.status === "in-corso" ? labels.inProgress : labels.delivered;
+  const statusLabel = data?.status === "in-corso" ? labels.inProgress : labels.delivered;
 
   return (
     <dialog
-      ref={dialogo}
+      ref={dialog}
       data-work-dialog
       // A dossier aperto Lenis e' fermo, e da fermo annulla ogni rotella che
       // non trova questo attributo: il foglio, che scorre dentro di se' quando
@@ -52,18 +52,18 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
       aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault();
-        onChiudi();
+        onRequestClose();
       }}
       onClose={onClose}
       // Il dialog e' un piano trasparente grande quanto lo schermo: un clic
       // che finisce su di lui, e non su un suo figlio, e' un clic sul velo.
       onClick={(event) => {
-        if (event.target === event.currentTarget) onChiudi();
+        if (event.target === event.currentTarget) onRequestClose();
       }}
     >
       {data && (
         <>
-          <button type="button" data-dossier-close data-enter onClick={onChiudi}>
+          <button type="button" data-dossier-close data-enter onClick={onRequestClose}>
             <span aria-hidden="true">×</span>
             <span className="sr-only">{labels.close}</span>
           </button>
@@ -82,7 +82,7 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
                 <p data-dossier-number>
                   {labels.dossier}{" "}
                   <strong>
-                    {pad2(numero)} / {pad2(totale)}
+                    {pad2(number)} / {pad2(total)}
                   </strong>
                 </p>
               </header>
@@ -98,11 +98,11 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
                 </div>
                 <div>
                   <dt>{labels.status}</dt>
-                  <dd>{stato}</dd>
+                  <dd>{statusLabel}</dd>
                 </div>
                 <div>
                   <dt>{labels.online}</dt>
-                  <dd>{data.url ? dominio(data.url) : labels.confidential}</dd>
+                  <dd>{data.url ? domain(data.url) : labels.confidential}</dd>
                 </div>
               </dl>
 
@@ -161,12 +161,12 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
                     [labels.choice, data.choice],
                     [labels.approach, data.approach],
                   ] as const
-                ).map(([titolo, testo], n) => (
-                  <li key={titolo} data-enter>
+                ).map(([title, text], n) => (
+                  <li key={title} data-enter>
                     <span aria-hidden="true">{n + 1}</span>
                     <div>
-                      <h3>{titolo}</h3>
-                      <p>{testo}</p>
+                      <h3>{title}</h3>
+                      <p>{text}</p>
                     </div>
                   </li>
                 ))}
@@ -175,8 +175,8 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
               <footer data-dossier-foot data-enter>
                 <div data-dossier-foot-left>
                   <ul data-dossier-tech>
-                    {data.tech.map((voce) => (
-                      <li key={voce}>{voce}</li>
+                    {data.tech.map((item) => (
+                      <li key={item}>{item}</li>
                     ))}
                   </ul>
                   {/* Senza url il link lascia la sua forma, tratteggiata e non
@@ -189,7 +189,7 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
                     <span data-dossier-no-link>{labels.confidential}</span>
                   )}
                 </div>
-                <p data-dossier-stamp>{stato}</p>
+                <p data-dossier-stamp>{statusLabel}</p>
                 <p data-dossier-signature>
                   <em>{labels.signatureName}</em>
                   {labels.signatureRole}

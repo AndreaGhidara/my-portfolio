@@ -38,10 +38,10 @@ export function JourneyView({
   eyebrow,
   title,
   present,
-  noBadge: senzaTesserino,
-  lessonLabel: etichettaLezione,
-  note: nota,
-  hint: suggerimento,
+  noBadge,
+  lessonLabel,
+  note,
+  hint,
   entries,
   stats,
 }: JourneyViewProps) {
@@ -57,7 +57,7 @@ export function JourneyView({
       <JourneyTrack
         n={entries.length}
         startYear={entries[0]?.year ?? 0}
-        hint={suggerimento}
+        hint={hint}
         header={
           // Titolo in carta e occhiello in inchiostro, come nella seconda
           // sezione: sull'arancio la scala dei toni e' quella, e --on-accent
@@ -74,8 +74,8 @@ export function JourneyView({
             entry={entry}
             pose={poseAt(i)}
             present={present}
-            noBadge={senzaTesserino}
-            lessonLabel={etichettaLezione}
+            noBadge={noBadge}
+            lessonLabel={lessonLabel}
           />
         ))}
 
@@ -98,7 +98,7 @@ export function JourneyView({
               </div>
             ))}
           </dl>
-          <p data-journey-note>{nota}</p>
+          <p data-journey-note>{note}</p>
         </li>
       </JourneyTrack>
     </section>

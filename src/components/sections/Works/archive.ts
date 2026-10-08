@@ -21,26 +21,26 @@ export const ARCHIVE_PARAMS = {
   tabWidth: 23,
 } as const;
 
-const limita = (v: number) => Math.min(1, Math.max(0, v));
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
 /**
  * Quanto una cartella che arriva copre quella sotto: 0 finche' la sua cima sta
  * sotto lo schermo, 1 quando e' ferma al suo `top` sticky.
  */
 export function archiveCoverage({
-  top: cima,
-  stop: fermo,
-  screen: schermo,
+  top,
+  stop,
+  screen,
 }: {
   top: number;
   stop: number;
   screen: number;
 }): number {
-  const corsa = schermo - fermo;
+  const travel = screen - stop;
   // Una corsa nulla o negativa e' una cartella gia' arrivata o mai partita:
   // dividere darebbe Infinity o NaN, e il NaN finisce in una custom property.
-  if (corsa <= 0) return cima <= fermo ? 1 : 0;
-  return limita(1 - (cima - fermo) / corsa);
+  if (travel <= 0) return top <= stop ? 1 : 0;
+  return clamp01(1 - (top - stop) / travel);
 }
 
 /**
@@ -49,14 +49,14 @@ export function archiveCoverage({
  * (misurati una volta, non a ogni fotogramma). L'ultima non e' mai sotto.
  */
 export function depths(
-  cime: readonly number[],
-  fermi: readonly number[],
-  schermo: number,
+  tops: readonly number[],
+  stops: readonly number[],
+  screen: number,
 ): number[] {
-  return cime.map((_, i) => {
+  return tops.map((_, i) => {
     let p = 0;
-    for (let j = i + 1; j < cime.length; j++) {
-      p += archiveCoverage({ top: cime[j], stop: fermi[j], screen: schermo });
+    for (let j = i + 1; j < tops.length; j++) {
+      p += archiveCoverage({ top: tops[j], stop: stops[j], screen });
     }
     return p;
   });
@@ -75,11 +75,11 @@ export function depths(
  * distanza fra due: sono tutte alte uguali, apposta.
  */
 export function returnTop({
-  start: inizio,
-  step: passo,
-  stops: fermi,
+  start,
+  step,
+  stops,
   i,
-  screen: schermo,
+  screen,
 }: {
   start: number;
   step: number;
@@ -87,10 +87,10 @@ export function returnTop({
   i: number;
   screen: number;
 }): number {
-  const ferma = inizio + i * passo - fermi[i];
-  if (i + 1 >= fermi.length) return ferma;
-  const primaCheArriviLaDopo = inizio + (i + 1) * passo - schermo;
-  return Math.min(ferma, primaCheArriviLaDopo);
+  const settled = start + i * step - stops[i];
+  if (i + 1 >= stops.length) return settled;
+  const beforeNextArrives = start + (i + 1) * step - screen;
+  return Math.min(settled, beforeNextArrives);
 }
 
 /**
@@ -101,10 +101,10 @@ export function returnTop({
  * Un pixel di tolleranza per gli arrotondamenti. Una faccia alta zero non ci
  * sta: vuol dire che non c'e' stato layout da misurare.
  */
-export function fits(facce: readonly { content: number; room: number }[]): boolean {
+export function fits(faces: readonly { content: number; room: number }[]): boolean {
   return (
-    facce.length > 0 &&
-    facce.every(({ content: contenuto, room: posto }) => posto > 0 && contenuto <= posto + 1)
+    faces.length > 0 &&
+    faces.every(({ content, room }) => room > 0 && content <= room + 1)
   );
 }
 
@@ -119,17 +119,17 @@ export function fits(facce: readonly { content: number; room: number }[]): boole
  * di chi legge fa saltare la pagina. Si aspetta che esca.
  */
 export function shouldRedecide({
-  widthChanged: larghezzaCambiata,
-  finePointer: puntatoreFine,
-  inView: inVista,
+  widthChanged,
+  finePointer,
+  inView,
 }: {
   widthChanged: boolean;
   finePointer: boolean;
   inView: boolean;
-}): "ora" | "dopo" | "mai" {
-  if (larghezzaCambiata) return "ora";
-  if (!puntatoreFine) return "mai";
-  return inVista ? "dopo" : "ora";
+}): "now" | "later" | "never" {
+  if (widthChanged) return "now";
+  if (!finePointer) return "never";
+  return inView ? "later" : "now";
 }
 
 /**

@@ -5,7 +5,7 @@ import { ContactView } from "./ContactView";
 /** I tre momenti di «cosa succede dopo», nell'ordine in cui succedono. Sono
  *  una lista di chiavi e nient'altro, quindi stanno qui e non in un file di
  *  contenuto: non c'e' nessun altro dato da tenere insieme a loro. */
-const DOPO_IDS = ["risposta", "chiamata", "preventivo"] as const;
+const AFTER_IDS = ["risposta", "chiamata", "preventivo"] as const;
 
 export async function Contact() {
   const t = await getTranslations("contact");
@@ -21,7 +21,7 @@ export async function Contact() {
       }}
       after={{
         label: t("dopo.etichetta"),
-        moments: DOPO_IDS.map((id) => ({
+        moments: AFTER_IDS.map((id) => ({
           id,
           when: t(`dopo.momenti.${id}.quando`),
           title: t(`dopo.momenti.${id}.titolo`),

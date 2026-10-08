@@ -6,7 +6,7 @@ import type { WorkScreenshot } from "./types";
  * Una schermata si scarica una volta sola per sessione. Il mouse su una
  * cartella ci passa sopra dieci volte mentre si legge il sintomo.
  */
-const gia = new Set<string>();
+const requested = new Set<string>();
 
 /**
  * Chiede la schermata mentre il mouse e' ancora sulla cartella.
@@ -22,8 +22,8 @@ const gia = new Set<string>();
  * regalati.
  */
 export function preloadShot(shot?: WorkScreenshot) {
-  if (!shot || typeof window === "undefined" || gia.has(shot.src)) return;
-  gia.add(shot.src);
+  if (!shot || typeof window === "undefined" || requested.has(shot.src)) return;
+  requested.add(shot.src);
 
   const { props } = getImageProps({
     src: shot.src,

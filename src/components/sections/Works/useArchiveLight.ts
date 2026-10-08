@@ -18,26 +18,26 @@ import { isDossierOpen } from "./useDossier";
  * colonna tutti i telefoni. Le schermate si tolgono dalla copia: nel riquadro
  * non contano (si stringono) e non devono partire a scaricarsi.
  */
-function facceNellaSonda(lista: HTMLElement) {
-  const sonda = lista.cloneNode(true) as HTMLElement;
-  for (const nodo of sonda.querySelectorAll("img, [data-shot-blur]")) nodo.remove();
-  sonda.setAttribute("data-archive-lit", "");
-  sonda.setAttribute("data-archive-probe", "");
-  sonda.setAttribute("aria-hidden", "true");
-  sonda.style.width = `${lista.clientWidth}px`;
-  (lista.parentElement ?? document.body).append(sonda);
+function measureFaces(list: HTMLElement) {
+  const probe = list.cloneNode(true) as HTMLElement;
+  for (const node of probe.querySelectorAll("img, [data-shot-blur]")) node.remove();
+  probe.setAttribute("data-archive-lit", "");
+  probe.setAttribute("data-archive-probe", "");
+  probe.setAttribute("aria-hidden", "true");
+  probe.style.width = `${list.clientWidth}px`;
+  (list.parentElement ?? document.body).append(probe);
   // Quanto chiede si legge lasciandola alta quanto vuole, e non da
   // scrollHeight: quello non conta il contenuto che scende dentro il padding
   // basso, e a 390x664 la faccia del riservato debordava di 18px dentro i suoi
   // 21 di padding con scrollHeight uguale all'altezza. «Apri il caso» finiva
   // schiacciato sul bordo e la soglia diceva che ci stava.
-  const facce = [...sonda.querySelectorAll<HTMLElement>("[data-face]")].map((faccia) => {
-    const posto = faccia.offsetHeight;
-    faccia.style.height = "auto";
-    return { content: faccia.offsetHeight, room: posto };
+  const faces = [...probe.querySelectorAll<HTMLElement>("[data-face]")].map((face) => {
+    const room = face.offsetHeight;
+    face.style.height = "auto";
+    return { content: face.offsetHeight, room };
   });
-  sonda.remove();
-  return facce;
+  probe.remove();
+  return faces;
 }
 
 /**
@@ -50,85 +50,85 @@ function facceNellaSonda(lista: HTMLElement) {
  * in svh) e col puntatore fine solo quando l'archivio non e' sullo schermo. Se
  * lo e', la decisione aspetta che esca.
  */
-export function useArchiveLight(schedario: RefObject<HTMLOListElement | null>): boolean {
-  const [ciStanno, setCiStanno] = useState(false);
+export function useArchiveLight(shelf: RefObject<HTMLOListElement | null>): boolean {
+  const [allFit, setAllFit] = useState(false);
 
   useEffect(() => {
-    const lista = schedario.current;
-    if (!lista) return;
-    let vivo = true;
-    let larghezza = window.innerWidth;
-    let inVista = false;
-    let inSospeso = false;
+    const list = shelf.current;
+    if (!list) return;
+    let alive = true;
+    let width = window.innerWidth;
+    let inView = false;
+    let pending = false;
     /** Un resize arrivato a pratica aperta: si pesa alla chiusura. */
-    let resizeSospeso = false;
-    const fine = window.matchMedia(MEDIA.finePointer);
+    let pendingResize = false;
+    const finePointer = window.matchMedia(MEDIA.finePointer);
     // Solo in sviluppo e solo con ?righelli: un archivio che resta in colonna
     // senza dire perche' non si diagnostica.
-    const racconta =
+    const logDecisions =
       process.env.NODE_ENV !== "production" &&
       new URLSearchParams(window.location.search).has("rulers");
-    const decidi = () => {
-      if (!vivo) return;
+    const decide = () => {
+      if (!alive) return;
       // A pratica aperta l'archivio sotto non si spegne: una rotazione del
       // telefono misurerebbe una lista con la cartella caduta. Si decide alla
       // chiusura.
       if (isDossierOpen()) {
-        inSospeso = true;
+        pending = true;
         return;
       }
-      inSospeso = false;
-      const facce = facceNellaSonda(lista);
-      const esito = fits(facce);
-      if (racconta) {
+      pending = false;
+      const faces = measureFaces(list);
+      const result = fits(faces);
+      if (logDecisions) {
         console.debug(
-          `[archivio] ${esito ? "acceso" : "colonna"} a ${window.innerWidth}x${window.innerHeight}`,
-          facce,
+          `[archive] ${result ? "lit" : "column"} at ${window.innerWidth}x${window.innerHeight}`,
+          faces,
         );
       }
-      setCiStanno(esito);
+      setAllFit(result);
     };
-    const alResize = () => {
+    const onResize = () => {
       // A pratica aperta si segna e basta, senza toccare `larghezza`: alla
       // chiusura si confronta con quella di prima dell'apertura.
       if (isDossierOpen()) {
-        resizeSospeso = true;
+        pendingResize = true;
         return;
       }
-      const cambiata = window.innerWidth !== larghezza;
-      larghezza = window.innerWidth;
-      const quando = shouldRedecide({ widthChanged: cambiata, finePointer: fine.matches, inView: inVista });
-      if (quando === "ora") decidi();
-      else if (quando === "dopo") inSospeso = true;
+      const widthChanged = window.innerWidth !== width;
+      width = window.innerWidth;
+      const when = shouldRedecide({ widthChanged, finePointer: finePointer.matches, inView });
+      if (when === "now") decide();
+      else if (when === "later") pending = true;
     };
-    const osservatore = new IntersectionObserver(([voce]) => {
-      inVista = voce.isIntersecting;
-      if (!inVista && inSospeso) decidi();
+    const observer = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      if (!inView && pending) decide();
     });
     /* Chiusa la pratica, quello che e' rimasto sospeso passa dalle stesse
        regole di sempre: un resize da ridecidere(), cosi' una sola altezza non
        rimodella l'archivio sotto gli occhi; il resto solo se l'archivio non e'
        sullo schermo, come fa l'IntersectionObserver. */
-    const dossier = new MutationObserver(() => {
+    const dialogWatcher = new MutationObserver(() => {
       if (isDossierOpen()) return;
-      if (resizeSospeso) {
-        resizeSospeso = false;
-        alResize();
+      if (pendingResize) {
+        pendingResize = false;
+        onResize();
       }
-      if (inSospeso && !inVista) decidi();
+      if (pending && !inView) decide();
     });
-    osservatore.observe(lista.closest("section") ?? lista);
-    dossier.observe(document.documentElement, { attributeFilter: ["data-dialog-open"] });
-    decidi();
-    void document.fonts?.ready.then(decidi);
-    window.addEventListener("resize", alResize);
+    observer.observe(list.closest("section") ?? list);
+    dialogWatcher.observe(document.documentElement, { attributeFilter: ["data-dialog-open"] });
+    decide();
+    void document.fonts?.ready.then(decide);
+    window.addEventListener("resize", onResize);
     return () => {
-      vivo = false;
-      osservatore.disconnect();
-      dossier.disconnect();
-      window.removeEventListener("resize", alResize);
+      alive = false;
+      observer.disconnect();
+      dialogWatcher.disconnect();
+      window.removeEventListener("resize", onResize);
     };
-  }, [schedario]);
+  }, [shelf]);
 
-  return ciStanno;
+  return allFit;
 }

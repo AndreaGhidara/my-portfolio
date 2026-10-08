@@ -24,10 +24,10 @@ describe("ProcessView", () => {
 
   it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
     render(<ProcessView {...props} />);
-    const sezione = screen.getByRole("region", { name: props.title });
-    const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
-    expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
-    expect(titolo).toHaveClass("section-title");
+    const section = screen.getByRole("region", { name: props.title });
+    const heading = within(section).getByRole("heading", { level: 2, name: props.title });
+    expect(section).toHaveAttribute("aria-labelledby", heading.id);
+    expect(heading).toHaveClass("section-title");
   });
   it("le consegne sono una lista ordinata: «in quest'ordine» è metà del titolo", () => {
     // Non quattro riquadri. L'ordine e' l'informazione, e una lista ordinata e'
@@ -42,20 +42,20 @@ describe("ProcessView", () => {
     // pesca anche quelle. L'ultima voce della pagina e' un trattino, non una
     // consegna.
     const { container } = render(<ProcessView {...props} />);
-    const voci = container.querySelectorAll("[data-process-item]");
-    const ultima = deliveries[deliveries.length - 1];
-    expect(voci[voci.length - 1]).toHaveTextContent(ultima.title);
+    const items = container.querySelectorAll("[data-process-item]");
+    const last = deliveries[deliveries.length - 1];
+    expect(items[items.length - 1]).toHaveTextContent(last.title);
   });
 
   it("i lati si alternano: due voci di fila dallo stesso lato lasciano mezza colonna vuota", () => {
     const { container } = render(<ProcessView {...props} />);
-    const lati = [...container.querySelectorAll("[data-process-item]")].map((el) =>
+    const sides = [...container.querySelectorAll("[data-process-item]")].map((el) =>
       el.getAttribute("data-side"),
     );
-    expect(lati).toHaveLength(processDeliveries.length);
-    for (let i = 1; i < lati.length; i++) {
-      expect(lati[i], `la voce ${i + 1} sta dallo stesso lato della precedente`).not.toBe(
-        lati[i - 1],
+    expect(sides).toHaveLength(processDeliveries.length);
+    for (let i = 1; i < sides.length; i++) {
+      expect(sides[i], `la voce ${i + 1} sta dallo stesso lato della precedente`).not.toBe(
+        sides[i - 1],
       );
     }
   });
@@ -73,8 +73,8 @@ describe("ProcessView", () => {
     // `data-desk-object`: quello conta i ventiquattro oggetti sul tavolo, e
     // queste quattro consegne sul tavolo non ci stanno.
     const { container } = render(<ProcessView {...props} />);
-    const pezzi = [...container.querySelectorAll("[data-desk-piece]")];
-    expect(pezzi.map((p) => p.getAttribute("data-shape"))).toEqual(
+    const pieces = [...container.querySelectorAll("[data-desk-piece]")];
+    expect(pieces.map((p) => p.getAttribute("data-shape"))).toEqual(
       processDeliveries.map((d) => d.shape),
     );
     expect(container.querySelectorAll("[data-desk-object]")).toHaveLength(0);

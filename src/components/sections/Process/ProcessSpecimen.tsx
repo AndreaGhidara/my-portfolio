@@ -21,8 +21,8 @@ import type { ProcessSample } from "@/content/process";
 
 /** Una riga di testo finto, larga quanto le si dice. La larghezza e' un dato
  *  del disegno (quanto e' lunga quella riga) non una scelta di stile. */
-const Riga = ({ w, ...attr }: { w: number; "data-title"?: string; "data-url"?: string }) => (
-  <i data-m="line" {...attr} style={{ "--w": `${w}%` } as CSSProperties} />
+const SpecimenLine = ({ w, ...rest }: { w: number; "data-title"?: string; "data-url"?: string }) => (
+  <i data-m="line" {...rest} style={{ "--w": `${w}%` } as CSSProperties} />
 );
 
 export const PROCESS_SPECIMENS: Record<ProcessSample, ReactNode> = {
@@ -34,13 +34,13 @@ export const PROCESS_SPECIMENS: Record<ProcessSample, ReactNode> = {
    */
   accordo: (
     <>
-      <Riga w={46} data-title="" />
-      <Riga w={100} />
-      <Riga w={88} />
-      <Riga w={96} />
-      <Riga w={38} data-url="" />
-      <Riga w={74} />
-      <Riga w={58} />
+      <SpecimenLine w={46} data-title="" />
+      <SpecimenLine w={100} />
+      <SpecimenLine w={88} />
+      <SpecimenLine w={96} />
+      <SpecimenLine w={38} data-url="" />
+      <SpecimenLine w={74} />
+      <SpecimenLine w={58} />
     </>
   ),
   /**
@@ -67,11 +67,11 @@ export const PROCESS_SPECIMENS: Record<ProcessSample, ReactNode> = {
    */
   indirizzo: (
     <>
-      <Riga w={100} data-title="" />
+      <SpecimenLine w={100} data-title="" />
       <i data-m="block" data-b="header" />
-      <Riga w={100} />
-      <Riga w={100} />
-      <Riga w={80} />
+      <SpecimenLine w={100} />
+      <SpecimenLine w={100} />
+      <SpecimenLine w={80} />
       <i data-m="cta" />
     </>
   ),
@@ -86,9 +86,9 @@ export const PROCESS_SPECIMENS: Record<ProcessSample, ReactNode> = {
    */
   numero: (
     <>
-      <Riga w={54} />
+      <SpecimenLine w={54} />
       <b data-m="mono">+39 ___ ___ ____</b>
-      <Riga w={34} data-url="" />
+      <SpecimenLine w={34} data-url="" />
     </>
   ),
 };

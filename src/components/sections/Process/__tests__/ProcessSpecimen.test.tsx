@@ -9,19 +9,19 @@ describe("i campioni delle consegne", () => {
     // tavolo fa sui suoi: un campione dichiarato senza disegno e' un buco in
     // pagina, un disegno che nessuno chiama e' codice morto che il giorno dopo
     // qualcuno "sistema" cambiandolo.
-    const dichiarati = new Set(processDeliveries.map((d) => d.sample));
-    const disegnati = new Set(Object.keys(PROCESS_SPECIMENS) as ProcessSample[]);
-    for (const id of dichiarati) {
-      expect(disegnati.has(id), `il campione "${id}" non sa disegnarsi`).toBe(true);
+    const declared = new Set(processDeliveries.map((d) => d.sample));
+    const drawn = new Set(Object.keys(PROCESS_SPECIMENS) as ProcessSample[]);
+    for (const id of declared) {
+      expect(drawn.has(id), `il campione "${id}" non sa disegnarsi`).toBe(true);
     }
-    for (const id of disegnati) {
-      expect(dichiarati.has(id), `il disegno "${id}" non lo chiama nessuna consegna`).toBe(true);
+    for (const id of drawn) {
+      expect(declared.has(id), `il disegno "${id}" non lo chiama nessuna consegna`).toBe(true);
     }
   });
 
   it("nessuna consegna divide il campione con un'altra: un frammento è di una cosa sola", () => {
-    const usati = processDeliveries.map((d) => d.sample);
-    expect(new Set(usati).size).toBe(usati.length);
+    const used = processDeliveries.map((d) => d.sample);
+    expect(new Set(used).size).toBe(used.length);
   });
 
   it("due campioni non sono lo stesso disegno", () => {
@@ -29,10 +29,10 @@ describe("i campioni delle consegne", () => {
     // qui non c'e' la rete di sicurezza che ha il tavolo: se «l'accordo» e «la
     // bozza» fossero fatti delle stesse marche, il documento e lo schermo
     // disegnato sarebbero due disegni identici uno sotto l'altro.
-    const disegni = (Object.keys(PROCESS_SPECIMENS) as ProcessSample[]).map(
+    const drawings = (Object.keys(PROCESS_SPECIMENS) as ProcessSample[]).map(
       (id) => render(<ProcessSpecimen sample={id} />).container.innerHTML,
     );
-    expect(new Set(disegni).size).toBe(disegni.length);
+    expect(new Set(drawings).size).toBe(drawings.length);
   });
 
   it("il campione è decorazione dichiarata: non entra nell'albero di accessibilità", () => {

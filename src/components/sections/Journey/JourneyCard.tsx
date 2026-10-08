@@ -25,9 +25,9 @@ import type { JourneyEntryView } from "./JourneyView";
 export function JourneyCard({
   entry,
   present,
-  noBadge: senzaTesserino,
-  lessonLabel: etichettaLezione,
-  pose: posa,
+  noBadge,
+  lessonLabel,
+  pose,
 }: {
   entry: JourneyEntryView;
   pose: Pose;
@@ -40,8 +40,8 @@ export function JourneyCard({
       data-journey-item
       data-badge={entry.badge ? undefined : "no"}
       data-year={entry.year}
-      data-offset={posa.offset}
-      style={{ "--r": `${posa.rotation}deg`, "--dy": `${posa.offset}rem` } as CSSProperties}
+      data-offset={pose.offset}
+      style={{ "--r": `${pose.rotation}deg`, "--dy": `${pose.offset}rem` } as CSSProperties}
     >
       <div data-journey-badge>
         <span data-journey-clip aria-hidden="true" />
@@ -51,12 +51,12 @@ export function JourneyCard({
             {entry.present ? ` ${present}` : null}
           </p>
           <h3>{entry.role}</h3>
-          <p data-journey-company>{entry.badge ? entry.company : senzaTesserino}</p>
+          <p data-journey-company>{entry.badge ? entry.company : noBadge}</p>
         </div>
       </div>
 
       <div data-journey-sheet>
-        <p data-journey-label>{etichettaLezione}</p>
+        <p data-journey-label>{lessonLabel}</p>
         <p data-journey-lesson>{entry.lesson}</p>
         <p data-journey-body>{entry.body}</p>
       </div>

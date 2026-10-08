@@ -31,7 +31,7 @@ export type Folder = {
 };
 
 /** I quattro tempi, oppure (movimento a "none") una dissolvenza e basta. */
-export type FolderMotion = "quattro-tempi" | "dissolvenza";
+export type FolderMotion = "four-beats" | "fade";
 
 /** Quel tanto di Animation che serve qui, e che si sa finto senza WAAPI. */
 export type Move = { finished: Promise<unknown>; cancel(): void };
@@ -49,17 +49,17 @@ export type Slide = {
   stop(): void;
 };
 
-const MORBIDO = "cubic-bezier(0.22, 1, 0.36, 1)";
+const EASE_SOFT = "cubic-bezier(0.22, 1, 0.36, 1)";
 /** Parte piano e accelera: e' una caduta. */
-const CADE = "cubic-bezier(0.55, 0, 0.8, 0.35)";
-const ALLARGA = "cubic-bezier(0.65, 0, 0.2, 1)";
-const STRINGE = "cubic-bezier(0.5, 0, 0.2, 1)";
-const SALE = "cubic-bezier(0.2, 0.8, 0.3, 1)";
-const RIENTRA = "cubic-bezier(0.4, 0, 0.2, 1)";
+const EASE_FALL = "cubic-bezier(0.55, 0, 0.8, 0.35)";
+const EASE_WIDEN = "cubic-bezier(0.65, 0, 0.2, 1)";
+const EASE_NARROW = "cubic-bezier(0.5, 0, 0.2, 1)";
+const EASE_RISE = "cubic-bezier(0.2, 0.8, 0.3, 1)";
+const EASE_RETURN = "cubic-bezier(0.4, 0, 0.2, 1)";
 
 /** Di quanto sale il foglio sfilando: di piu' finiva sotto la barra del sito. */
-const SU = 22;
-const INCLINA = -1.4;
+const LIFT = 22;
+const TILT = -1.4;
 
 /**
  * Element.animate, o un'animazione gia' finita dove non esiste (jsdom): il
@@ -68,65 +68,65 @@ const INCLINA = -1.4;
 export function animate(
   el: Element,
   frames: Keyframe[],
-  { durata, ritardo = 0, curva = MORBIDO }: { durata: number; ritardo?: number; curva?: string },
+  { duration, delay = 0, easing = EASE_SOFT }: { duration: number; delay?: number; easing?: string },
 ): Move {
   if (typeof el.animate !== "function") return { finished: Promise.resolve(), cancel() {} };
-  return el.animate(frames, { duration: durata, delay: ritardo, easing: curva, fill: "both" });
+  return el.animate(frames, { duration, delay, easing, fill: "both" });
 }
 
 /** cancel() rigetta `finished`: chi aspettava una mossa fermata smette e basta. */
-const finite = (mosse: Move[]) =>
-  Promise.all(mosse.map((m) => m.finished.catch(() => undefined))).then(() => undefined);
+const allSettled = (moves: Move[]) =>
+  Promise.all(moves.map((m) => m.finished.catch(() => undefined))).then(() => undefined);
 
-export function slide(c: Folder, moto: FolderMotion): Slide {
+export function slide(c: Folder, motion: FolderMotion): Slide {
   /* Due mucchi: quello del dialog se ne va col foglio della pratica, quello
      della cartella solo quando la cartella e' di nuovo al suo posto. */
-  const suDialog = new Set<Move>();
-  const suCartella = new Set<Move>();
-  const muovi = (mucchio: Set<Move>, el: Element, frames: Keyframe[], opzioni: Parameters<typeof animate>[2]) => {
-    const m = animate(el, frames, opzioni);
-    mucchio.add(m);
+  const onDialog = new Set<Move>();
+  const onFolder = new Set<Move>();
+  const move = (pile: Set<Move>, el: Element, frames: Keyframe[], options: Parameters<typeof animate>[2]) => {
+    const m = animate(el, frames, options);
+    pile.add(m);
     return m;
   };
-  const cancella = (mucchio: Set<Move>) => {
-    for (const m of mucchio) m.cancel();
-    mucchio.clear();
+  const cancelAll = (pile: Set<Move>) => {
+    for (const m of pile) m.cancel();
+    pile.clear();
   };
 
-  let fermo = false;
-  let senzaFoglio = false;
-  let dialogAperto: HTMLDialogElement | null = null;
-  const cade = [c.tab, c.spine, c.face];
+  let stopped = false;
+  let sheetReleased = false;
+  let openDialog: HTMLDialogElement | null = null;
+  const falling = [c.tab, c.spine, c.face];
 
   // Misurato al clic, dopo che useProfondita ha riportato davanti la cartella.
-  const alto = c.face.offsetHeight - 16;
-  const giu = window.innerHeight - c.li.getBoundingClientRect().top + 40;
-  const ombra = getComputedStyle(c.li).getPropertyValue("--folder-shadow").trim();
-  const sfilato: Keyframe = {
-    height: `${alto}px`,
-    translate: `0 ${-SU}px`,
-    rotate: `${INCLINA}deg`,
-    boxShadow: `0 18px 40px -18px ${ombra}`,
+  const liftedHeight = c.face.offsetHeight - 16;
+  const drop = window.innerHeight - c.li.getBoundingClientRect().top + 40;
+  const shadow = getComputedStyle(c.li).getPropertyValue("--folder-shadow").trim();
+  const pulledOut: Keyframe = {
+    height: `${liftedHeight}px`,
+    translate: `0 ${-LIFT}px`,
+    rotate: `${TILT}deg`,
+    boxShadow: `0 18px 40px -18px ${shadow}`,
   };
-  const caduto = (i: number): Keyframe => ({ translate: `0 ${giu}px`, rotate: `${i === 2 ? 1.6 : 1}deg` });
+  const fallen = (i: number): Keyframe => ({ translate: `0 ${drop}px`, rotate: `${i === 2 ? 1.6 : 1}deg` });
 
-  let sfila: Move | null = null;
-  let scende: Move[] = [];
-  let caduta: Promise<void> = Promise.resolve();
+  let pullOut: Move | null = null;
+  let descents: Move[] = [];
+  let fallDone: Promise<void> = Promise.resolve();
 
-  if (moto === "quattro-tempi") {
+  if (motion === "four-beats") {
     // 1. SFILA. Un fotogramma solo: si parte dal foglio com'e' nel CSS.
-    sfila = muovi(suCartella, c.sheet, [sfilato], { durata: 420 });
+    pullOut = move(onFolder, c.sheet, [pulledOut], { duration: 420 });
     // 2. SCENDE. La faccia un attimo dopo la linguetta: la cartella si piega
     // appena cadendo, invece di scendere come un blocco.
-    scende = cade.map((el, i) =>
-      muovi(suCartella, el, [{ translate: "0 0", rotate: "0deg" }, caduto(i)], {
-        durata: 620,
-        ritardo: 240 + i * 25,
-        curva: CADE,
+    descents = falling.map((el, i) =>
+      move(onFolder, el, [{ translate: "0 0", rotate: "0deg" }, fallen(i)], {
+        duration: 620,
+        delay: 240 + i * 25,
+        easing: EASE_FALL,
       }),
     );
-    caduta = finite([sfila, ...scende]);
+    fallDone = allSettled([pullOut, ...descents]);
   }
 
   /**
@@ -137,184 +137,184 @@ export function slide(c: Folder, moto: FolderMotion): Slide {
    * Della pratica conta solo la parte nello schermo: sul telefono il resto e'
    * sotto, si scorre, e si taglia finche' il foglio si allarga.
    */
-  const partenza = (pratica: HTMLElement) => {
+  const startShape = (dossier: HTMLElement) => {
     const li = c.li.getBoundingClientRect();
     const r = {
       left: li.left + c.sheet.offsetLeft,
-      top: li.top + c.sheet.offsetTop - SU,
+      top: li.top + c.sheet.offsetTop - LIFT,
       width: c.sheet.offsetWidth,
       height: c.sheet.offsetHeight,
     };
-    const d = pratica.getBoundingClientRect();
-    const alta = Math.max(1, Math.min(d.height, window.innerHeight - d.top));
-    const sotto = d.height - alta;
+    const d = dossier.getBoundingClientRect();
+    const visible = Math.max(1, Math.min(d.height, window.innerHeight - d.top));
+    const below = d.height - visible;
     return {
-      transformOrigin: `50% ${alta / 2}px`,
+      transformOrigin: `50% ${visible / 2}px`,
       transform: `translate(${r.left + r.width / 2 - (d.left + d.width / 2)}px, ${
-        r.top + r.height / 2 - (d.top + alta / 2)
-      }px) rotate(${INCLINA}deg) scale(${r.width / d.width}, ${r.height / alta})`,
+        r.top + r.height / 2 - (d.top + visible / 2)
+      }px) rotate(${TILT}deg) scale(${r.width / d.width}, ${r.height / visible})`,
       // -3rem: la linguetta della pratica sta sopra il foglio, e resta.
-      clipPath: `inset(-3rem -3rem ${sotto > 0 ? `${sotto}px` : "-3rem"} -3rem)`,
+      clipPath: `inset(-3rem -3rem ${below > 0 ? `${below}px` : "-3rem"} -3rem)`,
       // Sullo scuro il foglio della cartella e' un tono sotto la carta.
-      tono: getComputedStyle(c.sheet).backgroundColor,
-      carta: getComputedStyle(pratica).backgroundColor,
+      tone: getComputedStyle(c.sheet).backgroundColor,
+      paper: getComputedStyle(dossier).backgroundColor,
     };
   };
 
-  const lasciaIlFoglio = (dialog: HTMLDialogElement) => {
-    senzaFoglio = true;
-    cancella(suDialog);
+  const releaseSheet = (dialog: HTMLDialogElement) => {
+    sheetReleased = true;
+    cancelAll(onDialog);
     dialog.removeAttribute("data-veil");
   };
 
   /* Via tutto quello che sta sul foglio PRIMA di close(), nello stesso task:
      nessun fotogramma mostra la pratica grande un attimo prima di sparire. */
-  const chiudiDialog = (dialog: HTMLDialogElement) => {
-    lasciaIlFoglio(dialog);
+  const closeDialog = (dialog: HTMLDialogElement) => {
+    releaseSheet(dialog);
     dialog.close();
   };
 
-  const ferma = () => {
-    fermo = true;
-    cancella(suDialog);
-    cancella(suCartella);
-    dialogAperto?.removeAttribute("data-veil");
+  const stop = () => {
+    stopped = true;
+    cancelAll(onDialog);
+    cancelAll(onFolder);
+    openDialog?.removeAttribute("data-veil");
   };
 
   return {
     async open(dialog) {
-      dialogAperto = dialog;
-      if (moto === "dissolvenza") {
+      openDialog = dialog;
+      if (motion === "fade") {
         // Sincrono fino al primo await: a "none" il dialog e' aperto appena
         // dopo il commit, senza aspettare niente.
         if (!dialog.open) dialog.showModal();
         dialog.setAttribute("data-veil", "");
-        const entra = muovi(suDialog, dialog, [{ opacity: 0 }, { opacity: 1 }], { durata: 180, curva: "ease-out" });
-        await finite([entra]);
-        if (fermo || senzaFoglio) return;
-        cancella(suDialog);
+        const fadeIn = move(onDialog, dialog, [{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: "ease-out" });
+        await allSettled([fadeIn]);
+        if (stopped || sheetReleased) return;
+        cancelAll(onDialog);
         return;
       }
 
-      await caduta;
-      const pratica = dialog.querySelector<HTMLElement>("[data-dossier]");
-      if (fermo || senzaFoglio || !pratica) return;
-      const parti = Array.from(dialog.querySelectorAll<HTMLElement>("[data-enter]"));
+      await fallDone;
+      const dossier = dialog.querySelector<HTMLElement>("[data-dossier]");
+      if (stopped || sheetReleased || !dossier) return;
+      const parts = Array.from(dialog.querySelectorAll<HTMLElement>("[data-enter]"));
 
       // 3. APRE.
       if (!dialog.open) dialog.showModal();
       dialog.scrollTop = 0;
-      const { tono, carta, ...forma } = partenza(pratica);
+      const { tone, paper, ...shape } = startShape(dossier);
       // Il foglio della cartella lo copre la pratica, che parte identica.
-      muovi(suDialog, c.sheet, [{ visibility: "hidden" }, { visibility: "hidden" }], { durata: 1 });
+      move(onDialog, c.sheet, [{ visibility: "hidden" }, { visibility: "hidden" }], { duration: 1 });
       // Il velo arriva in transizione: serve un fotogramma col ::backdrop gia'
       // disegnato trasparente.
       requestAnimationFrame(() => {
-        if (!fermo && !senzaFoglio) dialog.setAttribute("data-veil", "");
+        if (!stopped && !sheetReleased) dialog.setAttribute("data-veil", "");
       });
-      const apre = muovi(
-        suDialog,
-        pratica,
+      const widen = move(
+        onDialog,
+        dossier,
         [
-          { ...forma, backgroundColor: tono },
-          { ...forma, transform: "none", backgroundColor: carta },
+          { ...shape, backgroundColor: tone },
+          { ...shape, transform: "none", backgroundColor: paper },
         ],
-        { durata: 660, curva: ALLARGA },
+        { duration: 660, easing: EASE_WIDEN },
       );
       // 4. ENTRA. Le parti partono prima che il foglio abbia finito: la
       // pratica sembra riempirsi mentre si apre, non dopo.
-      const entrano = parti.map((p, i) =>
-        muovi(suDialog, p, [{ opacity: 0, translate: "0 12px" }, { opacity: 1, translate: "0 0" }], {
-          durata: 380,
-          ritardo: 470 + Math.min(i, 6) * 60,
+      const entering = parts.map((p, i) =>
+        move(onDialog, p, [{ opacity: 0, translate: "0 12px" }, { opacity: 1, translate: "0 0" }], {
+          duration: 380,
+          delay: 470 + Math.min(i, 6) * 60,
         }),
       );
-      await finite([apre, ...entrano]);
-      if (fermo || senzaFoglio) return;
+      await allSettled([widen, ...entering]);
+      if (stopped || sheetReleased) return;
       // Aperta, la pratica e' il suo CSS: il taglio del telefono se ne va, e
       // si scorre fino in fondo. Il foglio della cartella resta nascosto.
-      apre.cancel();
-      suDialog.delete(apre);
-      for (const m of entrano) {
+      widen.cancel();
+      onDialog.delete(widen);
+      for (const m of entering) {
         m.cancel();
-        suDialog.delete(m);
+        onDialog.delete(m);
       }
     },
 
     async close(dialog) {
-      if (moto === "dissolvenza") {
+      if (motion === "fade") {
         dialog.removeAttribute("data-veil");
-        const esce = muovi(suDialog, dialog, [{ opacity: 1 }, { opacity: 0 }], { durata: 140, curva: "ease-in" });
-        await finite([esce]);
-        if (fermo || senzaFoglio) return;
-        chiudiDialog(dialog);
+        const out = move(onDialog, dialog, [{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: "ease-in" });
+        await allSettled([out]);
+        if (stopped || sheetReleased) return;
+        closeDialog(dialog);
         return;
       }
 
-      const pratica = dialog.querySelector<HTMLElement>("[data-dossier]");
-      const parti = Array.from(dialog.querySelectorAll<HTMLElement>("[data-enter]"));
-      const esce = parti.map((p) =>
-        muovi(suDialog, p, [{ opacity: 1 }, { opacity: 0 }], { durata: 140, curva: "ease-out" }),
+      const dossier = dialog.querySelector<HTMLElement>("[data-dossier]");
+      const parts = Array.from(dialog.querySelectorAll<HTMLElement>("[data-enter]"));
+      const out = parts.map((p) =>
+        move(onDialog, p, [{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: "ease-out" }),
       );
-      await finite(esce);
-      if (fermo || senzaFoglio) return;
-      if (!pratica) {
-        chiudiDialog(dialog);
+      await allSettled(out);
+      if (stopped || sheetReleased) return;
+      if (!dossier) {
+        closeDialog(dialog);
         return;
       }
       // Si torna in cima prima di stringere: il foglio rientra dalla sua testa.
       dialog.scrollTop = 0;
-      const foglio = pratica.querySelector<HTMLElement>("[data-dossier-sheet]");
-      if (foglio) foglio.scrollTop = 0;
+      const sheet = dossier.querySelector<HTMLElement>("[data-dossier-sheet]");
+      if (sheet) sheet.scrollTop = 0;
       dialog.removeAttribute("data-veil");
       // Rimisurata qui e non riusata dall'apertura: nel frattempo lo schermo
       // puo' aver cambiato misura.
-      const { tono, carta, ...forma } = partenza(pratica);
-      const rientra = muovi(
-        suDialog,
-        pratica,
+      const { tone, paper, ...shape } = startShape(dossier);
+      const shrink = move(
+        onDialog,
+        dossier,
         [
-          { ...forma, transform: "none", backgroundColor: carta },
-          { ...forma, backgroundColor: tono },
+          { ...shape, transform: "none", backgroundColor: paper },
+          { ...shape, backgroundColor: tone },
         ],
-        { durata: 480, curva: STRINGE },
+        { duration: 480, easing: EASE_NARROW },
       );
-      await finite([rientra]);
-      if (fermo || senzaFoglio) return;
-      chiudiDialog(dialog);
+      await allSettled([shrink]);
+      if (stopped || sheetReleased) return;
+      closeDialog(dialog);
     },
 
-    releaseSheet: lasciaIlFoglio,
+    releaseSheet,
 
     async rise() {
-      if (moto === "dissolvenza" || fermo) return;
+      if (motion === "fade" || stopped) return;
       // La cartella risale da sotto e si assesta; parte prima la faccia.
-      for (const m of scende) {
+      for (const m of descents) {
         m.cancel();
-        suCartella.delete(m);
+        onFolder.delete(m);
       }
-      const sale = cade.map((el, i) =>
-        muovi(
-          suCartella,
+      const rising = falling.map((el, i) =>
+        move(
+          onFolder,
           el,
-          [caduto(i), { translate: "0 -6px", rotate: "0deg", offset: 0.82 }, { translate: "0 0", rotate: "0deg" }],
-          { durata: 640, ritardo: (2 - i) * 25, curva: SALE },
+          [fallen(i), { translate: "0 -6px", rotate: "0deg", offset: 0.82 }, { translate: "0 0", rotate: "0deg" }],
+          { duration: 640, delay: (2 - i) * 25, easing: EASE_RISE },
         ),
       );
-      await finite(sale);
-      if (fermo) return;
+      await allSettled(rising);
+      if (stopped) return;
       // Il foglio rientra quando la faccia e' di nuovo al suo posto. Un
       // fotogramma solo, di partenza: si arriva al foglio del CSS.
-      if (sfila) {
-        sfila.cancel();
-        suCartella.delete(sfila);
+      if (pullOut) {
+        pullOut.cancel();
+        onFolder.delete(pullOut);
       }
-      const riposa = muovi(suCartella, c.sheet, [{ ...sfilato, offset: 0 }], { durata: 380, curva: RIENTRA });
-      await finite([riposa]);
-      if (fermo) return;
-      ferma();
+      const settle = move(onFolder, c.sheet, [{ ...pulledOut, offset: 0 }], { duration: 380, easing: EASE_RETURN });
+      await allSettled([settle]);
+      if (stopped) return;
+      stop();
     },
 
-    stop: ferma,
+    stop,
   };
 }

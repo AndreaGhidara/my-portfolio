@@ -37,8 +37,8 @@ export function ProcessBlock({
         <p data-process-lead>{delivery.lead}</p>
 
         <ul data-process-includes>
-          {delivery.includes.map((voce) => (
-            <li key={voce}>{voce}</li>
+          {delivery.includes.map((item) => (
+            <li key={item}>{item}</li>
           ))}
         </ul>
 

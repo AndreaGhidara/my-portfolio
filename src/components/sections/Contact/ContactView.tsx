@@ -45,7 +45,7 @@ export function ContactView({
   eyebrow,
   title,
   client,
-  after: dopo,
+  after,
   recruiter,
   cvPath,
   email,
@@ -76,16 +76,16 @@ export function ContactView({
           </div>
 
           <div>
-            <p data-contact-after-label>{dopo.label}</p>
+            <p data-contact-after-label>{after.label}</p>
             {/* Ordinata: i tre momenti hanno un ordine nel tempo, e non e' una
                 scelta di impaginato. */}
             <ol data-contact-times>
-              {dopo.moments.map((momento) => (
-                <li key={momento.id}>
-                  <span data-contact-when>{momento.when}</span>
+              {after.moments.map((moment) => (
+                <li key={moment.id}>
+                  <span data-contact-when>{moment.when}</span>
                   <div>
-                    <b>{momento.title}</b>
-                    <p>{momento.text}</p>
+                    <b>{moment.title}</b>
+                    <p>{moment.text}</p>
                   </div>
                 </li>
               ))}

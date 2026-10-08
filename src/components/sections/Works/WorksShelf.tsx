@@ -1,21 +1,21 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { TAB, ARCHIVE_PARAMS } from "./archive";
+import { ARCHIVE_PARAMS, TAB } from "./archive";
 import { WorkFolder } from "./WorkFolder";
 import { WorkDialog } from "./WorkDialog";
 import { preloadShot } from "./preloadShot";
 import type { WorkCaseData, WorkCaseLabels } from "./types";
 import { useArchiveLight } from "./useArchiveLight";
-import { useDossier } from "./useDossier";
 import { useDepth } from "./useDepth";
+import { useDossier } from "./useDossier";
 
 /**
  * Le misure dell'archivio arrivano al CSS da qui, scritte nel markup del
  * server: il numero vive in archivio.ts e il foglio di stile lo legge, come fa
  * il percorso con binario.ts.
  */
-const MISURE = {
+const ARCHIVE_VARS = {
   "--step": `${ARCHIVE_PARAMS.step}px`,
   "--distance": `${ARCHIVE_PARAMS.distance}vh`,
   "--darkens": ARCHIVE_PARAMS.darkens,
@@ -39,16 +39,16 @@ const MISURE = {
  * - usePratica apre e chiude il dossier, uno solo per tutte le cartelle.
  */
 export function WorksShelf({
-  works: lavori,
+  works,
   labels,
 }: {
   works: WorkCaseData[];
   labels: WorkCaseLabels;
 }) {
-  const schedario = useRef<HTMLOListElement | null>(null);
-  const ciStanno = useArchiveLight(schedario);
-  const { riporta, prepara } = useDepth(schedario, ciStanno);
-  const { attiva, dialogo, apri, chiudi, alClose } = useDossier(schedario, prepara);
+  const shelf = useRef<HTMLOListElement | null>(null);
+  const allFit = useArchiveLight(shelf);
+  const { putBack, prepare } = useDepth(shelf, allFit);
+  const { active, dialogRef, open, close, onClose } = useDossier(shelf, prepare);
 
   return (
     <>
@@ -58,34 +58,34 @@ export function WorksShelf({
       {/* `--n` entra nell'altezza della faccia: i passi delle cartelle gia'
           archiviate sono n - 1. */}
       <ol
-        ref={schedario}
+        ref={shelf}
         data-work-shelf
-        style={{ ...MISURE, "--n": lavori.length } as CSSProperties}
+        style={{ ...ARCHIVE_VARS, "--n": works.length } as CSSProperties}
       >
-        {lavori.map((item, index) => (
+        {works.map((item, index) => (
           <WorkFolder
             key={item.id}
             data={item}
             index={index}
-            total={lavori.length}
+            total={works.length}
             openLabel={labels.open}
             confidentialLabel={labels.confidential}
             putBackLabel={labels.putBack}
-            onOpen={(cartella) => apri(index, cartella)}
+            onOpen={(folder) => open(index, folder)}
             onPreload={() => preloadShot(item.screenshot)}
-            onPutBack={() => riporta(index)}
+            onPutBack={() => putBack(index)}
           />
         ))}
       </ol>
 
       <WorkDialog
-        dialog={dialogo}
-        data={attiva === null ? null : (lavori[attiva] ?? null)}
-        number={(attiva ?? 0) + 1}
-        total={lavori.length}
+        dialog={dialogRef}
+        data={active === null ? null : (works[active] ?? null)}
+        number={(active ?? 0) + 1}
+        total={works.length}
         labels={labels}
-        onRequestClose={chiudi}
-        onClose={alClose}
+        onRequestClose={close}
+        onClose={onClose}
       />
     </>
   );

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { useMotionLevel } from "@/animations/motionPolicy";
-import { NO_DOSSIER, dossierReducer, type DossierEvent, type Dossier } from "./dossier";
+import { NO_DOSSIER, dossierReducer, type Dossier, type DossierEvent } from "./dossier";
 import { slide, type Folder, type Slide } from "./slide";
 
 /** Una pratica aperta ferma tutto quello che misura la pagina sotto. */
@@ -26,25 +26,25 @@ export const isDossierOpen = () => document.documentElement.hasAttribute("data-d
  * `prepara` porta la cartella in vista prima che cada (vedi useProfondita).
  */
 export function useDossier(
-  schedario: RefObject<HTMLOListElement | null>,
-  prepara: (i: number, cartella: Folder) => Promise<void> | null,
+  shelf: RefObject<HTMLOListElement | null>,
+  prepare: (i: number, folder: Folder) => Promise<void> | null,
 ) {
-  const [attiva, setAttiva] = useState<number | null>(null);
-  const movimento = useMotionLevel();
-  const dialogo = useRef<HTMLDialogElement | null>(null);
-  const stato = useRef<Dossier<Folder>>(NO_DOSSIER);
+  const [active, setActive] = useState<number | null>(null);
+  const motionLevel = useMotionLevel();
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const state = useRef<Dossier<Folder>>(NO_DOSSIER);
   /** La cartella che cade: un'animazione, che nello stato puro non entra. */
-  const scivolata = useRef<Slide | null>(null);
+  const slideRef = useRef<Slide | null>(null);
 
-  const manda = useCallback(
-    function manda(evento: DossierEvent<Folder>) {
-      const prima = stato.current;
-      const dopo = dossierReducer(prima, evento);
-      if (dopo === prima) return;
-      stato.current = dopo;
-      const p = prima.run;
-      const c = dopo.run;
-      const { gen } = dopo;
+  const send = useCallback(
+    function send(event: DossierEvent<Folder>) {
+      const before = state.current;
+      const after = dossierReducer(before, event);
+      if (after === before) return;
+      state.current = after;
+      const p = before.run;
+      const c = after.run;
+      const { gen } = after;
 
       /* Il clic. L'archivio inerte da subito, perche' sotto la cartella caduta
          c'e' la faccia della precedente, e il contenuto nel DOM da subito. Se
@@ -52,13 +52,13 @@ export function useDossier(
          svelta, e la cartella cade quando e' ferma. */
       if (!p) {
         if (!c) return;
-        schedario.current?.setAttribute("inert", "");
+        shelf.current?.setAttribute("inert", "");
         // La barra in basso resta finche' non arriva il velo (vedi sezioni/barra.css).
         document.documentElement.setAttribute("data-dossier-in-progress", "");
-        setAttiva(c.i);
-        const attesa = c.motion === "quattro-tempi" ? prepara(c.i, c.folder) : null;
-        if (attesa) void attesa.then(() => manda({ type: "cade", gen }));
-        else manda({ type: "cade", gen });
+        setActive(c.i);
+        const pending = c.motion === "four-beats" ? prepare(c.i, c.folder) : null;
+        if (pending) void pending.then(() => send({ type: "fall", gen }));
+        else send({ type: "fall", gen });
         return;
       }
 
@@ -66,87 +66,87 @@ export function useDossier(
          esplicito su «Apri il caso»: la faccia cliccata non lo prende, e il
          ritorno nativo del dialog finirebbe su body. */
       if (!c) {
-        scivolata.current?.stop();
-        scivolata.current = null;
-        schedario.current?.removeAttribute("inert");
+        slideRef.current?.stop();
+        slideRef.current = null;
+        shelf.current?.removeAttribute("inert");
         document.documentElement.removeAttribute("data-dialog-open");
         document.documentElement.removeAttribute("data-dossier-in-progress");
         p.folder.openButton.focus({ preventScroll: true });
-        if (p.openAfter) manda({ type: "apri", ...p.openAfter });
+        if (p.openAfter) send({ type: "open", ...p.openAfter });
         return;
       }
 
-      const dialog = dialogo.current;
+      const dialog = dialogRef.current;
       /* Tempo 1, con la cartella davanti e in vista. data-dialog-open da qui:
          Lenis si ferma prima che la cartella cada, e lo scroll non riscrive
          `--profondita` mentre cade. */
       if (c.fall && !p.fall) {
         document.documentElement.setAttribute("data-dialog-open", "");
-        scivolata.current = slide(c.folder, c.motion);
+        slideRef.current = slide(c.folder, c.motion);
       }
       // Tempi 3 e 4: il reducer li avvia quando ci sono la caduta e il contenuto.
       if (c.started && !p.started && dialog) {
-        void scivolata.current?.open(dialog).then(() => manda({ type: "aperta", gen }));
+        void slideRef.current?.open(dialog).then(() => send({ type: "opened", gen }));
       }
-      if (c.phase === "chiude" && p.phase !== "chiude" && dialog) {
-        void scivolata.current?.close(dialog);
+      if (c.phase === "closing" && p.phase !== "closing" && dialog) {
+        void slideRef.current?.close(dialog);
       }
       /* Il close del dialog, da qualunque parte arrivi. Il close watcher (al
          secondo Esc, o col gesto indietro di Android) chiude il dialog da solo,
          anche a chiusura orchestrata gia' partita: quello che resta del foglio
          si salta sempre, e si passa alla risalita. Chiusa da chiudi(), il
          foglio e' gia' lasciato e rifarlo non cambia niente. */
-      if (c.phase === "risale" && p.phase !== "risale") {
-        if (dialog) scivolata.current?.releaseSheet(dialog);
-        void (scivolata.current?.rise() ?? Promise.resolve()).then(() => manda({ type: "ferma", gen }));
+      if (c.phase === "rising" && p.phase !== "rising") {
+        if (dialog) slideRef.current?.releaseSheet(dialog);
+        void (slideRef.current?.rise() ?? Promise.resolve()).then(() => send({ type: "settled", gen }));
       }
     },
-    [schedario, prepara],
+    [shelf, prepare],
   );
 
-  const apri = useCallback(
-    (i: number, cartella: Folder) =>
-      manda({ type: "apri", i, folder: cartella, motion: movimento === "none" ? "dissolvenza" : "quattro-tempi" }),
-    [manda, movimento],
+  const open = useCallback(
+    (i: number, folder: Folder) =>
+      send({ type: "open", i, folder, motion: motionLevel === "none" ? "fade" : "four-beats" }),
+    [send, motionLevel],
   );
 
-  const chiudi = useCallback(() => manda({ type: "chiudi" }), [manda]);
+  const close = useCallback(() => send({ type: "close" }), [send]);
 
-  const alClose = useCallback(() => {
-    setAttiva(null);
-    manda({ type: "chiusa" });
-  }, [manda]);
+  const onClose = useCallback(() => {
+    setActive(null);
+    send({ type: "closed" });
+  }, [send]);
 
   useEffect(() => {
-    if (attiva !== null) manda({ type: "montata" });
-  }, [attiva, manda]);
+    if (active !== null) send({ type: "mounted" });
+  }, [active, send]);
 
   /* Esc fra il clic e showModal(): la cartella cade e il dialog non c'e'
      ancora, quindi niente cancel. Non si perde: si chiude appena aperta. */
   useEffect(() => {
-    const alTasto = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || dialogo.current?.open) return;
-      manda({ type: "esc" });
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || dialogRef.current?.open) return;
+      send({ type: "esc" });
     };
-    document.addEventListener("keydown", alTasto);
-    return () => document.removeEventListener("keydown", alTasto);
-  }, [manda]);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [send]);
 
   /* Smontato a meta': niente pagina bloccata ne' archivio inerte. */
   useEffect(() => {
-    const lista = schedario.current;
-    const dialog = dialogo.current;
+    const list = shelf.current;
+    const dialog = dialogRef.current;
     return () => {
-      if (!stato.current.run) return;
-      stato.current = dossierReducer(stato.current, { type: "smonta" });
-      scivolata.current?.stop();
-      scivolata.current = null;
+      if (!state.current.run) return;
+      state.current = dossierReducer(state.current, { type: "unmount" });
+      slideRef.current?.stop();
+      slideRef.current = null;
       if (dialog?.open) dialog.close();
-      lista?.removeAttribute("inert");
+      list?.removeAttribute("inert");
       document.documentElement.removeAttribute("data-dialog-open");
       document.documentElement.removeAttribute("data-dossier-in-progress");
     };
-  }, [schedario]);
+  }, [shelf]);
 
-  return { attiva, dialogo, apri, chiudi, alClose };
+  return { active, dialogRef, open, close, onClose };
 }

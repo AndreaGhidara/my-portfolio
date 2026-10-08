@@ -24,11 +24,11 @@ export type ContactFormCopy = {
  * perche' il colore da solo non basta a dire com'e' andata: c'e' chi non lo
  * distingue, e c'e' chi guarda lo schermo di sbieco al sole.
  */
-function SegnoEsito({ esito }: { esito: "success" | "error" }) {
+function OutcomeMark({ outcome }: { outcome: "success" | "error" }) {
   return (
     <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false">
       <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
-      {esito === "success" ? (
+      {outcome === "success" ? (
         <path
           d="M6 10.4l2.6 2.6L14.2 7.4"
           fill="none"
@@ -175,7 +175,7 @@ export function ContactForm({ copy, email }: { copy: ContactFormCopy; email: str
           errore che dice "scrivimi via email" senza dare l'email lascia la
           persona a cercarsela, ed e' il momento in cui se ne va. */}
       <p role="status" aria-live="polite" data-contact-outcome data-outcome={state}>
-        {state !== "idle" && <SegnoEsito esito={state} />}
+        {state !== "idle" && <OutcomeMark outcome={state} />}
         <span>
           {state === "success" ? copy.status.success : state === "error" ? copy.status.error : ""}
           {state === "error" && (

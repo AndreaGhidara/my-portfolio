@@ -93,7 +93,7 @@ export function poseAt(i: number): Pose {
   return POSES[i % POSES.length];
 }
 
-const limita = (v: number) => Math.min(1, Math.max(0, v));
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
 /**
  * Il tracciato SVG dell'onda che passa per `punti`. Fra due punti `onde` gobbe
@@ -106,14 +106,14 @@ const limita = (v: number) => Math.min(1, Math.max(0, v));
  * fossero tutti lunghi uguali; non lo sono (l'ingresso, l'arrivo piu' stretto),
  * e senza questa continuita' l'onda fa uno spigolo proprio li'.
  */
-export function wavePath(punti: readonly TrackPoint[], ampiezza: number, onde: number): string {
-  let d = `M${punti[0][0]},${punti[0][1]}`;
-  let verso = -1;
-  let pendenza: number | null = null;
-  for (let i = 0; i < punti.length - 1; i++) {
-    const [ax, ay] = punti[i];
-    const [bx, by] = punti[i + 1];
-    const n = i === 0 ? 1 : onde;
+export function wavePath(points: readonly TrackPoint[], amplitude: number, waves: number): string {
+  let d = `M${points[0][0]},${points[0][1]}`;
+  let sign = -1;
+  let slope: number | null = null;
+  for (let i = 0; i < points.length - 1; i++) {
+    const [ax, ay] = points[i];
+    const [bx, by] = points[i + 1];
+    const n = i === 0 ? 1 : waves;
     for (let k = 0; k < n; k++) {
       const xa = ax + ((bx - ax) * k) / n;
       const ya = ay + ((by - ay) * k) / n;
@@ -121,14 +121,14 @@ export function wavePath(punti: readonly TrackPoint[], ampiezza: number, onde: n
       const yb = ay + ((by - ay) * (k + 1)) / n;
       const w = xb - xa;
       const c1y =
-        pendenza === null ? ya + (yb - ya) / 3 + verso * ampiezza : ya + (pendenza * w) / 3;
-      const c2y = ya + (2 * (yb - ya)) / 3 + verso * ampiezza;
+        slope === null ? ya + (yb - ya) / 3 + sign * amplitude : ya + (slope * w) / 3;
+      const c2y = ya + (2 * (yb - ya)) / 3 + sign * amplitude;
       d += ` C${xa + w / 3},${c1y} ${xa + (2 * w) / 3},${c2y} ${xb},${yb}`;
       // Un tratto largo zero (fogli ancora in colonna, tutti allo stesso x) non
       // ha una pendenza: dividere darebbe Infinity o NaN, che il browser
       // rifiuta. Si tiene quella di prima, e il tratto degenere resta un punto.
-      if (w !== 0) pendenza = (yb - c2y) / (w / 3);
-      verso = -verso;
+      if (w !== 0) slope = (yb - c2y) / (w / 3);
+      sign = -sign;
     }
   }
   return d;
@@ -143,14 +143,14 @@ export function wavePath(punti: readonly TrackPoint[], ampiezza: number, onde: n
  */
 export function travel({
   track,
-  stage: palco,
-  tail: coda,
+  stage,
+  tail,
 }: {
   track: number;
   stage: number;
   tail: number;
 }): number {
-  return Math.max(0, track - palco * (1 + coda));
+  return Math.max(0, track - stage * (1 + tail));
 }
 
 /**
@@ -161,30 +161,30 @@ export function travel({
  * piccolo salto mentre si accende. Si chiama a ogni fotogramma: solo conti.
  */
 export function phases({
-  done: fatta,
-  travel: viaggio,
-  tail: coda,
-  height: altezza,
+  done,
+  travel: travelPx,
+  tail,
+  height,
 }: {
   done: number;
   travel: number;
   tail: number;
   height: number;
 }) {
-  const { filled: riempito, lit: acceso, falls: cade } = TRACK_PARAMS.timings;
-  const lunghezzaCoda = coda * altezza;
+  const { filled, lit, falls } = TRACK_PARAMS.timings;
+  const tailPx = tail * height;
   // Un viaggio o una coda nulli sono gia' compiuti: senza, 0/0 da' NaN e il
   // NaN finisce dritto in una custom property.
-  const p = viaggio > 0 ? limita(fatta / viaggio) : 1;
-  const q = lunghezzaCoda > 0 ? limita((fatta - viaggio) / lunghezzaCoda) : 1;
-  const luce = limita((q - riempito) / (acceso - riempito));
+  const p = travelPx > 0 ? clamp01(done / travelPx) : 1;
+  const q = tailPx > 0 ? clamp01((done - travelPx) / tailPx) : 1;
+  const light = clamp01((q - filled) / (lit - filled));
   return {
     p,
     q,
-    filled01: limita(q / riempito),
-    light: luce,
-    fall: limita((q - cade) / (1 - cade)),
-    jolt: Math.sin(Math.PI * luce),
+    filled01: clamp01(q / filled),
+    light,
+    fall: clamp01((q - falls) / (1 - falls)),
+    jolt: Math.sin(Math.PI * light),
   };
 }
 
@@ -197,9 +197,9 @@ export function phases({
  */
 export function filledLine({
   x,
-  width: larghezza,
-  arrivalEdge: bordoArrivo,
-  arrivalEnd: fineArrivo,
+  width,
+  arrivalEdge,
+  arrivalEnd,
   q,
 }: {
   x: number;
@@ -208,24 +208,24 @@ export function filledLine({
   arrivalEnd: number;
   q: number;
 }): number {
-  const pieno01 = limita(q / TRACK_PARAMS.timings.filled);
-  if (pieno01 >= 1) return Math.max(0, fineArrivo);
-  const centro = x + larghezza / 2;
-  const varco = larghezza * TRACK_PARAMS.gap;
-  return Math.max(0, Math.min(centro, bordoArrivo - varco) + pieno01 * varco);
+  const filled01 = clamp01(q / TRACK_PARAMS.timings.filled);
+  if (filled01 >= 1) return Math.max(0, arrivalEnd);
+  const centre = x + width / 2;
+  const gap = width * TRACK_PARAMS.gap;
+  return Math.max(0, Math.min(centre, arrivalEdge - gap) + filled01 * gap);
 }
 
 /** Una tappa e' arrivata quando il suo centro e' entro la soglia dal centro dello schermo. */
 export function arrived({
-  stopCentre: centroTappa,
+  stopCentre,
   x,
-  width: larghezza,
+  width,
 }: {
   stopCentre: number;
   x: number;
   width: number;
 }): boolean {
-  return centroTappa < x + larghezza / 2 + larghezza * TRACK_PARAMS.arrivalThreshold;
+  return stopCentre < x + width / 2 + width * TRACK_PARAMS.arrivalThreshold;
 }
 
 /**
@@ -237,14 +237,14 @@ export function arrived({
  */
 export function trackRoute({
   n,
-  sheet: foglio,
-  air: aria,
-  arrival: arrivo,
+  sheet,
+  air,
+  arrival,
 }: {
   n: number;
   sheet: number;
   air: number;
   arrival: number;
 }): number {
-  return (n - 0.5) * foglio + n * aria + arrivo / 2;
+  return (n - 0.5) * sheet + n * air + arrival / 2;
 }
