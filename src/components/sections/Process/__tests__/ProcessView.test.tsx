@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { ProcessView, type ProcessViewProps } from "../ProcessView";
 import { processDeliveries } from "@/content/process";
 
@@ -21,6 +21,14 @@ const props: ProcessViewProps = {
 };
 
 describe("ProcessView", () => {
+
+  it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
+    render(<ProcessView {...props} />);
+    const sezione = screen.getByRole("region", { name: props.title });
+    const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
+    expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
+    expect(titolo).toHaveClass("titolo-sezione");
+  });
   it("le consegne sono una lista ordinata: «in quest'ordine» è metà del titolo", () => {
     // Non quattro riquadri. L'ordine e' l'informazione, e una lista ordinata e'
     // il modo in cui arriva anche a chi la pagina non la vede.
@@ -73,10 +81,5 @@ describe("ProcessView", () => {
     for (const art of container.querySelectorAll("[data-process-art]")) {
       expect(art).toHaveAttribute("aria-hidden", "true");
     }
-  });
-
-  it("il filo attraversa la sezione", () => {
-    const { container } = render(<ProcessView {...props} />);
-    expect(container.querySelector('[data-thread="process"]')).not.toBeNull();
   });
 });

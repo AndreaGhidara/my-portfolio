@@ -1,18 +1,13 @@
 import { DeskStage } from "./DeskStage";
-import { Practice } from "./Practice";
 import type { DeskLayerData } from "./DeskTable";
-
-export type ServiceItem = { id: string; title: string; description: string };
+import { CassettaView } from "./cassetta/CassettaView";
+import type { TestiCassetta } from "./cassetta/tipi";
 
 export type ServicesViewProps = {
   eyebrow: string;
   stageTitle: string;
   stageLead: string;
   centre: string;
-  /** Il titolino sopra i quattro strati. Si vede solo sotto i 1024px: da
-      desktop gli strati arrivano uno alla volta con la camera, e un titolo
-      fisso sopra la scena sarebbe una didascalia che non aspetta nessuno. */
-  composto: string;
   /** Il nome del comando sul post-it bianco. Non e' un'etichetta del tavolo:
    *  e' la ventiquattresima cosa, quella che si preme. */
   blank: string;
@@ -20,59 +15,47 @@ export type ServicesViewProps = {
    *  che qualcuno lo prema. */
   note: string;
   punch: string;
-  practice: string;
-  intro: string;
   layers: DeskLayerData[];
-  items: ServiceItem[];
+  cassetta: { eyebrow: string; title: string; lead: string; testi: TestiCassetta };
 };
 
 /**
- * La risposta alle quattro frasi della sezione precedente. Non e' un elenco di
- * risposte: e' un tavolo, e la risposta e' "qualunque delle quattro sia la tua,
- * il lavoro e' questo tavolo qui".
+ * Il tavolo: tutto quello che sta sotto un sito finito. I quattro servizi, uno
+ * per uno, li stampa la stampante della sezione sopra.
  *
- * "E in pratica?" viene dopo, ed e' deliberatamente separabile: il tavolo e' lo
- * spettacolo, quella scena e' la sostanza, e conserva la risposta 1:1 alle
- * quattro voci. Costa una scena — quattro voci alternate testo|disegno, con gli
- * stessi oggetti del tavolo ingranditi — e non piu' un elenco asciutto. Se un
- * giorno pesa, si toglie senza toccare il tavolo.
+ * Sotto il tavolo c'era «E in pratica?», le quattro voci con i loro disegni e
+ * una freccia che le attraversava. E' stata tolta: le quattro descrizioni
+ * adesso si leggono sullo scontrino. Al suo posto c'e' la cassetta degli
+ * attrezzi, cioe' con cosa lo costruisco.
  */
 export function ServicesView({
   eyebrow,
   stageTitle,
   stageLead,
   centre,
-  composto,
   blank,
   note,
   punch,
-  practice,
-  intro,
   layers,
-  items,
+  cassetta,
 }: ServicesViewProps) {
   return (
-    <section id="services" className="relative">
-      {/* Niente <ThreadSegment> qui: in questa sezione il filo SONO i cavi, dentro
-          il tavolo. Due tratti sovrapposti sarebbero due fili, ed e' esattamente
-          la cosa che il concept vieta. */}
+    // Il nome della sezione e' il titolo del tavolo: l'id sta in DeskStage.
+    // Scritto a mano in tutti e due i posti perche' DeskStage e' un modulo
+    // client, e una costante esportata da li' qui arriverebbe come riferimento
+    // client invece che come stringa.
+    <section id="services" aria-labelledby="titolo-services" className="relative">
       <DeskStage
         eyebrow={eyebrow}
         title={stageTitle}
         lead={stageLead}
         centre={centre}
-        composto={composto}
         blank={blank}
         note={note}
         punch={punch}
         layers={layers}
       />
-
-      {/* Il palco e' largo 74rem e non 64: non e' una colonna di lettura, e'
-          una scena in cui un braccio deve poter oscillare. Il testo dentro
-          resta a 36ch. La misura e' anche quella su cui il gesto e' stato
-          calibrato, cosi' i numeri partono vicini al punto giusto. */}
-      <Practice practice={practice} intro={intro} items={items} />
+      <CassettaView {...cassetta} />
     </section>
   );
 }

@@ -8,7 +8,6 @@ import { journey } from "../journey";
 import { metrics, metricById } from "../metrics";
 import { site } from "../site";
 import { deskLayers } from "../desk";
-import { practiceBlocks, practiceScenes } from "../practice";
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
@@ -59,12 +58,25 @@ describe("servizi", () => {
       expect(itKeys).toContain(`services.list.${service.id}.description`);
     }
   });
+
+  it("ogni servizio ha fra quattro e sei pezzi, scritti in entrambe le lingue", () => {
+    // Sono le voci dello scontrino e i richiami della tavola: la tavola ha sei
+    // posti, e sotto i quattro il disegno resta mezzo vuoto.
+    for (const service of services) {
+      expect(service.pezzi.length, service.id).toBeGreaterThanOrEqual(4);
+      expect(service.pezzi.length, service.id).toBeLessThanOrEqual(6);
+      for (const pezzo of service.pezzi) {
+        expect(itKeys).toContain(`services.list.${service.id}.pezzi.${pezzo}`);
+        expect(enKeys).toContain(`services.list.${service.id}.pezzi.${pezzo}`);
+      }
+    }
+  });
 });
 
 describe("lavori", () => {
   it("sono quattro, e uno solo e' coperto da accordo", () => {
-    // CustomerTrack e' uscito — costruita per intero e mai messa online, il
-    // dominio non risolve, e un caso senza utenti non prova niente — e al suo
+    // CustomerTrack e' uscito (costruita per intero e mai messa online, il
+    // dominio non risolve, e un caso senza utenti non prova niente) e al suo
     // posto e' entrato il lavoro di adesso, che non si puo' nominare. E' anche
     // l'unico modo di far entrare qui dentro qualcosa che non venga da D.lab,
     // finita ad aprile: senza, la sezione racconterebbe solo un posto lasciato.
@@ -72,6 +84,29 @@ describe("lavori", () => {
     const senzaNome = works.filter((w) => !w.url && !w.screenshot);
     expect(senzaNome).toHaveLength(1);
     expect(senzaNome[0].id).toBe("riservato");
+  });
+
+  it("lo stato e' scritto, non ricavato dall'anno: in corso solo il lavoro di adesso", () => {
+    expect(Object.fromEntries(works.map((w) => [w.id, w.stato]))).toEqual({
+      riservato: "in-corso",
+      bdroppy: "consegnato",
+      aidify: "consegnato",
+      visualboost: "consegnato",
+    });
+  });
+
+  it("la pratica ha le sue etichette in entrambe le lingue", () => {
+    const chiavi = [
+      "archivio", "pratica", "comEra", "cliente", "anno", "stato", "online", "allegato",
+      "rilevato", "rilevatoFinora", "stima", "consegnato", "inCorso", "firmaNome", "firmaRuolo",
+    ];
+    for (const dizionario of [it_, en_]) {
+      for (const chiave of chiavi) {
+        const valore = valueAt(dizionario, `works.labels.${chiave}`);
+        expect(typeof valore, `works.labels.${chiave}`).toBe("string");
+        expect(valore).not.toBe("");
+      }
+    }
   });
 
   it("ogni caso dice il lavoro, la scelta e la conduzione in entrambe le lingue", () => {
@@ -209,53 +244,6 @@ describe("il tavolo", () => {
   it("la sezione conserva i quattro testi lunghi: il tavolo non li sostituisce", () => {
     for (const id of ["sites", "ecommerce", "webapp", "ai"]) {
       expect(itKeys).toContain(`services.list.${id}.description`);
-    }
-  });
-});
-
-/**
- * Le illustrazioni di «E in pratica?» non sono disegni nuovi: sono gli oggetti
- * del tavolo, citati per id e ripresi da vicino. E' quella la ragione per cui
- * qui non si dichiarano ne' sagome ne' campioni: si dichiara un nome.
- */
-describe("E in pratica", () => {
-  it("risponde alle quattro voci, nel loro ordine", () => {
-    expect(practiceBlocks.map((b) => b.service)).toEqual(services.map((s) => s.id));
-  });
-
-  it("ogni disegno e' un oggetto che sta davvero sul tavolo", () => {
-    const sul = new Set(deskLayers.flatMap((l) => l.objects).map((o) => o.id));
-    for (const block of practiceBlocks) {
-      for (const shape of block.shapes) {
-        expect(sul.has(shape.object), `«${shape.object}» non sta sul tavolo`).toBe(true);
-      }
-    }
-  });
-
-  it("ogni disegno porta il suo campione: a questa misura una sagoma nuda e' vuota", () => {
-    // Sul tavolo un oggetto senza campione ci sta (hosting e il post-it bianco
-    // ne sono senza, e con una ragione scritta). Qui no: il disegno e' largo
-    // duecentocinquanta pixel, e a quella misura un contorno vuoto non e' un
-    // oggetto, e' un buco.
-    for (const scene of practiceScenes) {
-      for (const drawing of scene.drawings) {
-        expect(drawing.sample, `«${drawing.object}» non ha un campione`).toBeTruthy();
-      }
-    }
-  });
-
-  it("i lati si alternano: e' il vincolo da cui dipende tutto il resto", () => {
-    // La freccia deve passare SOLO sopra i disegni, mai sopra il testo. Due
-    // voci di fila con il disegno dallo stesso lato e la strada attraversa un
-    // paragrafo.
-    expect(practiceBlocks.map((b) => b.lato)).toEqual(["dx", "sx", "dx", "sx"]);
-  });
-
-  it("dentro una voce i disegni non stanno tutti sullo stesso piano", () => {
-    // Si sovrappongono apposta: e' una pila sulla scrivania, non una fila.
-    for (const block of practiceBlocks) {
-      const piani = new Set(block.shapes.map((s) => s.layer));
-      expect(piani.size).toBe(block.shapes.length);
     }
   });
 });

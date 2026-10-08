@@ -21,7 +21,7 @@ export type ContactFormCopy = {
 /**
  * Il segno dell'esito. Sta fuori dal testo e con aria-hidden: la regione viva
  * annuncia quello che LEGGE, e un'icona annunciata sarebbe rumore. Serve
- * perche' il colore da solo non basta a dire com'e' andata — c'e' chi non lo
+ * perche' il colore da solo non basta a dire com'e' andata: c'e' chi non lo
  * distingue, e c'e' chi guarda lo schermo di sbieco al sole.
  */
 function SegnoEsito({ esito }: { esito: "success" | "error" }) {
@@ -52,7 +52,7 @@ function SegnoEsito({ esito }: { esito: "success" | "error" }) {
 
 /**
  * I campi non sono piu' riquadri ma righe su cui si scrive, e il vestito sta
- * in tokens.css: un campo senza contorno ha due cose da difendere che una
+ * in sezioni/contatti.css: un campo senza contorno ha due cose da difendere che una
  * scatola dava gratis, il fuoco della tastiera e la dimensione del bersaglio
  * sotto il pollice. Due prove le verificano nel foglio di stile, perche' nel
  * DOM non si vedono.
@@ -167,7 +167,7 @@ export function ContactForm({ copy, email }: { copy: ContactFormCopy; email: str
           visibile, e restava li' a chiedersi se il modulo fosse rotto. Adesso
           e' un riquadro con un segno e un colore.
 
-          L'elemento resta nel DOM anche da fermo — vuoto, ma presente: una
+          L'elemento resta nel DOM anche da fermo, vuoto ma presente: una
           regione viva che nasce nel momento in cui ha qualcosa da dire, certi
           screen reader non la leggono affatto.
 

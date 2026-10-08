@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import { useMotionLevel, type MotionLevel } from "./motionPolicy";
+import { quandoLibero } from "./quandoLibero";
 import type * as Presets from "./presets";
 
 /** Quello che una sezione riceve per costruire le sue animazioni. */
@@ -26,7 +27,7 @@ export type Scena = {
  *
  * L'attesa è `requestIdleCallback` con un tetto: se il browser non trova mai un
  * momento libero, dopo 800ms si parte lo stesso. Nessuna animazione qui è
- * immediata — la più presta è quella dell'apertura, e mezzo secondo di ritardo
+ * immediata: la più presta è quella dell'apertura, e mezzo secondo di ritardo
  * su una cosa che dura mezzo secondo non la nota nessuno.
  *
  * La pulizia la fa `gsap.context`: revert allo smontaggio e a ogni cambio di
@@ -35,7 +36,7 @@ export type Scena = {
 /**
  * In fase di layout e non dopo, e non e' un dettaglio: React stacca i `ref`
  * DOPO le pulizie di layout e PRIMA di quelle passive. Chi smonta leggendo
- * `scope.current` — il palco del tavolo toglie due custom property da li' —
+ * `scope.current` (il palco del tavolo toglie due custom property da li')
  * con un `useEffect` trovava null e non puliva niente. Sul server il layout
  * effect non esiste, quindi si ripiega su useEffect: tanto li' non gira.
  * Qui dentro non si fa lavoro pesante: si prenota soltanto il momento libero
@@ -77,15 +78,11 @@ export function useSectionAnimation(
       }, scope.current ?? undefined);
     };
 
-    const suIdle = typeof window !== "undefined" && "requestIdleCallback" in window;
-    const id = suIdle
-      ? window.requestIdleCallback(() => void avvia(), { timeout: 800 })
-      : window.setTimeout(() => void avvia(), 200);
+    const annulla = quandoLibero(() => void avvia());
 
     return () => {
       vivo = false;
-      if (suIdle) window.cancelIdleCallback(id as number);
-      else window.clearTimeout(id as number);
+      annulla();
       // Prima quello che ha registrato `build` (ascoltatori, guide), poi il
       // contesto: al contrario, il revert toglierebbe di mezzo gli elementi su
       // cui la pulizia deve ancora lavorare.

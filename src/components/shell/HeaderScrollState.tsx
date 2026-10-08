@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-
-/** Oltre questa soglia l'header prende il suo fondo: qualche pixel di
- *  margine evita che un rimbalzo dello scroll faccia sfarfallare la barra. */
-const TOP_THRESHOLD = 8;
+import { SOGLIA_IN_CIMA } from "./inCima";
 
 /**
  * Tiene aggiornato data-at-top su <html>, che TopStateScript ha già
@@ -13,7 +10,7 @@ const TOP_THRESHOLD = 8;
  * perché da lì in poi ha del contenuto che gli passa sotto.
  *
  * Ascolta lo scroll nativo e non Lenis di proposito: Lenis è attivo solo al
- * livello di movimento "full", mentre l'header serve identico ovunque —
+ * livello di movimento "full", mentre l'header serve identico ovunque;
  * Lenis muove comunque lo scroll della finestra, quindi l'evento arriva.
  */
 export function HeaderScrollState() {
@@ -21,7 +18,7 @@ export function HeaderScrollState() {
     const root = document.documentElement;
 
     const sync = () => {
-      if (window.scrollY < TOP_THRESHOLD) root.setAttribute("data-at-top", "");
+      if (window.scrollY < SOGLIA_IN_CIMA) root.setAttribute("data-at-top", "");
       else root.removeAttribute("data-at-top");
     };
 

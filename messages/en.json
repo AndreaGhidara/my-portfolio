@@ -19,108 +19,79 @@
     "scrollHint": "Scroll",
     "avatarAlt": "Illustrated portrait of Andrea Ghidara"
   },
-  "seeking": {
-    "eyebrow": "Let's start here",
-    "title": "The five requests I get asked most often",
-    "intro": "They rarely turn up alone: a single project usually holds most of them, and deciding which to answer first is already designing it. I rewrote them, they aren't anyone's mail, but the answers are the real ones.",
-    "labels": {
-      "tipo": "What kind of work it is"
-    },
-    "casella": {
-      "etichettaDa": "From",
-      "etichettaA": "To",
-      "da": "a request like yours",
-      "a": "Andrea",
-      "vuoto": "Open one. The replies are the ones I actually write: not a quote, but where I'd start. And one in five ends with «you don't need this».",
-      "firma": "Andrea Ghidara",
-      "ruolo": "Web developer · Full stack"
-    },
-    "list": {
-      "capire": {
-        "nome": "Being understood",
-        "oggetto": "Our site doesn't reflect our direction",
-        "anteprima": "We have a site but the people who land on it don't understand what we actually do. We'd like to redo it, but we don't know where to start…",
-        "et": "What it usually means",
-        "titolo": "It's almost never a wording problem.",
-        "etPrima": "A test you can run today, in ten minutes",
-        "prima": "Write down the three questions people ask you on the phone before they buy. Then open your homepage and count how many it answers in the first screenful. If it's none or one, the problem isn't how it's written, it's the order it's in: the site describes how the company is organised instead of answering the person who just arrived.",
-        "tipo": "The real work is deciding what comes first, not producing copy. A few weeks, and you don't need to redo the design to find out.",
-        "cta": "This one's mine, write to me"
-      },
-      "strumento": {
-        "nome": "A tool",
-        "oggetto": "One step costs us hours a week",
-        "anteprima": "What we have works, but there are things we redo by hand every week. Can it be automated?",
-        "et": "What it usually means",
-        "titolo": "It's the only one of the five where you know if it's worth it before you start.",
-        "etPrima": "The maths you can do today",
-        "prima": "Hours a week, times what an hour of that person costs, times forty-five weeks. If the number that comes out isn't at least double what the tool costs, the step to automate is a different one.",
-        "tipo": "A small, self-standing piece, wired into what you already use. Then it gets calibrated: how you really need it only shows once it's in use, and from there it gets taken in.",
-        "cta": "This one's mine, write to me"
-      },
-      "aggiunta": {
-        "nome": "An addition",
-        "oggetto": "The platform is there, but it needs to do more",
-        "anteprima": "The platform is already there and it works, but we need a couple of new things. Roughly how long would it take?",
-        "et": "What it usually means",
-        "titolo": "Almost always the platform was built for the company you were, not the one you are.",
-        "etPrima": "The two numbers to compare",
-        "prima": "Count how many people use it today against how many used it in the first month, and how many things it does today against how many it did. If either number has doubled, what you're asking for isn't one more feature: it's the structure underneath that has to grow with you.",
-        "tipo": "It starts with reading, not writing: first you look at what already holds up, then you say whether what you're asking is an addition or the first piece of a new structure.",
-        "cta": "This one's mine, write to me"
-      },
-      "fulcro": {
-        "nome": "A hub",
-        "oggetto": "Every morning I log into five different tools",
-        "anteprima": "Five logins, five accounts, and none of them talk to each other. We'd like one single thing, built around us…",
-        "et": "What it usually means",
-        "titolo": "The problem isn't the five logins. It's that nobody knows which of the five holds the right number.",
-        "etPrima": "The number to look up twice",
-        "prima": "Take a number you need every day, open orders or active clients, and look it up in every tool where it might live. If you get two different answers, that's the job: not merging the logins, deciding which one is right.",
-        "tipo": "In stages, and the first one has to genuinely replace something. One piece that people actually use is worth more than ten that are finished and switched off.",
-        "cta": "This one's mine, write to me"
-      },
-      "nonancora": {
-        "nome": "Not yet",
-        "oggetto": "I have an idea, but I don't know if it fits our processes",
-        "anteprima": "I have something in mind that would make our life easier, but I don't know if it's doable with what we use…",
-        "et": "What it usually means",
-        "titolo": "Nobody arrives knowing whether they need a tool or a platform.",
-        "etPrima": "A question you can answer on your own, today",
-        "prima": "If one single person disappeared from the company tomorrow, what would stop? That thing is where any sensible project starts, and it's almost always the same thing costing you too much time right now.",
-        "tipo": "None, for now. Answering that question is worth more than any quote, and you don't need me to do it.",
-        "cta": "Write to me anyway"
-      }
-    }
+  "scontrino": {
+    "eyebrow": "Services",
+    "title": "Pick one, and I'll print it",
+    "lead": "Press a key: out comes the receipt with the service, and next to it what you'll find inside.",
+    "hint": "The printer is ready: press a key.",
+    "tasti": "Pick the service to print",
+    "marca": "ANDREA GHIDARA · SERVICES",
+    "nome": "ANDREA GHIDARA",
+    "mestiere": "web development · full stack",
+    "numero": "No.",
+    "totale": "TOTAL",
+    "daParlarne": "LET'S TALK",
+    "parliamone": "Let's talk",
+    "strappa": "tear off ✂",
+    "disegno": "Technical drawing of “{titolo}”, with its parts: {pezzi}.",
+    "tavola": "SHEET",
+    "scala": "SCALE 1:1",
+    "firma": "A. GHIDARA"
   },
   "services": {
     "eyebrow": "The method",
-    "intro": "Each one stands on its own: you can ask me for just a site, or just the automation that saves you two hours a week. But they're built to fit, and together they become the place where the work actually happens. You start with the piece that weighs most, the rest gets added when it's needed.",
     "list": {
       "sites": {
         "title": "Sites and landing pages",
-        "description": "No bought themes filled with text. It starts from what a visitor has to understand in the first three seconds; structure, words and images follow from that. Then speed and indexing: the difference between having a site and being found."
+        "description": "No bought themes filled with text. It starts from what a visitor has to understand in the first three seconds; structure, words and images follow from that. Then speed and indexing: the difference between having a site and being found.",
+        "pezzi": {
+          "treSecondi": "the first 3 seconds",
+          "struttura": "structure",
+          "parole": "words",
+          "immagini": "images",
+          "velocita": "speed",
+          "indicizzazione": "indexing"
+        }
       },
       "ecommerce": {
         "title": "E-commerce",
-        "description": "I connect the catalogue to what you already run (back office, warehouse, courier) instead of asking you to update two systems by hand. Payments and shipping stay configurable: tomorrow you can switch provider without rebuilding the shop."
+        "description": "I connect the catalogue to what you already run (back office, warehouse, courier) instead of asking you to update two systems by hand. Payments and shipping stay configurable: tomorrow you can switch provider without rebuilding the shop.",
+        "pezzi": {
+          "catalogo": "catalogue",
+          "gestionale": "management system",
+          "magazzino": "warehouse",
+          "corriere": "courier",
+          "pagamenti": "payments",
+          "spedizioni": "shipping"
+        }
       },
       "webapp": {
         "title": "Web apps and platforms",
-        "description": "We start from the smallest version that stands up and put it in front of a real person early. Roles, permissions and subscriptions get built from the start: adding them later means rewriting."
+        "description": "We start from the smallest version that stands up and put it in front of a real person early. Roles, permissions and subscriptions get built from the start: adding them later means rewriting.",
+        "pezzi": {
+          "versionePiccola": "smallest version",
+          "utentiVeri": "real users",
+          "ruoli": "roles",
+          "permessi": "permissions",
+          "abbonamenti": "subscriptions"
+        }
       },
       "ai": {
         "title": "AI and automation",
-        "description": "Connected to your real data, not to a model that guesses. And one rule I don't negotiate: when the assistant doesn't know, it hands over to a person instead of inventing an answer."
+        "description": "Connected to your real data, not to a model that guesses. And one rule I don't negotiate: when the assistant doesn't know, it hands over to a person instead of inventing an answer.",
+        "pezzi": {
+          "dati": "your data",
+          "assistente": "the assistant",
+          "nonSa": "doesn't know?",
+          "persona": "a real person"
+        }
       }
     },
     "stageTitle": "Everything you don't see",
     "stageLead": "A finished website. From here on, everything underneath it.",
     "centre": "the project",
-    "composto": "What it's made of",
     "blank": "And yours, what is it? Write to me.",
     "punch": "What you call «a website» is the screen in the middle. The rest is the work behind it.",
-    "practice": "Four pieces, and they fit together",
     "layers": {
       "site": {
         "title": "The site",
@@ -169,6 +140,798 @@
           "care": "Upkeep"
         }
       }
+    },
+    "gioco": {
+      "comune": {
+        "barrette": "The four levels of the game",
+        "etichetta": "{numero} · {nome}",
+        "livelli": {
+          "schermo": "screen",
+          "logiche": "logic",
+          "pannello": "services",
+          "notte": "cloud"
+        },
+        "righe": {
+          "schermo": "First build the screen: colours, type, sections. Then unscrew it and see what's underneath.",
+          "logiche": "Behind the screen an order crosses six pieces of logic, and you move it on at each node. Or try to break the site.",
+          "pannello": "The site is live. A month after launch, in one minute: the lights come on, and someone steps in.",
+          "notte": "What keeps the site up even at three in the morning. It's set up in advance, and seen only when missing.",
+          "finale": "That's the whole round. Use the bars above to reopen any level."
+        }
+      },
+      "schermo": {
+        "attrezzi": "The tools",
+        "stato": {
+          "prova": "try",
+          "provato": "tried"
+        },
+        "attrezzo": {
+          "colori": {
+            "nome": "colors",
+            "titolo": "Palette",
+            "testo": "Five colors that talk: background, surface, text, accent, grey. The images follow them too."
+          },
+          "caratteri": {
+            "nome": "fonts",
+            "titolo": "The fonts",
+            "testo": "One for headings, one for reading. Swap the pair, watch the title."
+          },
+          "testi": {
+            "nome": "sizes",
+            "titolo": "The type sizes",
+            "testo": "Title, subtitle, paragraph: one scale that keeps everything in order."
+          },
+          "sezioni": {
+            "nome": "layout",
+            "titolo": "Sections",
+            "testo": "The same content, four ways to show it: each one says something different."
+          },
+          "immagini": {
+            "nome": "images",
+            "titolo": "The images",
+            "testo": "The first thing people see. Light to download, right for the business."
+          },
+          "telefono": {
+            "nome": "phone",
+            "titolo": "The phone",
+            "testo": "Most people will see it here first. Same site, made for six inches."
+          }
+        },
+        "palette": {
+          "bottega": "shop",
+          "notte": "night",
+          "salvia": "sage",
+          "cipria": "blush",
+          "oceano": "ocean",
+          "terracotta": "terracotta"
+        },
+        "scale": {
+          "compatta": "compact",
+          "equilibrata": "balanced",
+          "generosa": "generous"
+        },
+        "impaginazioni": {
+          "classica": "classic",
+          "manifesto": "manifesto",
+          "copertina": "cover",
+          "bento": "bento"
+        },
+        "illustrazioni": {
+          "pane": "loaf",
+          "vetrina": "window",
+          "torta": "cake",
+          "cornetto": "pastry"
+        },
+        "campione": {
+          "h1": "H1 · Warm bread",
+          "h2": "H2 · Cakes",
+          "p": "Paragraph: sourdough, wood oven."
+        },
+        "vista": {
+          "pc": "computer",
+          "cell": "phone"
+        },
+        "pronto": "The screen is done. <b>Undo the four screws</b> and see what's behind it.",
+        "tornaAlComputer": "Looks good here too. <b>Back to the computer</b>: one more thing to do.",
+        "vite": "undo screw {numero}",
+        "dietro": {
+          "testa": "behind the screen",
+          "occhiello": "you're in",
+          "testo": "Behind the screen you just built, the logic runs: every tap from a visitor follows a wire to a rule. Level two starts here.",
+          "ricomincia": "restart",
+          "ingresso": "the visitor taps",
+          "regola": "every tap is a written rule"
+        },
+        "sito": {
+          "nav": {
+            "pane": "Bread",
+            "torte": "Cakes",
+            "orari": "Hours",
+            "prenota": "Book"
+          },
+          "titolo": "Warm bread",
+          "titoloEm": "from six.",
+          "nota": "Sourdough, a wood oven, and the Sunday cake to book ahead.",
+          "cta": "Book the cake",
+          "schede": {
+            "pane": {
+              "titolo": "Bread",
+              "testo": "Six kinds, daily."
+            },
+            "torte": {
+              "titolo": "Cakes",
+              "testo": "Made to order."
+            },
+            "dove": {
+              "titolo": "Find us",
+              "testo": "Via Roma 12."
+            }
+          },
+          "bollo": "wood oven",
+          "fascia": "BREAD · CAKES · FOCACCIA · FROM SIX · SOURDOUGH · ",
+          "numero": "No. 01 · autumn",
+          "sfornato": "just baked",
+          "lato": "bread · cakes · buns",
+          "indirizzo": "Sourdough and a wood oven, at Via Roma 12.",
+          "aperto": "open",
+          "oggi": "today",
+          "quartiere": "local bakery",
+          "tipi": "breads,\nevery morning",
+          "prenotaTorta": "Book\nthe cake",
+          "giorni": "MTWTFSS"
+        }
+      },
+      "logiche": {
+        "titolo": "Behind the screen",
+        "regole": "rules",
+        "nodo": "node {numero} of 6 · {nome}",
+        "partenza": {
+          "occhiello": "the screen you built",
+          "indirizzo": "fornoaurora.it",
+          "nome": "Forno Aurora",
+          "menu": "bread · cakes · open",
+          "via": "via Roma 12",
+          "titolo": "Warm bread",
+          "titoloAccento": "from six.",
+          "testo": "Sourdough, wood oven, cakes to order.",
+          "prenota": "Book the cake",
+          "appuntoTitolo": "Book here",
+          "appuntoTesto": "Press it: behind the screen six pieces of logic start, and you follow each one."
+        },
+        "nodi": [
+          {
+            "nome": "Your account",
+            "titolo": "Who's ordering?",
+            "spiega": "First the bakery knows you: you find your past orders and never retype your details.",
+            "fai": "log in as Andrea",
+            "rompi": "fail 3 times",
+            "errore": "Wrong password, for the third time.",
+            "regola": {
+              "se": "three wrong tries in a row",
+              "allora": "the account pauses 15 minutes and a login link is sent"
+            }
+          },
+          {
+            "nome": "Catalogue",
+            "titolo": "Which cake?",
+            "spiega": "Cakes, prices and what's still available come from one place: what you see is true.",
+            "fai": "pick the Sacher",
+            "rompi": "pick the millefoglie",
+            "errore": "Sunday's millefoglie is sold out.",
+            "regola": {
+              "se": "a cake is sold out",
+              "allora": "it can't be picked; the site offers the closest one"
+            }
+          },
+          {
+            "nome": "Bookings",
+            "titolo": "For which day?",
+            "spiega": "Each day the bakery can make so many cakes: the calendar knows, and never promises what isn't there.",
+            "fai": "book Saturday",
+            "rompi": "book Sunday",
+            "errore": "Sunday is fully booked.",
+            "regola": {
+              "se": "the chosen day is full",
+              "allora": "offer the nearest free day: Saturday"
+            }
+          },
+          {
+            "nome": "Payments",
+            "titolo": "Deposit",
+            "spiega": "A 5 euro deposit holds the spot. Payment is where a mistake costs the most.",
+            "fai": "pay the deposit",
+            "rompi": "the card is declined",
+            "errore": "The bank declined the card.",
+            "regola": {
+              "se": "the payment fails",
+              "allora": "the cake stays held for 15 minutes and you never pay twice"
+            }
+          },
+          {
+            "nome": "Contacts",
+            "titolo": "Order email",
+            "spiega": "Once booked, an email goes out: the customer knows what, for when, and where to come.",
+            "fai": "send confirmation",
+            "rompi": "wrong address",
+            "errore": "«andrea@gmial.con» doesn't exist: the email would bounce.",
+            "regola": {
+              "se": "the address looks mistyped",
+              "allora": "it asks «did you mean gmail.com?» first"
+            }
+          },
+          {
+            "nome": "Your back office",
+            "titolo": "In the bakery's ledger",
+            "spiega": "The order lands where the bakery already works: no retyping, and it's listed by morning.",
+            "fai": "log the order",
+            "rompi": "order twice in a row",
+            "errore": "The same order arrived twice in one second.",
+            "regola": {
+              "se": "the same order arrives twice in a minute",
+              "allora": "only one stays, and the customer pays once"
+            }
+          }
+        ],
+        "scene": {
+          "email": "andrea@esempio.it",
+          "dentro": "in",
+          "torte": [
+            {
+              "nome": "Crostata",
+              "prezzo": "18 €"
+            },
+            {
+              "nome": "Sacher",
+              "prezzo": "24 €"
+            },
+            {
+              "nome": "Millefoglie",
+              "prezzo": "22 €"
+            }
+          ],
+          "finita": "gone",
+          "giorni": [
+            "M",
+            "T",
+            "W",
+            "T",
+            "F",
+            "S",
+            "S"
+          ],
+          "pieno": "full",
+          "importo": "5.00 €",
+          "carta": "•••• •••• •••• 4242",
+          "pagato": "paid",
+          "mailA": "to:",
+          "mailDa": "from: Forno Aurora",
+          "mailTitolo": "Your Sacher is booked.",
+          "mailTesto": "Saturday from 9 at via Roma 12. 5 € deposit received.",
+          "registro": [
+            [
+              "no.",
+              "cake",
+              "day",
+              "status"
+            ],
+            [
+              "0140",
+              "Crostata",
+              "fri",
+              "ready"
+            ],
+            [
+              "0141",
+              "Sacher",
+              "sat",
+              "oven"
+            ]
+          ],
+          "nuovo": [
+            "0142",
+            "Sacher",
+            "sat",
+            "new"
+          ]
+        },
+        "incidente": {
+          "se": "IF",
+          "allora": "THEN",
+          "salvato": "the site held. Now do it the right way."
+        },
+        "trovata": "rule found",
+        "giaRotto": "broken",
+        "avanti": "next: {nome}",
+        "stampa": "print the order",
+        "fine": {
+          "occhiello": "order received · rules found {trovate} of 6",
+          "titolo": "Six logic steps, one order",
+          "mancano": "Tap the nodes without ⚡ in the circuit to find the other rules.",
+          "tutte": "You tried to break it all, and the site held every time.",
+          "negozio": "FORNO AURORA",
+          "ordine": "ORDER NO. 0142 · ANDREA",
+          "giorni": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday"
+          ],
+          "caparra": "DEPOSIT 5.00 € PAID",
+          "laboratorio": "TICKET FOR THE KITCHEN",
+          "ricomincia": "restart",
+          "livello3": "level 3"
+        }
+      },
+      "pannello": {
+        "conta": {
+          "spento": "panel off",
+          "acceso": "on",
+          "avviso": "alert {n} of {totale}",
+          "fine": "end of month"
+        },
+        "salute": "site health · drops while a light stays on",
+        "servizi": {
+          "assistenza": "Support",
+          "automazioni": "Automation",
+          "numeri": "Numbers",
+          "trovare": "Being found",
+          "manutenzione": "Maintenance"
+        },
+        "coda": {
+          "attesa": "waiting",
+          "risolto": "{nome} · fixed",
+          "fine": "a month in a minute"
+        },
+        "eventi": [
+          {
+            "testo": "The security certificate expires in three days.",
+            "intervento": "renew",
+            "esito": "Renewed. The browser padlock stays locked."
+          },
+          {
+            "testo": "“I can't change my pickup day.” A customer, at 9 pm.",
+            "intervento": "reply",
+            "esito": "Answered, order moved to Sunday. She orders again."
+          },
+          {
+            "testo": "Half the visitors leave the cake page at step two.",
+            "intervento": "see the data",
+            "esito": "The phone field was required. Removed: the step now completes."
+          },
+          {
+            "testo": "Saturday morning: 40 orders to print for the kitchen.",
+            "intervento": "let the site do it",
+            "esito": "The sheet prints itself at 6, sorted by pickup time."
+          },
+          {
+            "testo": "On maps, Sunday's opening hours are still the old ones.",
+            "intervento": "fix it",
+            "esito": "Hours aligned everywhere: site, maps, profile."
+          },
+          {
+            "testo": "The catalogue page takes 4 seconds to load.",
+            "intervento": "lighten it",
+            "esito": "Smaller images and caching: now under a second."
+          }
+        ],
+        "spento": {
+          "occhiello": "the bakery's panel",
+          "titolo": "A month after launch, in one minute",
+          "spiega": "Five modules, one per service. Lights come on by themselves: tap the red one, read, act. The longer you wait, the lower the site's health.",
+          "calma": "the panel is off",
+          "accendi": "switch the panel on"
+        },
+        "acceso": {
+          "occhiello": "the panel is on",
+          "spia": {
+            "titolo": "A light just came on",
+            "spiega": "Tap the flashing module, up there.",
+            "calma": "the red module shows where to look"
+          },
+          "verde": {
+            "titolo": "All green",
+            "spiega": "Nothing yet. Wait: things arrive when they want to.",
+            "calma": "the site works alone"
+          }
+        },
+        "modulo": {
+          "occhiello": "module · {nome}",
+          "fatto": "Done.",
+          "cosa": "What's wrong",
+          "aPosto": "All fine here",
+          "altra": "Another light is on: look at the red module.",
+          "risolto": "fixed",
+          "avviso": "alert",
+          "nessuno": "no alerts on {nome}",
+          "aspetta": "wait for the next alert",
+          "niente": "nothing to do here"
+        },
+        "fine": {
+          "occhiello": "the month's report",
+          "bene": "Six alerts, and the site didn't notice",
+          "male": "Six alerts, and the site noticed a bit",
+          "spiega": "Health at month end: {salute}%. Every second with a light on counts: that's why someone checks the panel every day, not now and then.",
+          "avvisi": "{n, plural, one {# alert} other {# alerts}}",
+          "ricomincia": "start over",
+          "avanti": "level 4 · cloud"
+        }
+      },
+      "notte": {
+        "titolo": "The bakery's night",
+        "prepara": {
+          "occhiello": "11 pm · the bakery closes",
+          "titolo": "What do you set up before bed?",
+          "spiega": "Switch on what you want ready. Then the night runs alone.",
+          "vai": "go to sleep"
+        },
+        "corsa": {
+          "occhiello": "the night",
+          "titolo": "You sleep. The site doesn't.",
+          "spiega": "Watch the strip up there: green the site is up, red it's down.",
+          "zzz": "zzz"
+        },
+        "mattina": {
+          "occhiello": "7 am · the report",
+          "tutto": "Eight hours of eight. Nobody noticed.",
+          "ore": "The site was up {ore, number} hours of 8",
+          "spiegaTutto": "That's the whole point: infrastructure only shows when it's missing.",
+          "spiegaParte": "What went down wasn't ready. You set it up once, then it works every night.",
+          "rifai": "redo the night",
+          "meglio": "prepare better",
+          "finale": "the finale"
+        },
+        "cielo": {
+          "orologio": "bakery asleep · site awake",
+          "apre": "7 am · bakery opens"
+        },
+        "parato": "held",
+        "giu": "down",
+        "giuOre": "down {ore, number} h",
+        "giuMin": "down {min} min",
+        "voci": {
+          "dominio": "The domain",
+          "sicurezza": "Security",
+          "dati": "The data",
+          "copie": "Backups",
+          "dove": "Location",
+          "velocita": "Speed"
+        },
+        "eventi": {
+          "dominio": {
+            "fatto": "the fornoaurora.it domain expires",
+            "parato": "renewed on its own"
+          },
+          "sicurezza": {
+            "fatto": "2,000 passwords tried on the client area",
+            "parato": "locked after three tries"
+          },
+          "dati": {
+            "fatto": "a fault shuts the server down",
+            "parato": "data restarts intact"
+          },
+          "copie": {
+            "fatto": "an update wipes the catalogue",
+            "parato": "restored from the 3 am copy"
+          },
+          "dove": {
+            "fatto": "first customers visit from Brescia",
+            "parato": "server in Milan: instant"
+          },
+          "velocita": {
+            "fatto": "a post brings 800 people at once",
+            "parato": "pages ready, they hold"
+          }
+        }
+      },
+      "finale": {
+        "testa": "end · 4 levels of 4",
+        "alba": "You've seen everything\nyou don't see.",
+        "dopoAlba": "and at seven the bakery opens, as always",
+        "occhiello": "the full round",
+        "titolo": "A website is four layers",
+        "strati": {
+          "schermo": "screen · what you see",
+          "logiche": "logic · what it does",
+          "pannello": "services · how it stays alive",
+          "notte": "cloud · what keeps it standing"
+        },
+        "tornaAlSito": "back to site",
+        "parliamone": "let's talk"
+      }
+    }
+  },
+  "cassetta": {
+    "eyebrow": "The tools",
+    "title": "Everything I know how to use. For you, I pick what to sew.",
+    "lead": "This is my toolbox: the tools I know, sorted by what they do. I don't use them all every time, just as a tailor doesn't use every fabric for one suit. Tell me what you need and I'll show you which ones I'd pick, and what I could use instead.",
+    "cuciPer": "Sew for",
+    "tutta": "the whole toolbox",
+    "partenza": "A starting point, not a fixed recipe: I look at every job closely before choosing.",
+    "elenco": "The toolbox, compartment by compartment",
+    "attrezziZona": "{n, plural, one {# tool} other {# tools}}",
+    "radice": {
+      "nome": "Your site",
+      "cosa": "The finished garment. Everything below is the toolbox: for each site I take only what it needs."
+    },
+    "etichetta": {
+      "nome": "The label",
+      "marca": "A. GHIDARA · TAILORED",
+      "composizione": "COMPOSITION",
+      "stima": "estimate",
+      "fibre": "FIBRES",
+      "cura": "CARE",
+      "curaSe": "if needed,",
+      "alPosto": "instead of",
+      "contiene": "CONTAINS",
+      "scomparto": "COMPARTMENT",
+      "entraIn": "GOES INTO",
+      "suRichiesta": "on request",
+      "siAbbina": "PAIRS WITH",
+      "provato": "USED",
+      "lavoro": "used in real work",
+      "conosciuto": "known, ready when needed",
+      "taglia": "MADE TO MEASURE · {n, plural, one {# PIECE} other {# PIECES}}",
+      "indietro": "back",
+      "chiudi": "close"
+    },
+    "editor": {
+      "nome": "The toolbox as a configuration file",
+      "cartelle": "The toolbox compartments",
+      "file": "your-site.config.ts",
+      "cartella": "toolbox",
+      "pacchetto": "@andrea/toolbox",
+      "funzione": "defineSite",
+      "tipo": "kind",
+      "vuoto": "pick a job above: I'll write the rest",
+      "seServe": "if needed:",
+      "serve": "needed",
+      "stato": "{n, plural, one {# tool} other {# tools}} · 0 errors",
+      "zeroErrori": "0 errors"
+    },
+    "zone": {
+      "front": {
+        "nome": "Front end",
+        "snodo": "Front end",
+        "corto": "front-end",
+        "chiave": "frontEnd",
+        "cosa": "What the people using the site see and touch."
+      },
+      "stili": {
+        "nome": "Styling and motion",
+        "snodo": "Styling",
+        "corto": "styling",
+        "chiave": "styling",
+        "cosa": "How it looks and how it moves."
+      },
+      "mezzo": {
+        "nome": "In between",
+        "snodo": "In between",
+        "corto": "between",
+        "chiave": "between",
+        "cosa": "How front end and back end talk, and the fast memory between them."
+      },
+      "back": {
+        "nome": "Back end",
+        "snodo": "Back end",
+        "corto": "back-end",
+        "chiave": "backEnd",
+        "cosa": "The rules: who can do what, and what happens when they do."
+      },
+      "auth": {
+        "nome": "Access",
+        "snodo": "Access",
+        "corto": "access",
+        "chiave": "access",
+        "cosa": "Who you are, and what you are allowed to do."
+      },
+      "dati": {
+        "nome": "Data",
+        "snodo": "Data",
+        "corto": "data",
+        "chiave": "data",
+        "cosa": "Where the things that must not be lost are kept."
+      },
+      "casa": {
+        "nome": "Where it runs",
+        "snodo": "Where it runs",
+        "corto": "hosting",
+        "chiave": "hosting",
+        "cosa": "The machines, real or not, that all of this runs on."
+      },
+      "ai": {
+        "nome": "AI",
+        "snodo": "AI",
+        "corto": "ai",
+        "chiave": "ai",
+        "cosa": "Assistants and automations wired to real data."
+      },
+      "ovunque": {
+        "nome": "Everywhere",
+        "snodo": "Everywhere",
+        "corto": "everywhere",
+        "chiave": "everywhere",
+        "cosa": "What runs through every zone."
+      }
+    },
+    "attrezzi": {
+      "nextjs": {
+        "cosa": "The framework: pages rendered on the server or on demand, routing, server actions.",
+        "breve": "the framework"
+      },
+      "react": {
+        "cosa": "The pieces of the interface, and their state.",
+        "breve": "the interface pieces"
+      },
+      "tailwind": {
+        "cosa": "Styles written next to the markup, on one scale of sizes.",
+        "breve": "styles next to the markup"
+      },
+      "shadcn-ui": {
+        "cosa": "Accessible components copied into the project, not a library to keep updating.",
+        "breve": "accessible components"
+      },
+      "gsap": {
+        "cosa": "Scroll-driven animation, accurate to the frame.",
+        "breve": "scroll-driven animation"
+      },
+      "framer-motion": {
+        "cosa": "Animation for React components: entrances and exits.",
+        "breve": "component animation"
+      },
+      "radix": {
+        "cosa": "The accessible behaviour under shadcn: focus, keyboard, ARIA.",
+        "breve": "accessible behaviour"
+      },
+      "graphql": {
+        "cosa": "Ask only for the data you need, all at once.",
+        "breve": "only the data you need"
+      },
+      "rest": {
+        "cosa": "The simplest APIs: one address per resource.",
+        "breve": "the simplest APIs"
+      },
+      "trpc": {
+        "cosa": "Call the back end like a function, with shared types.",
+        "breve": "the back end as a function"
+      },
+      "redis": {
+        "cosa": "Fast memory: cache, queues, sessions, rate limits.",
+        "breve": "fast memory"
+      },
+      "websocket": {
+        "cosa": "A line that stays open, for what changes in real time.",
+        "breve": "an always-open line"
+      },
+      "nodejs": {
+        "cosa": "JavaScript outside the browser: the engine under the whole back end.",
+        "breve": "JavaScript outside the browser"
+      },
+      "express": {
+        "cosa": "The minimal back end: routes and middleware, nothing more.",
+        "breve": "the minimal back end"
+      },
+      "nestjs": {
+        "cosa": "The structured back end: modules, dependency injection, decorators.",
+        "breve": "the structured back end"
+      },
+      "clerk": {
+        "cosa": "Ready-made sign-in: sign-up, login, organisations.",
+        "breve": "ready-made sign-in"
+      },
+      "authjs": {
+        "cosa": "NextAuth: sign-in inside the Next app, with the providers you want.",
+        "breve": "sign-in inside the Next app"
+      },
+      "supabase-auth": {
+        "cosa": "Sign-in next to the database, with row-level policies.",
+        "breve": "sign-in next to the database"
+      },
+      "better-auth": {
+        "cosa": "Sign-in written in your own code, with no external service.",
+        "breve": "sign-in in your own code"
+      },
+      "jwt": {
+        "cosa": "The signed token that says who you are on every request.",
+        "breve": "the signed token"
+      },
+      "postgresql": {
+        "cosa": "The reference relational database: transactions, constraints, extensions.",
+        "breve": "the relational database"
+      },
+      "mysql": {
+        "cosa": "Relational too, and used everywhere.",
+        "breve": "relational too"
+      },
+      "mongodb": {
+        "cosa": "Documents instead of tables, when the schema changes often.",
+        "breve": "documents instead of tables"
+      },
+      "prisma": {
+        "cosa": "The ORM: the schema in one file, typed queries.",
+        "breve": "the ORM"
+      },
+      "drizzle": {
+        "cosa": "The lightweight ORM, close to SQL.",
+        "breve": "the lightweight ORM"
+      },
+      "vercel": {
+        "cosa": "The front end at the edge, close to whoever opens it.",
+        "breve": "the front end at the edge"
+      },
+      "railway": {
+        "cosa": "Servers, databases and Redis without managing machines.",
+        "breve": "servers without machines"
+      },
+      "docker": {
+        "cosa": "The same environment from my computer to production.",
+        "breve": "the same environment everywhere"
+      },
+      "typescript": {
+        "cosa": "Types, from the browser to the database: if data changes shape, I find out first.",
+        "breve": "the types"
+      },
+      "git": {
+        "cosa": "The history of every line.",
+        "breve": "the history of every line"
+      },
+      "vitest": {
+        "cosa": "Tests: what has to keep working, written down.",
+        "breve": "the tests"
+      },
+      "zod": {
+        "cosa": "Validation: the same schema checks the form and the API.",
+        "breve": "validation"
+      },
+      "langchain": {
+        "cosa": "Connects the model to documents and tools.",
+        "breve": "the model wired to documents"
+      },
+      "vercel-ai-sdk": {
+        "cosa": "Streamed answers inside the interface.",
+        "breve": "streamed answers"
+      },
+      "pgvector": {
+        "cosa": "Search by meaning, inside PostgreSQL.",
+        "breve": "search by meaning"
+      }
+    },
+    "capi": {
+      "vetrina": {
+        "nome": "A showcase site",
+        "slug": "showcase",
+        "perche": "Fast, findable, a pleasure to scroll. No back end: it doesn't need one.",
+        "alt": {
+          "gsap": "if the animation is only components coming and going"
+        }
+      },
+      "ecommerce": {
+        "nome": "An online shop",
+        "slug": "shop",
+        "perche": "Catalogue, cart, orders: the data matters, and queues keep the orders safe.",
+        "alt": {
+          "postgresql": "if your management software already uses it",
+          "express": "if the shop grows and the back end gets big"
+        }
+      },
+      "piattaforma": {
+        "nome": "A platform",
+        "slug": "platform",
+        "perche": "Many users, roles and permissions, things that change in real time.",
+        "alt": {
+          "clerk": "if user data has to stay entirely on your side",
+          "trpc": "if other apps need to read the same data"
+        }
+      },
+      "assistente": {
+        "nome": "An AI assistant",
+        "slug": "assistant",
+        "perche": "Answers from your real documents, and hands over to a person when it doesn't know.",
+        "alt": {
+          "supabase-auth": "if the assistant lives inside a platform that already has its own sign-in"
+        }
+      }
     }
   },
   "works": {
@@ -182,37 +945,53 @@
       "visit": "Visit the site",
       "open": "Open the case",
       "close": "Close",
+      "riporta": "bring this folder to the front",
       "screenshotAlt": "{name}: screenshot of the project",
-      "riservato": "Covered by a non-disclosure agreement"
+      "riservato": "Covered by a non-disclosure agreement",
+      "archivio": "Work archive",
+      "pratica": "Case no.",
+      "comEra": "How it was when I arrived",
+      "cliente": "Client",
+      "anno": "Year",
+      "stato": "Status",
+      "online": "Online",
+      "allegato": "Attachment A · the platform today",
+      "rilevato": "Recorded at handover",
+      "rilevatoFinora": "Recorded so far",
+      "stima": "estimate",
+      "consegnato": "Delivered",
+      "inCorso": "In progress",
+      "firmaNome": "A. Ghidara",
+      "firmaRuolo": "developer"
     },
     "list": {
       "riservato": {
         "name": "Under NDA",
-        "riga": "A business running on several tools and several platforms, with the same data sitting in different places and nobody able to say which version was the right one.",
-        "lavoro": "One platform in place of the scattered tools. Video streaming, documents and client contracts live inside it, along with many operators writing on the same things at the same time.",
-        "scelta": "Replace the tools rather than wire them to each other. Integrations don't remove the copies, they multiply them: each tool stays the owner of its own data, and the day one of the two changes you rebuild the connection from scratch.",
-        "conduzione": "In phases, and the first one had to actually replace something instead of being added to what was already there: as long as the old tool stays on next to the new one, the data keeps living in two places."
+        "riga": "A fitness business working with several outside tools, each with its own subscription.",
+        "lavoro": "Several clients, in different markets. The biggest project is a platform for fitness: with a small team we brought the tools the business already used into one place.",
+        "scelta": "Bring what came from the outside subscriptions into the platform, so that clients, contracts and commissions all sit in the same place.",
+        "conduzione": "We took the tools the business was using, looked at which features the client actually needed, and brought them onto our platform, tuned more closely to their needs."
       },
       "bdroppy": {
         "name": "BDroppy",
-        "riga": "The platform was stuck on Next 14. Every new feature took weeks, and the team was afraid to touch the code.",
-        "lavoro": "A platform that sells every day, and so could not afford a window of downtime: whatever we did had to happen with the shop open.",
-        "scelta": "Migrate one route at a time instead of rewriting from scratch. A rewrite ships all at once, and until that day the business stays on what it already has.",
-        "conduzione": "Old and new living side by side behind the same address: every migrated route went to production on its own, without waiting for the others. It runs on Next 15 and TypeScript today, and the service never went down."
+        "riga": "The platform was on Next 14, with much of the code still in JavaScript, and the shipping pages were slow because they weren't well optimised: that's where we started, optimising them.",
+        "lavoro": "Upgrade the platform from Next 14 to Next 15, improve its performance and fix the bugs it had been carrying.",
+        "scelta": "Move the code towards TypeScript wherever possible, instead of rewriting it all. Legacy JavaScript stays where it works, and new or touched parts are typed from the start.",
+        "conduzione": "Upgrade, performance and interface in the same job: we reworked the product selection and checkout screens, to make finding a product and buying it simpler."
       },
       "aidify": {
         "name": "Aidify",
-        "riga": "A customer support team buried under the same ten questions, repeated across five different e-commerce platforms.",
-        "lavoro": "An assistant that answers in place of people on the questions that keep coming back, across the five e-commerce platforms they come from.",
-        "scelta": "Wire it into the real catalogue and real orders, instead of training a model on the most frequent questions. A model guesses, and when it guesses wrong it does so with the same confidence as when it gets it right: the customer finds out after buying.",
-        "conduzione": "The edge of what the assistant knows is not left to the model, it is written into the code: past that edge the conversation goes to an operator without the customer having to ask."
+        "riga": "Shopify stores that had to answer customers at any hour, even when nobody was in front of the screen.",
+        "lavoro": "An AI chatbot that handles customer support inside Shopify stores, and the landing page that brings stores to try it, then to stay.",
+        "scelta": "A single widget that adapts to each store: style and colours change to fit in, without touching the code.",
+        "conduzione": "By optimising the widget on Shopify so it wouldn't weigh down the store hosting it, and by looking after the landing page for acquiring and retaining customers and leads."
       },
       "visualboost": {
         "name": "VisualBoost",
-        "riga": "An editorial image library nobody could browse without sitting there waiting.",
-        "lavoro": "An editorial library to browse, where the content is made almost entirely of heavy images.",
-        "scelta": "Work on the images, not on the code laying them out. The code is the first place everyone looks, and it's almost never there: the weight was in the files.",
-        "conduzione": "Modern formats, right dimensions and progressive loading, before anything else. The public landing page was later rebuilt by others: what remains is the engine underneath."
+        "riga": "A service that creates AI images of a store's products: a showcase made almost entirely of images, which had to open instantly.",
+        "lavoro": "The service's landing page and the loading of the images, which here are the product itself.",
+        "scelta": "Work on the images before the code: the right formats and sizes, and loading only when they're needed.",
+        "conduzione": "Measuring with Lighthouse before and after, with an eye on conversion: a page that opens instantly is a page that gets read down to the button."
       }
     }
   },
@@ -278,6 +1057,7 @@
     "senzaTesserino": "No badge",
     "etichettaLezione": "What it left me",
     "nota": "Nobody hands you a badge when you work for yourself.",
+    "suggerimento": "keep scrolling",
     "list": {
       "freelanceOggi": {
         "role": "Freelance web developer",
@@ -302,8 +1082,9 @@
     }
   },
   "metrics": {
-    "riservatoCycleTime": "for a step that used to take hours",
-    "bdroppyComponents": "components migrated",
+    "riservatoCycleTime": "for a step that used to take hours, now done in under 15 minutes",
+    "bdroppyPagina": "to open a product page, down from over 4 s",
+    "bdroppyTypescript": "of the code moved to TypeScript",
     "bdroppyDowntime": "hours of downtime",
     "aidifyConversations": "conversations handled per month",
     "visualboostCatalog": "images in the catalogue",
@@ -311,6 +1092,49 @@
     "coffees": "coffees",
     "years": "years building for the web",
     "responseTime": "response time"
+  },
+  "notizie": {
+    "eyebrow": "This week's news",
+    "title": "Pick what you like, turn the knob",
+    "intro": "Three worlds I follow closely: artificial intelligence, design and the code I work with. Press the button for the one you're curious about, turn, and out comes a story from the last few days.",
+    "categorie": {
+      "ia": { "nome": "A.I.", "testata": "The A.I. Gazette" },
+      "design": { "nome": "Design", "testata": "The Design Sheet" },
+      "codice": { "nome": "Code", "testata": "The Code Courier" }
+    },
+    "timbri": {
+      "primaPagina": "front page",
+      "paper": "paper of the day",
+      "piuLetto": "most read",
+      "release": "new release"
+    },
+    "dati": {
+      "punti": "points",
+      "commenti": "comments",
+      "voti": "votes",
+      "autori": "authors",
+      "reazioni": "reactions",
+      "lettura": "read",
+      "versione": "version"
+    },
+    "minuti": "{n} min",
+    "rilascio": "{titolo} is out",
+    "leggiSu": "Read on {sito}",
+    "targa": "{categoria} · {n} balls",
+    "targaUna": "{categoria} · 1 ball",
+    "gruppo": "What news do you want",
+    "manopola": "Turn the knob: out comes a story",
+    "aiuto": "Pick the kind, then turn the knob: a click, or drag it round.",
+    "attesa": "Filling the machine with this week's news…",
+    "vuota": "Pick A.I., Design or Code, then turn the knob: the story prints here.",
+    "errore": "The news didn't arrive. Turn the knob to try again.",
+    "finite": "Today's {categoria} news has run out: try another button, or come back tomorrow.",
+    "giaUscite": "Already out",
+    "testata": "The News",
+    "nessunaUscita": "The other stories you draw line up here.",
+    "senzaRiassunto": "The whole story is on the other side of the link: here you get the headline, and where to read it.",
+    "raccolteOggi": "News gathered at {ora} today: tomorrow there'll be more.",
+    "raccolteIl": "News gathered on {giorno} at {ora}."
   },
   "contact": {
     "eyebrow": "Contact",

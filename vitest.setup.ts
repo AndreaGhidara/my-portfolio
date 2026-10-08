@@ -5,7 +5,7 @@ import { vi } from "vitest";
 // così resolveMotionLevel(...) risolve sempre a "none" nei test. Se invece
 // tutte le query dessero false, il livello risolto sarebbe "reduced" e GSAP
 // animerebbe davvero i componenti (es. gsap.from({ opacity: 0 }) dentro un
-// preset) mentre ScrollTrigger, in jsdom, non scatta mai — lasciando gli
+// preset) mentre ScrollTrigger, in jsdom, non scatta mai, lasciando gli
 // elementi bloccati a opacity 0 e rompendo ogni asserzione toBeVisible() in
 // questo task e nei task delle sezioni successive. "none" è il livello
 // giusto anche concettualmente: i test di base devono verificare che il
@@ -28,7 +28,7 @@ Object.defineProperty(window, "matchMedia", {
 
 /**
  * jsdom non implementa <dialog>: showModal() e close() non esistono proprio.
- * Questo minimo li aggiunge — attributo `open` e evento `close` — quel tanto
+ * Questo minimo li aggiunge (attributo `open` e evento `close`) quel tanto
  * che serve a verificare COSA mostriamo nel dossier e come lo annunciamo.
  *
  * Quello che questo finto <dialog> NON dimostra: trappola del focus, chiusura
@@ -51,8 +51,8 @@ if (typeof HTMLDialogElement !== "undefined" && !HTMLDialogElement.prototype.sho
 
 /**
  * jsdom non ha nemmeno SVGPathElement: un <path> gli esce come SVGElement, e
- * getTotalLength() non esiste. Chi disegna un tratto — il filo, i cavi del
- * tavolo — lo misura per darsi lo strokeDasharray, e senza questo lancia appena
+ * getTotalLength() non esiste. Chi disegna un tratto (il filo, i cavi del
+ * tavolo) lo misura per darsi lo strokeDasharray, e senza questo lancia appena
  * il livello di movimento sale sopra "none". Zero, e non un numero finto: la
  * lunghezza vera dipende dalla geometria, che qui nessuno calcola, e un numero
  * inventato inviterebbe a scriverci sopra un'asserzione che non prova niente.

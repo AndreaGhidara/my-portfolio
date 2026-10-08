@@ -1,0 +1,108 @@
+/* ── Il gioco del metodo: il finale ─────────────────────────────────────────
+   Tutto sotto [data-gioco-livello="finale"] (vedi la regola in base.css).
+
+   Il cielo che si fa giorno. Nel prototipo la notte era blu, e il blu nella
+   tavolozza non c'e': qui la notte e' un inchiostro appena scaldato verso il
+   grigio, e il giorno e' la carta col giallo della lampadina sopra. Il giorno
+   non e' un cambio di fondo (due gradienti non si dissolvono l'uno
+   nell'altro): e' uno strato sopra la notte che sale di opacita'. Con il
+   movimento ridotto le animazioni si azzerano e il giorno e' gia' li'. */
+
+[data-gioco-livello="finale"] .sopra {
+  background: linear-gradient(var(--ink), color-mix(in oklab, var(--ink) 80%, var(--muted)));
+  animation: gioco-finale-testo 1.4s 0.3s ease both;
+}
+
+[data-gioco-livello="finale"] .sopra::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(color-mix(in oklab, var(--bulb) 38%, var(--paper)), var(--paper));
+  animation: gioco-finale-giorno 1.4s 0.3s ease both;
+}
+
+[data-gioco-livello="finale"] .testa .destra { color: inherit; }
+
+[data-gioco-livello="finale"] .stelle {
+  animation: gioco-finale-stelle 0.8s 0.3s ease both;
+}
+
+[data-gioco-livello="finale"] .alba {
+  position: absolute;
+  z-index: 2;
+  inset: 2.2rem 0.7rem 0.7rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+[data-gioco-livello="finale"] .alba b {
+  display: block;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  /* L'a capo sta nel testo, dopo «tutto»: e' li' che la frase respira. */
+  white-space: pre-line;
+}
+
+[data-gioco-livello="finale"] .alba small {
+  display: block;
+  margin-block-start: 0.4rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+}
+
+/* I quattro strati, uno per livello. */
+[data-gioco-livello="finale"] .strati {
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-gioco-livello="finale"] .strati li {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--graph);
+  border-radius: 8px;
+  background: var(--paper);
+  font-size: 0.7rem;
+  animation: gioco-entra 0.35s ease backwards;
+}
+
+[data-gioco-livello="finale"] .strati li:nth-child(2) { animation-delay: 0.1s; }
+[data-gioco-livello="finale"] .strati li:nth-child(3) { animation-delay: 0.2s; }
+[data-gioco-livello="finale"] .strati li:nth-child(4) { animation-delay: 0.3s; }
+
+[data-gioco-livello="finale"] .strati li > span:first-child {
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--bulb);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+}
+
+@keyframes gioco-finale-giorno {
+  from { opacity: 0; }
+}
+
+@keyframes gioco-finale-stelle {
+  to { opacity: 0; }
+}
+
+@keyframes gioco-finale-testo {
+  from { color: var(--paper); }
+  to { color: var(--ink); }
+}

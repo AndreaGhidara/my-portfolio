@@ -1,5 +1,4 @@
 import { Reveal } from "@/animations/components/Reveal";
-import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { ContactForm, type ContactFormCopy } from "./ContactForm";
 
 /** Un momento di quello che succede dopo l'invio. L'ordine è nel tempo. */
@@ -56,13 +55,11 @@ export function ContactView({
   const urlFor = (id: string) => socials.find((social) => social.id === id)?.url ?? "#";
 
   return (
-    <section id="contact" className="relative px-[var(--gutter)] py-[var(--section-y)]">
-      <ThreadSegment section="contact" className="pointer-events-none absolute inset-0 -z-10" />
-
+    <section id="contact" aria-labelledby="titolo-contact" className="relative px-[var(--gutter)] py-[var(--section-y)]">
       <div className="mx-auto max-w-[56rem]">
         <Reveal moto="dietro" stagger={0.08}>
           <p className="eyebrow">{eyebrow}</p>
-          <h2 className="mt-3 text-4xl lg:text-6xl">{title}</h2>
+          <h2 id="titolo-contact" className="titolo-sezione">{title}</h2>
         </Reveal>
 
         {/* Il foglio e il cartellino entrano uno dopo l'altro, e l'attributo

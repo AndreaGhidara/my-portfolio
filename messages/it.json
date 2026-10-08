@@ -19,108 +19,79 @@
     "scrollHint": "Scorri",
     "avatarAlt": "Ritratto illustrato di Andrea Ghidara"
   },
-  "seeking": {
-    "eyebrow": "Partiamo da qui",
-    "title": "Le cinque richieste che mi fanno più spesso",
-    "intro": "Raramente arrivano da sole: in un progetto solo ci stanno quasi tutte, e decidere a quale rispondere per prima è già progettarlo. Le ho riscritte io, non sono le mail di nessuno, ma le risposte sono quelle vere.",
-    "labels": {
-      "tipo": "Che tipo di lavoro è"
-    },
-    "casella": {
-      "etichettaDa": "Da",
-      "etichettaA": "A",
-      "da": "una richiesta come la tua",
-      "a": "Andrea",
-      "vuoto": "Aprine una. Le risposte sono quelle che scrivo davvero: non un preventivo, ma da dove partirei. E in un caso su cinque finiscono con «non ti serve».",
-      "firma": "Andrea Ghidara",
-      "ruolo": "Sviluppatore web · Full stack"
-    },
-    "list": {
-      "capire": {
-        "nome": "Farsi capire",
-        "oggetto": "Il sito non esprime la nostra direzione",
-        "anteprima": "Abbiamo un sito ma chi ci arriva non capisce di cosa ci occupiamo. Vorremmo rifarlo, ma non sappiamo da dove cominciare…",
-        "et": "Quello che di solito significa",
-        "titolo": "Quasi mai è un problema di parole.",
-        "etPrima": "La prova che puoi fare oggi, in dieci minuti",
-        "prima": "Scrivi le tre domande che ti fanno al telefono prima di comprare. Poi apri la tua home e conta a quante risponde nella prima schermata. Se sono zero o una, il problema non è come è scritto, è l'ordine in cui è messo: il sito racconta com'è fatta l'azienda invece di rispondere a chi arriva.",
-        "tipo": "Il lavoro grosso è decidere cosa viene prima, non produrre testo. Poche settimane, e non serve rifare la grafica per scoprirlo.",
-        "cta": "Questa è la mia, scrivimi"
-      },
-      "strumento": {
-        "nome": "Uno strumento",
-        "oggetto": "Un passaggio ci ruba ore a settimana",
-        "anteprima": "Quello che abbiamo funziona, ma ci sono cose che rifacciamo a mano ogni settimana. Si può automatizzare?",
-        "et": "Quello che di solito significa",
-        "titolo": "È l'unica delle cinque in cui sai se conviene prima di cominciare.",
-        "etPrima": "Il conto che puoi fare oggi",
-        "prima": "Ore a settimana, per quanto costa un'ora di quella persona, per quarantacinque settimane. Se il numero che esce non è almeno il doppio di quanto costa lo strumento, il passaggio da automatizzare è un altro.",
-        "tipo": "Un pezzo piccolo e a sé, collegato a quello che già usi. Poi si calibra: come ti serve davvero si scopre usandolo, e da lì lo si stringe addosso.",
-        "cta": "Questa è la mia, scrivimi"
-      },
-      "aggiunta": {
-        "nome": "Un'aggiunta",
-        "oggetto": "La piattaforma c'è, ma deve fare di più",
-        "anteprima": "La piattaforma c'è già e funziona, ma servono un paio di cose nuove. Quanto ci vuole più o meno?",
-        "et": "Quello che di solito significa",
-        "titolo": "Quasi sempre la piattaforma è stata costruita per l'azienda che eri, non per quella che sei.",
-        "etPrima": "I due numeri da confrontare",
-        "prima": "Conta quante persone la usano oggi contro quante la usavano il primo mese, e quante cose fa oggi contro quante ne faceva. Se uno dei due numeri è raddoppiato, quello che stai chiedendo non è una funzionalità in più: è la struttura sotto che deve crescere con te.",
-        "tipo": "Si comincia leggendo, non scrivendo: prima si guarda cosa regge già, poi si dice se quello che chiedi è un'aggiunta o il primo pezzo di una struttura nuova.",
-        "cta": "Questa è la mia, scrivimi"
-      },
-      "fulcro": {
-        "nome": "Un fulcro",
-        "oggetto": "Ogni mattina entro in cinque strumenti diversi",
-        "anteprima": "Cinque accessi, cinque account, e nessuno parla con gli altri. Vorremmo una cosa sola, fatta su di noi…",
-        "et": "Quello che di solito significa",
-        "titolo": "Il problema non sono i cinque accessi. È che nessuno sa quale dei cinque ha il dato giusto.",
-        "etPrima": "Il numero da cercare due volte",
-        "prima": "Prendi un numero che ti serve tutti i giorni, quanti ordini aperti o quanti clienti attivi, e cercalo in ogni strumento dove potrebbe stare. Se ti escono due numeri diversi, quello è il lavoro: non unire gli accessi, decidere chi ha ragione.",
-        "tipo": "A fasi, e la prima deve sostituire qualcosa per davvero. Un pezzo entrato in uso vale più di dieci pronti e spenti.",
-        "cta": "Questa è la mia, scrivimi"
-      },
-      "nonancora": {
-        "nome": "Non ancora",
-        "oggetto": "Ho un'idea, ma non so se si può fare sui miei processi",
-        "anteprima": "Ho in mente una cosa che ci semplificherebbe la vita, ma non so se è fattibile con quello che usiamo…",
-        "et": "Quello che di solito significa",
-        "titolo": "Nessuno arriva sapendo se gli serve uno strumento o una piattaforma.",
-        "etPrima": "Una domanda a cui puoi rispondere da solo, oggi",
-        "prima": "Se domani sparisse una persona sola dall'azienda, cosa si fermerebbe? Quella cosa è il punto da cui parte qualunque progetto sensato, e quasi sempre è la stessa che ti costa troppo tempo adesso.",
-        "tipo": "Nessuno, per ora. Rispondere a quella domanda vale più di qualunque preventivo, e per farlo non servo io.",
-        "cta": "Scrivimi lo stesso"
-      }
-    }
+  "scontrino": {
+    "eyebrow": "Servizi",
+    "title": "Scegli, e te lo stampo",
+    "lead": "Premi un tasto: esce lo scontrino con il servizio, e accanto quello che ci trovi dentro.",
+    "hint": "La stampante è pronta: premi un tasto.",
+    "tasti": "Scegli il servizio da stampare",
+    "marca": "ANDREA GHIDARA · SERVIZI",
+    "nome": "ANDREA GHIDARA",
+    "mestiere": "sviluppo web · full stack",
+    "numero": "N.",
+    "totale": "TOTALE",
+    "daParlarne": "DA PARLARNE",
+    "parliamone": "Parliamone",
+    "strappa": "strappa ✂",
+    "disegno": "Schema tecnico di «{titolo}», con i suoi pezzi: {pezzi}.",
+    "tavola": "TAV.",
+    "scala": "SCALA 1:1",
+    "firma": "A. GHIDARA"
   },
   "services": {
     "eyebrow": "Il metodo",
-    "intro": "Ognuno sta in piedi da solo: puoi chiedermi solo un sito, o solo l'automazione che ti toglie due ore a settimana. Ma sono fatti per combaciare, e messi insieme diventano il posto dove si lavora davvero. Si parte dal pezzo che pesa di più, il resto si aggiunge quando serve.",
     "list": {
       "sites": {
         "title": "Siti e landing",
-        "description": "Niente temi comprati e riempiti di testo. Si parte da cosa deve capire chi atterra nei primi tre secondi, e da lì scendono struttura, parole e immagini. Poi velocità e indicizzazione: sono la differenza fra avere un sito ed essere trovati."
+        "description": "Niente temi comprati e riempiti di testo. Si parte da cosa deve capire chi atterra nei primi tre secondi, e da lì scendono struttura, parole e immagini. Poi velocità e indicizzazione: sono la differenza fra avere un sito ed essere trovati.",
+        "pezzi": {
+          "treSecondi": "i primi 3 secondi",
+          "struttura": "struttura",
+          "parole": "parole",
+          "immagini": "immagini",
+          "velocita": "velocità",
+          "indicizzazione": "indicizzazione"
+        }
       },
       "ecommerce": {
         "title": "E-commerce",
-        "description": "Il catalogo lo collego a quello che hai già (gestionale, magazzino, corriere) invece di chiederti di aggiornare due sistemi a mano. Pagamenti e spedizioni restano configurabili: domani puoi cambiare fornitore senza rifare il negozio."
+        "description": "Il catalogo lo collego a quello che hai già (gestionale, magazzino, corriere) invece di chiederti di aggiornare due sistemi a mano. Pagamenti e spedizioni restano configurabili: domani puoi cambiare fornitore senza rifare il negozio.",
+        "pezzi": {
+          "catalogo": "catalogo",
+          "gestionale": "gestionale",
+          "magazzino": "magazzino",
+          "corriere": "corriere",
+          "pagamenti": "pagamenti",
+          "spedizioni": "spedizioni"
+        }
       },
       "webapp": {
         "title": "Web app e piattaforme",
-        "description": "Si parte dalla versione più piccola che sta in piedi e la si mette presto davanti a qualcuno vero. Ruoli, permessi e abbonamenti si costruiscono da subito: aggiungerli a cose fatte vuol dire riscrivere."
+        "description": "Si parte dalla versione più piccola che sta in piedi e la si mette presto davanti a qualcuno vero. Ruoli, permessi e abbonamenti si costruiscono da subito: aggiungerli a cose fatte vuol dire riscrivere.",
+        "pezzi": {
+          "versionePiccola": "versione piccola",
+          "utentiVeri": "utenti veri",
+          "ruoli": "ruoli",
+          "permessi": "permessi",
+          "abbonamenti": "abbonamenti"
+        }
       },
       "ai": {
         "title": "AI e automazioni",
-        "description": "Collegate ai tuoi dati veri, non a un modello che indovina. E una regola che non negozio: quando l'assistente non sa, passa a una persona invece di inventare una risposta."
+        "description": "Collegate ai tuoi dati veri, non a un modello che indovina. E una regola che non negozio: quando l'assistente non sa, passa a una persona invece di inventare una risposta.",
+        "pezzi": {
+          "dati": "i tuoi dati",
+          "assistente": "l'assistente",
+          "nonSa": "non sa?",
+          "persona": "una persona"
+        }
       }
     },
     "stageTitle": "Tutto quello che non si vede",
     "stageLead": "Un sito finito. Da qui in poi, tutto quello che c'è sotto.",
     "centre": "il progetto",
-    "composto": "Da cosa è composto",
     "blank": "E la tua, qual è? Scrivimi.",
     "punch": "Quello che chiami «un sito» è lo schermo al centro. Il resto è il lavoro che c'è dietro.",
-    "practice": "Quattro pezzi, e si montano insieme",
     "layers": {
       "site": {
         "title": "Il sito",
@@ -169,6 +140,798 @@
           "care": "La manutenzione"
         }
       }
+    },
+    "gioco": {
+      "comune": {
+        "barrette": "I quattro livelli del gioco",
+        "etichetta": "{numero} · {nome}",
+        "livelli": {
+          "schermo": "lo schermo",
+          "logiche": "le logiche",
+          "pannello": "i servizi",
+          "notte": "il cloud"
+        },
+        "righe": {
+          "schermo": "Prima costruisci lo schermo: colori, caratteri, sezioni. Poi svitalo e guarda cosa c'è sotto.",
+          "logiche": "Dietro lo schermo un ordine attraversa sei logiche, e a ogni nodo lo porti avanti tu. Oppure provi a rompere il sito.",
+          "pannello": "Il sito è online. Un mese dopo il lancio, in un minuto: le spie si accendono, e qualcuno interviene.",
+          "notte": "Quello che tiene in piedi il sito anche alle tre di notte. Si prepara prima, e si vede solo quando manca.",
+          "finale": "Il giro è finito. Dalle barrette qui sopra puoi riaprire ogni livello."
+        }
+      },
+      "schermo": {
+        "attrezzi": "Gli attrezzi",
+        "stato": {
+          "prova": "prova",
+          "provato": "provato"
+        },
+        "attrezzo": {
+          "colori": {
+            "nome": "colori",
+            "titolo": "La palette",
+            "testo": "Cinque colori che si parlano: fondo, superficie, testo, accento, grigio. Anche le immagini li seguono."
+          },
+          "caratteri": {
+            "nome": "caratteri",
+            "titolo": "I caratteri",
+            "testo": "Uno per i titoli, uno per leggere. Cambia coppia e guarda il titolo."
+          },
+          "testi": {
+            "nome": "testi",
+            "titolo": "Le misure dei testi",
+            "testo": "Titolo, sottotitolo, paragrafo: una scala sola che tiene tutto in ordine."
+          },
+          "sezioni": {
+            "nome": "sezioni",
+            "titolo": "Le sezioni",
+            "testo": "Lo stesso contenuto, quattro modi di presentarlo: ognuno dice una cosa diversa."
+          },
+          "immagini": {
+            "nome": "immagini",
+            "titolo": "Le immagini",
+            "testo": "La prima cosa che si guarda. Leggera da scaricare, giusta per l'attività."
+          },
+          "telefono": {
+            "nome": "telefono",
+            "titolo": "Il telefono",
+            "testo": "Quasi tutti lo vedranno prima qui. Stesso sito, pensato per sei pollici."
+          }
+        },
+        "palette": {
+          "bottega": "bottega",
+          "notte": "notte",
+          "salvia": "salvia",
+          "cipria": "cipria",
+          "oceano": "oceano",
+          "terracotta": "terracotta"
+        },
+        "scale": {
+          "compatta": "compatta",
+          "equilibrata": "equilibrata",
+          "generosa": "generosa"
+        },
+        "impaginazioni": {
+          "classica": "classica",
+          "manifesto": "manifesto",
+          "copertina": "copertina",
+          "bento": "bento"
+        },
+        "illustrazioni": {
+          "pane": "pane",
+          "vetrina": "vetrina",
+          "torta": "torta",
+          "cornetto": "cornetto"
+        },
+        "campione": {
+          "h1": "H1 · Pane caldo",
+          "h2": "H2 · Le torte",
+          "p": "Paragrafo: lievito madre, forno a legna."
+        },
+        "vista": {
+          "pc": "il computer",
+          "cell": "il telefono"
+        },
+        "pronto": "Lo schermo è finito. <b>Svita le quattro viti</b> e guarda cosa c'è dietro.",
+        "tornaAlComputer": "Bello anche qui. <b>Torna al computer</b>: c'è ancora una cosa da fare.",
+        "vite": "svita la vite {numero}",
+        "dietro": {
+          "testa": "dietro lo schermo",
+          "occhiello": "sei entrato",
+          "testo": "Dietro lo schermo che hai appena costruito corrono le logiche: ogni tocco del visitatore segue un filo fino a una regola. Qui comincia il livello due.",
+          "ricomincia": "ricomincia",
+          "ingresso": "il visitatore tocca",
+          "regola": "ogni tocco è una regola scritta"
+        },
+        "sito": {
+          "nav": {
+            "pane": "Pane",
+            "torte": "Torte",
+            "orari": "Orari",
+            "prenota": "Prenota"
+          },
+          "titolo": "Pane caldo",
+          "titoloEm": "dalle sei.",
+          "nota": "Lievito madre, forno a legna, e la torta della domenica da prenotare.",
+          "cta": "Prenota la torta",
+          "schede": {
+            "pane": {
+              "titolo": "Il pane",
+              "testo": "Ogni mattina, sei tipi."
+            },
+            "torte": {
+              "titolo": "Le torte",
+              "testo": "Su ordinazione."
+            },
+            "dove": {
+              "titolo": "Dove siamo",
+              "testo": "Via Roma 12."
+            }
+          },
+          "bollo": "forno a legna",
+          "fascia": "PANE · TORTE · FOCACCE · DALLE SEI · LIEVITO MADRE · ",
+          "numero": "N° 01 · autunno",
+          "sfornato": "appena sfornato",
+          "lato": "pane · torte · focacce",
+          "indirizzo": "Lievito madre e forno a legna, in via Roma 12.",
+          "aperto": "aperto",
+          "oggi": "oggi",
+          "quartiere": "forno di quartiere",
+          "tipi": "tipi di pane,\nogni mattina",
+          "prenotaTorta": "Prenota\nla torta",
+          "giorni": "LMMGVSD"
+        }
+      },
+      "logiche": {
+        "titolo": "Dietro lo schermo",
+        "regole": "regole",
+        "nodo": "nodo {numero} di 6 · {nome}",
+        "partenza": {
+          "occhiello": "lo schermo che hai costruito",
+          "indirizzo": "fornoaurora.it",
+          "nome": "Forno Aurora",
+          "menu": "pane · torte · orari",
+          "via": "via Roma 12",
+          "titolo": "Pane caldo",
+          "titoloAccento": "dalle sei.",
+          "testo": "Lievito madre, forno a legna, torte su ordinazione.",
+          "prenota": "Prenota la torta",
+          "appuntoTitolo": "Qui puoi prenotare",
+          "appuntoTesto": "Premi il pulsante: dietro lo schermo partono sei logiche, e le segui una per una."
+        },
+        "nodi": [
+          {
+            "nome": "L'area riservata",
+            "titolo": "Chi sta ordinando?",
+            "spiega": "Prima di tutto il forno ti riconosce: così ritrovi i tuoi ordini e non riscrivi i dati ogni volta.",
+            "fai": "entra come Andrea",
+            "rompi": "sbaglia 3 volte",
+            "errore": "Password sbagliata, per la terza volta.",
+            "regola": {
+              "se": "tre tentativi sbagliati di fila",
+              "allora": "l'account si ferma 15 minuti e arriva un link per rientrare"
+            }
+          },
+          {
+            "nome": "Il catalogo",
+            "titolo": "Quale torta?",
+            "spiega": "Le torte, i prezzi e cosa è ancora disponibile vengono da un posto solo: quello che vedi è vero.",
+            "fai": "scegli la Sacher",
+            "rompi": "scegli la millefoglie",
+            "errore": "La millefoglie di domenica è finita.",
+            "regola": {
+              "se": "una torta è finita",
+              "allora": "non si può scegliere e il sito propone la più simile"
+            }
+          },
+          {
+            "nome": "Le prenotazioni",
+            "titolo": "Per che giorno?",
+            "spiega": "Ogni giorno il forno può fare un numero di torte: il calendario lo sa, e non promette quello che non c'è.",
+            "fai": "prenota sabato",
+            "rompi": "prenota domenica",
+            "errore": "Domenica è tutto pieno.",
+            "regola": {
+              "se": "il giorno scelto è pieno",
+              "allora": "proponi il giorno libero più vicino: sabato"
+            }
+          },
+          {
+            "nome": "I pagamenti",
+            "titolo": "La caparra",
+            "spiega": "Una caparra di 5 euro tiene il posto. Il pagamento è il punto in cui un errore costa di più.",
+            "fai": "paga la caparra",
+            "rompi": "la carta viene rifiutata",
+            "errore": "La banca ha rifiutato la carta.",
+            "regola": {
+              "se": "il pagamento non va a buon fine",
+              "allora": "la torta resta tenuta per 15 minuti e non si paga mai due volte"
+            }
+          },
+          {
+            "nome": "I contatti",
+            "titolo": "La conferma",
+            "spiega": "Appena prenotata, parte un'email: il cliente sa cosa ha ordinato, per quando, e dove venire.",
+            "fai": "manda la conferma",
+            "rompi": "indirizzo sbagliato",
+            "errore": "«andrea@gmial.con» non esiste: l'email tornerebbe indietro.",
+            "regola": {
+              "se": "l'indirizzo sembra scritto male",
+              "allora": "il sito chiede «intendevi gmail.com?» prima di mandare"
+            }
+          },
+          {
+            "nome": "Il tuo gestionale",
+            "titolo": "Nel registro del forno",
+            "spiega": "L'ordine arriva dove il forno lavora già: non va ricopiato a mano, e la mattina è in lista.",
+            "fai": "registra l'ordine",
+            "rompi": "ordina due volte di fila",
+            "errore": "Lo stesso ordine è arrivato due volte in un secondo.",
+            "regola": {
+              "se": "lo stesso ordine arriva due volte in un minuto",
+              "allora": "ne resta uno solo, e il cliente paga una volta"
+            }
+          }
+        ],
+        "scene": {
+          "email": "andrea@esempio.it",
+          "dentro": "dentro",
+          "torte": [
+            {
+              "nome": "Crostata",
+              "prezzo": "18 €"
+            },
+            {
+              "nome": "Sacher",
+              "prezzo": "24 €"
+            },
+            {
+              "nome": "Millefoglie",
+              "prezzo": "22 €"
+            }
+          ],
+          "finita": "finita",
+          "giorni": [
+            "L",
+            "M",
+            "M",
+            "G",
+            "V",
+            "S",
+            "D"
+          ],
+          "pieno": "pieno",
+          "importo": "5,00 €",
+          "carta": "•••• •••• •••• 4242",
+          "pagato": "pagato",
+          "mailA": "a:",
+          "mailDa": "da: Forno Aurora",
+          "mailTitolo": "La tua Sacher è prenotata.",
+          "mailTesto": "Sabato dalle 9 in via Roma 12. Caparra di 5 € ricevuta.",
+          "registro": [
+            [
+              "n.",
+              "torta",
+              "giorno",
+              "stato"
+            ],
+            [
+              "0140",
+              "Crostata",
+              "ven",
+              "pronta"
+            ],
+            [
+              "0141",
+              "Sacher",
+              "sab",
+              "forno"
+            ]
+          ],
+          "nuovo": [
+            "0142",
+            "Sacher",
+            "sab",
+            "nuova"
+          ]
+        },
+        "incidente": {
+          "se": "SE",
+          "allora": "ALLORA",
+          "salvato": "il sito ha retto. Ora fallo nel modo giusto."
+        },
+        "trovata": "regola trovata",
+        "giaRotto": "già rotto",
+        "avanti": "avanti: {nome}",
+        "stampa": "stampa l'ordine",
+        "fine": {
+          "occhiello": "l'ordine è arrivato · regole trovate {trovate} di 6",
+          "titolo": "Sei logiche, un ordine solo",
+          "mancano": "Tocca i nodi senza ⚡ nel circuito per scoprire le altre regole.",
+          "tutte": "Hai provato a rompere tutto, e il sito ha retto ogni volta.",
+          "negozio": "FORNO AURORA",
+          "ordine": "ORDINE N. 0142 · ANDREA",
+          "giorni": [
+            "lunedì",
+            "martedì",
+            "mercoledì",
+            "giovedì",
+            "venerdì",
+            "sabato"
+          ],
+          "caparra": "CAPARRA 5,00 € PAGATA",
+          "laboratorio": "SCONTRINO PER IL LABORATORIO",
+          "ricomincia": "ricomincia",
+          "livello3": "livello 3"
+        }
+      },
+      "pannello": {
+        "conta": {
+          "spento": "pannello spento",
+          "acceso": "acceso",
+          "avviso": "avviso {n} di {totale}",
+          "fine": "fine del mese"
+        },
+        "salute": "salute del sito · si abbassa finché una spia resta accesa",
+        "servizi": {
+          "assistenza": "Assistenza",
+          "automazioni": "Automazioni",
+          "numeri": "I numeri",
+          "trovare": "Farsi trovare",
+          "manutenzione": "Manutenzione"
+        },
+        "coda": {
+          "attesa": "in attesa",
+          "risolto": "{nome} · risolto",
+          "fine": "un mese, in un minuto"
+        },
+        "eventi": [
+          {
+            "testo": "Il certificato di sicurezza scade fra tre giorni.",
+            "intervento": "rinnova",
+            "esito": "Rinnovato. Il lucchetto nel browser resta chiuso."
+          },
+          {
+            "testo": "«Non riesco a cambiare il giorno del ritiro.» Una cliente, alle 21.",
+            "intervento": "rispondi",
+            "esito": "Risposta e ordine spostato a domenica. Lei torna a ordinare."
+          },
+          {
+            "testo": "Metà delle persone lascia la pagina della torta al secondo passaggio.",
+            "intervento": "guarda i dati",
+            "esito": "Il campo del telefono era obbligatorio. Tolto: il passaggio si chiude."
+          },
+          {
+            "testo": "Sabato mattina: 40 ordini da stampare per il laboratorio.",
+            "intervento": "fallo fare al sito",
+            "esito": "Il foglio si stampa da solo alle 6, già in ordine di ritiro."
+          },
+          {
+            "testo": "Sulle mappe l'orario della domenica è ancora quello vecchio.",
+            "intervento": "correggi",
+            "esito": "Orari allineati ovunque: sito, mappe, profilo."
+          },
+          {
+            "testo": "La pagina del catalogo ci mette 4 secondi a comparire.",
+            "intervento": "alleggerisci",
+            "esito": "Immagini ridotte e cache: ora meno di un secondo."
+          }
+        ],
+        "spento": {
+          "occhiello": "il pannello del forno",
+          "titolo": "Un mese dopo il lancio, in un minuto",
+          "spiega": "Cinque moduli, uno per servizio. Le spie si accendono da sole: tocca quella rossa, leggi, intervieni. Più aspetti, più la salute del sito scende.",
+          "calma": "il pannello è spento",
+          "accendi": "accendi il pannello"
+        },
+        "acceso": {
+          "occhiello": "il pannello è acceso",
+          "spia": {
+            "titolo": "Una spia si è accesa",
+            "spiega": "Tocca il modulo che lampeggia, lassù.",
+            "calma": "il modulo rosso ti dice dove guardare"
+          },
+          "verde": {
+            "titolo": "Tutto verde",
+            "spiega": "Per ora niente. Aspetta: le cose arrivano quando vogliono loro.",
+            "calma": "il sito lavora da solo"
+          }
+        },
+        "modulo": {
+          "occhiello": "modulo · {nome}",
+          "fatto": "Fatto.",
+          "cosa": "Cosa succede",
+          "aPosto": "Qui è tutto a posto",
+          "altra": "La spia accesa è un'altra: guarda il modulo rosso.",
+          "risolto": "risolto",
+          "avviso": "avviso",
+          "nessuno": "nessun avviso su {nome}",
+          "aspetta": "aspetta il prossimo avviso",
+          "niente": "niente da fare qui"
+        },
+        "fine": {
+          "occhiello": "il resoconto del mese",
+          "bene": "Sei avvisi, e il sito non se n'è accorto",
+          "male": "Sei avvisi, e il sito se n'è accorto un po'",
+          "spiega": "Salute a fine mese: {salute}%. Ogni secondo con una spia accesa pesa: è per questo che il pannello lo guarda qualcuno ogni giorno, non quando capita.",
+          "avvisi": "{n, plural, one {# avviso} other {# avvisi}}",
+          "ricomincia": "ricomincia",
+          "avanti": "livello 4 · il cloud"
+        }
+      },
+      "notte": {
+        "titolo": "La notte del forno",
+        "prepara": {
+          "occhiello": "sono le 23 · il forno chiude",
+          "titolo": "Cosa prepari prima di dormire?",
+          "spiega": "Accendi quello che vuoi pronto. Poi la notte va da sola.",
+          "vai": "vai a dormire"
+        },
+        "corsa": {
+          "occhiello": "la notte",
+          "titolo": "Dormi. Il sito no.",
+          "spiega": "Guarda la striscia lassù: verde il sito c'è, rossa il sito è giù.",
+          "zzz": "zzz"
+        },
+        "mattina": {
+          "occhiello": "le 7 · il resoconto",
+          "tutto": "Otto ore su otto. Nessuno se n'è accorto.",
+          "ore": "Il sito c'è stato {ore, number} ore su 8",
+          "spiegaTutto": "Ed è proprio questo il punto: l'infrastruttura si vede solo quando manca.",
+          "spiegaParte": "Quello che è andato giù non era pronto. Si prepara una volta, e poi lavora tutte le notti.",
+          "rifai": "rifai la notte",
+          "meglio": "prepara meglio",
+          "finale": "il finale"
+        },
+        "cielo": {
+          "orologio": "il forno dorme · il sito no",
+          "apre": "le 7 · il forno apre"
+        },
+        "parato": "parato",
+        "giu": "giù",
+        "giuOre": "giù {ore, number} ore",
+        "giuMin": "giù {min} min",
+        "voci": {
+          "dominio": "Il dominio",
+          "sicurezza": "La sicurezza",
+          "dati": "I dati",
+          "copie": "Le copie",
+          "dove": "Dove sta",
+          "velocita": "La velocità"
+        },
+        "eventi": {
+          "dominio": {
+            "fatto": "scade il dominio fornoaurora.it",
+            "parato": "rinnovato da solo"
+          },
+          "sicurezza": {
+            "fatto": "2.000 password provate sull'area clienti",
+            "parato": "chiusa dopo tre tentativi"
+          },
+          "dati": {
+            "fatto": "il server si spegne per un guasto",
+            "parato": "i dati ripartono intatti"
+          },
+          "copie": {
+            "fatto": "un aggiornamento cancella il catalogo",
+            "parato": "rimesso dalla copia delle 3"
+          },
+          "dove": {
+            "fatto": "i primi clienti aprono il sito da Brescia",
+            "parato": "server a Milano: subito"
+          },
+          "velocita": {
+            "fatto": "un post porta 800 persone insieme",
+            "parato": "pagine pronte, reggono"
+          }
+        }
+      },
+      "finale": {
+        "testa": "fine · 4 livelli su 4",
+        "alba": "Hai visto tutto\nquello che non si vede.",
+        "dopoAlba": "e alle sette il forno apre, come ogni mattina",
+        "occhiello": "il giro completo",
+        "titolo": "Un sito sono quattro strati",
+        "strati": {
+          "schermo": "lo schermo · quello che si vede",
+          "logiche": "le logiche · quello che fa",
+          "pannello": "i servizi · come si tiene in vita",
+          "notte": "il cloud · quello che lo tiene in piedi"
+        },
+        "tornaAlSito": "torna al sito",
+        "parliamone": "parliamone"
+      }
+    }
+  },
+  "cassetta": {
+    "eyebrow": "Gli attrezzi",
+    "title": "Tutto quello che so usare. Per te scelgo cosa cucire.",
+    "lead": "Questa è la mia cassetta: gli strumenti che conosco, divisi per cosa fanno. Non li uso tutti ogni volta, come un sarto non usa tutte le stoffe per un vestito. Dimmi cosa ti serve e ti faccio vedere quali prenderei, e cosa potrei usare al loro posto.",
+    "cuciPer": "Cuci per",
+    "tutta": "tutta la cassetta",
+    "partenza": "È un punto di partenza, non una ricetta fissa: ogni lavoro lo guardo da vicino prima di scegliere.",
+    "elenco": "La cassetta, scomparto per scomparto",
+    "attrezziZona": "{n, plural, one {# attrezzo} other {# attrezzi}}",
+    "radice": {
+      "nome": "Il tuo sito",
+      "cosa": "Il capo finito. Tutto quello che sta sotto è la cassetta: per ogni sito prendo solo quello che serve."
+    },
+    "etichetta": {
+      "nome": "L'etichetta",
+      "marca": "A. GHIDARA · SU MISURA",
+      "composizione": "COMPOSIZIONE",
+      "stima": "stima",
+      "fibre": "FIBRE",
+      "cura": "CURA",
+      "curaSe": "se serve,",
+      "alPosto": "al posto di",
+      "contiene": "CONTIENE",
+      "scomparto": "SCOMPARTO",
+      "entraIn": "ENTRA IN",
+      "suRichiesta": "su richiesta",
+      "siAbbina": "SI ABBINA A",
+      "provato": "PROVATO",
+      "lavoro": "usato nei lavori",
+      "conosciuto": "conosciuto, pronto se serve",
+      "taglia": "MADE TO MEASURE · {n, plural, one {# PEZZO} other {# PEZZI}}",
+      "indietro": "indietro",
+      "chiudi": "chiudi"
+    },
+    "editor": {
+      "nome": "La cassetta come file di configurazione",
+      "cartelle": "Gli scomparti della cassetta",
+      "file": "il-tuo-sito.config.ts",
+      "cartella": "cassetta",
+      "pacchetto": "@andrea/cassetta",
+      "funzione": "defineSito",
+      "tipo": "tipo",
+      "vuoto": "scegli un lavoro in alto: scrivo io il resto",
+      "seServe": "se serve:",
+      "serve": "serve",
+      "stato": "{n, plural, one {# attrezzo} other {# attrezzi}} · 0 errori",
+      "zeroErrori": "0 errori"
+    },
+    "zone": {
+      "front": {
+        "nome": "Front-end",
+        "snodo": "Front-end",
+        "corto": "front-end",
+        "chiave": "frontEnd",
+        "cosa": "Quello che vede e tocca chi usa il sito."
+      },
+      "stili": {
+        "nome": "Stili e movimento",
+        "snodo": "Stili",
+        "corto": "stili",
+        "chiave": "stili",
+        "cosa": "Come appare e come si muove."
+      },
+      "mezzo": {
+        "nome": "Nel mezzo",
+        "snodo": "Nel mezzo",
+        "corto": "mezzo",
+        "chiave": "mezzo",
+        "cosa": "Come front-end e back-end si parlano, e la memoria veloce fra i due."
+      },
+      "back": {
+        "nome": "Back-end",
+        "snodo": "Back-end",
+        "corto": "back-end",
+        "chiave": "backEnd",
+        "cosa": "Le regole: chi può fare cosa, e cosa succede quando lo fa."
+      },
+      "auth": {
+        "nome": "Accessi",
+        "snodo": "Accessi",
+        "corto": "accessi",
+        "chiave": "accessi",
+        "cosa": "Chi sei, e cosa ti è permesso."
+      },
+      "dati": {
+        "nome": "Dati",
+        "snodo": "Dati",
+        "corto": "dati",
+        "chiave": "dati",
+        "cosa": "Dove stanno le cose che non si possono perdere."
+      },
+      "casa": {
+        "nome": "Dove gira",
+        "snodo": "Dove gira",
+        "corto": "hosting",
+        "chiave": "hosting",
+        "cosa": "I computer, veri o no, su cui tutto questo gira."
+      },
+      "ai": {
+        "nome": "AI",
+        "snodo": "AI",
+        "corto": "ai",
+        "chiave": "ai",
+        "cosa": "Assistenti e automazioni collegati ai dati veri."
+      },
+      "ovunque": {
+        "nome": "Ovunque",
+        "snodo": "Ovunque",
+        "corto": "ovunque",
+        "chiave": "ovunque",
+        "cosa": "Quello che attraversa tutte le zone."
+      }
+    },
+    "attrezzi": {
+      "nextjs": {
+        "cosa": "Il framework: pagine rese sul server o al volo, routing, azioni sul server.",
+        "breve": "il framework"
+      },
+      "react": {
+        "cosa": "I pezzi dell'interfaccia, e il loro stato.",
+        "breve": "i pezzi dell'interfaccia"
+      },
+      "tailwind": {
+        "cosa": "Gli stili scritti accanto al markup, con un sistema di misure unico.",
+        "breve": "gli stili accanto al markup"
+      },
+      "shadcn-ui": {
+        "cosa": "Componenti accessibili copiati nel progetto, non una libreria da aggiornare.",
+        "breve": "componenti accessibili"
+      },
+      "gsap": {
+        "cosa": "Le animazioni legate allo scroll, precise al fotogramma.",
+        "breve": "le animazioni legate allo scroll"
+      },
+      "framer-motion": {
+        "cosa": "Le animazioni dei componenti React, entrate e uscite.",
+        "breve": "le animazioni dei componenti"
+      },
+      "radix": {
+        "cosa": "I comportamenti accessibili sotto shadcn: focus, tastiera, aria.",
+        "breve": "i comportamenti accessibili"
+      },
+      "graphql": {
+        "cosa": "Chiedere solo i dati che servono, tutti in una volta.",
+        "breve": "solo i dati che servono"
+      },
+      "rest": {
+        "cosa": "Le API più semplici: un indirizzo per risorsa.",
+        "breve": "le API più semplici"
+      },
+      "trpc": {
+        "cosa": "Chiamare il back-end come una funzione, con i tipi condivisi.",
+        "breve": "il back-end come una funzione"
+      },
+      "redis": {
+        "cosa": "La memoria veloce: cache, code, sessioni, limiti ai tentativi.",
+        "breve": "la memoria veloce"
+      },
+      "websocket": {
+        "cosa": "Una linea sempre aperta, per quello che cambia in tempo reale.",
+        "breve": "una linea sempre aperta"
+      },
+      "nodejs": {
+        "cosa": "JavaScript fuori dal browser: il motore sotto a tutto il back-end.",
+        "breve": "JavaScript fuori dal browser"
+      },
+      "express": {
+        "cosa": "Il back-end minimo: rotte e middleware, niente di più.",
+        "breve": "il back-end minimo"
+      },
+      "nestjs": {
+        "cosa": "Il back-end strutturato: moduli, dipendenze, decoratori.",
+        "breve": "il back-end strutturato"
+      },
+      "clerk": {
+        "cosa": "Accessi pronti: registrazione, login, organizzazioni.",
+        "breve": "accessi pronti"
+      },
+      "authjs": {
+        "cosa": "NextAuth: gli accessi dentro l'app Next, con i provider che vuoi.",
+        "breve": "gli accessi dentro l'app Next"
+      },
+      "supabase-auth": {
+        "cosa": "Gli accessi accanto al database, con le policy sulle righe.",
+        "breve": "gli accessi accanto al database"
+      },
+      "better-auth": {
+        "cosa": "Gli accessi scritti nel tuo codice, senza un servizio esterno.",
+        "breve": "gli accessi nel tuo codice"
+      },
+      "jwt": {
+        "cosa": "Il gettone firmato che dice chi sei a ogni richiesta.",
+        "breve": "il gettone firmato"
+      },
+      "postgresql": {
+        "cosa": "Il database relazionale di riferimento: transazioni, vincoli, estensioni.",
+        "breve": "il database relazionale"
+      },
+      "mysql": {
+        "cosa": "Relazionale anche lui, diffusissimo.",
+        "breve": "relazionale anche lui"
+      },
+      "mongodb": {
+        "cosa": "Documenti invece di tabelle, quando lo schema cambia spesso.",
+        "breve": "documenti invece di tabelle"
+      },
+      "prisma": {
+        "cosa": "L'ORM: lo schema in un file, le query con i tipi.",
+        "breve": "l'ORM"
+      },
+      "drizzle": {
+        "cosa": "L'ORM leggero, vicino all'SQL.",
+        "breve": "l'ORM leggero"
+      },
+      "vercel": {
+        "cosa": "Il front-end al bordo, vicino a chi lo apre.",
+        "breve": "il front-end al bordo"
+      },
+      "railway": {
+        "cosa": "Server, database e Redis senza gestire macchine.",
+        "breve": "server senza macchine"
+      },
+      "docker": {
+        "cosa": "Lo stesso ambiente dal mio computer alla produzione.",
+        "breve": "lo stesso ambiente ovunque"
+      },
+      "typescript": {
+        "cosa": "I tipi, dal browser al database: se un dato cambia forma, me lo dice prima.",
+        "breve": "i tipi"
+      },
+      "git": {
+        "cosa": "La storia di ogni riga.",
+        "breve": "la storia di ogni riga"
+      },
+      "vitest": {
+        "cosa": "I test: quello che deve continuare a funzionare, scritto.",
+        "breve": "i test"
+      },
+      "zod": {
+        "cosa": "La validazione: lo stesso schema controlla il modulo e l'API.",
+        "breve": "la validazione"
+      },
+      "langchain": {
+        "cosa": "Collega il modello ai documenti e agli strumenti.",
+        "breve": "il modello collegato ai documenti"
+      },
+      "vercel-ai-sdk": {
+        "cosa": "Le risposte in streaming dentro l'interfaccia.",
+        "breve": "le risposte in streaming"
+      },
+      "pgvector": {
+        "cosa": "La ricerca per significato, dentro PostgreSQL.",
+        "breve": "la ricerca per significato"
+      }
+    },
+    "capi": {
+      "vetrina": {
+        "nome": "Un sito vetrina",
+        "slug": "vetrina",
+        "perche": "Veloce, trovabile, bello da scorrere. Niente back-end: non serve.",
+        "alt": {
+          "gsap": "se le animazioni sono solo entrate e uscite dei componenti"
+        }
+      },
+      "ecommerce": {
+        "nome": "Un e-commerce",
+        "slug": "ecommerce",
+        "perche": "Catalogo, carrello, ordini: i dati contano e le code tengono gli ordini al sicuro.",
+        "alt": {
+          "postgresql": "se il tuo gestionale lo usa già",
+          "express": "se il negozio cresce e il back-end diventa grande"
+        }
+      },
+      "piattaforma": {
+        "nome": "Una piattaforma",
+        "slug": "piattaforma",
+        "perche": "Tanti utenti, ruoli e permessi, cose che cambiano in tempo reale.",
+        "alt": {
+          "clerk": "se i dati degli utenti devono restare tutti in casa tua",
+          "trpc": "se altre app devono leggere gli stessi dati"
+        }
+      },
+      "assistente": {
+        "nome": "Un assistente AI",
+        "slug": "assistente",
+        "perche": "Risponde sui tuoi documenti veri, e quando non sa passa a una persona.",
+        "alt": {
+          "supabase-auth": "se l'assistente vive dentro una piattaforma che ha già i suoi accessi"
+        }
+      }
     }
   },
   "works": {
@@ -182,37 +945,53 @@
       "visit": "Visita il sito",
       "open": "Apri il caso",
       "close": "Chiudi",
+      "riporta": "riporta davanti la cartella",
       "screenshotAlt": "{name}: schermata del progetto",
-      "riservato": "Coperto da accordo di riservatezza"
+      "riservato": "Coperto da accordo di riservatezza",
+      "archivio": "Archivio lavori",
+      "pratica": "Pratica n.",
+      "comEra": "Com'era, quando sono arrivato",
+      "cliente": "Cliente",
+      "anno": "Anno",
+      "stato": "Stato",
+      "online": "Online",
+      "allegato": "Allegato A · la piattaforma oggi",
+      "rilevato": "Rilevato a fine lavoro",
+      "rilevatoFinora": "Rilevato finora",
+      "stima": "stima",
+      "consegnato": "Consegnato",
+      "inCorso": "In corso",
+      "firmaNome": "A. Ghidara",
+      "firmaRuolo": "sviluppatore"
     },
     "list": {
       "riservato": {
         "name": "Riservato",
-        "riga": "Un'attività che lavorava su più strumenti e più piattaforme, con gli stessi dati in posti diversi e nessuno in grado di dire quale versione fosse quella buona.",
-        "lavoro": "Una piattaforma sola al posto degli strumenti sparsi. Dentro ci vivono lo streaming video, i documenti e i contratti dei clienti, e tanti operatori che scrivono sulle stesse cose nello stesso momento.",
-        "scelta": "Sostituire gli strumenti, non collegarli fra loro. Le integrazioni non tolgono le copie, le moltiplicano: ogni strumento resta padrone dei suoi dati, e il giorno che uno dei due cambia il collegamento si rifà da capo.",
-        "conduzione": "A fasi, e la prima doveva sostituire qualcosa per davvero invece di aggiungersi a quello che c'era già: finché il vecchio strumento resta acceso accanto al nuovo, i dati continuano a stare in due posti."
+        "riga": "Un'attività di fitness che lavorava con diversi strumenti presi da fuori, ognuno con il suo abbonamento.",
+        "lavoro": "Diversi clienti, in mercati diversi. Il progetto più grande è una piattaforma per il fitness: con un piccolo team abbiamo riunito in un posto solo gli strumenti che l'attività usava già.",
+        "scelta": "Portare dentro la piattaforma quello che arrivava dagli abbonamenti esterni, così che clienti, contratti e provvigioni stiano tutti nello stesso posto.",
+        "conduzione": "Abbiamo preso gli strumenti che l'attività usava, visto quali funzioni servivano davvero al cliente e le abbiamo riportate sulla nostra piattaforma, tarandole meglio sulle sue esigenze."
       },
       "bdroppy": {
         "name": "BDroppy",
-        "riga": "La piattaforma era ferma su Next 14. Ogni funzionalità nuova richiedeva settimane e il team aveva paura di toccare il codice.",
-        "lavoro": "Una piattaforma che vende ogni giorno, e che quindi non poteva avere una finestra di fermo: qualunque cosa si facesse, doveva succedere mentre il negozio era aperto.",
-        "scelta": "Migrare una rotta alla volta, invece di riscrivere da zero. Una riscrittura si consegna tutta insieme, e fino a quel giorno l'azienda resta su quello che ha.",
-        "conduzione": "Vecchia e nuova in convivenza dietro lo stesso indirizzo: ogni rotta migrata andava in produzione per conto suo, senza aspettare le altre. Oggi è su Next 15 e TypeScript, e il servizio non si è mai fermato."
+        "riga": "La piattaforma era su Next 14, con buona parte del codice ancora in JavaScript, e le pagine di spedizione rallentavano perché poco ottimizzate: siamo partiti da lì, ottimizzandole.",
+        "lavoro": "Aggiornare la piattaforma da Next 14 a Next 15, migliorarne le prestazioni e correggere i bug che si portava dietro.",
+        "scelta": "Portare il codice verso TypeScript dove si poteva, invece di riscriverlo tutto. Il JavaScript legacy resta dove funziona, e le parti nuove o toccate nascono tipizzate.",
+        "conduzione": "Aggiornamento, prestazioni e interfaccia nello stesso lavoro: abbiamo rivisto le schermate di scelta e di acquisto, per rendere più semplice trovare un prodotto e comprarlo."
       },
       "aidify": {
         "name": "Aidify",
-        "riga": "Un'assistenza clienti sommersa dalle stesse dieci domande, ripetute su cinque piattaforme e-commerce diverse.",
-        "lavoro": "Un assistente che risponde al posto delle persone sulle domande che tornano sempre, sulle cinque piattaforme e-commerce da cui arrivano.",
-        "scelta": "Legarlo al catalogo e agli ordini veri, invece di addestrare un modello sulle domande più frequenti. Un modello indovina, e quando indovina male lo fa con la stessa sicurezza di quando indovina bene: il cliente se ne accorge dopo aver comprato.",
-        "conduzione": "Il confine di quello che l'assistente sa non è affidato al modello, è scritto nel codice: oltre quel confine la conversazione passa a un operatore senza che il cliente debba chiederlo."
+        "riga": "Negozi Shopify che dovevano rispondere ai clienti a qualunque ora, anche quando nessuno era davanti allo schermo.",
+        "lavoro": "Un chatbot con l'intelligenza artificiale che fa assistenza dentro i negozi Shopify, e la landing che porta i negozi a conoscerlo, poi a restare.",
+        "scelta": "Un widget solo che si adatta a ogni negozio: stile e colori si cambiano per starci dentro, senza toccare il codice.",
+        "conduzione": "Ottimizzando il widget sulle piattaforme Shopify, perché non appesantisse il negozio che lo ospita, e curando la landing per l'arrivo e la fidelizzazione di clienti e lead."
       },
       "visualboost": {
         "name": "VisualBoost",
-        "riga": "Un archivio di immagini editoriali che nessuno riusciva a sfogliare senza restare ad aspettare.",
-        "lavoro": "Un archivio editoriale da sfogliare, dove il contenuto è fatto quasi solo di immagini pesanti.",
-        "scelta": "Lavorare sulle immagini, non sul codice che le impagina. Il codice è il primo posto dove si guarda, e quasi mai è lì: a pesare erano i file.",
-        "conduzione": "Formati moderni, dimensioni giuste e caricamento progressivo, prima di ogni altra cosa. La landing pubblica è stata poi rifatta da altri: quello che resta è l'impianto sotto."
+        "riga": "Un servizio che crea con l'IA le immagini dei prodotti di uno store: una vetrina fatta quasi solo di immagini, che doveva aprirsi subito.",
+        "lavoro": "La landing del servizio e il caricamento delle immagini, che qui sono il prodotto stesso.",
+        "scelta": "Lavorare sulle immagini prima che sul codice: formati e dimensioni giusti, e caricamento solo quando servono.",
+        "conduzione": "Misurando con Lighthouse prima e dopo, con un occhio alla conversione: una pagina che si apre subito è una pagina che si legge fino al pulsante."
       }
     }
   },
@@ -278,6 +1057,7 @@
     "senzaTesserino": "Nessun tesserino",
     "etichettaLezione": "Cosa mi ha lasciato",
     "nota": "Da freelance il tesserino non te lo dà nessuno.",
+    "suggerimento": "continua a scorrere",
     "list": {
       "freelanceOggi": {
         "role": "Sviluppatore web freelance",
@@ -302,8 +1082,9 @@
     }
   },
   "metrics": {
-    "riservatoCycleTime": "per un passaggio che prima chiedeva ore",
-    "bdroppyComponents": "componenti migrati",
+    "riservatoCycleTime": "per un passaggio che prima chiedeva ore, convertito in meno di 15 minuti",
+    "bdroppyPagina": "per aprire una pagina prodotto, da oltre 4 s",
+    "bdroppyTypescript": "del codice portato a TypeScript",
     "bdroppyDowntime": "ore di servizio interrotto",
     "aidifyConversations": "conversazioni gestite al mese",
     "visualboostCatalog": "immagini a catalogo",
@@ -311,6 +1092,49 @@
     "coffees": "caffè",
     "years": "anni di sviluppo web",
     "responseTime": "tempo di risposta"
+  },
+  "notizie": {
+    "eyebrow": "Le notizie della settimana",
+    "title": "Scegli cosa ti va, gira la manopola",
+    "intro": "Tre mondi che seguo da vicino: l'intelligenza artificiale, il design e il codice con cui lavoro. Premi il pulsante di quello che ti incuriosisce, gira, e ti esce una notizia di questi giorni.",
+    "categorie": {
+      "ia": { "nome": "I.A.", "testata": "La Gazzetta dell'I.A." },
+      "design": { "nome": "Design", "testata": "Il Foglio del Design" },
+      "codice": { "nome": "Codice", "testata": "Il Corriere del Codice" }
+    },
+    "timbri": {
+      "primaPagina": "in prima pagina",
+      "paper": "paper del giorno",
+      "piuLetto": "più letto",
+      "release": "nuova versione"
+    },
+    "dati": {
+      "punti": "punti",
+      "commenti": "commenti",
+      "voti": "voti",
+      "autori": "autori",
+      "reazioni": "reazioni",
+      "lettura": "di lettura",
+      "versione": "versione"
+    },
+    "minuti": "{n} min",
+    "rilascio": "{titolo} è uscito",
+    "leggiSu": "Leggi su {sito}",
+    "targa": "{categoria} · {n} palline",
+    "targaUna": "{categoria} · 1 pallina",
+    "gruppo": "Che notizie vuoi",
+    "manopola": "Gira la manopola: esce una notizia",
+    "aiuto": "Scegli il tipo, poi gira la manopola: un clic, o trascinala in tondo.",
+    "attesa": "Riempio la macchina con le notizie della settimana…",
+    "vuota": "Scegli fra I.A., Design e Codice, poi gira la manopola: la notizia si stampa qui.",
+    "errore": "Le notizie non sono arrivate. Gira la manopola per riprovare.",
+    "finite": "Le notizie {categoria} di oggi sono finite: prova un altro pulsante, o torna domani.",
+    "giaUscite": "Già uscite",
+    "testata": "Le notizie",
+    "nessunaUscita": "Le altre notizie che fai uscire si mettono in fila qui.",
+    "senzaRiassunto": "La notizia intera sta dall'altra parte del link: qui c'è il titolo, e il posto dove leggerla.",
+    "raccolteOggi": "Notizie raccolte alle {ora} di oggi: domani sono altre.",
+    "raccolteIl": "Notizie raccolte il {giorno} alle {ora}."
   },
   "contact": {
     "eyebrow": "Contatti",

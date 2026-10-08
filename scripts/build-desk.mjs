@@ -38,7 +38,7 @@ const round = (n) => +n.toFixed(2);
 
 /**
  * Un rettangolo disegnato a mano: si campiona il perimetro e si sposta ogni
- * punto di un'inezia. Il tratto non chiude mai perfettamente — e' voluto:
+ * punto di un'inezia. Il tratto non chiude mai perfettamente, ed e' voluto:
  * l'ink-circle del brand non chiude, e questo e' lo stesso gesto.
  */
 function wobblyRect(x, y, w, h, random, jitter = 1.6, step = 22) {
@@ -111,7 +111,7 @@ function inner(name, spec, random) {
 
 /**
  * Il contorno esterno: il corpo dell'oggetto, e nient'altro. E' il PRIMO
- * sorteggio che ogni sagoma fa, ed e' l'unico punto in cui viene disegnato —
+ * sorteggio che ogni sagoma fa, ed e' l'unico punto in cui viene disegnato:
  * il contorno e il pieno chiamano questa, cosi' l'uno e' per costruzione il
  * tracciato dell'altro. Ridisegnarlo a parte darebbe due tremolii diversi e
  * ogni oggetto del tavolo avrebbe un alone.
@@ -149,7 +149,7 @@ export function buildShape(name) {
  *
  * Il seme e' quello della sagoma e il sorteggio e' il primo, lo stesso che fa
  * buildShape: i due tracciati escono identici carattere per carattere, e per
- * questo combaciano. Niente tratto — il tratto e' l'altro strato.
+ * questo combaciano. Niente tratto: il tratto e' l'altro strato.
  */
 export function buildFill(name) {
   const spec = SHAPES[name];

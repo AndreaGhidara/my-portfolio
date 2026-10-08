@@ -1,7 +1,27 @@
 "use client";
 
 import { useEffect } from "react";
+import type Lenis from "lenis";
 import { useMotionLevel } from "@/animations/motionPolicy";
+import { quandoLibero } from "@/animations/quandoLibero";
+
+/**
+ * Lo scroll fluido acceso in questo momento, o null. Serve a chi deve portare
+ * la pagina in un punto preciso mentre Lenis e' in corsa: Lenis 1.3 si
+ * riallinea allo scroll nativo solo quando non sta animando, quindi un
+ * window.scrollTo entro un secondo da un giro di rotellina viene riscritto dal
+ * fotogramma dopo, e il salto non succede. Chi ce l'ha chiede a lui.
+ *
+ * Una variabile di modulo e non un contesto React: chi la legge lo fa dentro
+ * un gestore di evento, e un solo SmoothScroll esiste per pagina. `import type`
+ * sopra non porta Lenis nel pacchetto: arriva ancora solo col caricamento al
+ * volo qui sotto.
+ */
+let attiva: Lenis | null = null;
+
+export function lenisAttiva(): Lenis | null {
+  return attiva;
+}
 
 /**
  * Lenis SOLO al livello "full". Su touch lo smooth-scroll dà sempre la
@@ -34,6 +54,7 @@ export function SmoothScroll() {
 
       registerGsap();
       const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+      attiva = lenis;
 
       lenis.on("scroll", ScrollTrigger.update);
 
@@ -61,6 +82,7 @@ export function SmoothScroll() {
       syncDialogState();
 
       smonta = () => {
+        attiva = null;
         observer.disconnect();
         gsap.ticker.remove(tick);
         gsap.ticker.lagSmoothing(500, 33);
@@ -71,15 +93,11 @@ export function SmoothScroll() {
     // Dopo la prima pittura, come le animazioni: qui non c'e' niente da
     // mostrare, c'e' solo da rendere piu' morbido un gesto che l'utente non ha
     // ancora fatto.
-    const suIdle = "requestIdleCallback" in window;
-    const id = suIdle
-      ? window.requestIdleCallback(() => void avvia(), { timeout: 800 })
-      : window.setTimeout(() => void avvia(), 200);
+    const annulla = quandoLibero(() => void avvia());
 
     return () => {
       vivo = false;
-      if (suIdle) window.cancelIdleCallback(id as number);
-      else window.clearTimeout(id as number);
+      annulla();
       smonta?.();
     };
   }, [level]);

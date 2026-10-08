@@ -9,7 +9,7 @@ export type Metric = {
 };
 
 /**
- * ATTENZIONE — decisione presa consapevolmente dall'utente.
+ * ATTENZIONE: decisione presa consapevolmente dall'utente.
  * Tutti i numeri qui sotto sono PLAUSIBILI MA INVENTATI: non sono stati
  * misurati. Sono di scala (componenti, volumi, durate) e non commerciali
  * (conversioni, fatturato), perché sono meno contestabili.
@@ -21,20 +21,26 @@ export const metrics: Metric[] = [
     /**
      * Il caso riservato non aveva numeri, ed era l'unico: senza, il dossier
      * del lavoro di adesso raccontava una scelta senza dire cosa ha prodotto.
-     * Il numero arriva dal CV, dov'era scritto e basta: qui dentro almeno
-     * porta con se' come si verifica.
+     * Il numero arriva dal CV. Il 2026-09-29 l'utente l'ha confermato come
+     * vero («convertito in meno di 15 minuti»): non e' piu' una stima.
      */
     id: "riservatoCycleTime",
-    value: "15 min",
-    estimated: true,
+    value: "< 15 min",
+    estimated: false,
     howToVerify:
       "Cronometrare il passaggio dentro la piattaforma con chi lo esegue davvero, e confrontarlo con quanto durava sui vecchi strumenti. Finche' non e' misurato, in call si dice \"si e' passati da ore a minuti\" senza dare il numero.",
   },
   {
-    id: "bdroppyComponents",
-    value: "120",
+    id: "bdroppyPagina",
+    value: "< 2 s",
     estimated: true,
-    howToVerify: "Contare i componenti migrati nel repo BDroppy fra il primo e l'ultimo commit della migrazione.",
+    howToVerify: "Misurare il caricamento del contenuto principale (LCP) di una pagina prodotto con PageSpeed Insights, prima e dopo l'aggiornamento, sulla stessa pagina.",
+  },
+  {
+    id: "bdroppyTypescript",
+    value: "40%",
+    estimated: true,
+    howToVerify: "Contare i file .ts/.tsx sul totale dei file sorgente nel repo BDroppy, prima e dopo l'aggiornamento.",
   },
   {
     id: "bdroppyDowntime",
@@ -70,7 +76,7 @@ export const metrics: Metric[] = [
   {
     // Il post-it grigio del tavolo. E' l'unico numero del sito che non e' una
     // metrica di lavoro: e' una battuta, e va letta come tale. Sta qui lo stesso
-    // — e con estimated: true come gli altri — perche' la regola di questo file
+    // (e con estimated: true come gli altri) perche' la regola di questo file
     // e' "ogni numero inventato sta in un posto solo e si dichiara inventato",
     // e un numero che si autorizza l'eccezione perche' e' simpatico e' esatta-
     // mente il modo in cui quella regola smette di valere.

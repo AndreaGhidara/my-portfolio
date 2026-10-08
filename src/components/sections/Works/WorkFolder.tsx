@@ -1,67 +1,142 @@
 "use client";
 
+import { useRef, type CSSProperties } from "react";
+import { due } from "@/lib/formato";
+import { WorkShot } from "./WorkShot";
+import type { Cartella } from "./scivola";
 import type { WorkCaseData } from "./types";
 
 /**
- * Una cartella dello schedario, chiusa.
+ * Una cartella dell'archivio: la linguetta col nome, il dorso con un foglio
+ * che spunta, e davanti la faccia.
  *
- * La linguetta porta il nome del cliente, la faccia porta il lavoro in una
- * frase: chi arriva da cliente si riconosce nella situazione prima di sapere di
- * che azienda si tratta, ed e' il motivo per cui il nome non e' il titolo.
+ * La faccia porta il lavoro in una frase: chi arriva da cliente si riconosce
+ * nella situazione prima di sapere di che azienda si tratta, ed e' il motivo per
+ * cui il nome sta sulla linguetta e non nel titolo. Accanto, la schermata
+ * infilata come un foglio; il riservato non ne ha, e lo dice.
  *
- * Quella riga resta leggibile anche da telefono, dove nessuno passa il mouse:
- * una pila di sole linguette costringerebbe a un tap per sapere di cosa si
- * parla, e meta' di chi apre il sito lo apre da mobile.
+ * La linguetta e' un bottone suo, fratello della faccia e non annidato: quando
+ * la cartella e' archiviata e' l'unica parte che si vede, e deve prendere il
+ * click per intero. Riporta davanti la sua cartella. La faccia apre il dossier,
+ * dal bottone «Apri il caso» o da un click qualunque sopra: la cartella scivola
+ * via e ne esce la pratica (vedi scivola.ts), quindi al dossier passano i
+ * pezzi della cartella e non un rettangolo.
  */
 export function WorkFolder({
   data,
   index,
+  totale,
   openLabel,
+  riservatoLabel,
+  riportaLabel,
   onOpen,
   onPreload,
+  onRiporta,
 }: {
   data: WorkCaseData;
   index: number;
+  totale: number;
   openLabel: string;
-  onOpen: (data: WorkCaseData, origin: DOMRect) => void;
+  /** La scritta del riquadro quando non c'e' una schermata da mostrare. */
+  riservatoLabel: string;
+  /** Per chi legge a voce: la linguetta non apre il caso, lo riporta davanti. */
+  riportaLabel: string;
+  onOpen: (cartella: Cartella) => void;
   /** Chiesto appena si capisce che questa cartella sta per aprirsi. */
   onPreload: () => void;
+  /** La linguetta: questa cartella torna davanti. */
+  onRiporta: () => void;
 }) {
+  const li = useRef<HTMLLIElement | null>(null);
+  const linguetta = useRef<HTMLButtonElement | null>(null);
+  const dorso = useRef<HTMLDivElement | null>(null);
+  const foglio = useRef<HTMLDivElement | null>(null);
+  const faccia = useRef<HTMLDivElement | null>(null);
+  const bottone = useRef<HTMLButtonElement | null>(null);
+
+  const apri = () => {
+    if (!li.current || !linguetta.current || !dorso.current || !foglio.current || !faccia.current || !bottone.current) {
+      return;
+    }
+    onOpen({
+      li: li.current,
+      linguetta: linguetta.current,
+      dorso: dorso.current,
+      faccia: faccia.current,
+      foglio: foglio.current,
+      apri: bottone.current,
+    });
+  };
+
   return (
-    <button
-      type="button"
-      data-work-folder
-      aria-haspopup="dialog"
-      onClick={(event) => onOpen(data, event.currentTarget.getBoundingClientRect())}
-      // Tre segnali per la stessa cosa: sta per aprirsi. Il mouse che si posa
-      // (desktop), il focus da tastiera, e il dito che scende (telefono, dove
-      // hover non esiste). La schermata parte di la', non dal click.
-      onPointerEnter={onPreload}
-      onFocus={onPreload}
-      onPointerDown={onPreload}
-      style={{ zIndex: index }}
-      className="group flex w-full flex-col items-start text-left focus-visible:outline-none"
-    >
-      {/* La linguetta copre di un pixel il bordo alto del corpo e non ha bordo
-          inferiore: e' quello che salda le due forme in una cartella sola. */}
-      <span className="relative z-10 -mb-px rounded-t-[10px] border border-b-0 border-[var(--line)] bg-[var(--superficie)] px-3 py-1.5 text-[0.62rem] font-extrabold uppercase tracking-[0.14em] text-[var(--fg-muted)]">
-        {data.name} · {data.year}
-      </span>
+    <li ref={li} data-cartella style={{ "--i": index } as CSSProperties}>
+      <button ref={linguetta} type="button" data-linguetta onClick={onRiporta}>
+        <b>{data.name}</b>
+        {/* Sul telefono la linguetta porta solo il nome: quattro in fila non
+            ci starebbero con l'anno, e l'anno lo dice la faccia. */}
+        <span data-linguetta-anno> · {data.year}</span>
+        <span className="sr-only">, {riportaLabel}</span>
+      </button>
 
-      <span data-folder-body className="flex w-full flex-1 flex-col rounded-b-[var(--radius)] rounded-tr-[var(--radius)] border border-[var(--line)] bg-[var(--superficie)] p-4 transition-shadow group-focus-visible:ring-2 group-focus-visible:ring-[var(--accent)] lg:p-5">
-        <span className="eyebrow">{String(index + 1).padStart(2, "0")}</span>
-        <span className="mt-3 block flex-1 text-[0.95rem] font-semibold leading-snug text-[var(--fg)] lg:text-base">
-          {data.riga}
-        </span>
-        <span
-          aria-hidden="true"
-          className="mt-4 self-end text-lg leading-none text-[var(--accento-testo)]"
-        >
-          +
-        </span>
-      </span>
+      {/* Ad archivio acceso il dorso prende il puntatore (vedi sezioni/lavori.css) e
+          non fa niente: e' la fascia fra le linguette e la faccia, e un click
+          li' non deve arrivare alla faccia di una cartella coperta. */}
+      <div ref={dorso} data-dorso aria-hidden="true" />
+      {/* Il foglio che spunta: e' lui che sfila quando la cartella si apre. */}
+      <div ref={foglio} data-foglio aria-hidden="true" />
 
-      <span className="sr-only">{openLabel}</span>
-    </button>
+      {/* Un click sulla faccia apre il caso come il suo bottone: sono la
+          stessa cosa. Il bottone c'e' per la tastiera e per chi legge a voce,
+          e la faccia gli delega il puntatore. */}
+      <div
+        ref={faccia}
+        data-faccia
+        onClick={(event) => {
+          if ((event.target as Element).closest("button")) return;
+          apri();
+        }}
+        // Tre segnali per la stessa cosa: sta per aprirsi. Il mouse che si posa
+        // (desktop), il focus da tastiera, e il dito che scende (telefono, dove
+        // hover non esiste). La schermata parte di la', non dal click.
+        onPointerEnter={onPreload}
+        onFocus={onPreload}
+        onPointerDown={onPreload}
+      >
+        <div>
+          <p data-faccia-numero>
+            {due(index + 1)} / {due(totale)}
+          </p>
+          {/* Il titolo della cartella e' chi, non la frase: e' quello che
+              distingue una cartella dall'altra nell'elenco dei titoli, ed e'
+              lo stesso titolo del dossier che la faccia apre. */}
+          <h3 data-faccia-chi>
+            {data.name} · {data.year}
+          </h3>
+        </div>
+
+        <div data-faccia-centro>
+          <p data-faccia-riga>{data.riga}</p>
+          <div data-faccia-schermata>
+            {data.screenshot ? (
+              <WorkShot shot={data.screenshot} alt={data.screenshotAlt} />
+            ) : (
+              <p data-faccia-riservato>{riservatoLabel}</p>
+            )}
+          </div>
+        </div>
+
+        <div data-faccia-piede>
+          <ul data-faccia-tech>
+            {data.tech.map((voce) => (
+              <li key={voce}>{voce}</li>
+            ))}
+          </ul>
+          <button ref={bottone} type="button" data-apri aria-haspopup="dialog" onClick={apri}>
+            {openLabel} <span aria-hidden="true">+</span>
+            <span className="sr-only">: {data.name}</span>
+          </button>
+        </div>
+      </div>
+    </li>
   );
 }

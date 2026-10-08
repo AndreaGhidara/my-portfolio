@@ -1,7 +1,6 @@
 import { Avatar } from "@/components/brand/Avatar";
 import { InkCircle } from "@/components/brand/InkCircle";
 import { Wordmark } from "@/components/brand/Wordmark";
-import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { HeroMotion } from "./HeroMotion";
 import { CartaStropicciata } from "./CartaStropicciata";
 
@@ -30,8 +29,6 @@ export function HeroView({
 }: HeroViewProps) {
   return (
     <section id="hero" className="relative overflow-hidden px-[var(--gutter)] pb-16 pt-6">
-      <ThreadSegment section="hero" className="pointer-events-none absolute inset-0 -z-10" />
-
       {/* Le lettere del nome sono fogli, e si possono appallottolare. Non
           sostituisce le <img>: si sovrappone alla lettera che si sta toccando
           e ne segue il rettangolo, cosi' eredita il parallasse di HeroMotion e
@@ -130,7 +127,7 @@ export function HeroView({
           {/* L'anello arancione sta di suo su «Parliamone», che e' l'azione
               suggerita, e passa all'altro bottone quando ci si porta sopra: si
               vede sempre quale dei due si sta per scegliere. Il disegno e' in
-              tokens.css, sotto [data-hero-cta]. */}
+              sezioni/apertura.css, sotto [data-hero-cta]. */}
           <div data-hero-cta className="mt-7 flex flex-wrap justify-center gap-3">
             <a
               href="#contact"

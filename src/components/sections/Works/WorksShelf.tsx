@@ -1,88 +1,91 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useSectionAnimation } from "@/animations/useSectionAnimation";
+import { useRef, type CSSProperties } from "react";
+import { LINGUETTA, PARAMETRI } from "./archivio";
 import { WorkFolder } from "./WorkFolder";
 import { WorkDialog } from "./WorkDialog";
 import { preloadShot } from "./preloadShot";
 import type { WorkCaseData, WorkCaseLabels } from "./types";
-
-type Active = { data: WorkCaseData; origin: DOMRect };
+import { useArchivioAcceso } from "./useArchivioAcceso";
+import { usePratica } from "./usePratica";
+import { useProfondita } from "./useProfondita";
 
 /**
- * Lo schedario: le cartelle chiuse e il dossier che si apre.
+ * Le misure dell'archivio arrivano al CSS da qui, scritte nel markup del
+ * server: il numero vive in archivio.ts e il foglio di stile lo legge, come fa
+ * il percorso con binario.ts.
+ */
+const MISURE = {
+  "--passo": `${PARAMETRI.passo}px`,
+  "--distanza": `${PARAMETRI.distanza}vh`,
+  "--scurisce": PARAMETRI.scurisce,
+  "--stringe": PARAMETRI.stringe,
+  "--larghezza-linguetta": `${PARAMETRI.larghezzaLinguetta}%`,
+  "--buio-minimo": `${LINGUETTA.buioMinimo * 100}%`,
+};
+
+/**
+ * I Lavori come un archivio di cartelle: ognuna a tutta pagina, sticky, e la
+ * successiva le sale sopra fermandosi un passo piu' in basso. Quelle sotto si
+ * scuriscono e si stringono in proporzione a `--profondita`. A fine corsa
+ * resta il cassetto con le quattro linguette e l'ultima cartella intera, e
+ * l'archivio se ne va con la pagina: nessuna sosta.
  *
- * Lo stato sta qui e non nelle singole cartelle perche' il dialog e' uno solo:
- * uno per cartella significherebbe quattro <dialog> nel DOM, quattro trappole
- * di focus e la certezza che prima o poi se ne aprano due.
+ * Finche' l'archivio non e' acceso e' la colonna, che e' anche il markup del
+ * server: senza JavaScript si legge tutto. Tre pezzi, uno per file:
+ * - useArchivioAcceso decide se ogni faccia ci sta intera (sotto, la colonna
+ *   con l'entrata di sempre);
+ * - useProfondita accende l'archivio e scrive `--profondita` allo scroll;
+ * - usePratica apre e chiude il dossier, uno solo per tutte le cartelle.
  */
 export function WorksShelf({
-  items,
+  lavori,
   labels,
 }: {
-  items: WorkCaseData[];
+  lavori: WorkCaseData[];
   labels: WorkCaseLabels;
 }) {
-  const [active, setActive] = useState<Active | null>(null);
-  const schedario = useRef<HTMLDivElement | null>(null);
-
-  /**
-   * L'entrata delle quattro cartelle.
-   *
-   * Due impaginati, due modi di entrare, e la scelta la fa il DISEGNO e non il
-   * livello di movimento: da 1024px in su le cartelle sono in fila e le loro
-   * cime sono alla stessa quota, quindi entrano insieme, sfalsate nel tempo —
-   * che e' l'unico modo di dare un ordine a quattro cose affiancate. Sotto,
-   * sono impilate: li' ognuna scatta quando tocca a lei.
-   *
-   * Prima erano sfalsate anche da telefono, con un innesco solo per tutto lo
-   * schedario: la quarta partiva mezzo secondo dopo la prima, quando ormai era
-   * finita fuori dallo schermo, e la sua entrata non la vedeva nessuno.
-   */
-  useSectionAnimation(({ level, presets }) => {
-    const { daDietro } = presets;
-    const radice = schedario.current;
-    if (!radice) return;
-
-    const cartelle = Array.from(radice.children) as HTMLElement[];
-    if (cartelle.length === 0) return;
-
-    const impilate =
-      cartelle[cartelle.length - 1].offsetTop - cartelle[0].offsetTop > 40;
-
-    if (impilate) {
-      for (const cartella of cartelle) {
-        daDietro(cartella, { level, trigger: cartella, clearProps: true });
-      }
-      return;
-    }
-
-    daDietro(cartelle, { level, trigger: radice, stagger: 0.18, clearProps: true });
-  }, schedario);
+  const schedario = useRef<HTMLOListElement | null>(null);
+  const ciStanno = useArchivioAcceso(schedario);
+  const { riporta, prepara } = useProfondita(schedario, ciStanno);
+  const { attiva, dialogo, apri, chiudi, alClose } = usePratica(schedario, prepara);
 
   return (
     <>
-      {/* L'attributo resta su QUESTO elemento: tutto l'impaginato dello
-          schedario e' scritto con `[data-work-shelf] > *`, e un involucro in
-          mezzo lo scollegherebbe dalle cartelle. */}
-      <div ref={schedario} data-work-shelf>
-        {items.map((item, index) => (
+      {/* L'attributo resta su QUESTO elemento, e le cartelle ne sono figlie
+          dirette: tutto l'impaginato dell'archivio e' scritto con
+          `[data-work-shelf] > [data-cartella]`. */}
+      {/* `--n` entra nell'altezza della faccia: i passi delle cartelle gia'
+          archiviate sono n - 1. */}
+      <ol
+        ref={schedario}
+        data-work-shelf
+        style={{ ...MISURE, "--n": lavori.length } as CSSProperties}
+      >
+        {lavori.map((item, index) => (
           <WorkFolder
             key={item.id}
             data={item}
             index={index}
-            openLabel={labels.open}
-            onOpen={(data, origin) => setActive({ data, origin })}
+            totale={lavori.length}
+            openLabel={labels.apri}
+            riservatoLabel={labels.riservato}
+            riportaLabel={labels.riporta}
+            onOpen={(cartella) => apri(index, cartella)}
             onPreload={() => preloadShot(item.screenshot)}
+            onRiporta={() => riporta(index)}
           />
         ))}
-      </div>
+      </ol>
 
       <WorkDialog
-        data={active?.data ?? null}
-        origin={active?.origin ?? null}
+        dialogo={dialogo}
+        data={attiva === null ? null : (lavori[attiva] ?? null)}
+        numero={(attiva ?? 0) + 1}
+        totale={lavori.length}
         labels={labels}
-        onClose={() => setActive(null)}
+        onChiudi={chiudi}
+        onClose={alClose}
       />
     </>
   );

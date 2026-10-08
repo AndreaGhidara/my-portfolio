@@ -1,11 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
+import { renderConTesti as render } from "@/test/renderConTesti";
 import { ServicesView } from "../ServicesView";
 import type { ServicesViewProps } from "../ServicesView";
 import { LABEL, drawWidth } from "../layers";
+import { testi } from "../cassetta/__tests__/fixture";
 
-/** Il quarto, come nel tavolo vero: il mondo verticale disegna i primi quattro
- *  oggetti di ogni strato, e il post-it bianco deve stare fra quelli. */
+/** Il quarto, come nel tavolo vero. */
 const MUTO = 3;
 
 const layer = (id: string, n: number, mute = false) => ({
@@ -19,34 +20,35 @@ const layer = (id: string, n: number, mute = false) => ({
   })),
 });
 
-/**
- * Il mondo viene disegnato due volte, una per formato, e il CSS ne nasconde uno.
- * Il gemello nascosto porta data-ghost: sta nel DOM ma non conta, ne' per i test
- * ne' per uno screen reader.
- */
-const SOLI_VERI = "[data-desk-object]:not([data-ghost])";
+/** Gli oggetti del tavolo. */
+const SOLI_VERI = "[data-desk-object]";
 
 const props: ServicesViewProps = {
   eyebrow: "Il metodo",
   stageTitle: "Tutto quello che non si vede",
   stageLead: "Un sito finito.",
   centre: "il progetto",
-  composto: "Da cosa e\' composto",
   punch: "Quello che chiami 'un sito' è lo schermo al centro.",
   blank: "E la tua, qual è?",
   note: "23.777 caffè",
-  practice: "E in pratica?",
-  intro: "Quattro modi di lavorare.",
   layers: [layer("site", 6), layer("logic", 6), layer("infra", 6), layer("growth", 6, true)],
-  items: [
-    { id: "sites", title: "Siti e landing", description: "Niente temi comprati." },
-    { id: "ecommerce", title: "E-commerce", description: "Il catalogo lo collego." },
-    { id: "webapp", title: "Web app", description: "Si parte dalla versione piccola." },
-    { id: "ai", title: "AI e automazioni", description: "Collegate ai tuoi dati veri." },
-  ],
+  cassetta: {
+    eyebrow: "Gli attrezzi",
+    title: "Tutto quello che so usare.",
+    lead: "La mia cassetta.",
+    testi: testi("it"),
+  },
 };
 
 describe("la sezione del tavolo", () => {
+
+  it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
+    render(<ServicesView {...props} />);
+    const sezione = screen.getByRole("region", { name: props.stageTitle });
+    const titolo = within(sezione).getByRole("heading", { level: 2, name: props.stageTitle });
+    expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
+    expect(titolo).toHaveClass("titolo-sezione");
+  });
   it("è ancorabile dalla navbar", () => {
     const { container } = render(<ServicesView {...props} />);
     expect(container.querySelector("section#services")).not.toBeNull();
@@ -54,7 +56,18 @@ describe("la sezione del tavolo", () => {
 
   it("ha un titolo vero, non un titolo disegnato", () => {
     render(<ServicesView {...props} />);
-    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(props.stageTitle);
+    expect(screen.getByRole("heading", { level: 2, name: props.stageTitle })).toBeInTheDocument();
+  });
+
+  it("dopo il tavolo viene la cassetta degli attrezzi, dentro la stessa sezione", () => {
+    const { container } = render(<ServicesView {...props} />);
+    const sezione = container.querySelector("section#services") as HTMLElement;
+    const figli = [...sezione.children];
+    expect(figli[0]).toHaveAttribute("data-desk");
+    expect(figli[1]).toHaveAttribute("data-cassetta-sezione");
+    expect(within(figli[1] as HTMLElement).getByRole("heading", { level: 2 })).toHaveTextContent(
+      props.cassetta.title,
+    );
   });
 
   it("dice la sua tesi: è quella la ragione per cui la sezione esiste", () => {
@@ -73,9 +86,6 @@ describe("il tavolo è la lista", () => {
 
   it("ogni strato ha il suo titolo e la sua riga", () => {
     const { container } = render(<ServicesView {...props} />);
-    // Il gemello nascosto e' aria-hidden, quindi per getByRole non esiste: i
-    // titoli tornano uno per strato. Le righe invece sono testo semplice e
-    // getByText ne troverebbe due, percio' si cercano dentro il mondo vero.
     const vero = container.querySelector("[data-desk-world]:not([aria-hidden])") as HTMLElement;
     for (const l of props.layers) {
       expect(screen.getByRole("heading", { level: 3, name: l.title })).toBeInTheDocument();
@@ -118,31 +128,6 @@ describe("il tavolo è la lista", () => {
     expect(within(vero).getAllByRole("link")).toHaveLength(1);
   });
 
-  it("nel gemello il post-it si disegna e si preme, ma non entra nel giro dei Tab", () => {
-    // Sotto i 1024px il disegno e' il gemello, e questo post-it li' c'e': e' il
-    // quarto oggetto del suo strato, non il sesto, quindi non porta data-off.
-    // Un post-it che porta da qualche parte e non si preme sarebbe il disegno di
-    // un comando, percio' l'<a> c'e'. Ma il gemello e' aria-hidden per intero:
-    // una seconda fermata del Tab annuncerebbe il nulla, e il nome del comando
-    // sta nell'altro mondo: quello che uno screen reader legge davvero.
-    const { container } = render(<ServicesView {...props} />);
-    const gemello = container.querySelector("[data-desk-world][aria-hidden]") as HTMLElement;
-    const muti = [...gemello.querySelectorAll("[data-desk-object]")].filter(
-      (el) => !el.querySelector("[data-desk-label]"),
-    );
-    expect(muti).toHaveLength(1);
-    expect(muti[0]).not.toHaveAttribute("data-off");
-    const comando = muti[0].querySelector("[data-desk-blank]") as HTMLElement;
-    expect(comando).toHaveAttribute("href", "#contact");
-    expect(comando).toHaveAttribute("tabindex", "-1");
-    // Dentro ci sta la nota (il conto dei caffe'), che qui e' il disegno stesso
-    // del post-it: sotto i 1024px il mondo che si vede e' questo. Quello che il
-    // gemello NON porta e' la domanda, che e' il nome del comando: quella sta
-    // nell'altro mondo, l'unico che uno screen reader legge.
-    expect(comando.querySelector("[data-desk-note]")).not.toBeNull();
-    expect(comando.querySelector("[data-desk-ask]")).toBeNull();
-  });
-
   it("le sagome sono decorative: il significato sta nell'etichetta, non nel disegno", () => {
     const { container } = render(<ServicesView {...props} />);
     for (const oggetto of container.querySelectorAll(SOLI_VERI)) {
@@ -159,20 +144,16 @@ describe("il tavolo è la lista", () => {
     // nessuno disegna piu'.
     const { container } = render(<ServicesView {...props} />);
     const primo = container.querySelector(SOLI_VERI) as HTMLElement;
-    expect(primo.style.width).toBe(`${drawWidth("wide", "sheet")}%`);
+    expect(primo.style.width).toBe(`${drawWidth("sheet")}%`);
     const etichetta = primo.querySelector("[data-desk-label]") as HTMLElement;
     expect(etichetta.style.maxWidth).toBe(`${LABEL.width}em`);
   });
 
-  it("il gemello nascosto non si fa leggere due volte", () => {
+  it("il mondo e' uno solo: il gemello verticale ha lasciato il posto al gioco", () => {
     const { container } = render(<ServicesView {...props} />);
-    const gemelli = container.querySelectorAll("[data-desk-world][aria-hidden]");
-    expect(gemelli).toHaveLength(1);
-    // Tutti i suoi oggetti sono marcati: e' con data-ghost che i test e il CSS
-    // distinguono la copia disegnata dalla copia che si legge.
-    for (const oggetto of gemelli[0].querySelectorAll("[data-desk-object]")) {
-      expect(oggetto).toHaveAttribute("data-ghost");
-    }
+    expect(container.querySelectorAll("[data-desk-world]")).toHaveLength(1);
+    expect(container.querySelector("[data-desk-world][aria-hidden]")).toBeNull();
+    expect(container.querySelector("section#services [data-desk-stage] [data-gioco]")).not.toBeNull();
   });
 });
 
@@ -276,11 +257,12 @@ describe("i materiali", () => {
   });
 
   it("la sagoma sa che disegno e': la maschera pende da lei, non dall'oggetto", () => {
-    // Perche' questa prova esiste: «E in pratica?» usa le stesse sagome fuori
-    // dal tavolo, molto piu' grandi. Finche' le maschere pendevano da
-    // [data-desk-object], un disegno la' non le prendeva, e dargli
-    // data-desk-object avrebbe rotto il conteggio dei ventiquattro, che e' una
-    // prova giusta. La sagoma sa gia' che disegno e': glielo si chiede.
+    // Perche' questa prova esiste: le stesse sagome si usano fuori dal tavolo
+    // (le consegne di «Come lavoro», e prima «E in pratica?»). Finche' le
+    // maschere pendevano da [data-desk-object], un disegno la' non le
+    // prendeva, e dargli data-desk-object avrebbe rotto il conteggio dei
+    // ventiquattro, che e' una prova giusta. La sagoma sa gia' che disegno e':
+    // glielo si chiede.
     const { container } = render(<ServicesView {...props} />);
     const sagoma = container.querySelector(`${SOLI_VERI} [data-desk-shape]`) as HTMLElement;
     expect(sagoma).toHaveAttribute("data-shape", "sheet");
@@ -305,25 +287,5 @@ describe("il patto del fallback", () => {
     const primo = container.querySelector(SOLI_VERI) as HTMLElement;
     expect(primo.style.getPropertyValue("--from")).not.toBe("");
     expect(primo.style.getPropertyValue("--span")).not.toBe("");
-  });
-});
-
-describe("E in pratica?", () => {
-  it("i quattro testi lunghi restano: il tavolo è lo spettacolo, questi la sostanza", () => {
-    render(<ServicesView {...props} />);
-    for (const item of props.items) {
-      // Livello 4 e non 3: stanno dentro il blocco "E in pratica?", che e' il
-      // loro <h3>. Al livello 3 sarebbero fratelli del titolo che li contiene.
-      expect(screen.getByRole("heading", { level: 4, name: item.title })).toBeInTheDocument();
-      expect(screen.getByText(item.description)).toBeInTheDocument();
-    }
-  });
-
-  it("rispondono in ordine alle quattro voci, e l'ordine è visibile", () => {
-    const { container } = render(<ServicesView {...props} />);
-    const ol = container.querySelector("[data-practice]");
-    expect(ol?.tagName).toBe("OL");
-    expect(within(ol as HTMLElement).getByText("01")).toBeVisible();
-    expect(within(ol as HTMLElement).getByText("04")).toBeVisible();
   });
 });

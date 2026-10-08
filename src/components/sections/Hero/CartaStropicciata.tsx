@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useMotionLevel } from "@/animations/motionPolicy";
+import { palette } from "@/styles/palette";
 import { GRADINI, RAGGIO, maglia, veloPer, type Vertice } from "./carta/geometria";
 import { accartoccia, sorgente } from "./carta/disegno";
 import { aRiposo, lancio, passo, type Pezzo } from "./carta/fisica";
@@ -14,13 +16,13 @@ import { aRiposo, lancio, passo, type Pezzo } from "./carta/fisica";
  * si toccano. Sono l'elemento LCP della pagina, e `HeroMotion` le timbra
  * all'ingresso e poi le fa seguire il puntatore con un parallasse. Quindi qui
  * non si sostituisce niente: si sovrappone una tela alla singola lettera che
- * si sta toccando, posizionata sul suo rettangolo — che il parallasse lo porta
+ * si sta toccando, posizionata sul suo rettangolo, che il parallasse lo porta
  * gia' dentro, quindi lo eredita gratis. A riposo non esiste una tela, non
  * gira un ciclo, e il nome e' esattamente quello di prima.
  *
  * Solo a "full": e' un gesto che si fa col puntatore, e fermo non vuol dire
  * niente. A "reduced", a "none" e senza JavaScript non si monta nemmeno, e
- * l'hero resta quello che e' sempre stato — che e' anche il motivo per cui in
+ * l'hero resta quello che e' sempre stato, che e' anche il motivo per cui in
  * jsdom (dove il livello e' sempre "none") questo componente non disegna mai:
  * una tela li' non ha un contesto 2D.
  */
@@ -44,8 +46,8 @@ export function CartaStropicciata() {
     if (!nome || immagini.length === 0) return;
 
     const stile = getComputedStyle(document.body);
-    const carta = stile.getPropertyValue("--bg").trim() || "#F5F1E8";
-    const riga = stile.getPropertyValue("--line").trim() || "#D9D3C4";
+    const carta = stile.getPropertyValue("--bg").trim() || palette.paper;
+    const riga = stile.getPropertyValue("--line").trim() || palette.graph;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
 
     type Lettera = {
@@ -200,9 +202,18 @@ export function CartaStropicciata() {
     const dentro = (e: PointerEvent) =>
       lettere.find((L) => !L.via && L.img === (e.target as Node));
 
+    /* Una lettera che sta andando sotto il foglio della stampante (SottoIlFoglio
+       scrive --copertura su #hero) non si sgualcisce e non si prende: la tela
+       e la pallina stanno sopra il velo, e si accenderebbe una lettera sola
+       in mezzo alle altre scurite. Lo stile inline e non quello calcolato:
+       e' li' che il componente lo scrive, e leggerlo non costa un layout. */
+    const hero = document.getElementById("hero");
+    const sottoIlFoglio = () =>
+      (parseFloat(hero?.style.getPropertyValue("--copertura") ?? "") || 0) > 0;
+
     const sopra = (e: PointerEvent) => {
       const L = dentro(e);
-      if (L) { L.mira = 0.55; sveglia(); }
+      if (L && !sottoIlFoglio()) { L.mira = 0.55; sveglia(); }
     };
     const fuori = (e: PointerEvent) => {
       const L = dentro(e);
@@ -210,7 +221,7 @@ export function CartaStropicciata() {
     };
     const giu = (e: PointerEvent) => {
       const L = dentro(e);
-      if (!L) return;
+      if (!L || sottoIlFoglio()) return;
       e.preventDefault();
       L.t = 1;
       const p = stacca(L);
@@ -297,7 +308,15 @@ export function CartaStropicciata() {
   }, [livello]);
 
   // Lo strato c'e' sempre nel DOM ma e' vuoto e non riceve il puntatore: e'
-  // solo il posto dove le tele vanno a stare. Decorativo per intero — il nome
+  // solo il posto dove le tele vanno a stare. Decorativo per intero: il nome
   // che uno screen reader legge resta quello del wordmark.
-  return <div ref={strato} data-carta aria-hidden="true" />;
+  const tela = <div ref={strato} data-carta aria-hidden="true" />;
+  /* A "full" lo strato va in fondo a <body>, fuori da #hero. Quando la
+     stampante passa sopra Hero (SottoIlFoglio), #hero e' sticky, e un elemento sticky
+     apre sempre un contesto di impilamento suo, z-index o no: lo z-index 40
+     dello strato varrebbe solo dentro Hero, e la pallina lanciata finirebbe
+     sotto il foglio arancione. Da <body> se la gioca con il resto della
+     pagina, com'era prima. Solo a "full" perche' e' l'unico livello in cui
+     lo strato disegna qualcosa; negli altri resta dov'e', anche sul server. */
+  return livello === "full" ? createPortal(tela, document.body) : tela;
 }

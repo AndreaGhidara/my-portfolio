@@ -8,7 +8,7 @@ import { contrastRatio } from "@/styles/contrast";
  * Perche' esista un modulo e non solo il foglio di stile: la prima stesura
  * dichiarava UNA tavola sola per tutti e due i temi, e in tema scuro il
  * cartoncino (`--fg` 15% su `--bg`) e la scocca (`--ink` 78% con `--fg-muted`)
- * finivano sullo stesso identico colore — 1.00:1. Non era un valore sbagliato,
+ * finivano sullo stesso identico colore: 1.00:1. Non era un valore sbagliato,
  * era strutturale: la carta segue il tema e in scuro SALE, l'apparecchio e'
  * fisso ma schiarito per non fare nero-su-nero e in scuro sale anche lui. Le
  * due famiglie si incrociano, e nessuna tavolozza unica puo' impedirlo.
@@ -63,11 +63,12 @@ export type Coat = {
 
 export type Surface = {
   /**
-   * La PRIMA RIGA, esatta, della regola che porta la ricetta in `tokens.css`.
-   * La regola del tema scuro e' la stessa preceduta da `[data-theme="dark"] `.
-   * E' un ancoraggio per la prova del contratto, non un selettore da usare
-   * altrove: si cerca a capo riga perche' `[data-desk-shape] {` e' contenuto
-   * per intero dentro `[data-theme="dark"] [data-desk-shape] {`.
+   * Il selettore della regola che porta la ricetta in `sezioni/tavolo.css`,
+   * come lo si scrive in testa alla regola: la graffa o la virgola in coda
+   * la prova del contratto le toglie, e cerca il selettore intero fra quelli
+   * della lista. La regola del tema scuro e' la stessa preceduta da
+   * `[data-theme="dark"] `. E' un ancoraggio per la prova, non un selettore
+   * da usare altrove.
    */
   anchor: string;
   family: Family;
@@ -81,7 +82,7 @@ const mix = (a: Token, pct: number, b: Token): Recipe => ({ a, pct, b });
 
 /**
  * La carta piu' chiara della famiglia. Sta in una costante perche' due
- * superfici la spendono — il foglio e il post-it bianco — e due copie a mano
+ * superfici la spendono (il foglio e il post-it bianco) e due copie a mano
  * dello stesso numero sono due copie che un giorno divergono.
  */
 const PALEST_PAPER: Record<Theme, Recipe> = {
@@ -92,12 +93,12 @@ const PALEST_PAPER: Record<Theme, Recipe> = {
 /**
  * La tavola. Il disegno, in una riga: in tema chiaro la carta sta appena sotto
  * il fondo e l'apparecchio precipita a nero; in tema scuro si scambiano i
- * mestieri — la carta e' la cosa che brilla, l'apparecchio resta basso vicino
+ * mestieri: la carta e' la cosa che brilla, l'apparecchio resta basso vicino
  * al fondo e a tenerlo su sono il tratto e i led. In una stanza buia una
  * scatola nera su una scrivania scura non si legge per il suo pieno: si legge
  * per i suoi riflessi.
  *
- * L'ordine dentro la famiglia carta non cambia mai — il foglio e' la carta piu'
+ * L'ordine dentro la famiglia carta non cambia mai. Il foglio e' la carta piu'
  * chiara, la piastra la piu' scura: cambia il piano su cui appoggiano. E i
  * segni sulla carta sono scuri in tutti e due i temi, perche' una matita e' una
  * matita: in chiaro sono grafite tirata verso l'inchiostro, in scuro sono
@@ -111,7 +112,7 @@ export const SURFACES: Record<SurfaceName, Surface> = {
     light: { fill: PALEST_PAPER.light, line: { token: "fg-muted" } },
     dark: { fill: PALEST_PAPER.dark, line: mix("ink", 60, "fg-muted") },
   },
-  /* La scheda: cartoncino, e il bordo di inchiostro — e' stampata. */
+  /* La scheda: cartoncino, e il bordo di inchiostro: e' stampata. */
   card: {
     anchor: '[data-desk-piece][data-shape="card"] {',
     family: "carta",
@@ -141,8 +142,8 @@ export const SURFACES: Record<SurfaceName, Surface> = {
     dark: { fill: { token: "bulb" }, line: mix("bulb", 55, "ink") },
   },
   /* Il post-it BIANCO: la spec lo chiama cosi' (§3.2), ed e' il solo oggetto
-     del tavolo che si preme. Prende il pieno della carta piu' chiara — LO
-     STESSO del foglio, letto da li' e non ricopiato — e il tratto non lo
+     del tavolo che si preme. Prende il pieno della carta piu' chiara (LO
+     STESSO del foglio, letto da li' e non ricopiato) e il tratto non lo
      dichiara: eredita il giallo spento degli altri post-it. Resta un post-it,
      ma vuoto, che e' quello che la spec chiede e che i pieni hanno smesso di
      dire il giorno in cui sono arrivati. */
@@ -179,7 +180,7 @@ export const SHADOW: Record<Theme, { token: Token; pct: number }> = {
   light: { token: "ink", pct: 26 },
   /* In tema scuro non esiste niente di piu' scuro del fondo da mettere sotto un
      oggetto: --bg E' --ink, e il piu' nero della palette e' il piano stesso.
-     L'ombra diventa allora quello che in una stanza buia si vede davvero — il
+     L'ombra diventa allora quello che in una stanza buia si vede davvero: il
      contatto che schiarisce appena attorno alla sagoma, non il buio sotto. Sta
      sotto il pieno della scocca (1.27 sul fondo) apposta: deve staccare
      l'oggetto dal piano senza confondersi col suo bordo. */

@@ -16,13 +16,13 @@ export function HeroMotion({ children }: { children: ReactNode }) {
     const root = scope.current;
     if (!root) return;
 
-    const letters = root.querySelectorAll(".wordmark-letter");
-    const circle = root.querySelector("[data-ink-circle-fill]");
+    const lettere = root.querySelectorAll(".wordmark-letter");
+    const cerchio = root.querySelector("[data-ink-circle-fill]");
     const ritratto = root.querySelector("[data-hero-avatar] img");
 
     const intro = gsap.timeline();
-    intro.add(stamp(letters, { level, stagger: 0.09 }) ?? gsap.timeline());
-    intro.add(paint(circle, { level }) ?? gsap.timeline(), "-=0.35");
+    intro.add(stamp(lettere, { level, stagger: 0.09 }) ?? gsap.timeline());
+    intro.add(paint(cerchio, { level }) ?? gsap.timeline(), "-=0.35");
     /* La testa cresce DENTRO il cerchio che si sta ancora dipingendo: entra a
        un terzo di quella pennellata, cosi' le due cose si leggono come un
        gesto solo invece che come due animazioni in fila.
@@ -42,13 +42,13 @@ export function HeroMotion({ children }: { children: ReactNode }) {
        e la ragione e' una metrica.
        Il claim e' l'elemento piu' grande della prima schermata: e' lui che il
        browser cronometra come Largest Contentful Paint. Portandolo a opacita'
-       zero — come fa `reveal` — se l'animazione parte PRIMA che il browser
+       zero (come fa `reveal`) se l'animazione parte PRIMA che il browser
        l'abbia dipinto, quel cronometro non parte al primo disegno ma quando la
        frase ricompare. Misurato con Lighthouse mobile: LCP a 3,0s con 2,5s di
        sola attesa, su una frase che nel documento c'e' dall'inizio.
        Quindi il claim si muove e basta, senza dissolvenza: sale di qualche
        pixel, resta sempre visibile, e l'LCP e' il primo disegno. Il resto della
-       copia — sottotitolo e bottoni — non e' l'elemento piu' grande e puo'
+       copia (sottotitolo e bottoni) non e' l'elemento piu' grande e puo'
        continuare a comparire. */
     const claim = root.querySelector<HTMLElement>("[data-hero-claim]");
     const resto = [...root.querySelectorAll<HTMLElement>("[data-hero-copy] > *")].filter(
@@ -80,7 +80,7 @@ export function HeroMotion({ children }: { children: ReactNode }) {
     const move = (event: PointerEvent) => {
       const x = (event.clientX / window.innerWidth - 0.5) * 2;
       const y = (event.clientY / window.innerHeight - 0.5) * 2;
-      gsap.to(letters, { x: x * 6, y: y * 3, duration: 0.8, overwrite: "auto" });
+      gsap.to(lettere, { x: x * 6, y: y * 3, duration: 0.8, overwrite: "auto" });
       gsap.to(root.querySelectorAll("[data-hero-avatar]"), {
         x: x * -10, y: y * -5, duration: 0.8, overwrite: "auto",
       });
@@ -90,5 +90,14 @@ export function HeroMotion({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("pointermove", move);
   }, scope);
 
-  return <div ref={scope}>{children}</div>;
+  /* data-hero-strato: e' lo strato che si stringe e sale quando la stampante
+     passa sopra (SottoIlFoglio, regole in sezioni/sopra.css). Contiene solo il contenuto:
+     una trasformazione sulla sezione diventerebbe il riferimento dello strato
+     fisso della carta, che smetterebbe di coprire lo schermo. La carta sta
+     fuori, in HeroView. */
+  return (
+    <div ref={scope} data-hero-strato>
+      {children}
+    </div>
+  );
 }

@@ -20,10 +20,16 @@ export async function Works() {
     screenshot: work.screenshot ? shotBySrc(work.screenshot) : undefined,
     screenshotAlt: t("labels.screenshotAlt", { name: t(`list.${work.id}.name`) }),
     year: work.year,
+    stato: work.stato,
     tech: work.tech,
     metrics: work.metricIds.map((id) => {
       const metric = metricById(id);
-      return { id: metric.id, value: metric.value, label: tMetrics(metric.id) };
+      return {
+        id: metric.id,
+        value: metric.value,
+        label: tMetrics(metric.id),
+        estimated: metric.estimated,
+      };
     }),
   }));
 
@@ -36,10 +42,26 @@ export async function Works() {
         lavoro: t("labels.lavoro"),
         scelta: t("labels.scelta"),
         conduzione: t("labels.conduzione"),
-        visit: t("labels.visit"),
+        visita: t("labels.visit"),
         riservato: t("labels.riservato"),
-        open: t("labels.open"),
-        close: t("labels.close"),
+        apri: t("labels.open"),
+        chiudi: t("labels.close"),
+        riporta: t("labels.riporta"),
+        archivio: t("labels.archivio"),
+        pratica: t("labels.pratica"),
+        comEra: t("labels.comEra"),
+        cliente: t("labels.cliente"),
+        anno: t("labels.anno"),
+        stato: t("labels.stato"),
+        online: t("labels.online"),
+        allegato: t("labels.allegato"),
+        rilevato: t("labels.rilevato"),
+        rilevatoFinora: t("labels.rilevatoFinora"),
+        stima: t("labels.stima"),
+        consegnato: t("labels.consegnato"),
+        inCorso: t("labels.inCorso"),
+        firmaNome: t("labels.firmaNome"),
+        firmaRuolo: t("labels.firmaRuolo"),
       }}
       items={items}
     />

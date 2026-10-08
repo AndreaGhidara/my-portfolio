@@ -1,7 +1,6 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, it, expect } from "vitest";
 import { deskLayers } from "@/content/desk";
+import { regole } from "@/test/css";
 import it_ from "../../../../../messages/it.json";
 import en_ from "../../../../../messages/en.json";
 import {
@@ -22,11 +21,8 @@ import {
   objectFootprint,
   placeObject,
   type DeskDrawing,
-  type DeskLayout,
 } from "../layers";
 import { SHAPES } from "../../../../../scripts/build-desk.mjs";
-
-const LAYOUTS: DeskLayout[] = ["wide", "tall"];
 
 /**
  * Il pavimento dell'aria fra due cose sul tavolo, in percentuale dell'ALTEZZA
@@ -60,10 +56,9 @@ const CLEARANCE_FLOOR = 1.7;
  * compagni, e i quattro anelli si leggevano come una nuvola sola. Nessuna prova
  * se ne accorgeva, perche' 1,53 sta sopra il pavimento globale.
  *
- * 3,0 punti sono circa 19 px a 1440. Non e' il massimo raggiungibile: il mondo
- * orizzontale ne tiene 4,28 e quello verticale 3,52, ma e' la soglia sotto la
- * quale l'occhio ricomincia a raggruppare per vicinanza invece che per anello,
- * ed e' il mondo verticale a fissare il margine.
+ * 3,0 punti sono circa 19 px a 1440. Non e' il massimo raggiungibile (il
+ * mondo ne tiene 4,28), ma e' la soglia sotto la quale l'occhio ricomincia a
+ * raggruppare per vicinanza invece che per anello.
  */
 const RING_FLOOR = 3.0;
 
@@ -81,32 +76,32 @@ function overlap(a: Rect, b: Rect) {
  * di confrontarlo con quello verticale, o si sommano mele e pere. Negativo
  * vuol dire sovrapposti.
  */
-function clearance(a: Rect, b: Rect, layout: DeskLayout) {
-  const ratio = WORLD[layout].width / WORLD[layout].height;
+function clearance(a: Rect, b: Rect) {
+  const ratio = WORLD.width / WORLD.height;
   const dx = Math.max(b.x0 - a.x1, a.x0 - b.x1) * ratio;
   const dy = Math.max(b.y0 - a.y1, a.y0 - b.y1);
   return Math.max(dx, dy);
 }
 
 /** Quanto dista dal bordo del mondo, nella stessa unita'. */
-function clearanceFromWorld(a: Rect, layout: DeskLayout) {
-  const ratio = WORLD[layout].width / WORLD[layout].height;
+function clearanceFromWorld(a: Rect) {
+  const ratio = WORLD.width / WORLD.height;
   return Math.min(a.x0 * ratio, (100 - a.x1) * ratio, a.y0, 100 - a.y1);
 }
 
 /**
- * Tutti gli oggetti disegnati in un formato, ognuno col suo rettangolo vero:
+ * Tutti gli oggetti disegnati, ognuno col suo rettangolo vero:
  * sagoma piu' striscia dell'etichetta, inclinazione compresa. E' l'unica lista
  * su cui abbia senso provare qualcosa: un tavolo non si controlla uno strato
  * per volta, perche' le collisioni che si vedono sono quelle FRA strati.
  */
-function everyObject(layout: DeskLayout) {
+function everyObject() {
   const out: { box: Rect; dove: string }[] = [];
   for (let layer = 0; layer < deskLayers.length; layer++) {
-    for (let i = 0; i < OBJECTS_PER_LAYER[layout]; i++) {
+    for (let i = 0; i < OBJECTS_PER_LAYER; i++) {
       out.push({
-        box: objectBox(layout, layer, i),
-        dove: `${layout} ${deskLayers[layer].id}/${deskLayers[layer].objects[i].id}`,
+        box: objectBox(layer, i),
+        dove: `${deskLayers[layer].id}/${deskLayers[layer].objects[i].id}`,
       });
     }
   }
@@ -114,19 +109,13 @@ function everyObject(layout: DeskLayout) {
 }
 
 describe("il mondo del tavolo", () => {
-  it("ha due formati: orizzontale per il desktop, verticale per il telefono", () => {
-    expect(WORLD.wide.width).toBeGreaterThan(WORLD.wide.height);
-    expect(WORLD.tall.height).toBeGreaterThan(WORLD.tall.width);
+  it("e' orizzontale: si disegna solo da desktop", () => {
+    expect(WORLD.width).toBeGreaterThan(WORLD.height);
   });
 
-  it("sul telefono mostra meno oggetti per strato: quattro invece di sei", () => {
-    expect(OBJECTS_PER_LAYER.wide).toBe(6);
-    expect(OBJECTS_PER_LAYER.tall).toBe(4);
-  });
-
-  it("ogni strato ha almeno tanti oggetti quanti il formato ne mostra", () => {
+  it("ogni strato ha almeno tanti oggetti quanti il tavolo ne mostra", () => {
     for (const layer of deskLayers) {
-      expect(layer.objects.length).toBeGreaterThanOrEqual(OBJECTS_PER_LAYER.wide);
+      expect(layer.objects.length).toBeGreaterThanOrEqual(OBJECTS_PER_LAYER);
     }
   });
 });
@@ -142,20 +131,12 @@ describe("quanto sono grandi gli oggetti", () => {
     // La trappola: il mondo non e' quadrato, e una percentuale orizzontale e una
     // verticale non misurano lo stesso lato. Sbagliando, il telefono (74x148)
     // verrebbe alto un terzo del tavolo.
-    for (const layout of LAYOUTS) {
-      for (const [name, box] of Object.entries(SHAPE_BOX)) {
-        const half = objectExtent(layout, name as DeskDrawing, 0);
-        const larghezza = (half.x * 2 * WORLD[layout].width) / 100;
-        const altezza = (half.y * 2 * WORLD[layout].height) / 100;
-        expect(larghezza / altezza, `${layout}/${name}`).toBeCloseTo(box.w / box.h, 5);
-      }
+    for (const [name, box] of Object.entries(SHAPE_BOX)) {
+      const half = objectExtent(name as DeskDrawing, 0);
+      const larghezza = (half.x * 2 * WORLD.width) / 100;
+      const altezza = (half.y * 2 * WORLD.height) / 100;
+      expect(larghezza / altezza, name).toBeCloseTo(box.w / box.h, 5);
     }
-  });
-
-  it("nel mondo verticale si disegnano piu' piccoli: a misura naturale un foglio sarebbe un quinto della larghezza", () => {
-    const naturale = (SHAPE_BOX.sheet.w * 100) / WORLD.tall.width;
-    expect(naturale).toBeGreaterThan(20);
-    expect(drawWidth("tall", "sheet")).toBeLessThan(naturale * 0.6);
   });
 });
 
@@ -164,106 +145,83 @@ describe("quanto e' grande un oggetto", () => {
     // Senza questa, la prova successiva misurerebbe meta' oggetto: le
     // sovrapposizioni che si vedono a occhio sono quasi tutte fra una parola e
     // il disegno di qualcun altro.
-    for (const layout of LAYOUTS) {
-      const muto = objectFootprint(layout, "sheet", 0, false);
-      const parlante = objectFootprint(layout, "sheet", 0, true);
-      expect(parlante.y1, layout).toBeGreaterThan(muto.y1);
-      expect(parlante.y0, layout).toBe(muto.y0);
-    }
+    const muto = objectFootprint("sheet", 0, false);
+    const parlante = objectFootprint("sheet", 0, true);
+    expect(parlante.y1).toBeGreaterThan(muto.y1);
+    expect(parlante.y0).toBe(muto.y0);
   });
 
   it("inclinato occupa il rettangolo che il browser disegna, non uno isotropo", () => {
     // La trappola: x e' una quota della larghezza del mondo, y dell'altezza, e
     // il CSS ruota in PIXEL. Ruotare quella coppia mista con [cos -sin; sin cos]
-    // misura un rettangolo che non esiste: nel mondo orizzontale tiene troppo
+    // misura un rettangolo che non esiste: in questo mondo tiene troppo
     // largo e troppo poco alto, e l'errore cresce con l'inclinazione.
     // Qui il conto si rifa' dall'altra parte: si va in pixel, si ruota li', e si
     // torna. Due strade diverse per lo stesso rettangolo.
-    for (const layout of LAYOUTS) {
-      const { width, height } = WORLD[layout];
-      for (const rotate of [-7, -4.2, 3.5, 7]) {
-        const fermo = objectFootprint(layout, "phone", 0, true);
-        const radianti = (rotate * Math.PI) / 180;
-        const cos = Math.cos(radianti);
-        const sin = Math.sin(radianti);
-        const angoli = [
-          [fermo.x0, fermo.y0],
-          [fermo.x1, fermo.y0],
-          [fermo.x0, fermo.y1],
-          [fermo.x1, fermo.y1],
-        ]
-          // in pixel
-          .map(([x, y]) => [(x * width) / 100, (y * height) / 100])
-          // si ruota dove ruota il CSS
-          .map(([x, y]) => [x * cos - y * sin, x * sin + y * cos])
-          // e si torna in percentuale
-          .map(([x, y]) => [(x * 100) / width, (y * 100) / height]);
-        const atteso = {
-          x0: Math.min(...angoli.map((a) => a[0])),
-          x1: Math.max(...angoli.map((a) => a[0])),
-          y0: Math.min(...angoli.map((a) => a[1])),
-          y1: Math.max(...angoli.map((a) => a[1])),
-        };
-        const misurato = objectFootprint(layout, "phone", rotate, true);
-        for (const lato of ["x0", "x1", "y0", "y1"] as const) {
-          expect(misurato[lato], `${layout} ${rotate}° ${lato}`).toBeCloseTo(atteso[lato], 9);
-        }
+    const { width, height } = WORLD;
+    for (const rotate of [-7, -4.2, 3.5, 7]) {
+      const fermo = objectFootprint("phone", 0, true);
+      const radianti = (rotate * Math.PI) / 180;
+      const cos = Math.cos(radianti);
+      const sin = Math.sin(radianti);
+      const angoli = [
+        [fermo.x0, fermo.y0],
+        [fermo.x1, fermo.y0],
+        [fermo.x0, fermo.y1],
+        [fermo.x1, fermo.y1],
+      ]
+        // in pixel
+        .map(([x, y]) => [(x * width) / 100, (y * height) / 100])
+        // si ruota dove ruota il CSS
+        .map(([x, y]) => [x * cos - y * sin, x * sin + y * cos])
+        // e si torna in percentuale
+        .map(([x, y]) => [(x * 100) / width, (y * 100) / height]);
+      const atteso = {
+        x0: Math.min(...angoli.map((a) => a[0])),
+        x1: Math.max(...angoli.map((a) => a[0])),
+        y0: Math.min(...angoli.map((a) => a[1])),
+        y1: Math.max(...angoli.map((a) => a[1])),
+      };
+      const misurato = objectFootprint("phone", rotate, true);
+      for (const lato of ["x0", "x1", "y0", "y1"] as const) {
+        expect(misurato[lato], `${rotate}° ${lato}`).toBeCloseTo(atteso[lato], 9);
       }
     }
-  });
-
-  it("il post-it bianco si disegna anche sul telefono: e' l'unico oggetto che porta da qualche parte", () => {
-    // Il mondo verticale disegna i primi OBJECTS_PER_LAYER.tall oggetti di ogni
-    // strato e gli altri li lascia nell'elenco senza disegnarli. Se il post-it
-    // finisse fuori da quei primi, sul telefono resterebbe un comando che si
-    // annuncia e non si vede: il fuoco su una cosa larga zero pixel, e niente
-    // da premere col dito. E' il motivo per cui in content/desk.ts sta quarto.
-    const blank = deskLayers[3].objects.findIndex((o) => o.mute);
-    expect(blank).toBeGreaterThanOrEqual(0);
-    expect(blank, "il post-it bianco e' fuori dal disegno del telefono").toBeLessThan(
-      OBJECTS_PER_LAYER.tall,
-    );
   });
 
   it("il post-it bianco non ha etichetta e non ne occupa il posto", () => {
     const blank = deskLayers[3].objects.findIndex((o) => o.mute);
     expect(blank).toBeGreaterThanOrEqual(0);
-    const parlante = objectFootprint("wide", "postit", 0, true);
-    const muto = objectFootprint("wide", "postit", 0, false);
+    const parlante = objectFootprint("postit", 0, true);
+    const muto = objectFootprint("postit", 0, false);
     expect(muto.y1).toBeLessThan(parlante.y1);
   });
 });
 
 describe("dove finiscono gli oggetti", () => {
   it("restano dentro il mondo con tutto quello che sono, etichetta compresa", () => {
-    for (const layout of LAYOUTS) {
-      for (const { box, dove } of everyObject(layout)) {
-        expect(box.x0, dove).toBeGreaterThan(0);
-        expect(box.x1, dove).toBeLessThan(100);
-        expect(box.y0, dove).toBeGreaterThan(0);
-        expect(box.y1, dove).toBeLessThan(100);
-      }
+    for (const { box, dove } of everyObject()) {
+      expect(box.x0, dove).toBeGreaterThan(0);
+      expect(box.x1, dove).toBeLessThan(100);
+      expect(box.y0, dove).toBeGreaterThan(0);
+      expect(box.y1, dove).toBeLessThan(100);
     }
   });
 
   it("non coprono il laptop: nemmeno un angolo entra nel centro", () => {
-    for (const layout of LAYOUTS) {
-      const centro = centreBox(layout);
-      for (const { box, dove } of everyObject(layout)) {
-        expect(overlap(box, centro), `${dove} copre il laptop`).toBe(false);
-      }
+    const centro = centreBox();
+    for (const { box, dove } of everyObject()) {
+      expect(overlap(box, centro), `${dove} copre il laptop`).toBe(false);
     }
   });
 
   it("gli strati si allontanano: piu' e' alto il numero, piu' e' lontano dal centro", () => {
-    for (const layout of LAYOUTS) {
-      const distanze = deskLayers.map((_, layer) => {
-        const p = placeObject(layout, layer, 0);
-        return Math.hypot(p.x - 50, p.y - 50);
-      });
-      for (let i = 1; i < distanze.length; i++) {
-        expect(distanze[i], `${layout} strato ${i}`).toBeGreaterThan(distanze[i - 1]);
-      }
+    const distanze = deskLayers.map((_, layer) => {
+      const p = placeObject(layer, 0);
+      return Math.hypot(p.x - 50, p.y - 50);
+    });
+    for (let i = 1; i < distanze.length; i++) {
+      expect(distanze[i], `strato ${i}`).toBeGreaterThan(distanze[i - 1]);
     }
   });
 
@@ -272,13 +230,11 @@ describe("dove finiscono gli oggetti", () => {
     // dello stesso strato: due fogli a 8 e 8 di distanza passavano con 11,3
     // mentre i loro disegni si accavallavano su tutti e due i lati. E le
     // collisioni vere stavano fra strati diversi, dove non guardava nessuno.
-    for (const layout of LAYOUTS) {
-      const oggetti = everyObject(layout);
-      for (let a = 0; a < oggetti.length; a++) {
-        for (let b = a + 1; b < oggetti.length; b++) {
-          const dove = `${oggetti[a].dove} × ${oggetti[b].dove}`;
-          expect(overlap(oggetti[a].box, oggetti[b].box), dove).toBe(false);
-        }
+    const oggetti = everyObject();
+    for (let a = 0; a < oggetti.length; a++) {
+      for (let b = a + 1; b < oggetti.length; b++) {
+        const dove = `${oggetti[a].dove} × ${oggetti[b].dove}`;
+        expect(overlap(oggetti[a].box, oggetti[b].box), dove).toBe(false);
       }
     }
   });
@@ -290,31 +246,29 @@ describe("dove finiscono gli oggetti", () => {
     // un motore di rendering diverso ha bisogno di aria misurata, e dichiarata.
     // Il pavimento e' in percentuale dell'altezza del mondo, che e' l'unita' in
     // cui e' scritta tutta la geometria: a 1440 vale circa 6,3 pixel per punto.
-    for (const layout of LAYOUTS) {
-      const oggetti = everyObject(layout);
-      const centro = centreBox(layout);
-      let peggiore = Infinity;
-      let dove = "";
-      const segna = (aria: number, chi: string) => {
-        if (aria < peggiore) {
-          peggiore = aria;
-          dove = chi;
-        }
-      };
-      for (let a = 0; a < oggetti.length; a++) {
-        for (let b = a + 1; b < oggetti.length; b++) {
-          segna(
-            clearance(oggetti[a].box, oggetti[b].box, layout),
-            `${oggetti[a].dove} × ${oggetti[b].dove}`,
-          );
-        }
-        segna(clearance(oggetti[a].box, centro, layout), `${oggetti[a].dove} × il centro`);
-        segna(clearanceFromWorld(oggetti[a].box, layout), `${oggetti[a].dove} × il bordo`);
+    const oggetti = everyObject();
+    const centro = centreBox();
+    let peggiore = Infinity;
+    let dove = "";
+    const segna = (aria: number, chi: string) => {
+      if (aria < peggiore) {
+        peggiore = aria;
+        dove = chi;
       }
-      expect(peggiore, `${layout}: il punto piu' stretto e' ${dove}`).toBeGreaterThan(
-        CLEARANCE_FLOOR,
-      );
+    };
+    for (let a = 0; a < oggetti.length; a++) {
+      for (let b = a + 1; b < oggetti.length; b++) {
+        segna(
+          clearance(oggetti[a].box, oggetti[b].box),
+          `${oggetti[a].dove} × ${oggetti[b].dove}`,
+        );
+      }
+      segna(clearance(oggetti[a].box, centro), `${oggetti[a].dove} × il centro`);
+      segna(clearanceFromWorld(oggetti[a].box), `${oggetti[a].dove} × il bordo`);
     }
+    expect(peggiore, `il punto piu' stretto e' ${dove}`).toBeGreaterThan(
+      CLEARANCE_FLOOR,
+    );
   });
 
   it("gli anelli restano quattro: fra uno e l'altro c'e' piu' aria che dentro", () => {
@@ -326,33 +280,31 @@ describe("dove finiscono gli oggetti", () => {
     // Non e' il raggio a garantirla: gli anelli non sono omotetici apposta, e
     // due raggi lontani possono comunque incrociarsi sull'asse dove uno e' alto
     // e l'altro largo. Si misura dove si vede: fra i rettangoli veri.
-    for (const layout of LAYOUTS) {
-      const oggetti: { box: Rect; dove: string; anello: number }[] = [];
-      for (let layer = 0; layer < deskLayers.length; layer++) {
-        for (let i = 0; i < OBJECTS_PER_LAYER[layout]; i++) {
-          oggetti.push({
-            box: objectBox(layout, layer, i),
-            dove: `${layout} ${deskLayers[layer].id}/${deskLayers[layer].objects[i].id}`,
-            anello: layer,
-          });
-        }
+    const oggetti: { box: Rect; dove: string; anello: number }[] = [];
+    for (let layer = 0; layer < deskLayers.length; layer++) {
+      for (let i = 0; i < OBJECTS_PER_LAYER; i++) {
+        oggetti.push({
+          box: objectBox(layer, i),
+          dove: `${deskLayers[layer].id}/${deskLayers[layer].objects[i].id}`,
+          anello: layer,
+        });
       }
-      let peggiore = Infinity;
-      let dove = "";
-      for (let a = 0; a < oggetti.length; a++) {
-        for (let b = a + 1; b < oggetti.length; b++) {
-          if (oggetti[a].anello === oggetti[b].anello) continue;
-          const aria = clearance(oggetti[a].box, oggetti[b].box, layout);
-          if (aria < peggiore) {
-            peggiore = aria;
-            dove = `${oggetti[a].dove} × ${oggetti[b].dove}`;
-          }
-        }
-      }
-      expect(peggiore, `${layout}: i due anelli piu' vicini si toccano in ${dove}`).toBeGreaterThan(
-        RING_FLOOR,
-      );
     }
+    let peggiore = Infinity;
+    let dove = "";
+    for (let a = 0; a < oggetti.length; a++) {
+      for (let b = a + 1; b < oggetti.length; b++) {
+        if (oggetti[a].anello === oggetti[b].anello) continue;
+        const aria = clearance(oggetti[a].box, oggetti[b].box);
+        if (aria < peggiore) {
+          peggiore = aria;
+          dove = `${oggetti[a].dove} × ${oggetti[b].dove}`;
+        }
+      }
+    }
+    expect(peggiore, `i due anelli piu' vicini si toccano in ${dove}`).toBeGreaterThan(
+      RING_FLOOR,
+    );
   });
 
   it("dentro uno strato non stanno a distanze uguali, ma non si ammucchiano", () => {
@@ -362,38 +314,36 @@ describe("dove finiscono gli oggetti", () => {
     // raggiungibile a 1440 e' 0,64 punti, sotto il pavimento qui sopra.
     // Le due prove sono una coppia: senza la seconda "irregolare" si otterrebbe
     // benissimo ammucchiando tutto da una parte.
-    for (const layout of LAYOUTS) {
-      const conto = OBJECTS_PER_LAYER[layout];
-      const passo = 360 / conto;
-      const angolo = (layer: number, i: number) => {
-        const p = placeObject(layout, layer, i);
-        return (Math.atan2(p.y - 50, p.x - 50) * 180) / Math.PI;
-      };
-      for (let layer = 0; layer < deskLayers.length; layer++) {
-        const salti: number[] = [];
-        for (let i = 0; i < conto; i++) {
-          let d = angolo(layer, (i + 1) % conto) - angolo(layer, i);
-          while (d <= 0) d += 360;
-          expect(Number.isFinite(d), `${layout} strato ${layer} oggetto ${i}`).toBe(true);
-          salti.push(d);
-        }
-        expect(
-          salti.reduce((a, b) => a + b, 0),
-          `${layout} strato ${layer}: gli oggetti girano una volta sola`,
-        ).toBeCloseTo(360, 6);
-        const irregolare = Math.max(...salti.map((d) => Math.abs(d - passo)));
-        expect(irregolare, `${layout} strato ${layer} e' un quadrante`).toBeGreaterThan(passo * 0.1);
-        // e nessun grappolo: mai meno di meta' passo fra due consecutivi
-        expect(Math.min(...salti), `${layout} strato ${layer} si ammucchia`).toBeGreaterThan(
-          passo * 0.5,
-        );
+    const conto = OBJECTS_PER_LAYER;
+    const passo = 360 / conto;
+    const angolo = (layer: number, i: number) => {
+      const p = placeObject(layer, i);
+      return (Math.atan2(p.y - 50, p.x - 50) * 180) / Math.PI;
+    };
+    for (let layer = 0; layer < deskLayers.length; layer++) {
+      const salti: number[] = [];
+      for (let i = 0; i < conto; i++) {
+        let d = angolo(layer, (i + 1) % conto) - angolo(layer, i);
+        while (d <= 0) d += 360;
+        expect(Number.isFinite(d), `strato ${layer} oggetto ${i}`).toBe(true);
+        salti.push(d);
       }
+      expect(
+        salti.reduce((a, b) => a + b, 0),
+        `strato ${layer}: gli oggetti girano una volta sola`,
+      ).toBeCloseTo(360, 6);
+      const irregolare = Math.max(...salti.map((d) => Math.abs(d - passo)));
+      expect(irregolare, `strato ${layer} e' un quadrante`).toBeGreaterThan(passo * 0.1);
+      // e nessun grappolo: mai meno di meta' passo fra due consecutivi
+      expect(Math.min(...salti), `strato ${layer} si ammucchia`).toBeGreaterThan(
+        passo * 0.5,
+      );
     }
   });
 
   it("li inclina un po', ma sempre allo stesso modo: il disegno non balla fra un render e l'altro", () => {
-    const primo = placeObject("wide", 2, 3);
-    const secondo = placeObject("wide", 2, 3);
+    const primo = placeObject(2, 3);
+    const secondo = placeObject(2, 3);
     expect(primo).toEqual(secondo);
     expect(Math.abs(primo.rotate)).toBeLessThanOrEqual(8);
   });
@@ -432,7 +382,7 @@ describe("quando entrano", () => {
   });
 
   it("dentro uno strato gli oggetti entrano sfalsati, ma finiscono tutti col loro strato", () => {
-    const count = OBJECTS_PER_LAYER.wide;
+    const count = OBJECTS_PER_LAYER;
     const strato = LAYER_BEATS[1];
     const primo = objectBeat(1, 0, count);
     const ultimo = objectBeat(1, count - 1, count);
@@ -466,38 +416,25 @@ describe("la camera", () => {
 
 /**
  * L'etichetta e' un contratto fra due file che non si parlano: layers.ts tiene
- * il posto, tokens.css lo disegna. Cambiare interlinea, respiro o stacco nel
+ * il posto, sezioni/tavolo.css lo disegna. Cambiare interlinea, respiro o stacco nel
  * foglio di stile senza dirlo a LABEL fa misurare alla geometria un rettangolo
  * piu' piccolo di quello vero, e nessuna prova di sovrapposizione se ne
  * accorge, perche' una prova di collisione e' cieca per costruzione a un
  * ingombro che si restringe. Leggere il CSS come testo e' brutto: e' anche
  * l'unica cosa in questo repository che possa cogliere quella modifica.
  */
-const TOKENS = readFileSync(resolve(process.cwd(), "src/styles/tokens.css"), "utf8")
-  // Via i commenti: qui si legge quello che il browser applica, non quello che
-  // il foglio di stile racconta di se'.
-  .replace(/\/\*[\s\S]*?\*\//g, "");
-
 /**
- * Il selettore si cerca ANCORATO A CAPO RIGA, non con un indexOf qualunque.
- * "[data-desk-world] {" e' contenuto per intero dentro
- * "[data-desk][data-motion='full'] [data-desk-world] {", che sta piu' in giu'
- * nel file: con indexOf la regola giusta si trova solo perche' l'originale
+ * Il selettore si cerca INTERO, non come pezzo di testo.
+ * "[data-desk-world]" e' contenuto per intero dentro
+ * "[data-desk][data-motion='full'] [data-desk-world]", che sta piu' in giu':
+ * cercato come testo, la regola giusta si troverebbe solo perche' l'originale
  * viene prima, e la prima regola discendente scritta piu' in alto ripunterebbe
  * in silenzio la rete di sicurezza della geometria su un margin-bottom.
- * Il ^[ \t]* tiene le regole dentro @media, che sono rientrate, ma non lascia
- * passare niente prima del selettore sulla stessa riga.
  */
-function blocco(selettore: string, ultimo = false): string {
-  const ancorato = new RegExp(
-    `^[ \\t]*${selettore.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`,
-    "gm",
-  );
-  const trovati = [...TOKENS.matchAll(ancorato)];
-  const trovato = ultimo ? trovati.at(-1) : trovati[0];
-  if (!trovato) throw new Error(`tokens.css non ha piu' la regola ${selettore}`);
-  const apre = TOKENS.indexOf("{", trovato.index);
-  return TOKENS.slice(apre + 1, TOKENS.indexOf("}", apre));
+function blocco(selettore: string): string {
+  const [trovata] = regole(selettore);
+  if (!trovata) throw new Error(`il foglio di stile non ha piu' la regola ${selettore}`);
+  return trovata.corpo;
 }
 
 function misura(testo: string, dichiarazione: RegExp, dove: string): number[] {
@@ -506,13 +443,12 @@ function misura(testo: string, dichiarazione: RegExp, dove: string): number[] {
   return trovato.slice(1).map(Number);
 }
 
-const ETICHETTA = blocco("[data-desk-object] [data-desk-label] {");
-const MONDO = blocco("[data-desk-world] {");
-const MONDO_STRETTO = blocco('[data-desk-world][data-layout="tall"] {', true);
+const ETICHETTA = blocco("[data-desk-object] [data-desk-label]");
+const MONDO = blocco("[data-desk-world]");
 
-/** Il rem del sito, e le due finestre piu' strette in cui ogni mondo si disegna. */
+/** Il rem del sito, e la finestra piu' stretta in cui il mondo si disegna. */
 const REM = 16;
-const FINESTRA = { wide: 1024, tall: 320 };
+const FINESTRA = 1024;
 
 describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
   it("LABEL.height sono le due righe e il respiro scritti nel CSS", () => {
@@ -541,21 +477,13 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
       /font-size:\s*clamp\(\s*([\d.]+)rem\s*,\s*([\d.]+)cqw\s*,\s*([\d.]+)rem\s*\)/,
       "etichetta",
     );
-    const larghezze: Record<DeskLayout, number[]> = {
-      wide: misura(MONDO, /width:\s*min\(([\d.]+)vw,\s*([\d.]+)rem\)/, "mondo"),
-      tall: misura(MONDO_STRETTO, /width:\s*min\(([\d.]+)vw,\s*([\d.]+)rem\)/, "mondo stretto"),
-    };
-    for (const layout of LAYOUTS) {
-      const [vw, rem] = larghezze[layout];
-      const mondo = Math.min((FINESTRA[layout] * vw) / 100, rem * REM);
-      const corpo = Math.min(Math.max((cqw * mondo) / 100, minimo * REM), massimo * REM);
-      const atteso = (corpo / mondo) * 100;
-      // Riservare in eccesso va bene, in difetto no: la disuguaglianza ha un verso.
-      expect(LABEL.em[layout], `${layout} riserva meno di quanto disegna`).toBeGreaterThanOrEqual(
-        atteso,
-      );
-      expect(LABEL.em[layout], `${layout} riserva troppo`).toBeLessThan(atteso + 0.05);
-    }
+    const [vw, rem] = misura(MONDO, /width:\s*min\(([\d.]+)vw,\s*([\d.]+)rem\)/, "mondo");
+    const mondo = Math.min((FINESTRA * vw) / 100, rem * REM);
+    const corpo = Math.min(Math.max((cqw * mondo) / 100, minimo * REM), massimo * REM);
+    const atteso = (corpo / mondo) * 100;
+    // Riservare in eccesso va bene, in difetto no: la disuguaglianza ha un verso.
+    expect(LABEL.em, "riserva meno di quanto disegna").toBeGreaterThanOrEqual(atteso);
+    expect(LABEL.em, "riserva troppo").toBeLessThan(atteso + 0.05);
   });
 
   it("nessuna etichetta va a tre righe: LABEL.height ne conta due", () => {
@@ -628,7 +556,7 @@ describe("l'etichetta e' quella che il foglio di stile dichiara", () => {
  * lo stesso 0,6em della prova delle etichette e per le stesse ragioni.
  */
 describe("la domanda sul post-it ci sta dentro il post-it", () => {
-  const DOMANDA = blocco("[data-desk-ask] {");
+  const DOMANDA = blocco("[data-desk-ask]");
 
   it("in tutte e due le lingue, e in tutte le finestre in cui si disegna", () => {
     const [rientro] = misura(DOMANDA, /inset:\s*([\d.]+)%/, "domanda");
@@ -646,11 +574,10 @@ describe("la domanda sul post-it ci sta dentro il post-it", () => {
     );
     expect(testi.every((t) => t.length > 0)).toBe(true);
 
-    // Il post-it si disegna solo nel mondo orizzontale, che vive dai 1024px in
-    // su: sotto, il disegno e' il gemello e li' la domanda non si scrive. Le due
-    // finestre sono gli estremi: la piu' stretta che lo disegna e una in cui il
+    // Il post-it si disegna solo nel mondo del tavolo, che vive dai 1024px in
+    // su: sotto c'e' il gioco. Le due finestre sono gli estremi: la piu' stretta che lo disegna e una in cui il
     // mondo ha gia' toccato il suo massimo.
-    for (const finestra of [FINESTRA.wide, 2560]) {
+    for (const finestra of [FINESTRA, 2560]) {
       const mondo = Math.min((finestra * vw) / 100, rem * REM);
       const corpo = Math.min(Math.max((cqw * mondo) / 100, minimo * REM), massimo * REM);
       // Il post-it e' quadrato, quindi l'inset vale uguale sui due lati e il
@@ -658,7 +585,7 @@ describe("la domanda sul post-it ci sta dentro il post-it", () => {
       // smettesse di esserlo, questo conto misurerebbe l'asse sbagliato in
       // silenzio: meglio che cada qui.
       expect(SHAPE_BOX.postit.w, "il post-it non e' piu' quadrato").toBe(SHAPE_BOX.postit.h);
-      const lato = (drawWidth("wide", "postit") / 100) * mondo;
+      const lato = (drawWidth("postit") / 100) * mondo;
       const dentro = lato * (1 - (2 * rientro) / 100);
       const perRiga = Math.floor(dentro / (corpo * AVANZAMENTO));
 
@@ -692,9 +619,9 @@ describe("la domanda sul post-it ci sta dentro il post-it", () => {
  * cioe' i due testi da leggere insieme.
  */
 describe("il titolo e la tesi hanno gli stessi numeri nei due file", () => {
-  const TITOLO = blocco('[data-desk][data-motion="full"] [data-desk-title] {');
-  const TESI = blocco('[data-desk][data-motion="full"] [data-desk-punch] {');
-  const DIDASCALIA = blocco('[data-desk][data-motion="full"] [data-desk-caption] {');
+  const TITOLO = blocco('[data-desk][data-motion="full"] [data-desk-title]');
+  const TESI = blocco('[data-desk][data-motion="full"] [data-desk-punch]');
+  const DIDASCALIA = blocco('[data-desk][data-motion="full"] [data-desk-caption]');
 
   it("il titolo esce esattamente nella finestra di TITLE_BEAT", () => {
     const [da, quanto] = misura(TITOLO, /1 - \(var\(--p, 1\) - ([\d.]+)\) \/ ([\d.]+)/, "titolo");
@@ -736,22 +663,13 @@ describe("il titolo e la tesi hanno gli stessi numeri nei due file", () => {
 
 
 /**
- * Il blocco della camera, e tutto il resto del foglio di stile. Le graffe si
- * contano invece di fermarsi alla prima: dentro una @media la prima graffa che
- * chiude e' quella della prima regola, non quella del blocco.
+ * Le regole della camera, e tutto il resto del foglio di stile. La camera e'
+ * quello che del tavolo sta dentro la media query del movimento: le altre
+ * sezioni ne hanno una loro, con le loro chiavi, e non sono la camera.
  */
 const CAMERA = (() => {
-  const chiave = "@media (prefers-reduced-motion: no-preference)";
-  const inizio = TOKENS.indexOf(chiave);
-  if (inizio < 0) throw new Error(`tokens.css non ha piu' ${chiave}`);
-  const apre = TOKENS.indexOf("{", inizio);
-  let profondita = 0;
-  let i = apre;
-  for (; i < TOKENS.length; i++) {
-    if (TOKENS[i] === "{") profondita += 1;
-    else if (TOKENS[i] === "}" && (profondita -= 1) === 0) break;
-  }
-  return { dentro: TOKENS.slice(apre + 1, i), fuori: TOKENS.slice(0, inizio) + TOKENS.slice(i + 1) };
+  const dentro = regole(/\[data-desk/, { media: "(prefers-reduced-motion: no-preference)" });
+  return { dentro, fuori: regole().filter((r) => !dentro.includes(r)) };
 })();
 
 /**
@@ -770,7 +688,11 @@ describe("il patto del fallback e' scritto in ogni riga che legge la camera", ()
     // vede intero e il fotogramma a riposo e' anche quello finale. Basta un
     // `, 1` dimenticato perche' l'opacita' diventi invalida e mezzo tavolo
     // sparisca per chi non ha il JavaScript, e nient'altro se ne accorgerebbe.
-    const letture = [...TOKENS.matchAll(/var\(\s*--[ps]\b[^)]*\)/g)].map((m) => m[0]);
+    // Le letture del tavolo: il gioco del metodo ha un --p suo, la lunghezza
+    // di una barra, che con la camera non c'entra.
+    const letture = regole(/\[data-desk/).flatMap((r) =>
+      [...r.corpo.matchAll(/var\(\s*--[ps]\b[^)]*\)/g)].map((m) => m[0]),
+    );
     // Se un giorno le letture sparissero tutte, il ciclo qui sotto sarebbe vero
     // per vuoto: il conto dice che ce ne sono ancora.
     expect(letture.length).toBeGreaterThanOrEqual(5);
@@ -790,9 +712,7 @@ describe("il movimento ha una porta sola, e due chiavi per quella porta", () => 
     // data-motion. Una regola scritta qui dentro senza la chiave si
     // applicherebbe anche a un tablet, dove il palco non aggancia niente: piano
     // sticky, track alto 380vh e nessuno che scriva --p.
-    const selettori = [...CAMERA.dentro.matchAll(/(^|\})\s*([^{}]+)\{/g)].flatMap((m) =>
-      m[2].split(",").map((s) => s.trim().replace(/\s+/g, " ")),
-    );
+    const selettori = CAMERA.dentro.flatMap((r) => r.selettori);
     expect(selettori.length).toBeGreaterThanOrEqual(9);
     for (const selettore of selettori) {
       expect(selettore, `${selettore} entra senza chiave`).toContain(
@@ -806,18 +726,19 @@ describe("il movimento ha una porta sola, e due chiavi per quella porta", () => 
     // corsa e un palco che sta fermo mentre passano. Fuori da quella porta
     // vorrebbero dire tre schermi di vuoto da scorrere a mano, con il tavolo
     // gia' finito e fermo, che e' il modo peggiore di rompere il fallback.
-    expect(CAMERA.dentro).toContain("380vh");
-    expect(CAMERA.dentro).toContain("position: sticky");
-    expect(CAMERA.fuori).not.toContain("380vh");
+    const corpi = (dove: typeof CAMERA.dentro) => dove.map((r) => r.corpo).join("\n");
+    expect(corpi(CAMERA.dentro)).toContain("380vh");
+    expect(corpi(CAMERA.dentro)).toContain("position: sticky");
+    expect(corpi(CAMERA.fuori)).not.toContain("380vh");
 
     // Non la PAROLA sticky: il PALCO. Sotto i 1024px gli oggetti di uno strato
     // si appiccicano in alto mentre si legge la loro frase, ed e' un
     // impaginato, non una camera: nessun binario, nessuna altezza di schermo,
     // niente da agganciare. Quello che non deve uscire di qui e' il palco che
     // sta fermo con i suoi 380vh dietro, e sono questi due selettori.
-    for (const blocco of CAMERA.fuori.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
-      if (!/position:\s*sticky/.test(blocco[2])) continue;
-      expect(blocco[1], `${blocco[1].trim()} rende sticky il palco fuori dalla porta`)
+    for (const { selettore, corpo } of CAMERA.fuori) {
+      if (!/position:\s*sticky/.test(corpo)) continue;
+      expect(selettore, `${selettore} rende sticky il palco fuori dalla porta`)
         .not.toMatch(/data-desk-stage|data-desk-track/);
     }
   });

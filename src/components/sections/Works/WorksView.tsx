@@ -1,5 +1,4 @@
 import { Reveal } from "@/animations/components/Reveal";
-import { ThreadSegment } from "@/components/thread/ThreadSegment";
 import { QuoteFrame } from "@/components/brand/QuoteFrame";
 import { WorksShelf } from "./WorksShelf";
 import type { WorkCaseData, WorkCaseLabels } from "./types";
@@ -14,18 +13,12 @@ export type WorksViewProps = {
 
 export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewProps) {
   return (
-    <section id="works" className="relative px-[var(--gutter)] py-[var(--section-y)]">
-      {/* L'unica sezione che non si tesse sulla riga di tutte, ma la finestra
-          non gliela passa questo file: se la guarda ThreadSegment in
-          FINESTRE_FILO. Questo e' un Server Component, e un valore preso da un
-          modulo client qui arriverebbe `undefined`. Vedi finestre.ts. */}
-      <ThreadSegment section="works" className="pointer-events-none absolute inset-0 -z-10" />
-
+    <section id="works" aria-labelledby="titolo-works" className="relative px-[var(--gutter)] py-[var(--section-y)]">
       <Reveal className="mx-auto max-w-4xl" moto="dietro" stagger={0.08}>
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="eyebrow">{eyebrow}</p>
-            <h2 className="mt-3 text-3xl lg:text-5xl">{title}</h2>
+            <h2 id="titolo-works" className="titolo-sezione">{title}</h2>
           </div>
           <QuoteFrame variant="close" className="block w-10 shrink-0 lg:w-14" />
         </div>
@@ -33,12 +26,9 @@ export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewPro
         <p className="mt-5 max-w-2xl text-[var(--fg-muted)]">{intro}</p>
       </Reveal>
 
-      {/* Lo schedario esce dalla colonna del testo: quattro cartelle accostate
-          dentro 896px lascerebbero al sintomo una colonna da poche parole per
-          riga, e il sintomo e' la cosa che deve leggersi. */}
-      <div className="mx-auto mt-10 max-w-6xl">
-        <WorksShelf items={items} labels={labels} />
-      </div>
+      {/* L'archivio esce dalla colonna del testo: ogni cartella e' larga quanto
+          la pagina, tolto il gutter. */}
+      <WorksShelf lavori={items} labels={labels} />
     </section>
   );
 }

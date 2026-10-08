@@ -1,0 +1,73 @@
+/* La barra in basso del telefono, con le tre voci della navigazione. */
+
+/* ── La barra in basso ─────────────────────────────────────────────────────
+   Sotto i 768px la barra in alto perde le tre voci (accanto a nome, lingua e
+   tema non ci stanno) e la pagina e' alta una ventina di schermate: da meta'
+   sito, per tornare ai Contatti, si scorreva a mano fino in fondo. Qui le tre
+   voci restano ferme dove il pollice arriva senza spostare la mano.
+   Sopra i 768px non esiste: li' stanno in alto, che e' dove uno le cerca. */
+[data-nav-basso] {
+  display: none;
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 40;
+  /* Semitrasparente come la barra in alto, e per la stessa ragione: sotto ci
+     scorre il sito, e un fondo pieno la farebbe leggere come il bordo dello
+     schermo invece che come una cosa appoggiata sopra la pagina. */
+  background-color: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-block-start: 1px solid var(--line);
+  /* La tacca dei telefoni senza tasto: senza questo, l'ultima riga di voci
+     finisce sotto la barra di sistema. */
+  padding-block-end: env(safe-area-inset-bottom, 0px);
+}
+
+/* 3,25rem = 52px: sopra i 24 di WCAG 2.2 e sopra i 44 consigliati per il
+   pollice. La larghezza se la dividono in tre parti uguali, cosi' nessuna
+   delle tre e' piu' facile da prendere delle altre. */
+[data-nav-basso] a {
+  flex: 1 1 0;
+  min-block-size: 3.25rem;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* Il dossier sta a tutto schermo e ha gia' la sua uscita: una seconda
+   navigazione appiccicata sopra coprirebbe la cosa che sei appena andato ad
+   aprire. */
+html[data-dialog-open]:not([data-pratica-in-corso]) [data-nav-basso] { display: none; }
+
+/* La pratica dei Lavori (data-pratica-in-corso, scritto da usePratica) tiene
+   la barra finche' non arriva il velo: sparire al tocco, prima che la
+   cartella si muova, sembrava un salto. Se ne va e torna col velo, in
+   dissolvenza, e da nascosta non prende il puntatore. */
+
+html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* La dissolvenza si scrive fuori da un blocco `no-preference` e si spegne
+   sotto `reduce`: il primo `no-preference` del file e' la camera del tavolo,
+   e la sua guardia (layers.test.ts) lo cerca per posizione. */
+[data-nav-basso] { transition: opacity 200ms ease, visibility 0s; }
+
+html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] {
+  transition: opacity 200ms ease, visibility 0s linear 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-nav-basso],
+  html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] { transition: none; }
+}
+
+@media (max-width: 767px) {
+  [data-nav-basso] { display: flex; }
+}

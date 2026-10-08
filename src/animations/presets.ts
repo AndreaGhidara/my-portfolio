@@ -2,6 +2,10 @@
 
 import { gsap, ScrollTrigger } from "./gsap";
 import type { MotionLevel } from "./motionPolicy";
+// La riga d'innesco sta in ./finestre: e' un modulo di soli dati, senza
+// "use client", cosi' la possono leggere anche i Server Component.
+import { INIZIO_ENTRATA } from "./finestre";
+export { INIZIO_ENTRATA } from "./finestre";
 
 /**
  * La pulizia di fine entrata, fatta a mano.
@@ -27,7 +31,7 @@ import type { MotionLevel } from "./motionPolicy";
  *
  * `translate`, `rotate` e `scale` non sono di troppo: Tailwind v4 NON compila
  * piu' le utility di trasformazione dentro `transform`, le scrive nelle
- * proprieta' indipendenti — `-translate-y-[16%]` diventa `translate: 0 -16%`.
+ * proprieta' indipendenti: `-translate-y-[16%]` diventa `translate: 0 -16%`.
  * GSAP, per non litigare con loro, le azzera in linea (`translate: none`).
  * Togliendo solo `transform` si lascia addosso quell'azzeramento, e l'elemento
  * resta senza la trasformazione che il CSS gli dava: il ritratto
@@ -69,7 +73,7 @@ type Common = {
 };
 
 /**
- * SI TIMBRA — arriva sovradimensionato e storto, e si assesta con un
+ * SI TIMBRA: arriva sovradimensionato e storto, e si assesta con un
  * rimbalzo. Su "reduced" battono tutti insieme, senza rotazione.
  */
 export function stamp(
@@ -95,210 +99,37 @@ export function stamp(
 }
 
 /**
- * SI TESSE — i tratti si disegnano da capo a coda.
- * Lo scrub è consentito solo al livello "full": su touch è la prima
- * causa di scatti.
+ * SI TESSE: i tratti si disegnano da capo a coda. Oggi lo usa solo la
+ * ragnatela, che non ha `vector-effect: non-scaling-stroke`: il tratteggio e'
+ * in unita' di viewBox, e `getTotalLength()` e' gia' la lunghezza giusta.
  */
-// Le finestre di scorrimento stanno in ./finestre: e' un modulo di soli dati,
-// senza "use client", cosi' lo possono leggere anche i Server Component.
-export { TESSITURA, FINESTRA, CORSA_FRECCIA, TESSITURA_LAVORI, FINESTRE_FILO, INIZIO_ENTRATA } from "./finestre";
-import { TESSITURA, FINESTRA, INIZIO_ENTRATA } from "./finestre";
-
-/**
- * Quanto e' disegnata UNA corsa quando la testa del filo sta a `testa` pixel
- * dalla cima della finestra.
- *
- * E' quello che rende l'entrata una testa sola che scende invece di sette
- * corse che si accendono insieme. Su uno schermo alto la riga di tessitura al
- * caricamento cade gia' dentro la seconda sezione: dando a ognuna la propria
- * entrata, le prime due si disegnerebbero in parallelo. Facendo scendere la
- * testa da 0 fino alla riga, invece, ogni corsa si disegna quando la testa
- * attraversa la SUA fascia, e le altre stanno ferme. Alla fine della corsa la
- * testa e' esattamente dove la vuole lo scorrimento, quindi la consegna e'
- * senza salti.
- */
-export function frazioneDiEntrata(testa: number, cima: number, altezza: number): number {
-  if (altezza <= 0) return 0;
-  return Math.min(1, Math.max(0, (testa - cima) / altezza));
-}
-
-export const INTRO_FILO = { ritardo: 1.1, durata: 1.3 } as const;
-
-/**
- * La lunghezza da dare a `stroke-dasharray` perche' il tratto si disegni da
- * capo a coda, misurata NELLO SPAZIO IN CUI IL BROWSER CALCOLA IL TRATTEGGIO.
- *
- * Difetto vero, in pagina dal primo commit e diventato visibile solo quando il
- * filo ha smesso di essere quasi invisibile. Con `vector-effect:
- * non-scaling-stroke` il tratteggio si calcola in PIXEL DI SCHERMO, mentre
- * `getTotalLength()` misura in UNITA' DI VIEWBOX. I sei segmenti del filo
- * vivono in un viewBox 0-100 stirato a tutta pagina, quindi i due numeri
- * differiscono di un fattore che dipende da quanto e' grande la sezione:
- * misurato 7,6x su una corsa larga 1200px. Col dasharray in unita' di viewBox
- * il tratto non si disegna affatto: sfila un tratteggio di sette trattini.
- *
- * `pathLength` non serve: Chrome lo onora, ma lo risolve in unita' di viewBox
- * e poi non-scaling-stroke ri-scala lo stesso, quindi l'errore sopravvive.
- * Provato su banco, non dedotto.
- *
- * Senza quel vector-effect il tratteggio e' gia' in unita' di viewBox e
- * `getTotalLength()` e' la risposta giusta: e' il caso della ragnatela.
- */
-export function lunghezzaDelTratteggio(path: SVGPathElement): number {
-  const lunghezza = path.getTotalLength?.() ?? 0;
-  if (!lunghezza) return 0;
-  // L'attributo e non lo stile calcolato: tutti e tre i tratti del filo lo
-  // dichiarano in JSX, e getComputedStyle qui costerebbe un reflow per path.
-  if (path.getAttribute?.("vector-effect") !== "non-scaling-stroke") return lunghezza;
-
-  const matrice = path.getScreenCTM?.();
-  if (!matrice || !path.getPointAtLength) return lunghezza;
-
-  const CAMPIONI = 128;
-  let pixel = 0;
-  let prima: { x: number; y: number } | null = null;
-  for (let i = 0; i <= CAMPIONI; i++) {
-    const q = path.getPointAtLength((lunghezza * i) / CAMPIONI);
-    const p = {
-      x: q.x * matrice.a + q.y * matrice.c + matrice.e,
-      y: q.x * matrice.b + q.y * matrice.d + matrice.f,
-    };
-    if (prima) pixel += Math.hypot(p.x - prima.x, p.y - prima.y);
-    prima = p;
-  }
-  return pixel || lunghezza;
-}
-
 export function weave(
   paths: SVGPathElement[],
-  {
-    level,
-    trigger,
-    scrub = false,
-    stagger = 0.12,
-    start,
-    end,
-    intro = false,
-  }: Common & {
-    scrub?: boolean;
-    stagger?: number;
-    /**
-     * La finestra dello scrub, per chi ne ha una sua. Il default e' TESSITURA:
-     * apre e chiude sulla stessa riga dello schermo, perche' il filo si legga
-     * come una testa sola che scende invece che come sette corse che partono
-     * quando vogliono. Chi lo sovrascrive rinuncia alla consegna esatta con la
-     * sezione vicina, e deve avere un motivo: i cavi del tavolo devono
-     * arrivare al loro stato finale esattamente quando ci arriva la camera,
-     * che e' il fotogramma a riposo e l'unico in cui il filo va a posto.
-     * Ignorati fuori dallo scrub.
-     */
-    start?: string;
-    end?: string;
-    /**
-     * Il filo si disegna al caricamento invece di essere gia' li'. Serve
-     * all'apertura: quando la pagina si apre la riga di tessitura e' gia'
-     * oltre il fondo di quella sezione, quindi senza entrata il suo tratto
-     * risulta fatto prima che qualcuno lo guardi. Ignorato fuori da "full":
-     * a movimento ridotto il filo c'e' e basta.
-     */
-    intro?: boolean;
-  },
+  { level, trigger, stagger = 0.12 }: Common & { stagger?: number },
 ): gsap.core.Timeline | null {
   if (level === "none" || paths.length === 0) return null;
 
-  const useScrub = scrub && level === "full";
-  const conIntro = intro && level === "full";
-
-  // Quanto e' tessuta ogni corsa, da 0 a 1. Il tween anima QUESTI numeri e non
-  // direttamente lo stroke-dashoffset, e il giro in piu' si paga da solo:
-  //  - l'entrata al caricamento e lo scorrimento si MOLTIPLICANO invece di
-  //    contendersi la stessa proprieta', quindi l'entrata disegna fino al
-  //    punto in cui lo scorrimento e' gia' arrivato, e da li' si prosegue
-  //    senza salti;
-  //  - il dasharray puo' cambiare a ogni riflow senza che il tween ne sappia
-  //    niente, perche' il tween va sempre da 0 a 1. Prima serviva invalidate()
-  //    per rifargli imparare il valore di partenza.
-  const quote = paths.map(() => ({ v: 0 }));
-  const entrata = { v: conIntro ? 0 : 1 };
-  let lunghezze: number[] = paths.map(() => 0);
-
-  // Mentre l'entrata e' in corso comanda lei e lo scorrimento aspetta: sono due
-  // descrizioni della stessa cosa (dove sta la testa del filo), e se
-  // scrivessero tutte e due si contenderebbero la stessa proprieta'.
-  //
-  // Il riquadro della sezione si rilegge a ogni fotogramma invece di
-  // memorizzarlo al caricamento, ed e' la scelta che semplifica tutto: se la
-  // pagina si muove durante l'entrata il filo la segue da solo, e quando
-  // l'entrata finisce la testa E' la riga di tessitura, cioe' esattamente dove
-  // la vuole lo scorrimento, a qualunque altezza si sia arrivati. Niente resa
-  // da negoziare e nessun ascoltatore da staccare: la prima versione ne aveva
-  // uno, e Lenis lo faceva scattare all'avvio senza che la pagina si fosse
-  // mossa, uccidendo l'entrata a intermittenza.
-  const scrivi = () => {
-    let entrante: number | null = null;
-    if (entrata.v < 1 && trigger instanceof Element) {
-      const riquadro = trigger.getBoundingClientRect();
-      entrante = frazioneDiEntrata(
-        entrata.v * FINESTRA * window.innerHeight,
-        riquadro.top,
-        riquadro.height,
-      );
-    }
-    paths.forEach((path, i) => {
-      gsap.set(path, { strokeDashoffset: lunghezze[i] * (1 - (entrante ?? quote[i].v)) });
-    });
-  };
-
-  // La lunghezza a schermo dipende da quanto e' grande la sezione, quindi
-  // cambia a ogni riflow, mentre quella in unita' di viewBox non cambiava mai:
-  // e' il prezzo di misurare nello spazio giusto. ScrollTrigger si aggiorna da
-  // solo al resize, e `onRefreshInit` e' il momento in cui ristendere.
-  const stendi = () => {
-    lunghezze = paths.map(lunghezzaDelTratteggio);
-    paths.forEach((path, i) => gsap.set(path, { strokeDasharray: lunghezze[i] }));
-    scrivi();
-  };
-  stendi();
+  paths.forEach((path) => {
+    const lunghezza = path.getTotalLength?.() ?? 0;
+    gsap.set(path, { strokeDasharray: lunghezza, strokeDashoffset: lunghezza });
+  });
 
   const timeline = gsap.timeline({
-    scrollTrigger: trigger
-      ? {
-          trigger,
-          start: useScrub ? (start ?? TESSITURA.inizio) : "top 85%",
-          end: useScrub ? (end ?? TESSITURA.fine) : undefined,
-          scrub: useScrub ? 0.6 : false,
-          once: !useScrub,
-          onRefreshInit: stendi,
-        }
-      : undefined,
+    scrollTrigger: trigger ? { trigger, start: "top 85%", once: true } : undefined,
   });
 
-  timeline.to(quote, {
-    v: 1,
+  timeline.to(paths, {
+    strokeDashoffset: 0,
     duration: level === "full" ? 1.1 : 0.6,
-    ease: useScrub ? "none" : "power2.inOut",
+    ease: "power2.inOut",
     stagger: level === "full" ? stagger : 0,
-    onUpdate: scrivi,
-    onComplete: scrivi,
   });
-
-  if (conIntro) {
-    scrivi();
-    gsap.to(entrata, {
-      v: 1,
-      duration: INTRO_FILO.durata,
-      delay: INTRO_FILO.ritardo,
-      ease: "power2.inOut",
-      onUpdate: scrivi,
-      onComplete: scrivi,
-    });
-  }
 
   return timeline;
 }
 
 /**
- * SI DIPINGE — il colore avanza sotto una maschera invece di comparire.
+ * SI DIPINGE: il colore avanza sotto una maschera invece di comparire.
  * Anima la custom property --paint, non la geometria.
  */
 export function paint(
@@ -317,7 +148,7 @@ export function paint(
 }
 
 /**
- * CRESCE — arriva grande come un punto e si apre fino alla sua misura.
+ * CRESCE: arriva grande come un punto e si apre fino alla sua misura.
  *
  * Nato per il ritratto dell'apertura, che e' l'unica immagine del sito a stare
  * dentro un altro disegno: il cerchio si dipinge, e mentre si dipinge la testa
@@ -353,7 +184,7 @@ export function cresce(
     duration: level === "full" ? 0.8 : 0.6,
     ease: "back.out(1.4)",
     delay,
-    /* Il ritratto porta un translate scritto nel CSS — e' alzato del 16% per
+    /* Il ritratto porta un translate scritto nel CSS: e' alzato del 16% per
        far uscire la testa dal cerchio. Un `from` lascerebbe in linea la
        matrice d'arrivo, che quel translate lo contiene ma congelato in pixel:
        cambiando larghezza dello schermo il cerchio cambia misura e la testa
@@ -389,8 +220,8 @@ export function reveal(
     stagger,
     /* Un `from` finisce lasciando scritto nello stile in linea lo stato
        d'arrivo, e uno stile in linea batte il foglio di stile per sempre. Dove
-       il CSS usa `transform` per qualcos'altro — le cartelle dei Lavori si
-       alzano di 6px al passaggio del mouse — l'entrata gli lascia addosso un
+       il CSS usa `transform` per qualcos'altro (le cartelle dei Lavori si
+       alzano di 6px al passaggio del mouse), l'entrata gli lascia addosso un
        translate(0,0) e quel sollevamento non succede piu'. Qui si ripulisce
        quello che l'entrata ha scritto, e il CSS torna padrone. */
     ...pulizia(targets, clearProps),
@@ -399,11 +230,10 @@ export function reveal(
 }
 
 /**
- * ARRIVA DI LATO — entra scorrendo dal bordo che gli e' stato assegnato.
+ * ARRIVA DI LATO: entra scorrendo dal bordo che gli e' stato assegnato.
  *
- * Il verso non se lo inventa l'animazione: i blocchi di «E in pratica?» e le
- * quattro consegne portano gia' un `data-lato`, che e' il lato da cui il
- * disegno sta gia' impaginato. Facendoli entrare da li', il movimento e'
+ * Il verso non se lo inventa l'animazione: le quattro consegne portano gia'
+ * un `data-lato`, che e' il lato da cui il disegno sta gia' impaginato. Facendoli entrare da li', il movimento e'
  * l'impaginato che si compone, non un effetto appiccicato sopra.
  *
  * Le distanze sono corte apposta: un blocco che attraversa mezzo schermo su un
@@ -438,7 +268,7 @@ export function daLato(
 }
 
 /**
- * ARRIVA DA DIETRO — cresce dal fondo e si mette a fuoco.
+ * ARRIVA DA DIETRO: cresce dal fondo e si mette a fuoco.
  *
  * Non e' uno zoom: la scala parte vicina a 1 e il movimento vero e' il fatto
  * che la cosa era piu' lontana un attimo prima. Sopra il 10% di scala si legge
@@ -470,7 +300,7 @@ export function daDietro(
 }
 
 /**
- * CADE E SI ATTACCA — scende da sopra e si ferma con un rimbalzo corto.
+ * CADE E SI ATTACCA: scende da sopra e si ferma con un rimbalzo corto.
  *
  * E' il gesto di appuntare: un tesserino sul foglio, un francobollo sulla
  * busta. Il rimbalzo (`back.out`) e' quello che lo fa leggere come una cosa

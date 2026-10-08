@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { Archivo, Archivo_Black, JetBrains_Mono } from "next/font/google";
+import {
+  Archivo,
+  Archivo_Black,
+  Fraunces,
+  JetBrains_Mono,
+  Playfair_Display,
+  Space_Grotesk,
+} from "next/font/google";
 import localFont from "next/font/local";
 import "@/app/globals.css";
 import { Navbar } from "@/components/shell/Navbar";
@@ -20,7 +27,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { site } from "@/content/site";
 
 const SITE_URL = site.url;
-const DEFAULT_LOCALE = "it";
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -47,6 +53,35 @@ const monoLight = JetBrains_Mono({
   preload: false,
 });
 
+/* I tre caratteri del sito finto del gioco del metodo (Services/gioco): li
+   usano solo l'attrezzo «caratteri» del livello 1 e la schermata del Forno
+   Aurora al livello 2, cioe' testo che sta sotto i 1024px e dentro un banco
+   che compare solo a chi gioca. Senza preload il file si scarica quando quel
+   testo compare, non con la pagina; e i pesi sono solo quelli che il sito
+   finto chiede, perche' un peso mancante il browser lo finge. */
+const fintoFraunces = Fraunces({
+  subsets: ["latin"],
+  weight: "600",
+  style: ["normal", "italic"],
+  variable: "--font-finto-fraunces",
+  display: "swap",
+  preload: false,
+});
+const fintoGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["500", "700"],
+  variable: "--font-finto-grotesk",
+  display: "swap",
+  preload: false,
+});
+const fintoPlayfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["700", "800"],
+  variable: "--font-finto-playfair",
+  display: "swap",
+  preload: false,
+});
+
 /**
  * Il testo che compare sotto il titolo nei risultati di ricerca, e la stessa
  * frase che finisce nei dati strutturati: e' uno dei pochi posti in cui le
@@ -68,10 +103,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const langPrefix = locale === DEFAULT_LOCALE ? "/it" : `/${locale}`;
-  const canonical = `${SITE_URL}${langPrefix}`;
+  const canonical = `${SITE_URL}/${locale}`;
   const languages = Object.fromEntries(
-    routing.locales.map((l) => [l, l === DEFAULT_LOCALE ? "/it" : `/${l}`]),
+    routing.locales.map((l) => [l, `/${l}`]),
   );
 
   const title = "Andrea Ghidara";
@@ -191,7 +225,7 @@ export default async function RootLayout({
         <ThemeScript />
         <TopStateScript />
       </head>
-      <body className={`${archivo.variable} ${archivoBlack.variable} ${monoFull.variable} ${monoLight.variable} relative min-h-dvh`}>
+      <body className={`${archivo.variable} ${archivoBlack.variable} ${monoFull.variable} ${monoLight.variable} ${fintoFraunces.variable} ${fintoGrotesk.variable} ${fintoPlayfair.variable} relative min-h-dvh`}>
         <Script
           id="ld-person"
           type="application/ld+json"

@@ -1,11 +1,10 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import { deskLayers, type SampleId } from "@/content/desk";
 import { metricById } from "@/content/metrics";
 import { DeskTable, type DeskLayerData } from "../DeskTable";
 import { SPECIMENS } from "../DeskSpecimen";
+import { regole } from "@/test/css";
 
 /**
  * I due oggetti che un campione onesto non ce l'hanno, e perche'.
@@ -70,7 +69,7 @@ describe("il post-it grigio", () => {
 
   const tavolo = () =>
     render(
-      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="E la tua, qual è? Scrivimi." note={NOTA} layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" blank="E la tua, qual è? Scrivimi." note={NOTA} />,
     );
 
   it("porta la sua nota, e si vede senza che nessuno ci passi sopra", () => {
@@ -97,22 +96,6 @@ describe("il post-it grigio", () => {
     expect(container.querySelectorAll("[data-desk-note]")).toHaveLength(1);
     const dentro = container.querySelector("[data-desk-note]")?.closest("[data-desk-blank]");
     expect(dentro, "la nota sta fuori dal comando").not.toBeNull();
-  });
-
-  it("il gemello la porta: sotto i 1024px e' lui il disegno che si vede", () => {
-    // Prima qui ci si aspettava zero, e per una ragione che sembrava giusta:
-    // la stessa scritta in due mondi e' una ripetizione. Non lo e': il gemello
-    // e' aria-hidden per intero, quindi nessuno la legge due volte, e sotto i
-    // 1024px l'altro mondo il CSS lo riduce a un pixel. Senza la nota qui, da
-    // telefono il post-it era un quadrato grigio senza niente sopra, e nessuno
-    // capiva cosa fosse.
-    const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note={NOTA} layout="tall" ghost />,
-    );
-    const nota = container.querySelector("[data-desk-note]");
-    expect(nota).not.toBeNull();
-    expect(nota).toHaveTextContent(NOTA);
-    expect(nota).toHaveAttribute("aria-hidden", "true");
   });
 
   it("il numero sta dove stanno gli altri numeri inventati, e si dichiara tale", () => {
@@ -182,31 +165,9 @@ describe("i campioni sanno disegnarsi", () => {
 });
 
 describe("dove stanno e come si comportano", () => {
-  it("si disegnano anche nel mondo verticale, ma solo per gli oggetti che si vedono", () => {
-    // Il campione e' quello che distingue "I colori" da "I caratteri": senza,
-    // sotto i 1024px sono due fogli identici. Prima era solo nel mondo
-    // orizzontale, perche' nel verticale le sagome stavano sul piano a meta'
-    // scala; da quando quel piano non c'e' piu' e gli oggetti sono in griglia,
-    // stanno sui 180px e il campione si legge meglio che da desktop.
-    const largo = render(<DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note="23.777 caffè" layout="wide" />);
-    expect(largo.container.querySelectorAll("[data-desk-sample]").length).toBeGreaterThan(0);
-
-    const alto = render(
-      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note="23.777 caffè" layout="tall" ghost />,
-    );
-    // Quelli oltre il quarto sono display:none: un campione li' si pagherebbe
-    // nel DOM senza che nessuno lo veda.
-    const visibili = alto.container.querySelectorAll(
-      "[data-desk-object]:not([data-off]) [data-desk-sample]",
-    );
-    expect(visibili.length).toBeGreaterThan(0);
-    expect(alto.container.querySelectorAll("[data-desk-object][data-off] [data-desk-sample]"))
-      .toHaveLength(0);
-  });
-
   it("ce n'e' esattamente uno per ogni oggetto che lo dichiara", () => {
     const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" />,
     );
     const attesi = oggetti.filter((o) => o.sample).length;
     expect(container.querySelectorAll("[data-desk-sample]")).toHaveLength(attesi);
@@ -216,7 +177,7 @@ describe("dove stanno e come si comportano", () => {
     // Un campione che entra nell'albero di accessibilita' fa leggere "I colori,
     // I colori", o peggio, "Aa". L'etichetta e' il nome; questo e' il disegno.
     const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" />,
     );
     for (const campione of container.querySelectorAll("[data-desk-sample]")) {
       expect(
@@ -228,7 +189,7 @@ describe("dove stanno e come si comportano", () => {
 
   it("non toccano il conteggio delle etichette: restano ventitre'", () => {
     const { container } = render(
-      <DeskTable layers={finto()} centre="il progetto" composto="Da cosa e' composto" blank="Scrivimi" note="23.777 caffè" layout="wide" />,
+      <DeskTable layers={finto()} centre="il progetto" blank="Scrivimi" note="23.777 caffè" />,
     );
     expect(container.querySelectorAll("[data-desk-label]")).toHaveLength(23);
   });
@@ -242,14 +203,10 @@ describe("di che colore sono", () => {
     // seguire il tema, e qui non ce n'e' nessuno: anche i tre campioni de
     // "I colori" sono i token del brand, che e' esattamente il motivo per cui
     // quel campione e' onesto.
-    const css = readFileSync(resolve(__dirname, "../../../../styles/tokens.css"), "utf8");
-    const regole = css.split("}");
     const colpevoli: string[] = [];
-    for (const regola of regole) {
-      const [selettore = "", corpo = ""] = regola.split("{");
-      if (!selettore.includes("data-desk-sample")) continue;
+    for (const { selettore, corpo } of regole(/data-desk-sample/)) {
       const hex = corpo.match(/#[0-9a-fA-F]{3,8}\b/g);
-      if (hex) colpevoli.push(`${selettore.trim()} → ${hex.join(", ")}`);
+      if (hex) colpevoli.push(`${selettore} → ${hex.join(", ")}`);
     }
     expect(colpevoli, `colori scritti a mano nei campioni:\n${colpevoli.join("\n")}`).toHaveLength(
       0,
@@ -263,13 +220,13 @@ describe("di che colore sono", () => {
     // uno <i data-m="qualcosa"> mai dichiarato e' un elemento largo zero, che si
     // disegna, non si vede, e che nessuna prova di rendering sa distinguere da
     // un elemento disegnato bene.
-    const css = readFileSync(resolve(__dirname, "../../../../styles/tokens.css"), "utf8");
+    const selettori = regole().map((r) => r.selettore);
     const orfane = new Set<string>();
     for (const [id, disegno] of Object.entries(SPECIMENS)) {
       const { container } = render(<span data-desk-sample={id}>{disegno}</span>);
       for (const marca of container.querySelectorAll("[data-m]")) {
         const nome = marca.getAttribute("data-m");
-        if (nome && !css.includes(`[data-m="${nome}"]`)) orfane.add(`${id} → ${nome}`);
+        if (nome && !selettori.some((s) => s.includes(`[data-m="${nome}"]`))) orfane.add(`${id} → ${nome}`);
       }
     }
     expect([...orfane], `marche senza regola:\n${[...orfane].join("\n")}`).toHaveLength(0);

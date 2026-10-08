@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeToggle } from "../ThemeToggle";
 import { ThemeScript } from "../ThemeScript";
+import { TopStateScript } from "../TopStateScript";
+import { SOGLIA_IN_CIMA } from "../inCima";
 
 beforeEach(() => {
   document.documentElement.removeAttribute("data-theme");
@@ -46,5 +48,28 @@ describe("ThemeScript", () => {
     expect(script?.innerHTML).toContain("data-theme");
     expect(script?.innerHTML).toContain("localStorage");
     expect(script?.innerHTML).toContain("prefers-color-scheme");
+  });
+});
+
+describe("TopStateScript", () => {
+  it("segna la cima con la stessa soglia che usa l'header mentre si scorre", () => {
+    // Lo script e' una stringa: se la soglia ci arrivasse undefined, il
+    // confronto darebbe sempre false e l'header nascerebbe opaco. Qui lo si
+    // esegue davvero, ai due lati della soglia.
+    const { container } = render(<TopStateScript />);
+    const codice = container.querySelector("script")?.innerHTML ?? "";
+    const root = document.documentElement;
+
+    Object.defineProperty(window, "scrollY", { value: SOGLIA_IN_CIMA - 1, configurable: true });
+    root.removeAttribute("data-at-top");
+    new Function(codice)();
+    expect(root.hasAttribute("data-at-top")).toBe(true);
+
+    Object.defineProperty(window, "scrollY", { value: SOGLIA_IN_CIMA, configurable: true });
+    root.removeAttribute("data-at-top");
+    new Function(codice)();
+    expect(root.hasAttribute("data-at-top")).toBe(false);
+
+    Object.defineProperty(window, "scrollY", { value: 0, configurable: true });
   });
 });

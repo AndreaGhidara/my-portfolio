@@ -1,3 +1,5 @@
+import { SOGLIA_IN_CIMA } from "./inCima";
+
 /**
  * Va reso dentro <head>, come ThemeScript: segna se la pagina è ancora in
  * cima PRIMA del primo paint, così l'header nasce già trasparente e non si
@@ -9,7 +11,7 @@
  */
 export function TopStateScript() {
   const code = `(function(){try{
-    if (window.scrollY < 8) document.documentElement.setAttribute('data-at-top','');
+    if (window.scrollY < ${SOGLIA_IN_CIMA}) document.documentElement.setAttribute('data-at-top','');
   }catch(e){}})();`;
 
   return <script dangerouslySetInnerHTML={{ __html: code }} />;

@@ -1,6 +1,6 @@
 /**
  * La fisica delle palline. Pura: prende uno stato e lo riporta avanti di un
- * fotogramma. Nessun DOM — cosi' il rimbalzo, l'attrito e il fermarsi si
+ * fotogramma. Nessun DOM: cosi' il rimbalzo, l'attrito e il fermarsi si
  * possono provare senza un browser, che e' l'unico posto in cui il resto di
  * questo gesto vive.
  */

@@ -15,13 +15,17 @@ export async function Journey() {
     company: entry.company,
     year: entry.year,
     tesserino: entry.tesserino,
-    // Solo la prima porta «a oggi», e si sa dalla posizione: la lista e'
-    // ordinata dal piu' recente, e una prova del contenuto lo garantisce.
+    // Solo la prima porta «a oggi», e si sa dalla posizione: il dato e'
+    // ordinato dal piu' recente, e una prova del contenuto lo garantisce. Per
+    // questo si calcola PRIMA di girare la lista.
     present: index === 0,
     role: t(`list.${entry.id}.role`),
     body: t(`list.${entry.id}.body`),
     lezione: t(`list.${entry.id}.lezione`),
   }));
+  // Il percorso si racconta dal 2023 a oggi: si inverte la presentazione, non
+  // il dato, che resta dal piu' recente con il suo contratto e il suo test.
+  entries.reverse();
 
   const stats: JourneyStat[] = STAT_IDS.map((id) => {
     const metric = metricById(id);
@@ -36,6 +40,7 @@ export async function Journey() {
       senzaTesserino={t("senzaTesserino")}
       etichettaLezione={t("etichettaLezione")}
       nota={t("nota")}
+      suggerimento={t("suggerimento")}
       entries={entries}
       stats={stats}
     />

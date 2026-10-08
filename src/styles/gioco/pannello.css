@@ -1,0 +1,261 @@
+/* ── Il gioco del metodo: livello 3, i servizi ─────────────────────────────
+   Ogni selettore di questo file sta sotto [data-gioco-livello="pannello"]: i pezzi
+   comuni (banco, testa, console, azioni, righe) sono in base.css e qui non si
+   ridefiniscono. Le animazioni nuove si chiamano gioco-pannello-*. */
+
+[data-gioco-livello="pannello"] {
+  /* Il bordo dei moduli e il fondo del tubo, poi le viti: gradini piu'
+     chiari dello scuro del banco. */
+  --pannello-bordo: color-mix(in oklab, var(--ink) 82%, var(--paper));
+  --pannello-vite: color-mix(in oklab, var(--ink) 76%, var(--paper));
+  /* Il rosso cupo da cui parte il tubo quando la salute scende. */
+  --pannello-rosso-cupo: color-mix(in oklab, var(--orange) 65%, var(--ink));
+  /* L'arancio come testo sulla carta: pieno ci fa 3,27:1, poco per
+     un'etichetta di mezzo rem. */
+  --pannello-arancio-testo: color-mix(in oklab, var(--orange) 72%, var(--ink));
+  --pannello-problema: color-mix(in oklab, var(--orange) 6%, var(--paper));
+  --pannello-risolto: color-mix(in oklab, var(--green) 10%, var(--paper));
+}
+
+/* ── Sopra: la salute, la coda degli avvisi, i cinque moduli ───────────── */
+[data-gioco-livello="pannello"] .salute {
+  position: absolute;
+  inset-inline: 0.7rem;
+  inset-block-start: 2.35rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  /* Fra le due righe poco spazio, e il numero senza interlinea: con quella
+     del sito la nota finiva sotto la coda. */
+  gap: 0.3rem 0.6rem;
+}
+
+[data-gioco-livello="pannello"] .salute b {
+  min-inline-size: 3.6rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--greenDark);
+  transition: color 0.3s;
+}
+
+[data-gioco-livello="pannello"] .salute b.giu { color: var(--orange); }
+
+[data-gioco-livello="pannello"] .salute .tubo {
+  block-size: 0.5rem;
+  border-radius: 999px;
+  background: var(--pannello-bordo);
+  overflow: hidden;
+}
+
+[data-gioco-livello="pannello"] .salute .tubo i {
+  display: block;
+  block-size: 100%;
+  inline-size: var(--p);
+  background: linear-gradient(90deg, var(--green), var(--greenDark));
+  transition: inline-size 0.4s linear;
+}
+
+[data-gioco-livello="pannello"] .salute .tubo i.giu {
+  background: linear-gradient(90deg, var(--pannello-rosso-cupo), var(--orange));
+}
+
+[data-gioco-livello="pannello"] .salute small {
+  grid-column: 1 / 3;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+  /* Senza spaziatura fra le lettere: a 360px la nota sta su una riga, e
+     sotto c'e' subito la coda. */
+  line-height: 1.3;
+  color: var(--mutedDark);
+}
+
+/* La coda: l'ultimo avviso arrivato. Va a capo invece di tagliarsi con i
+   puntini come nel prototipo: e' la prima cosa che si legge, e due righe
+   ci stanno. */
+[data-gioco-livello="pannello"] .coda {
+  position: absolute;
+  inset-inline: 0.7rem;
+  inset-block-start: 5.2rem;
+  block-size: 2.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding-inline: 0.6rem;
+  border: 1px dashed var(--pannello-bordo);
+  border-radius: 8px;
+  background: var(--ink);
+  overflow: hidden;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  line-height: 1.3;
+  color: var(--mutedDark);
+}
+
+[data-gioco-livello="pannello"] .coda > span:last-child { animation: gioco-entra 0.3s ease; }
+[data-gioco-livello="pannello"] .coda b { font-weight: 500; color: var(--bulb); }
+
+[data-gioco-livello="pannello"] .moduli {
+  position: absolute;
+  inset-inline: 0.7rem;
+  inset-block-end: 0.7rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.25rem;
+}
+
+[data-gioco-livello="pannello"] [data-modulo] {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.3rem;
+  min-inline-size: 0;
+  /* Di lato quasi niente, e senza spaziatura fra le lettere: a 360px
+     «MANUTENZIONE» e' largo quanto il modulo. Piu' stretto ancora va a
+     capo con il trattino, non esce. */
+  padding: 0.5rem 0.05rem 0.4rem;
+  border: 1.5px solid var(--pannello-bordo);
+  border-radius: 10px;
+  background: var(--gioco-scuro-2);
+  color: var(--mutedDark);
+  cursor: pointer;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.44rem;
+  line-height: 1.15;
+  text-align: center;
+  hyphens: auto;
+  text-transform: uppercase;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+/* Spento, il pannello non risponde ma resta com'e': un oggetto spento, non
+   un pulsante sbiadito. */
+[data-gioco-livello="pannello"] [data-modulo]:disabled { cursor: default; }
+
+[data-gioco-livello="pannello"] [data-modulo] .ic {
+  inline-size: 2.1rem;
+  block-size: 2.1rem;
+  padding: 0.2rem;
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+[data-gioco-livello="pannello"] [data-modulo] .led {
+  position: absolute;
+  inset-block-start: 0.3rem;
+  inset-inline-end: 0.3rem;
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  border-radius: 50%;
+  background: var(--greenDark);
+  box-shadow: 0 0 6px var(--greenDark);
+}
+
+[data-gioco-livello="pannello"] [data-modulo].allarme {
+  border-color: var(--orange);
+  color: var(--paper);
+  animation: gioco-lampeggia 1s infinite;
+}
+
+[data-gioco-livello="pannello"] [data-modulo].allarme .led {
+  background: var(--orange);
+  box-shadow: 0 0 8px var(--orange);
+}
+
+[data-gioco-livello="pannello"] [data-modulo].scelto {
+  border-color: var(--bulb);
+  background: var(--pannello-bordo);
+  color: var(--paper);
+}
+
+[data-gioco-livello="pannello"] [data-modulo] .viti::before,
+[data-gioco-livello="pannello"] [data-modulo] .viti::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 0.25rem;
+  inline-size: 0.22rem;
+  block-size: 0.22rem;
+  border-radius: 50%;
+  background: var(--pannello-vite);
+}
+
+[data-gioco-livello="pannello"] [data-modulo] .viti::before { inset-inline-start: 0.3rem; }
+[data-gioco-livello="pannello"] [data-modulo] .viti::after { inset-inline-end: 0.3rem; }
+
+/* ── Sotto: il palco della console ─────────────────────────────────────── */
+[data-gioco-livello="pannello"] .calma {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  text-align: center;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+[data-gioco-livello="pannello"] .calma span {
+  display: block;
+  margin-block-end: 0.2rem;
+  font-size: 1.4rem;
+}
+
+[data-gioco-livello="pannello"] .problema {
+  padding: 0.55rem 0.65rem;
+  border: 1.5px solid var(--orange);
+  border-radius: 10px;
+  background: var(--pannello-problema);
+  animation: gioco-entra 0.3s ease;
+}
+
+[data-gioco-livello="pannello"] .problema small {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pannello-arancio-testo);
+}
+
+[data-gioco-livello="pannello"] .problema p {
+  margin-block-start: 0.15rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+[data-gioco-livello="pannello"] .problema.risolto {
+  border-color: var(--green);
+  background: var(--pannello-risolto);
+}
+
+[data-gioco-livello="pannello"] .problema.risolto small { color: var(--green); }
+
+/* Il resoconto: un servizio per riga. Righe piu' basse che nel prototipo:
+   con la salute sotto 90 il titolo va su due righe, e cinque righe alte
+   uscivano dal palco. */
+[data-gioco-livello="pannello"] .rapporto {
+  display: grid;
+  gap: 0.22rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: gioco-entra 0.4s ease;
+}
+
+[data-gioco-livello="pannello"] .rapporto li {
+  display: grid;
+  grid-template-columns: 1.35rem 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.18rem 0.45rem;
+  border: 1px solid var(--graph);
+  border-radius: 8px;
+  background: var(--paper);
+  font-size: 0.68rem;
+  line-height: 1.3;
+}
+
+[data-gioco-livello="pannello"] .rapporto .ic {
+  inline-size: 1.35rem;
+  block-size: 1.35rem;
+}

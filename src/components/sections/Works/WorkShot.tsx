@@ -6,9 +6,11 @@ import type { WorkScreenshot } from "./types";
 
 /**
  * Quanto spazio occupa la schermata a schermo. Sta qui, esportato, perche' lo
- * usano in due: il dossier per chiedere l'immagine, e il precarico per chiedere
- * la STESSA immagine mentre il mouse e' ancora sulla cartella. Due valori
- * diversi vorrebbero dire due file scaricati al posto di uno.
+ * usano in tre: la pratica per chiedere l'immagine, il precarico per chiedere
+ * la STESSA immagine mentre il mouse e' ancora sulla cartella, e la faccia
+ * della cartella. Sulla faccia la schermata e' mezza pagina e basterebbe una
+ * candidata piu' piccola, ma due valori diversi vorrebbero dire due file
+ * scaricati al posto di uno: con lo stesso, la pratica la trova gia' in cache.
  */
 export const SHOT_SIZES = "(min-width: 1024px) 60rem, 100vw";
 
@@ -23,15 +25,17 @@ export const SHOT_SIZES = "(min-width: 1024px) 60rem, 100vw";
  *
  * L'anteprima non si toglie mai: se la schermata non arriva, il riquadro resta
  * quello che era al primo frame invece di svuotarsi.
+ *
+ * Riempie il riquadro che la contiene, sulla faccia come nella pratica: bordo,
+ * angolo e altezza li decide il riquadro.
  */
 export function WorkShot({ shot, alt }: { shot: WorkScreenshot; alt: string }) {
   const [loaded, setLoaded] = useState(false);
 
   return (
-    // Il bordo e l'angolo stanno sul contenitore e non sull'immagine: e' il
-    // contenitore a ritagliare anche l'anteprima, che sborda per via della
-    // sfocatura.
-    <span className="relative block w-full overflow-hidden rounded-[var(--radius)] border border-[var(--line)]">
+    // E' il contenitore a ritagliare anche l'anteprima, che sborda per via
+    // della sfocatura.
+    <span className="relative block size-full overflow-hidden">
       <span
         aria-hidden="true"
         data-shot-blur
@@ -56,11 +60,9 @@ export function WorkShot({ shot, alt }: { shot: WorkScreenshot; alt: string }) {
         ref={(node) => {
           if (node?.complete) setLoaded(true);
         }}
-        // Tetto all'altezza: a piena proporzione lo screenshot si mangia
-        // tutto il dossier e le metriche finiscono sotto la piega. Si
-        // taglia dal basso, perche' la testata del sito e' la parte che
-        // lo fa riconoscere.
-        className={`relative block max-h-[34vh] w-full object-cover object-top transition-opacity duration-500 motion-reduce:transition-none ${
+        // Il tetto e' il riquadro. Si taglia dal basso e da destra: la testata
+        // del sito, in alto a sinistra, e' la parte che lo fa riconoscere.
+        className={`relative block size-full object-cover object-left-top transition-opacity duration-500 motion-reduce:transition-none ${
           loaded ? "opacity-100" : "opacity-0"
         }`}
       />

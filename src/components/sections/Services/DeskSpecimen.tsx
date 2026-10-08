@@ -9,29 +9,29 @@ import type { SampleId } from "@/content/desk";
  * stilizzata. "Il dominio" e' un dominio scritto, non un globo. "Le copie" sono
  * la stessa sagoma ripetuta tre volte, perche' una copia E' una ripetizione.
  * La differenza si sente: un simbolo dice "questo significa sicurezza", un
- * campione fa vedere com'e' fatta — e su un portfolio e' la differenza fra
+ * campione fa vedere com'e' fatta, e su un portfolio e' la differenza fra
  * dichiarare di saper fare una cosa e mostrarne un pezzo.
  *
  * Perche' e' DOM e non un'altra maschera come le sagome: una maschera CSS
- * dipinge un colore solo, e questi disegni sono a piu' colori per costruzione —
+ * dipinge un colore solo, e questi disegni sono a piu' colori per costruzione:
  * i tre campioni de "I colori" non esistono in un colore solo. Non e' un
  * precedente nuovo: lo schermo dentro il laptop al centro (data-desk-screen) e'
  * gia' DOM sovrapposto alla sagoma, e per la stessa identica ragione.
  *
  * Ognuno e' decorazione dichiarata: aria-hidden, sempre. Il nome dell'oggetto lo
  * porta gia' l'etichetta sotto, e un campione che entrasse nell'albero di
- * accessibilita' farebbe leggere "I colori, I colori" — o peggio, "Aa".
+ * accessibilita' farebbe leggere "I colori, I colori", o peggio, "Aa".
  *
  * Il vocabolario e' volutamente corto. Ventidue disegni fatti ognuno con i suoi
  * elementi sarebbero ventidue disegni da mantenere; qui sono composizioni di
- * poche marche ricorrenti — una riga, un blocco, una tessera, un testo mono — e
+ * poche marche ricorrenti (una riga, un blocco, una tessera, un testo mono) e
  * il foglio di stile ne dichiara la forma una volta sola. Quello che cambia da
- * un campione all'altro e' la DISPOSIZIONE, che sta in tokens.css accanto a
+ * un campione all'altro e' la DISPOSIZIONE, che sta in sezioni/tavolo.css accanto a
  * tutto il resto del tavolo.
  */
 
 /** Una riga di testo finto, larga quanto le si dice. La larghezza e' un dato del
- *  disegno — quanto e' lunga quella riga — non una scelta di stile. */
+ *  disegno (quanto e' lunga quella riga), non una scelta di stile. */
 const Riga = ({ w }: { w: number }) => (
   <i data-m="riga" style={{ "--w": `${w}%` } as CSSProperties} />
 );
@@ -94,7 +94,7 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
     </>
   ),
   /** Un impaginato mobile dentro lo schermo del telefono: testata, tre blocchi,
-   *  e il pulsante. La stessa struttura di "Le sezioni", in una colonna sola —
+   *  e il pulsante. La stessa struttura di "Le sezioni", in una colonna sola,
    *  che e' precisamente cosa vuol dire mettere un sito su un telefono. */
   telefono: (
     <>
@@ -124,7 +124,7 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
     </>
   ),
   /** Una scheda prodotto, non una griglia. Quattro tessere sono anche "Le
-   *  sezioni" e "Le immagini" — una griglia e' la forma piu' generica che
+   *  sezioni" e "Le immagini": una griglia e' la forma piu' generica che
    *  esista, e tre oggetti con la stessa forma non distinguono niente. Quello
    *  che rende un catalogo un catalogo, e non una galleria, e' il prezzo. */
   catalogo: (
@@ -140,7 +140,7 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   /**
    * Una ricevuta: tre voci, la linea di strappo, il totale in accento.
    *
-   * Prima qui c'era una carta di credito — banda magnetica e gruppi di cifre —
+   * Prima qui c'era una carta di credito (banda magnetica e gruppi di cifre)
    * ed erano due errori in uno. Il primo si vedeva: una carta disegnata dentro
    * una scheda che ha gia' la forma di una carta. Il secondo no, ed e' quello
    * grave: una carta e' il SIMBOLO del pagamento, non il pagamento. Era l'unico
@@ -148,7 +148,7 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
    *
    * Una ricevuta e' l'unico oggetto FISICO fra tutti i modi di disegnare un
    * pagamento, e questo e' un tavolo con delle cose sopra: tutti gli altri
-   * candidati — l'importo col bottone, i metodi, le rate — erano interfacce
+   * candidati (l'importo col bottone, i metodi, le rate) erano interfacce
    * disegnate dentro una scheda.
    */
   pagamenti: (
@@ -173,7 +173,7 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   ),
   /**
    * Un codice articolo e una quantita'. La prima stesura metteva qui una
-   * tabella — e "I dati", due anelli piu' in la', e' una tabella piu' fitta:
+   * tabella, e "I dati", due anelli piu' in la', e' una tabella piu' fitta:
    * due oggetti con lo stesso disegno, che e' esattamente il difetto che i
    * campioni dovevano risolvere. Un gestionale guardato da lontano e' una
    * tabella come lo e' qualunque altra cosa; guardato da vicino e' codici e
@@ -237,7 +237,7 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   ),
   /**
    * Tre risultati di ricerca, e il primo in accento. Non "un risultato": farsi
-   * trovare non e' esistere in una lista — esistono tutti — e' stare in cima.
+   * trovare non e' esistere in una lista (esistono tutti), e' stare in cima.
    * La differenza fra il campione di prima e questo e' una riga in piu' e tutto
    * il significato.
    */
@@ -262,8 +262,8 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
  * Il campione dentro un oggetto. Sta accanto alla sagoma e non dentro di lei:
  * [data-desk-shape] porta l'ombra dell'oggetto, e un'ombra su ognuna delle
  * marche di un campione impasterebbe un disegno che a 98 px ha gia' poco da
- * spendere. Come fratello prende lo stesso rettangolo — il <li> e' alto quanto
- * la sagoma — senza ereditarne il filtro.
+ * spendere. Come fratello prende lo stesso rettangolo (il <li> e' alto quanto
+ * la sagoma) senza ereditarne il filtro.
  */
 export function DeskSpecimen({ sample }: { sample: SampleId }) {
   return (

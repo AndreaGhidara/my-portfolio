@@ -1,8 +1,7 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, it, expect } from "vitest";
 import { contrastRatio } from "@/styles/contrast";
 import { palette } from "@/styles/palette";
+import { regole } from "@/test/css";
 import {
   LEDS,
   SURFACES,
@@ -152,33 +151,26 @@ describe("la scala dei materiali", () => {
 /**
  * IL CONTRATTO CSS-COME-TESTO.
  *
- * Il modulo qui sopra e' la specifica; `tokens.css` e' l'unico che dipinge. Se
- * i due divergono, la prova della scala misura un tavolo che nessuno vede, che
+ * Il modulo qui sopra e' la specifica; il CSS (tokens.css e
+ * sezioni/tavolo.css) e' l'unico che dipinge. Se i due divergono, la prova
+ * della scala misura un tavolo che nessuno vede, che
  * e' il modo piu' silenzioso di non provare niente. E' lo stesso pattern gia'
  * in uso per il contratto dell'etichetta e per la porta del movimento.
  */
-const TOKENS = readFileSync(resolve(process.cwd(), "src/styles/tokens.css"), "utf8").replace(
-  /\/\*[\s\S]*?\*\//g,
-  "",
-);
-
-/** Il selettore si cerca ANCORATO A CAPO RIGA: `[data-desk-shape] {` e'
- *  contenuto per intero dentro `[data-theme="dark"] [data-desk-shape] {`. */
+/** Il selettore si cerca INTERO: `[data-desk-shape]` e' contenuto per intero
+ *  dentro `[data-theme="dark"] [data-desk-shape]`. Le ancore di materials.ts
+ *  finiscono con la graffa o con la virgola della lista: si tolgono. */
 function blocco(selettore: string): string | null {
-  const ancorato = new RegExp(`^[ \\t]*${selettore.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "m");
-  const trovato = TOKENS.match(ancorato);
-  if (!trovato || trovato.index === undefined) return null;
-  const apre = TOKENS.indexOf("{", trovato.index);
-  return TOKENS.slice(apre + 1, TOKENS.indexOf("}", apre));
+  return regole(selettore.replace(/\s*[{,]\s*$/, ""))[0]?.corpo ?? null;
 }
 
 function pretende(selettore: string): string {
   const testo = blocco(selettore);
-  if (testo === null) throw new Error(`tokens.css non ha la regola ${selettore}`);
+  if (testo === null) throw new Error(`il foglio di stile non ha la regola ${selettore}`);
   return testo;
 }
 
-describe("tokens.css dichiara esattamente la tavola dei materiali", () => {
+describe("il CSS dichiara esattamente la tavola dei materiali", () => {
   it("il tema scuro inverte i token come li inverte il modulo", () => {
     // THEME_TOKENS e' l'assunto su cui poggia ogni numero della scala: se un
     // giorno --fg-muted scuro cambiasse mestiere nel CSS, il modulo
@@ -232,7 +224,7 @@ describe("tokens.css dichiara esattamente la tavola dei materiali", () => {
     const led = pretende("[data-desk-leds] {");
     expect(led).toContain(recipeCss(LEDS.on));
     expect(led).toContain(recipeCss(LEDS.off));
-    expect(blocco('[data-theme="dark"] [data-desk-leds]')).toBeNull();
+    expect(regole(/\[data-theme="dark"\] \[data-desk-leds\]/)).toEqual([]);
   });
 
   it("i led sono ritagliati sulla sagoma che li porta", () => {
@@ -252,10 +244,13 @@ describe("tokens.css dichiara esattamente la tavola dei materiali", () => {
  */
 describe("l'ombra sta sulle superfici e su niente altro", () => {
   it("la dichiara la sagoma, e nessun'altra regola del foglio di stile", () => {
-    const regole = [...TOKENS.matchAll(/(^|\})([^{}]+)\{([^{}]*)\}/g)];
-    const conOmbra = regole
-      .filter((r) => /drop-shadow/.test(r[3]))
-      .map((r) => r[2].trim().replace(/\s+/g, " "));
+    // Tutte le regole del sito, anche la prima di ogni media query: l'ombra
+    // delle palline di carta dell'apertura c'e', ma il tavolo e' quello che
+    // conta qui, e le palline non sono una superficie del tavolo.
+    const conOmbra = regole()
+      .filter((r) => /drop-shadow/.test(r.corpo))
+      .map((r) => r.selettore)
+      .filter((selettore) => /\[data-desk/.test(selettore));
     expect(conOmbra).toEqual(["[data-desk-shape]"]);
   });
 
