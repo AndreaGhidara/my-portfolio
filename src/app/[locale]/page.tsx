@@ -1,11 +1,11 @@
 import { setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/sections/Hero";
-import { SottoIlFoglio } from "@/components/sections/Hero/SottoIlFoglio";
-import { Scontrino } from "@/components/sections/Scontrino";
+import { SottoIlFoglio } from "@/components/sections/Hero/UnderSheet";
+import { Scontrino } from "@/components/sections/Receipt";
 import { Services } from "@/components/sections/Services";
 import { Works } from "@/components/sections/Works";
 import { Journey } from "@/components/sections/Journey";
-import { Notizie } from "@/components/sections/Notizie";
+import { Notizie } from "@/components/sections/News";
 import { Contact } from "@/components/sections/Contact";
 
 /**

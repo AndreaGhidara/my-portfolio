@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { SOGLIA_IN_CIMA } from "./inCima";
+import { SOGLIA_IN_CIMA } from "./atTop";
 
 /**
  * Tiene aggiornato data-at-top su <html>, che TopStateScript ha già

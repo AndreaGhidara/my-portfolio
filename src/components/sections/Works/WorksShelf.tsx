@@ -1,14 +1,14 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { LINGUETTA, PARAMETRI } from "./archivio";
+import { LINGUETTA, PARAMETRI } from "./archive";
 import { WorkFolder } from "./WorkFolder";
 import { WorkDialog } from "./WorkDialog";
 import { preloadShot } from "./preloadShot";
 import type { WorkCaseData, WorkCaseLabels } from "./types";
-import { useArchivioAcceso } from "./useArchivioAcceso";
-import { usePratica } from "./usePratica";
-import { useProfondita } from "./useProfondita";
+import { useArchivioAcceso } from "./useArchiveLight";
+import { usePratica } from "./useDossier";
+import { useProfondita } from "./useDepth";
 
 /**
  * Le misure dell'archivio arrivano al CSS da qui, scritte nel markup del

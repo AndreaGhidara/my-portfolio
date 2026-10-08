@@ -5,7 +5,7 @@ import type { ScrollTrigger as TipoScrollTrigger } from "gsap/ScrollTrigger";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import { DeskTable, type DeskLayerData } from "./DeskTable";
-import { Gioco } from "./gioco/Gioco";
+import { Gioco } from "./game/Game";
 import { CENTRE, FIRST_RING_REACH, SHAPE_BOX, cameraScale } from "./layers";
 
 /** Quanta parte dell'altezza del palco occupa il laptop al fotogramma zero. */

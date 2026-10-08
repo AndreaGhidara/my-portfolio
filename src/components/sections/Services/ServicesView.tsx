@@ -1,7 +1,7 @@
 import { DeskStage } from "./DeskStage";
 import type { DeskLayerData } from "./DeskTable";
-import { CassettaView } from "./cassetta/CassettaView";
-import type { TestiCassetta } from "./cassetta/tipi";
+import { CassettaView } from "./toolbox/ToolboxView";
+import type { TestiCassetta } from "./toolbox/types";
 
 export type ServicesViewProps = {
   eyebrow: string;

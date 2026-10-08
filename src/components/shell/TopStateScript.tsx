@@ -1,4 +1,4 @@
-import { SOGLIA_IN_CIMA } from "./inCima";
+import { SOGLIA_IN_CIMA } from "./atTop";
 
 /**
  * Va reso dentro <head>, come ThemeScript: segna se la pagina è ancora in

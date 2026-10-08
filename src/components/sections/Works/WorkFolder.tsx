@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { due } from "@/lib/formato";
+import { due } from "@/lib/format";
 import { WorkShot } from "./WorkShot";
-import type { Cartella } from "./scivola";
+import type { Cartella } from "./slide";
 import type { WorkCaseData } from "./types";
 
 /**

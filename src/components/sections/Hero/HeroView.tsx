@@ -2,7 +2,7 @@ import { Avatar } from "@/components/brand/Avatar";
 import { InkCircle } from "@/components/brand/InkCircle";
 import { Wordmark } from "@/components/brand/Wordmark";
 import { HeroMotion } from "./HeroMotion";
-import { CartaStropicciata } from "./CartaStropicciata";
+import { CartaStropicciata } from "./CrumpledPaper";
 
 export type HeroViewProps = {
   eyebrow: string;

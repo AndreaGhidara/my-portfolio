@@ -1,5 +1,5 @@
 import type { ProcessDelivery } from "@/content/process";
-import { due } from "@/lib/formato";
+import { due } from "@/lib/format";
 import { DeskShapeArt } from "../Services/DeskObject";
 import { ProcessSpecimen } from "./ProcessSpecimen";
 import type { ProcessDeliveryView } from "./ProcessView";

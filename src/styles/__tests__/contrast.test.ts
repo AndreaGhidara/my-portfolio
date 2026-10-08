@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { contrastRatio, relativeLuminance } from "../contrast";
 import { palette } from "../palette";
-import { LINGUETTA, PARAMETRI, tonoLinguetta } from "../../components/sections/Works/archivio";
+import { LINGUETTA, PARAMETRI, tonoLinguetta } from "../../components/sections/Works/archive";
 
 describe("relativeLuminance", () => {
   it("vale 0 sul nero e 1 sul bianco", () => {

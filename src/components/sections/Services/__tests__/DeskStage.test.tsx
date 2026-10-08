@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act, cleanup, waitFor } from "@testing-library/react";
-import { renderConTesti } from "@/test/renderConTesti";
+import { renderConTesti } from "@/test/renderWithMessages";
 import { regole } from "@/test/css";
 import { DeskStage } from "../DeskStage";
 import { cameraScale } from "../layers";

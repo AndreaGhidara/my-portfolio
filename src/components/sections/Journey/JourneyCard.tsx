@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { Posa } from "./binario";
+import type { Posa } from "./track";
 import type { JourneyEntryView } from "./JourneyView";
 
 /**

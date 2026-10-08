@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act, within, waitFor } from "@testing-librar
 import userEvent from "@testing-library/user-event";
 import { WorksView } from "../WorksView";
 import { SHOT_SIZES } from "../WorkShot";
-import { LINGUETTA, PARAMETRI } from "../archivio";
+import { LINGUETTA, PARAMETRI } from "../archive";
 import { regole } from "@/test/css";
 
 const labels = {

@@ -1,5 +1,5 @@
 import { Reveal } from "@/animations/components/Reveal";
-import { Oggi } from "./Oggi";
+import { Oggi } from "./Today";
 export type FooterViewProps = {
   tagline: string;
   /** L'etichetta sopra l'indirizzo: «Rispondi a». */

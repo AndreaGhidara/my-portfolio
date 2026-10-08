@@ -3,7 +3,7 @@ import { deskLayers } from "@/content/desk";
 import { metricById } from "@/content/metrics";
 import { ServicesView } from "./ServicesView";
 import type { DeskLayerData } from "./DeskTable";
-import { testiCassetta } from "./cassetta/testi";
+import { testiCassetta } from "./toolbox/copy";
 
 export async function Services() {
   const t = await getTranslations("services");

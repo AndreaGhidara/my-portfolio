@@ -4,8 +4,8 @@ import { gsap, ScrollTrigger } from "./gsap";
 import type { MotionLevel } from "./motionPolicy";
 // La riga d'innesco sta in ./finestre: e' un modulo di soli dati, senza
 // "use client", cosi' la possono leggere anche i Server Component.
-import { INIZIO_ENTRATA } from "./finestre";
-export { INIZIO_ENTRATA } from "./finestre";
+import { INIZIO_ENTRATA } from "./timing";
+export { INIZIO_ENTRATA } from "./timing";
 
 /**
  * La pulizia di fine entrata, fatta a mano.

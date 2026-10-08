@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import { useMotionLevel, type MotionLevel } from "./motionPolicy";
-import { quandoLibero } from "./quandoLibero";
+import { quandoLibero } from "./whenIdle";
 import type * as Presets from "./presets";
 
 /** Quello che una sezione riceve per costruire le sue animazioni. */

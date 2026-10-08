@@ -2,7 +2,7 @@
 
 import { useId, type RefObject } from "react";
 import { site } from "@/content/site";
-import { due } from "@/lib/formato";
+import { due } from "@/lib/format";
 import { WorkShot } from "./WorkShot";
 import type { WorkCaseData, WorkCaseLabels } from "./types";
 

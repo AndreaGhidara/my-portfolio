@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { Reveal } from "@/animations/components/Reveal";
-import { POSA_ARRIVO, posa } from "./binario";
-import { JourneyBinario } from "./JourneyBinario";
+import { POSA_ARRIVO, posa } from "./track";
+import { JourneyBinario } from "./JourneyTrack";
 import { JourneyCard } from "./JourneyCard";
 
 export type JourneyEntryView = {

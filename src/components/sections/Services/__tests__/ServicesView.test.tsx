@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { screen, within } from "@testing-library/react";
-import { renderConTesti as render } from "@/test/renderConTesti";
+import { renderConTesti as render } from "@/test/renderWithMessages";
 import { ServicesView } from "../ServicesView";
 import type { ServicesViewProps } from "../ServicesView";
 import { LABEL, drawWidth } from "../layers";
-import { testi } from "../cassetta/__tests__/fixture";
+import { testi } from "../toolbox/__tests__/fixture";
 
 /** Il quarto, come nel tavolo vero. */
 const MUTO = 3;

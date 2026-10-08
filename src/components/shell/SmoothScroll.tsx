@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import type Lenis from "lenis";
 import { useMotionLevel } from "@/animations/motionPolicy";
-import { quandoLibero } from "@/animations/quandoLibero";
+import { quandoLibero } from "@/animations/whenIdle";
 
 /**
  * Lo scroll fluido acceso in questo momento, o null. Serve a chi deve portare

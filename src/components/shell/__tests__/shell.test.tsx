@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { ThemeToggle } from "../ThemeToggle";
 import { ThemeScript } from "../ThemeScript";
 import { TopStateScript } from "../TopStateScript";
-import { SOGLIA_IN_CIMA } from "../inCima";
+import { SOGLIA_IN_CIMA } from "../atTop";
 
 beforeEach(() => {
   document.documentElement.removeAttribute("data-theme");

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { site } from "@/content/site";
-import { creaChiedi } from "@/lib/notizie/chiedi";
-import { raccogli } from "@/lib/notizie/raccolta";
+import { creaChiedi } from "@/lib/news/fetcher";
+import { raccogli } from "@/lib/news/collector";
 
 /**
  * Le notizie della sezione «Le notizie della settimana». Si chiamano da qui e
