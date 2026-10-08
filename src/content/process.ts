@@ -1,7 +1,5 @@
 import type { DeskShape } from "./desk";
 
-/** L'ordine e' quello del lavoro e non e' scambiabile: e' meta' del titolo, e
- *  per questo in pagina resta una lista ordinata. */
 export type ProcessSample = "accordo" | "bozza" | "indirizzo" | "numero";
 
 /** Da che parte sta il disegno. Il testo sta dall'altra. */
@@ -21,6 +19,8 @@ export type ProcessDelivery = {
   sample: ProcessSample;
 };
 
+/** L'ordine e' quello del lavoro e non e' scambiabile: e' meta' del titolo, e
+ *  per questo in pagina resta una lista ordinata. */
 export const processDeliveries: ProcessDelivery[] = [
   { id: "documento", side: "left", shape: "sheet", sample: "accordo" },
   { id: "schermo", side: "right", shape: "sheet", sample: "bozza" },

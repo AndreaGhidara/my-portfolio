@@ -68,8 +68,9 @@ export function HeroView({
           >
             {claim}
           </p>
-          {/* text-balance: senza, "e-commerce" si spezzava dopo il trattino. Colonna
-              stretta: oltre ~75 battute per riga l'occhio perde l'inizio della dopo. */}
+          {/* text-balance: senza, "e-commerce" si spezzava dopo il trattino. Non col
+              trattino unificatore: la parola non corrisponderebbe piu' a come la si
+              cerca. Colonna stretta: oltre ~75 battute l'occhio perde la riga dopo. */}
           <p className="mt-3 max-w-xl text-balance text-[var(--fg-muted)] mx-auto">
             {subclaim}
           </p>

@@ -32,7 +32,6 @@ export const GRID_SIDE = 12;
 /** In frazione del lato del foglio. A 0,46 il foglio restava un quadrato rimpicciolito. */
 export const RADIUS = 0.205;
 
-/** Quanto il foglio si attorciglia mentre collassa, in radianti. */
 const TWIST = 2.6;
 
 /** Lo stesso generatore del resto del sito: seme fisso, pieghe identiche a

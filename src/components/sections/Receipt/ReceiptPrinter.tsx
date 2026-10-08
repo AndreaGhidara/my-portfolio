@@ -31,7 +31,6 @@ export type PrintableService = {
 export type PrinterCopy = {
   /** Sotto la stampante quando non c'e' uno scontrino. */
   hint: string;
-  /** Il nome del gruppo dei tasti. */
   keys: string;
   brand: string;
   name: string;
@@ -224,6 +223,7 @@ export function ReceiptPrinter({
     if (!el.style.maxHeight) return;
     el.style.maxHeight = `${el.scrollHeight + 4}px`;
     const release = () => el.style.removeProperty("max-height");
+    // 200 ms: la transizione dei bottoni che escono a stampa finita.
     const releaseTimer = window.setTimeout(release, 200);
     return () => window.clearTimeout(releaseTimer);
   }, [state.phase, state.ticks, state.traced]);

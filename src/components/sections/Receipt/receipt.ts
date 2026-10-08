@@ -1,11 +1,12 @@
 // La stampante senza DOM: la parte che si sbaglia (due tocchi di fila, un timer
-// rimasto indietro) si prova qui. Numeri e disegni vengono dal prototipo approvato:
-// cambiarli senza ripassare da li' e' ritarare a occhio chiuso.
+// rimasto indietro) si prova qui. Numeri e disegni sono tarati insieme:
+// cambiarne uno senza riguardare il risultato e' ritarare a occhio chiuso.
 
 import { pad2 } from "@/lib/format";
 
 export const LINE_WIDTH = 32;
 
+// Il titolo grande va piano, un carattere alla volta.
 export const CHARS_PER_TICK = { line: 3, large: 1 } as const;
 
 export const TICK_MS = 16;
@@ -274,7 +275,7 @@ export const TITLE_BLOCK = "M290 390 H580 M290 390 V440";
 export const DIVIDER = "M500 390 V440";
 
 // `p` il punto sul disegno, `l` il gomito della linea di richiamo, da cui il testo
-// parte verso l'esterno. I gomiti stanno 20 unita' piu' dentro che nel prototipo:
+// parte verso l'esterno. I gomiti stanno 20 unita' piu' dentro del primo disegno:
 // le voci inglesi piu' lunghe uscivano dalla cornice.
 export const SLOTS: readonly { p: readonly [number, number]; l: readonly [number, number] }[] = [
   { p: [205, 150], l: [185, 80] },

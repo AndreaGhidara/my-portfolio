@@ -1,7 +1,10 @@
-/* Sotto i 960px la macchina sopra e il foglio sotto: la stessa soglia e' in
-   NewsStand.tsx (PHONE_QUERY). I colori delle categorie sono fissi nei due temi
-   (contrast.test.ts); il giallo di Design ha sempre un contorno d'inchiostro, e il
-   verde di Codice e' palette.green perche' --theme-green si schiarisce di notte. */
+/* Sotto i 960px la macchina sopra e il foglio sotto. 960 e non 860: fra i due
+   la notizia aveva meno spazio che su un telefono. La stessa soglia e' in
+   NewsStand.tsx (PHONE_QUERY). */
+
+/* I colori delle categorie sono fissi nei due temi (contrast.test.ts); il giallo
+   di Design ha sempre un contorno d'inchiostro, e il verde di Codice e'
+   palette.green perche' --theme-green si schiarisce di notte. */
 :root {
   --news-ia: var(--orange);
   --on-news-ia: var(--ink);

@@ -1,6 +1,6 @@
 /* Tutto sotto [data-game-level="schermo"]; i pezzi comuni stanno in base.css.
-   Il banco e' alto 38rem contro i 35 del prototipo: i tre rem in piu' vanno al
-   cassetto, che deve tenere le scelte e la riga scura insieme anche a 360px.
+   Il banco e' alto 38rem e non 35: i tre rem in piu' vanno al cassetto, che
+   deve tenere le scelte e la riga scura insieme anche a 360px.
    Il sito finto legge --sf..--sm, i colori del Forno Aurora (fakeSite.ts). */
 
 [data-game] .bench[data-game-level="schermo"] {

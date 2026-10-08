@@ -15,7 +15,6 @@ export type WorkScreenshot = {
 export type WorkCaseData = {
   id: string;
   name: string;
-  /** Si legge sulla cartella chiusa. */
   tagline: string;
   work: string;
   choice: string;

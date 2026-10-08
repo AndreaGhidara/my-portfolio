@@ -5,6 +5,8 @@
 [data-receipt] {
   min-height: 100vh;
   min-height: 100svh;
+  /* Un contesto suo, che convive con lo z-index 2 dell'effetto sopra
+     l'apertura (under-sheet.css). */
   isolation: isolate;
   /* La caduta dello scontrino strappato esce dall'uscita: si ferma qui. */
   overflow: hidden;
@@ -100,8 +102,8 @@
   transform: translateY(3px);
   box-shadow: 0 1px 0 color-mix(in oklab, var(--ink) 60%, var(--paper));
 }
-/* Il tasto premuto resta giu' di un filo e si scalda appena: 90% e non 80
-   come nel prototipo, perche' il numero arancio scuro ci resti sopra 4,5:1. */
+/* Il tasto premuto resta giu' di un filo e si scalda appena: 90% e non 80,
+   perche' il numero arancio scuro ci resti sopra 4,5:1. */
 [data-receipt-key][aria-pressed="true"] {
   background: color-mix(in oklab, var(--paper) 90%, var(--accent));
   transform: translateY(2px);
@@ -282,8 +284,8 @@
   opacity: 0;
   transition: opacity 0.3s;
 }
-/* 10px e non gli 11 del prototipo: «1 · THE FIRST 3 SECONDS» e «2 ·
-   MANAGEMENT SYSTEM» a 11 uscivano dalla cornice. */
+/* 10px e non 11: «1 · THE FIRST 3 SECONDS» e «2 · MANAGEMENT SYSTEM» a 11
+   uscivano dalla cornice. */
 [data-receipt-plate] text {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 10px;

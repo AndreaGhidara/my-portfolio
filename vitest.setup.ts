@@ -3,7 +3,8 @@ import { vi } from "vitest";
 
 // Solo reduced-motion risponde true, cosi' il livello e' sempre "none": a
 // "reduced" GSAP animerebbe davvero, ScrollTrigger in jsdom non scatta mai, e
-// gli elementi resterebbero a opacity 0 rompendo ogni toBeVisible().
+// gli elementi resterebbero a opacity 0 rompendo ogni toBeVisible(). Per questo
+// il livello "reduced" va verificato a mano, su un dispositivo vero.
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: (query: string) => ({

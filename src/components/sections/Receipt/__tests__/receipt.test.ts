@@ -139,7 +139,7 @@ describe("la tavola", () => {
     }
   });
 
-  it("i tempi sono quelli del prototipo: righe ogni 0,15s, richiami da 1,1s ogni 0,28s", () => {
+  it("i tempi sono quelli tarati: righe ogni 0,15s, richiami da 1,1s ogni 0,28s", () => {
     expect(DELAYS.line(2)).toBeCloseTo(0.3);
     expect(callout(0).delay).toBeCloseTo(1.1);
     expect(callout(3).delay).toBeCloseTo(1.1 + 3 * 0.28);

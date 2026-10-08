@@ -24,7 +24,6 @@ export const GRAVITY = 2600;
 const AIR_DRAG = 0.994;
 /** Quanto rimbalza toccando. Bassa: la carta non e' una pallina di gomma. */
 const BOUNCE = 0.4;
-/** Quanto frena strisciando a terra. */
 const FRICTION = 0.8;
 /** Sotto questa velocita' verticale non rimbalza piu': si posa. */
 const SETTLE_SPEED = 70;
@@ -84,7 +83,6 @@ export function atRest(p: Piece, walls: Walls): boolean {
   );
 }
 
-/** La velocita' del lancio, dalle ultime posizioni del puntatore. */
 export function fling(trail: readonly { x: number; y: number; t: number }[]): {
   vx: number;
   vy: number;

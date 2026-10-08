@@ -9,7 +9,6 @@ import type { WorkCaseData, WorkCaseLabels } from "./types";
 export type WorkDialogProps = {
   dialog: RefObject<HTMLDialogElement | null>;
   data: WorkCaseData | null;
-  /** Da uno. */
   number: number;
   total: number;
   labels: WorkCaseLabels;

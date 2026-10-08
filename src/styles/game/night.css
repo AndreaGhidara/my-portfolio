@@ -1,7 +1,7 @@
 /* Tutto sotto [data-game-level="notte"]; i pezzi comuni stanno in base.css. */
 
 /* Lo stesso inchiostro scaldato del finale, che parte da questo cielo e lo fa
-   giorno: il blu del prototipo non e' in tavolozza. */
+   giorno. Non un blu: non e' in tavolozza. */
 [data-game-level="notte"] .above {
   background: linear-gradient(var(--ink), color-mix(in oklab, var(--ink) 80%, var(--muted)));
 }

@@ -43,7 +43,7 @@ describe("HeroView", () => {
     }
   });
 
-  it("dice cosa fa e per chi: è ciò che nel prototipo mancava", () => {
+  it("dice cosa fa e per chi", () => {
     render(<HeroView {...props} />);
     expect(screen.getByText(props.claim)).toBeVisible();
     expect(screen.getByText(props.subclaim)).toBeVisible();

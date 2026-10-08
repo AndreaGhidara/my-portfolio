@@ -140,7 +140,7 @@ describe("WorksView", () => {
     expect(container.querySelector("[data-archive-lit]")).toBeNull();
   });
 
-  it("i numeri tarati nel prototipo arrivano al CSS dal modulo, non da una seconda copia", () => {
+  it("i numeri tarati arrivano al CSS dal modulo, non da una seconda copia", () => {
     const { container } = render(<WorksView {...props} />);
     const shelf = container.querySelector<HTMLElement>("[data-work-shelf]")!;
     expect(shelf.style.getPropertyValue("--step")).toBe(`${ARCHIVE_PARAMS.step}px`);

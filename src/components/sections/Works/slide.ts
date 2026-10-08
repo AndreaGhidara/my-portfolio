@@ -1,7 +1,9 @@
-/** Tempi e curve tarati nel prototipo della cartella che scivola: si ritoccano
- *  li', non qui. Della cartella si animano solo `translate` e `rotate`, perche'
- *  `scale` e `filter` sono gia' della sua profondita'. Niente stili in linea: a
- *  fine corsa si cancellano le animazioni e resta il CSS. */
+/** Quattro tempi: 1 sfila il foglio, 2 la cartella scende, 3 si apre il dialog
+ *  e il foglio si allarga, 4 entrano le parti. La chiusura fa il contrario. */
+
+/** Della cartella si animano solo `translate` e `rotate`, perche' `scale` e
+ *  `filter` sono gia' della sua profondita'. Niente stili in linea: a fine
+ *  corsa si cancellano le animazioni e resta il CSS. */
 
 export type Folder = {
   li: HTMLElement;
@@ -20,7 +22,7 @@ export type FolderMotion = "four-beats" | "fade";
 export type Move = { finished: Promise<unknown>; cancel(): void };
 
 export type Slide = {
-  /** Si chiama dopo il commit: il contenuto dev'essere nel DOM. */
+  /** Tempi 3 e 4, dopo il commit: il contenuto dev'essere nel DOM. */
   open(dialog: HTMLDialogElement): Promise<void>;
   close(dialog: HTMLDialogElement): Promise<void>;
   /** Il dialog si e' chiuso senza chiedere: del foglio non si anima piu' niente. */

@@ -47,7 +47,7 @@
   --fg-muted: #A79E8C; /* palette.mutedDark */
   /* Il verde di carta qui fa 2,39:1, sotto il 3:1 di WCAG; questo fa 6,68:1. */
   --theme-green: #7FBF95;
-  --line: var(--muted); /* 3:1 su --ink, la soglia WCAG per elementi non testuali */
+  --line: var(--muted); /* 3,34:1 su --ink: supera il 3:1 di WCAG per elementi non testuali */
 }
 
 body {

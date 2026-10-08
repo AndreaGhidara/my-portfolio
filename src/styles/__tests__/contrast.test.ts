@@ -182,6 +182,7 @@ describe("l'editor della cassetta, scuro in tutti e due i temi", () => {
   const newLine = "#261913";
   const statusBar = "#1F1D19";
 
+  // mutedDark perche' muted sul fondo scuro fa 3,34:1, sotto AA per un testo di 12px.
   it("i commenti che portano contenuto sono mutedDark, e superano AA sui tre fondi", () => {
     for (const bg of [palette.ink, newLine, statusBar]) {
       expect(contrastRatio(palette.mutedDark, bg)).toBeGreaterThanOrEqual(4.5);
@@ -203,7 +204,9 @@ describe("l'editor della cassetta, scuro in tutti e due i temi", () => {
 });
 
 describe("la mappa della cassetta: i conti degli scomparti", () => {
-  // Il conto e' --fg all'80% nel fondo; valori letti dal pixel in Chrome.
+  // Il conto e' --fg all'80% nel fondo; valori letti dal pixel in Chrome. #3A3733
+  // e non --fg-muted: con --fg-muted le pezze piu' cariche del chiaro scendevano
+  // sotto 4,5:1.
   const lightPatches = ["#F6D1C1", "#F6E1D4", "#E3DFD7", "#D4D0C8", "#F6DED1", "#DEDAD2", "#EBE7DE", "#F6E8DD", "#F5F1E8"];
   const darkPatches = ["#3C2218", "#281A14", "#211E1B", "#2C2A26", "#2B1B14", "#24221E", "#1B1916", "#1F1612", "#14120F"];
 

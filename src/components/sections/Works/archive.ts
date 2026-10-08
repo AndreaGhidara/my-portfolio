@@ -1,6 +1,6 @@
 /** L'aritmetica dell'archivio, senza DOM, perche' si possa provare in un test.
- *  I numeri sono tarati nel prototipo delle cartelle: cambiarli qui senza
- *  ripassare da li' e' ritarare a occhio chiuso. */
+ *  I numeri sono tarati insieme, guardando le cartelle: cambiarne uno senza
+ *  riguardare il risultato e' ritarare a occhio chiuso. */
 export const ARCHIVE_PARAMS = {
   /** Px: quanto piu' in basso si ferma ogni cartella rispetto alla precedente. */
   step: 14,

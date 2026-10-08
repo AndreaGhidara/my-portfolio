@@ -125,6 +125,9 @@ export const OBJECTS_PER_LAYER = 6;
 // objectFootprint: piu' di 2,0 punti fra due cose qualsiasi, piu' di 4,2 fra
 // anelli diversi (le due prove di layers.test.ts). Gli anelli restano annidati,
 // e si ritoccano tutti insieme o nessuno.
+
+// Non omotetici apposta: sull'asse verticale dal laptop al bordo ci stanno meno
+// di tre ingombri. A tenere separati gli anelli e' ANGLE_OFFSET, non il raggio.
 const RADII: { rx: number; ry: number }[] = [
   { rx: 14.97, ry: 26.28 },
   { rx: 28.17, ry: 30.16 },
@@ -135,6 +138,7 @@ const RADII: { rx: number; ry: number }[] = [
 // Sfalsati: allineati, i quattro strati formavano dei raggi.
 const START_ANGLE: number[] = [81.09, 166.32, 115.17, 147.81];
 
+// L'unica leva che fa spazio: decide se si vedono quattro corone o una nuvola.
 // Ventiquattro scostamenti e non sei condivisi: con lo stesso schema i quattro
 // anelli allineavano i loro grappoli e fra anelli restavano 1,53 punti. Media
 // zero per strato: la rotazione dell'anello sta in START_ANGLE.

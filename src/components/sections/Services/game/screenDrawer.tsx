@@ -141,8 +141,8 @@ export function Drawer({ active, choices, tried, message, onChoose }: DrawerProp
             ),
           )}
         </div>
-        {/* Le misure del campione sono quelle del prototipo: i pixel veri divisi
-            per quanto il cassetto e' piu' piccolo di una pagina. */}
+        {/* Le misure del campione sono i pixel veri divisi per quanto il
+            cassetto e' piu' piccolo di una pagina. */}
         <div className="scale-sample">
           <div>
             <b className="h1" style={{ fontSize: `${s.h1 / 80}rem` }}>

@@ -289,7 +289,7 @@ describe("gli indirizzi delle fonti", () => {
     ]);
   });
 
-  it("ogni categoria ha le sue fonti, come nel prototipo", () => {
+  it("ogni categoria ha le sue fonti", () => {
     expect(SOURCES.ia.map((f) => f.kind)).toEqual(["hn", "hf", "dev"]);
     expect(SOURCES.design.map((f) => f.kind)).toEqual(["hn", "dev", "dev", "dev"]);
     expect(SOURCES.codice.map((f) => f.kind)).toEqual(["releases", "dev", "hn", "dev", "dev"]);

@@ -26,6 +26,8 @@ export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewPro
         <p className="mt-5 max-w-2xl text-[var(--fg-muted)]">{intro}</p>
       </Reveal>
 
+      {/* L'archivio esce dalla colonna del testo: ogni cartella e' larga quanto
+          la pagina tolto il gutter. */}
       <WorksShelf works={items} labels={labels} />
     </section>
   );

@@ -44,10 +44,12 @@
   will-change: opacity;
 }
 
-/* translate prima di scale, come negli scale/translate del prototipo: la
-   salita non si stringe con il resto. L'origine al 30% tiene il nome quasi
-   fermo: a stringersi verso l'alto e' il fondo, che il foglio sta coprendo. */
+/* translate prima di scale: la salita non si stringe con il resto. L'origine al
+   30% tiene il nome quasi fermo: a stringersi verso l'alto e' il fondo, che il
+   foglio sta coprendo. */
 [data-under-sheet][data-lit] [data-hero-layer] {
+  /* A mano: la trasformazione apre gia' un contesto, ma e' un effetto
+     collaterale e non ci si appoggia. */
   isolation: isolate;
   transform-origin: 50% 30%;
   transform: translateY(calc(var(--coverage, 0) * var(--rise) * -1))

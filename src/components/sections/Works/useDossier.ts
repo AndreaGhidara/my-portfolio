@@ -40,6 +40,8 @@ export function useDossier(
         // La barra in basso resta finche' non arriva il velo (vedi sections/bottom-nav.css).
         document.documentElement.setAttribute("data-dossier-in-progress", "");
         setActive(c.i);
+        // Se la cartella non e' davanti o in vista la pagina scorre prima, svelta,
+        // e la cartella cade a scorrimento fermo: per questo prepare() e' asincrono.
         const pending = c.motion === "four-beats" ? prepare(c.i, c.folder) : null;
         if (pending) void pending.then(() => send({ type: "fall", gen }));
         else send({ type: "fall", gen });

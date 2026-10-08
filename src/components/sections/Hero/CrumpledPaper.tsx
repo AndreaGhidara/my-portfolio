@@ -75,7 +75,6 @@ export function CrumpledPaper() {
       return tex;
     };
 
-    /** Una tela grande quanto la lettera, appoggiata dove sta adesso. */
     const placeCanvas = (L: Letter) => {
       const r = L.img.getBoundingClientRect();
       const size = Math.max(r.width, r.height);

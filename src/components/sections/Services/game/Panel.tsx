@@ -297,8 +297,8 @@ function ServiceModule({
         <p className="mono">{t("occhiello", { nome: name })}</p>
         <h3>{solved !== null ? t("fatto") : isTheirs ? t("cosa") : t("aPosto")}</h3>
       </div>
-      {/* Nel prototipo questa riga c'e' anche col pannello tutto verde; qui
-          solo quando la spia accesa e' davvero un'altra. */}
+      {/* La riga c'e' solo quando la spia accesa e' davvero un'altra, non col
+          pannello tutto verde. */}
       <p className="explain">{solved === null && !isTheirs && active !== null ? t("altra") : ""}</p>
       <div className="stage">
         {solved !== null ? (

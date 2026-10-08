@@ -1,6 +1,6 @@
 /** L'aritmetica del percorso, senza DOM, perche' si possa provare in un test.
- *  I numeri sono tarati nel prototipo del percorso orizzontale: cambiarli qui
- *  senza ripassare da li' e' ritarare a occhio chiuso. */
+ *  I numeri sono tarati insieme, guardando il percorso: cambiarne uno senza
+ *  riguardare il risultato e' ritarare a occhio chiuso. */
 
 /** In pixel del binario. */
 export type TrackPoint = readonly [number, number];
@@ -39,9 +39,9 @@ export const POSES: readonly Pose[] = [
   { rotation: 1.3, offset: 1.25 },
 ];
 
-/** Misurata in Chrome, non scelta: il caso peggiore e' 360px di larghezza in
- *  italiano (593px), arrotondato per un carattere di ripiego piu' largo. Si
- *  confronta con il palco vero, 100svh: `min-height` sul telefono segue il
+/** Misurata in Chrome a 360px in italiano, il caso peggiore: 593 = barra alta 68
+ *  + testata 91 + fila 338 + barra bassa 96, arrotondato a 600 per un carattere
+ *  di ripiego piu' largo. Si confronta con 100svh, che sul telefono segue il
  *  viewport a barre nascoste. Un iPhone SE (circa 548px) resta in colonna. */
 export const MIN_HEIGHT = 600;
 

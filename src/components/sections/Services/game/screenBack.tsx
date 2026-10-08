@@ -6,7 +6,7 @@ import { Icon, type NodeIcon } from "./icons";
 import { levelNumber } from "./levels";
 
 // I nodi stanno nello stesso svg dei fili, nelle stesse coordinate: posati
-// sopra in percentuale, come nel prototipo, su un banco stretto scivolavano via.
+// sopra in percentuale, su un banco stretto scivolavano via.
 
 const NODES: Record<NodeIcon, [number, number]> = {
   contatti: [70, 110],

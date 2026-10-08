@@ -65,6 +65,7 @@ export function UnderSheet({ children }: { children: ReactNode }) {
       const changed = window.innerWidth !== width;
       width = window.innerWidth;
       if (changed || fine.matches) measure();
+      // La copertura invece si ricalcola sempre: e' solo una lettura.
       update();
     };
 
@@ -90,6 +91,9 @@ export function UnderSheet({ children }: { children: ReactNode }) {
     const onFocus = (event: FocusEvent) => {
       const focused = event.target as HTMLElement | null;
       if (!focused?.matches(":focus-visible") || coverage() <= 0) return;
+      // Dove Hero si ferma ne mostra il fondo, coi bottoni: in cima al contenitore,
+      // su un telefono basso, finirebbero sotto la barra. Se il fuoco resta sotto
+      // la testata si sale ancora.
       const stuckAt = root.getBoundingClientRect().top + window.scrollY - stick;
       window.scrollTo({ top: Math.max(0, stuckAt), behavior: "instant" });
       const hidden = headerHeight - focused.getBoundingClientRect().top;

@@ -66,8 +66,8 @@
   color: var(--mutedDark);
 }
 
-/* Va a capo invece di tagliarsi coi puntini come nel prototipo: e' la prima
-   cosa che si legge, e due righe ci stanno. */
+/* Va a capo invece di tagliarsi coi puntini: e' la prima cosa che si legge, e
+   due righe ci stanno. */
 [data-game-level="pannello"] .tail {
   position: absolute;
   inset-inline: 0.7rem;
@@ -223,8 +223,8 @@
 
 [data-game-level="pannello"] .problem.solved small { color: var(--green); }
 
-/* Righe piu' basse che nel prototipo: con la salute sotto 90 il titolo va su
-   due righe, e cinque righe alte uscivano dal palco. */
+/* Righe basse: con la salute sotto 90 il titolo va su due righe, e cinque
+   righe alte uscivano dal palco. */
 [data-game-level="pannello"] .report {
   display: grid;
   gap: 0.22rem;

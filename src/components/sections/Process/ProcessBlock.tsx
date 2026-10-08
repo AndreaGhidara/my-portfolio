@@ -4,7 +4,7 @@ import { DeskShapeArt } from "../Services/DeskObject";
 import { ProcessSpecimen } from "./ProcessSpecimen";
 import type { ProcessDeliveryView } from "./ProcessView";
 
-/** Una prova conta che il «cosa NON e'» ci sia in tutte e quattro. Livello 3:
+/** Una prova esige il «cosa NON e'» in tutte e quattro le consegne. Livello 3:
  *  le consegne sono figlie del titolo della sezione. */
 export function ProcessBlock({
   delivery,

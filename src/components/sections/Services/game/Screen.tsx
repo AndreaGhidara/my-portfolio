@@ -16,7 +16,7 @@ import { FakeSite } from "./screenSite";
 import { DRAWER_TOOLS, Drawer, type DrawerToolId, type Choices } from "./screenDrawer";
 import { ScreenBack } from "./screenBack";
 
-// Tempi del prototipo: le viti 0,4 s dopo l'ultimo attrezzo, il circuito
+// Tempi: le viti 0,4 s dopo l'ultimo attrezzo, il circuito
 // 0,85 s dopo l'ultima vite, il livello dopo a 2,8 s. Fuori dallo schermo si
 // fermano, e al rientro ripartono da capo.
 

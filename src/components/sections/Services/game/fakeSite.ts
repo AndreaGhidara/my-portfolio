@@ -40,7 +40,7 @@ export function siteVariables(c: FakeColors): SiteVariables {
 
 export type FontPairId = "archivo" | "fraunces" | "grotesk" | "playfair";
 
-// Il paragrafo e' sempre Archivo: Inter del prototipo il sito non lo carica.
+// Il paragrafo e' sempre Archivo, il carattere del sito: un altro andrebbe caricato apposta.
 // `weight` e' il peso caricato: un altro sarebbe un grassetto finto del browser.
 export type FakeFontPair = { id: FontPairId; name: string; heading: string; weight: number; body: string };
 

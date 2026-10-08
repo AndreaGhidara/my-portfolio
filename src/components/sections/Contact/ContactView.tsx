@@ -45,7 +45,7 @@ export function ContactView({
         </Reveal>
 
         {/* L'attributo resta sull'entrata: `[data-contact-columns]` e' la griglia
-            a due colonne, e infilarsi dentro la romperebbe. */}
+            a due colonne. */}
         <Reveal data-contact-columns motion="behind" stagger={0.12}>
           <div data-contact-sheet>
             <p data-contact-sheet-label>{client.eyebrow}</p>

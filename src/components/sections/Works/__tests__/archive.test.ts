@@ -143,7 +143,7 @@ describe("il tono del testo della linguetta", () => {
   });
 });
 
-describe("i parametri tarati nel prototipo", () => {
+describe("i parametri tarati", () => {
   it("sono quelli approvati", () => {
     expect(ARCHIVE_PARAMS).toEqual({
       step: 14,

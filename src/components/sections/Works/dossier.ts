@@ -1,8 +1,9 @@
 import type { FolderMotion } from "./slide";
 
-/** Stato puro della pratica, dal clic alla cartella di nuovo ferma: niente DOM
- *  ne' timer, gli effetti li fa useDossier guardando come cambia lo stato.
- *  `C` e' la cartella: qui si porta e basta, non si tocca. */
+/** Stato puro della pratica, senza DOM ne' timer. Aprire e chiudere durano un
+ *  secondo e mezzo: `closeAfter` e `openAfter` fanno da coda perche' un clic o
+ *  un Esc nel mezzo non si perda ne' si accavalli. `C` e' la cartella: qui si
+ *  porta e basta, non si tocca. */
 export type DossierPhase = "opening" | "open" | "closing" | "rising";
 
 export type DossierRun<C> = {
@@ -10,7 +11,7 @@ export type DossierRun<C> = {
   i: number;
   folder: C;
   motion: FolderMotion;
-  /** Tempo 1 partito: la cartella e' davanti, in vista, e cade. */
+  /** Tempi 1 e 2 partiti: la cartella e' davanti, in vista, e cade. */
   fall: boolean;
   /** Il contenuto e' nel DOM (l'effetto dopo il commit e' passato). */
   mounted: boolean;
