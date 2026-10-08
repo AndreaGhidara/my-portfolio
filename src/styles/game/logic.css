@@ -411,7 +411,7 @@
   letter-spacing: 0.14em;
 }
 
-[data-game-level="logiche"] .paper .imp {
+[data-game-level="logiche"] .paper .amount {
   position: absolute;
   inset-inline-end: 0.7rem;
   inset-block-start: 0.55rem;
@@ -437,7 +437,7 @@
   font-size: 0.7rem;
 }
 
-[data-game-level="logiche"] .mail .intest {
+[data-game-level="logiche"] .mail .letterhead {
   padding: 0.35rem 0.55rem;
   border-block-end: 1px solid var(--graph);
   background: color-mix(in oklab, var(--graph) 25%, var(--paper));
@@ -446,7 +446,7 @@
   color: var(--muted);
 }
 
-[data-game-level="logiche"] .mail .intest b {
+[data-game-level="logiche"] .mail .letterhead b {
   font-weight: 500;
   color: var(--ink);
 }

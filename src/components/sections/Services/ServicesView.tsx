@@ -31,7 +31,7 @@ export function ServicesView({
   return (
     // L'id del titolo e' scritto a mano anche in DeskStage: una costante
     // esportata da un modulo client qui arriverebbe come riferimento, non stringa.
-    <section id="services" aria-labelledby="titolo-services" className="relative">
+    <section id="services" aria-labelledby="services-title" className="relative">
       <DeskStage
         eyebrow={eyebrow}
         title={stageTitle}

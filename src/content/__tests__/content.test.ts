@@ -80,10 +80,10 @@ describe("lavori", () => {
 
   it("lo stato e' scritto, non ricavato dall'anno: in corso solo il lavoro di adesso", () => {
     expect(Object.fromEntries(works.map((w) => [w.id, w.status]))).toEqual({
-      riservato: "in-corso",
-      bdroppy: "consegnato",
-      aidify: "consegnato",
-      visualboost: "consegnato",
+      riservato: "in-progress",
+      bdroppy: "delivered",
+      aidify: "delivered",
+      visualboost: "delivered",
     });
   });
 

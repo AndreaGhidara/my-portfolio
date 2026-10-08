@@ -96,7 +96,7 @@ export function LogicScene({ node, state, copy, onCake, onDay }: Props) {
     case 3:
       return (
         <div className="scene paper">
-          <span className="imp">{copy.importo}</span>
+          <span className="amount">{copy.importo}</span>
           <span className="num">{copy.carta}</span>
           {state.ok && <span className="state">{copy.pagato}</span>}
         </div>
@@ -104,7 +104,7 @@ export function LogicScene({ node, state, copy, onCake, onDay }: Props) {
     case 4:
       return (
         <div className="scene mail">
-          <div className="intest">
+          <div className="letterhead">
             {copy.mailA} <b>{copy.email}</b> · {copy.mailDa}
           </div>
           <p>

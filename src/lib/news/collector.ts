@@ -162,7 +162,7 @@ export function parseSource(f: SourceSpec, body: unknown, now: Date = new Date()
               ],
             },
             { id: "hn" },
-            "prima-pagina",
+            "front-page",
           );
         }),
       ).slice(0, PER_HN_SEARCH);
@@ -210,7 +210,7 @@ export function parseSource(f: SourceSpec, body: unknown, now: Date = new Date()
               ],
             },
             { id: "dev", tag: f.tag },
-            "piu-letto",
+            "most-read",
           );
         }),
       );

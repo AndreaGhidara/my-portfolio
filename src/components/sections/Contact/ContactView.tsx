@@ -37,16 +37,16 @@ export function ContactView({
   const urlFor = (id: string) => socials.find((social) => social.id === id)?.url ?? "#";
 
   return (
-    <section id="contact" aria-labelledby="titolo-contact" className="relative px-[var(--gutter)] py-[var(--section-y)]">
+    <section id="contact" aria-labelledby="contact-title" className="relative px-[var(--gutter)] py-[var(--section-y)]">
       <div className="mx-auto max-w-[56rem]">
-        <Reveal motion="dietro" stagger={0.08}>
+        <Reveal motion="behind" stagger={0.08}>
           <p className="eyebrow">{eyebrow}</p>
-          <h2 id="titolo-contact" className="section-title">{title}</h2>
+          <h2 id="contact-title" className="section-title">{title}</h2>
         </Reveal>
 
         {/* L'attributo resta sull'entrata: `[data-contact-columns]` e' la griglia
             a due colonne, e infilarsi dentro la romperebbe. */}
-        <Reveal data-contact-columns motion="dietro" stagger={0.12}>
+        <Reveal data-contact-columns motion="behind" stagger={0.12}>
           <div data-contact-sheet>
             <p data-contact-sheet-label>{client.eyebrow}</p>
             <h3>{client.title}</h3>
@@ -72,7 +72,7 @@ export function ContactView({
 
         {/* Il cartellino entra dopo il foglio: la sequenza dice quale delle due
             uscite e' la principale. */}
-        <Reveal data-contact-badge motion="alto" delay={0.05}>
+        <Reveal data-contact-badge motion="above" delay={0.05}>
           <span data-contact-clip aria-hidden="true" />
           <div data-contact-badge-body>
             <div>

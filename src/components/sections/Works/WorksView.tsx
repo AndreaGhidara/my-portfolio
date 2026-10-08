@@ -13,12 +13,12 @@ export type WorksViewProps = {
 
 export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewProps) {
   return (
-    <section id="works" aria-labelledby="titolo-works" className="relative px-[var(--gutter)] py-[var(--section-y)]">
-      <Reveal className="mx-auto max-w-4xl" motion="dietro" stagger={0.08}>
+    <section id="works" aria-labelledby="works-title" className="relative px-[var(--gutter)] py-[var(--section-y)]">
+      <Reveal className="mx-auto max-w-4xl" motion="behind" stagger={0.08}>
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="eyebrow">{eyebrow}</p>
-            <h2 id="titolo-works" className="section-title">{title}</h2>
+            <h2 id="works-title" className="section-title">{title}</h2>
           </div>
           <QuoteFrame variant="close" className="block w-10 shrink-0 lg:w-14" />
         </div>

@@ -1,6 +1,6 @@
 /** Scritto a mano e non ricavato dall'anno: e' il timbro della pratica, e deve
  *  essere vero. */
-export type WorkStatus = "consegnato" | "in-corso";
+export type WorkStatus = "delivered" | "in-progress";
 
 export type Work = {
   /** E' anche la chiave di traduzione: works.list.<id>.riga */
@@ -22,7 +22,7 @@ export const works: Work[] = [
      *  indirizzo ne' schermata. In cima perche' e' il piu' recente. */
     id: "riservato",
     year: 2026,
-    status: "in-corso",
+    status: "in-progress",
     tech: ["Next.js", "TypeScript", "Node.js", "PostgreSQL"],
     metricIds: ["riservatoCycleTime"],
   },
@@ -31,7 +31,7 @@ export const works: Work[] = [
     url: "https://www.bdroppy.com",
     screenshot: "/works/bdroppy.webp",
     year: 2025,
-    status: "consegnato",
+    status: "delivered",
     tech: ["Next.js", "TypeScript", "SEO"],
     metricIds: ["bdroppyPagina", "bdroppyTypescript", "bdroppyDowntime"],
   },
@@ -40,7 +40,7 @@ export const works: Work[] = [
     url: "https://aidify.cx",
     screenshot: "/works/aidify.webp",
     year: 2025,
-    status: "consegnato",
+    status: "delivered",
     tech: ["Next.js", "TypeScript", "GraphQL", "Supabase"],
     metricIds: ["aidifyConversations"],
   },
@@ -49,7 +49,7 @@ export const works: Work[] = [
     url: "https://visual-boost.com",
     screenshot: "/works/visualboost.webp",
     year: 2025,
-    status: "consegnato",
+    status: "delivered",
     tech: ["Next.js", "TypeScript", "SEO"],
     metricIds: ["visualboostCatalog", "visualboostLighthouse"],
   },

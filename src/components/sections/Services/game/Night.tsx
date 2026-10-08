@@ -129,7 +129,7 @@ export function Night({ onNext, visible }: LevelProps) {
                     <span>
                       <b>{t(`voci.${item}`)}</b>
                     </span>
-                    <span className="interr" aria-hidden="true" />
+                    <span className="switch" aria-hidden="true" />
                   </button>
                 ))}
               </div>

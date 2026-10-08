@@ -12,7 +12,7 @@ export type StorySource =
   | { id: "dev"; tag: string }
   | { id: "github"; repo: string };
 
-export type StoryStamp = "prima-pagina" | "paper" | "piu-letto" | "release";
+export type StoryStamp = "front-page" | "paper" | "most-read" | "release";
 
 export type StoryFigure =
   | { code: "punti" | "commenti" | "voti" | "autori" | "reazioni" | "lettura"; value: number }

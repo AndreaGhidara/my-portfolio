@@ -27,7 +27,7 @@ const domain = (url: string) => new URL(url).hostname.replace(/^www\./, "");
  *  col tema entra qui, .eyebrow compreso (vedi sections/works.css). */
 export function WorkDialog({ dialog, data, number, total, labels, onRequestClose, onClose }: WorkDialogProps) {
   const titleId = useId();
-  const statusLabel = data?.status === "in-corso" ? labels.inProgress : labels.delivered;
+  const statusLabel = data?.status === "in-progress" ? labels.inProgress : labels.delivered;
 
   return (
     <dialog
@@ -114,7 +114,7 @@ export function WorkDialog({ dialog, data, number, total, labels, onRequestClose
 
                   {data.metrics.length > 0 && (
                     <section data-dossier-figures data-enter>
-                      <h3>{data.status === "in-corso" ? labels.measuredSoFar : labels.measured}</h3>
+                      <h3>{data.status === "in-progress" ? labels.measuredSoFar : labels.measured}</h3>
                       <dl>
                         {data.metrics.map((metric) => (
                           <div key={metric.id}>

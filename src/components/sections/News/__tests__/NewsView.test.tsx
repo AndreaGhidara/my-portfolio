@@ -38,7 +38,7 @@ const story = (url: string, title: string, extra: Partial<Story> = {}): Story =>
   hostname: new URL(url).hostname,
   when: yesterday,
   source: { id: "hn" },
-  stamp: "prima-pagina",
+  stamp: "front-page",
   summary: "A short summary of the story.",
   figures: [
     { code: "punti", value: 1234 },
@@ -51,7 +51,7 @@ const collection: NewsCollection = {
   collectedAt: new Date().toISOString(),
   categories: {
     ia: [story("https://example.com/ia-1", "Agents are here"), story("https://example.com/ia-2", "A second AI story")],
-    design: [story("https://example.com/design-1", "Fonts again", { source: { id: "dev", tag: "design" }, stamp: "piu-letto" })],
+    design: [story("https://example.com/design-1", "Fonts again", { source: { id: "dev", tag: "design" }, stamp: "most-read" })],
     codice: [
       story("https://github.com/vercel/next.js/releases/tag/v15.5.0", "Next.js 15.5.0", {
         source: { id: "github", repo: "vercel/next.js" },

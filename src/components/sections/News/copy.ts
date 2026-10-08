@@ -14,9 +14,9 @@ export function newsCopy(t: Translate): NewsCopy {
       CATEGORIES.map((c) => [c, { name: t(`categorie.${c}.nome`), masthead: t(`categorie.${c}.testata`) }]),
     ) as NewsCopy["categories"],
     stamps: {
-      "prima-pagina": t("timbri.primaPagina"),
+      "front-page": t("timbri.primaPagina"),
       paper: t("timbri.paper"),
-      "piu-letto": t("timbri.piuLetto"),
+      "most-read": t("timbri.piuLetto"),
       release: t("timbri.release"),
     },
     figures: {

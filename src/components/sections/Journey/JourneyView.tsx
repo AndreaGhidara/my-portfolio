@@ -48,16 +48,16 @@ export function JourneyView({
     // aggancia. Sui due assi, a differenza di #services e #process (vedi
     // sections/works.css): in y il foglio dei numeri che cade deve sparire sul
     // bordo della sezione.
-    <section id="journey" aria-labelledby="titolo-journey" className="relative overflow-clip bg-[var(--accent)]">
+    <section id="journey" aria-labelledby="journey-title" className="relative overflow-clip bg-[var(--accent)]">
       <JourneyTrack
         n={entries.length}
         startYear={entries[0]?.year ?? 0}
         hint={hint}
         header={
           // Sull'arancio --on-accent non si ribalta col tema, --fg-muted si'.
-          <Reveal motion="dietro" stagger={0.08}>
+          <Reveal motion="behind" stagger={0.08}>
             <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
-            <h2 id="titolo-journey" className="section-title">{title}</h2>
+            <h2 id="journey-title" className="section-title">{title}</h2>
           </Reveal>
         }
       >

@@ -3,9 +3,9 @@
 import { useRef, type ComponentPropsWithoutRef, type ElementType, type ReactNode } from "react";
 import { useSectionAnimation } from "../useSectionAnimation";
 
-// `lati`: ogni figlio entra dal lato scritto nel suo `data-side`, cioe' da dove
+// `sides`: ogni figlio entra dal lato scritto nel suo `data-side`, cioe' da dove
 // l'impaginato lo ha gia' messo.
-export type RevealMotion = "sale" | "dietro" | "alto" | "lati";
+export type RevealMotion = "rise" | "behind" | "above" | "sides";
 
 type RevealProps = {
   children: ReactNode;
@@ -25,7 +25,7 @@ export function Reveal({
   className,
   delay = 0,
   stagger = 0.07,
-  motion = "sale",
+  motion = "rise",
   clearProps = false,
   ...rest
 }: RevealProps) {
@@ -38,7 +38,7 @@ export function Reveal({
       if (!root) return;
       const items = Array.from(root.children);
 
-      if (motion === "lati") {
+      if (motion === "sides") {
         // Un trigger per figlio: le voci si compongono una alla volta mentre si
         // scende. Con uno solo entrerebbero insieme appena il blocco si affaccia.
         for (const item of items) {
@@ -50,8 +50,8 @@ export function Reveal({
 
       const targets = items.length > 1 ? items : root;
       const common = { level, trigger: root, delay, stagger, clearProps };
-      if (motion === "dietro") fromBehind(targets, common);
-      else if (motion === "alto") fromAbove(targets, common);
+      if (motion === "behind") fromBehind(targets, common);
+      else if (motion === "above") fromAbove(targets, common);
       else reveal(targets, common);
     },
     scope,

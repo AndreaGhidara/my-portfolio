@@ -52,7 +52,7 @@ const story = (url: string, title = url): Story => ({
   hostname: new URL(url).hostname,
   when: "2026-09-27T10:00:00.000Z",
   source: { id: "hn" },
-  stamp: "prima-pagina",
+  stamp: "front-page",
   figures: [],
 });
 
@@ -64,7 +64,7 @@ describe("le fonti, lette una per una", () => {
       url: "https://www.example1.com/a",
       hostname: "example1.com",
       source: { id: "hn" },
-      stamp: "prima-pagina",
+      stamp: "front-page",
       when: "2026-09-27T10:00:00.000Z",
       figures: [
         { code: "punti", value: 101 },
@@ -113,7 +113,7 @@ describe("le fonti, lette una per una", () => {
       },
     ]);
     expect(d.source).toEqual({ id: "dev", tag: "ai" });
-    expect(d.stamp).toBe("piu-letto");
+    expect(d.stamp).toBe("most-read");
     expect(d.summary).toBe("Two lines of text");
     expect(d.figures).toEqual([
       { code: "reazioni", value: 12 },

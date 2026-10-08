@@ -45,7 +45,7 @@ export function FooterView({
     <footer data-footer>
       {/* L'attributo resta qui: [data-envelope] porta il fondo, la patta e il
           taglio, e un involucro in mezzo li staccherebbe dal contenuto. */}
-      <Reveal data-envelope data-testid="envelope" motion="dietro" stagger={0.12}>
+      <Reveal data-envelope data-testid="envelope" motion="behind" stagger={0.12}>
         <div data-envelope-top>
           <p data-envelope-profiles data-testid="envelope-profiles">
             <span data-envelope-label>{alsoHere}</span>
@@ -71,7 +71,7 @@ export function FooterView({
               quando si affranca. `as="span"` perche' sta in una riga di testo. */}
           <Reveal
             as="span"
-            motion="alto"
+            motion="above"
             delay={0.25}
             data-envelope-postage
             data-testid="envelope-postage"
