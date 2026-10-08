@@ -27,7 +27,7 @@ export type ReceiptViewProps = {
  * Il fondo e' arancione e di notte resta arancione: dentro solo carta e
  * inchiostro, come nel percorso. Le regole stanno in sezioni/scontrino.css.
  */
-export function ReceiptView({ eyebrow, title, lead, locale, services: servizi, copy: testi }: ReceiptViewProps) {
+export function ReceiptView({ eyebrow, title, lead, locale, services, copy }: ReceiptViewProps) {
   return (
     <section
       id="scontrino"
@@ -41,7 +41,7 @@ export function ReceiptView({ eyebrow, title, lead, locale, services: servizi, c
         <p data-receipt-lead>{lead}</p>
       </Reveal>
 
-      <ReceiptPrinter services={servizi} copy={testi} locale={locale} />
+      <ReceiptPrinter services={services} copy={copy} locale={locale} />
     </section>
   );
 }

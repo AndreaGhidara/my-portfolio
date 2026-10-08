@@ -50,11 +50,11 @@ export type FooterViewProps = {
  */
 export function FooterView({
   tagline,
-  replyTo: rispondiA,
-  alsoHere: ancheQui,
-  city: citta,
-  office: ufficio,
-  country: paese,
+  replyTo,
+  alsoHere,
+  city,
+  office,
+  country,
   rights,
   name,
   email,
@@ -74,7 +74,7 @@ export function FooterView({
    * browser calcolerebbero diverso. Se un giorno deve essere scansionabile va
    * generato da una libreria, non da questa riga.
    */
-  const barre = Array.from(email, (char) => char.charCodeAt(0) % 2 === 0);
+  const bars = Array.from(email, (char) => char.charCodeAt(0) % 2 === 0);
 
   return (
     <footer data-footer>
@@ -84,7 +84,7 @@ export function FooterView({
       <Reveal data-envelope data-testid="envelope" motion="dietro" stagger={0.12}>
         <div data-envelope-top>
           <p data-envelope-profiles data-testid="envelope-profiles">
-            <span data-envelope-label>{ancheQui}</span>
+            <span data-envelope-label>{alsoHere}</span>
             <a
               href={urlFor("linkedin")}
               target="_blank"
@@ -124,7 +124,7 @@ export function FooterView({
                   --on-accent, che fa 5,08:1. Vedi contrast.test.ts. */}
               <b data-stamp-code>AG</b>
               <span data-stamp-country data-testid="stamp-country">
-                {paese}
+                {country}
               </span>
             </span>
             <svg data-envelope-postmark viewBox="0 0 100 100">
@@ -152,7 +152,7 @@ export function FooterView({
                 fontSize="11"
                 letterSpacing=".5"
               >
-                {ufficio}
+                {office}
               </text>
               <text
                 x="50"
@@ -162,27 +162,27 @@ export function FooterView({
                 letterSpacing=".3"
                 data-testid="envelope-postmark-date"
               >
-                <Today format="annullo" />
+                <Today format="postmark" />
               </text>
             </svg>
           </Reveal>
         </div>
 
         <div data-envelope-address data-testid="envelope-address">
-          <p data-envelope-label>{rispondiA}</p>
+          <p data-envelope-label>{replyTo}</p>
           <p data-envelope-name>{name}</p>
           <a data-envelope-mail href={`mailto:${email}`}>
             {email}
           </a>
-          <p data-envelope-city>{citta}</p>
+          <p data-envelope-city>{city}</p>
         </div>
 
         <div data-envelope-bottom>
           <p data-envelope-tagline>{tagline}</p>
           <div data-envelope-bottom-right>
             <span data-envelope-code aria-hidden="true">
-              {barre.map((alta, i) => (
-                <i key={i} data-high={alta ? "" : undefined} />
+              {bars.map((high, i) => (
+                <i key={i} data-high={high ? "" : undefined} />
               ))}
             </span>
             {/* Niente opacita' sul testo: l'opacita' comporrebbe il colore
@@ -190,7 +190,7 @@ export function FooterView({
                 distinzione arriva da dimensione e posizione, non da un colore
                 piu' debole. */}
             <p data-footer-rights>
-              © <Today format="anno" /> {name}. {rights}
+              © <Today format="year" /> {name}. {rights}
             </p>
           </div>
         </div>

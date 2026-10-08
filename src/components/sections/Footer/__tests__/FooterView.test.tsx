@@ -58,11 +58,11 @@ describe("FooterView", () => {
     // e diventi la riga di un indirizzo. Se i tre pezzi si separano, resta un
     // disegno di busta con dentro un piede qualsiasi.
     render(<FooterView {...props} />);
-    const indirizzo = screen.getByTestId("envelope-address");
-    expect(within(indirizzo).getByText(props.replyTo)).toBeVisible();
-    expect(within(indirizzo).getByText(props.name)).toBeVisible();
-    expect(within(indirizzo).getByRole("link", { name: props.email })).toBeVisible();
-    expect(within(indirizzo).getByText(props.city)).toBeVisible();
+    const address = screen.getByTestId("envelope-address");
+    expect(within(address).getByText(props.replyTo)).toBeVisible();
+    expect(within(address).getByText(props.name)).toBeVisible();
+    expect(within(address).getByRole("link", { name: props.email })).toBeVisible();
+    expect(within(address).getByText(props.city)).toBeVisible();
   });
 
   it("la tagline resta nel piede: è l'unico posto del sito in cui esiste", () => {
@@ -76,8 +76,8 @@ describe("FooterView", () => {
     // Su una busta indirizzata ad Andrea il mittente e' il visitatore, non lui.
     // L'etichetta dice cosa c'e' davvero li' dentro: altri posti dove trovarlo.
     render(<FooterView {...props} />);
-    const profili = screen.getByTestId("envelope-profiles");
-    expect(within(profili).getByText(props.alsoHere)).toBeVisible();
+    const profiles = screen.getByTestId("envelope-profiles");
+    expect(within(profiles).getByText(props.alsoHere)).toBeVisible();
     expect(screen.queryByText(/mittente/i)).not.toBeInTheDocument();
   });
 
@@ -109,19 +109,19 @@ describe("FooterView", () => {
     expect(html).not.toContain("01.01.30");
 
     vi.setSystemTime(new Date(2031, 2, 5));
-    const errori = vi.spyOn(console, "error").mockImplementation(() => {});
-    const contenitore = document.createElement("div");
-    contenitore.innerHTML = html;
-    document.body.appendChild(contenitore);
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const host = document.createElement("div");
+    host.innerHTML = html;
+    document.body.appendChild(host);
     await act(async () => {
-      hydrateRoot(contenitore, <FooterView {...props} />);
+      hydrateRoot(host, <FooterView {...props} />);
     });
 
-    expect(within(contenitore).getByTestId("envelope-postmark-date")).toHaveTextContent("05.03.31");
-    expect(within(contenitore).getByText(/© 2031 Andrea Ghidara/)).toBeInTheDocument();
-    expect(errori).not.toHaveBeenCalled();
-    errori.mockRestore();
-    contenitore.remove();
+    expect(within(host).getByTestId("envelope-postmark-date")).toHaveTextContent("05.03.31");
+    expect(within(host).getByText(/© 2031 Andrea Ghidara/)).toBeInTheDocument();
+    expect(consoleError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+    host.remove();
   });
 
   it("il copyright sta DENTRO la busta: fuori non c'e' piu' niente in cui stare", () => {
@@ -129,16 +129,16 @@ describe("FooterView", () => {
     // ospitava questa riga non esiste piu'. Se restasse fuori, finirebbe su
     // una striscia alta zero e sparirebbe dalla pagina.
     render(<FooterView {...props} />);
-    const busta = screen.getByTestId("envelope");
-    expect(within(busta).getByText(new RegExp(String(new Date().getFullYear())))).toBeVisible();
+    const envelope = screen.getByTestId("envelope");
+    expect(within(envelope).getByText(new RegExp(String(new Date().getFullYear())))).toBeVisible();
   });
 
   it("la busta e' l'unico figlio del piede: e' lei a occuparlo tutto", () => {
     // Il senso della modifica: niente cornice, niente incassatura, niente
     // contenitore intermedio che la rimpicciolisca.
     render(<FooterView {...props} />);
-    const piede = screen.getByRole("contentinfo");
-    expect(piede.children).toHaveLength(1);
-    expect(piede.firstElementChild).toBe(screen.getByTestId("envelope"));
+    const footer = screen.getByRole("contentinfo");
+    expect(footer.children).toHaveLength(1);
+    expect(footer.firstElementChild).toBe(screen.getByTestId("envelope"));
   });
 });

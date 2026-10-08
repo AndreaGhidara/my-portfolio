@@ -1,11 +1,11 @@
 import type { Fetcher } from "./collector";
 
-const UN_ORA = 3600;
-const PAZIENZA_MS = 4000;
+const ONE_HOUR = 3600;
+const TIMEOUT_MS = 4000;
 /** Oltre questa eta' una risposta in cache non vale piu' come «della settimana». */
 export const STALE_MS = 3 * 3_600_000;
 
-type Prendi = (url: string, init: RequestInit) => Promise<Response>;
+type FetchFn = (url: string, init: RequestInit) => Promise<Response>;
 
 /**
  * Chi va in rete per la route. Ogni fonte ha la sua cache di un'ora e nessuna
@@ -17,23 +17,23 @@ type Prendi = (url: string, init: RequestInit) => Promise<Response>;
  * richiesta fresca non va, resta la vecchia.
  */
 export function createFetcher(
-  prendi: Prendi,
-  intestazioni: (url: string) => Record<string, string>,
-  adesso: () => number = Date.now,
+  fetchFn: FetchFn,
+  headersFor: (url: string) => Record<string, string>,
+  now: () => number = Date.now,
 ): Fetcher {
-  const leggi = async (r: Response) => ({ body: (await r.json()) as unknown, date: r.headers.get("date") });
+  const read = async (r: Response) => ({ body: (await r.json()) as unknown, date: r.headers.get("date") });
   return async (url) => {
-    const headers = intestazioni(url);
-    const r = await prendi(url, { headers, next: { revalidate: UN_ORA }, signal: AbortSignal.timeout(PAZIENZA_MS) });
+    const headers = headersFor(url);
+    const r = await fetchFn(url, { headers, next: { revalidate: ONE_HOUR }, signal: AbortSignal.timeout(TIMEOUT_MS) });
     if (!r.ok) throw new Error(`${r.status} ${url}`);
-    const quando = Date.parse(r.headers.get("date") ?? "");
-    if (Number.isNaN(quando) || adesso() - quando <= STALE_MS) return leggi(r);
+    const sentAt = Date.parse(r.headers.get("date") ?? "");
+    if (Number.isNaN(sentAt) || now() - sentAt <= STALE_MS) return read(r);
     try {
-      const fresca = await prendi(url, { headers, cache: "no-store", signal: AbortSignal.timeout(PAZIENZA_MS) });
-      if (fresca.ok) return await leggi(fresca);
+      const fresh = await fetchFn(url, { headers, cache: "no-store", signal: AbortSignal.timeout(TIMEOUT_MS) });
+      if (fresh.ok) return await read(fresh);
     } catch {
       // La vecchia e' meglio di niente.
     }
-    return leggi(r);
+    return read(r);
   };
 }

@@ -9,20 +9,20 @@ import type { PrintableService } from "./ReceiptPrinter";
  */
 export async function Receipt() {
   const t = await getTranslations("scontrino");
-  const tServizi = await getTranslations("services");
+  const tServices = await getTranslations("services");
   // La data dello scontrino la scrive il browser, nella lingua della pagina:
   // qui si passa solo la lingua, perche' la data del server e' quella della build.
   const locale = await getLocale();
 
-  const servizi: PrintableService[] = services.map((service) => {
-    const titolo = tServizi(`list.${service.id}.title`);
-    const pezzi = service.pieces.map((pezzo) => tServizi(`list.${service.id}.pezzi.${pezzo}`));
+  const printable: PrintableService[] = services.map((service) => {
+    const title = tServices(`list.${service.id}.title`);
+    const pieces = service.pieces.map((piece) => tServices(`list.${service.id}.pezzi.${piece}`));
     return {
       id: service.id,
-      title: titolo,
-      text: tServizi(`list.${service.id}.description`),
-      pieces: pezzi,
-      drawing: t("disegno", { titolo, pezzi: pezzi.join(", ") }),
+      title,
+      text: tServices(`list.${service.id}.description`),
+      pieces,
+      drawing: t("disegno", { titolo: title, pezzi: pieces.join(", ") }),
     };
   });
 
@@ -32,7 +32,7 @@ export async function Receipt() {
       title={t("title")}
       lead={t("lead")}
       locale={locale}
-      services={servizi}
+      services={printable}
       copy={{
         hint: t("hint"),
         keys: t("tasti"),

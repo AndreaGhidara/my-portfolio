@@ -40,10 +40,10 @@ describe("HeroView", () => {
     // documentava gia' che `priority` e' "da attivare solo nell'hero", e
     // nell'hero non era attivato.
     const { container } = render(<HeroView {...props} />);
-    const lettere = container.querySelectorAll("img.wordmark-letter");
-    expect(lettere.length).toBeGreaterThan(0);
-    for (const lettera of lettere) {
-      expect(lettera, "una lettera del nome e' ancora in coda").not.toHaveAttribute(
+    const letters = container.querySelectorAll("img.wordmark-letter");
+    expect(letters.length).toBeGreaterThan(0);
+    for (const letter of letters) {
+      expect(letter, "una lettera del nome e' ancora in coda").not.toHaveAttribute(
         "loading",
         "lazy",
       );
@@ -79,9 +79,9 @@ describe("HeroView", () => {
 describe("la carta del nome", () => {
   it("lo strato c'e', ed e' muto", () => {
     const { container } = render(<HeroView {...props} />);
-    const strato = container.querySelector("[data-paper]");
-    expect(strato).not.toBeNull();
-    expect(strato).toHaveAttribute("aria-hidden", "true");
+    const layer = container.querySelector("[data-paper]");
+    expect(layer).not.toBeNull();
+    expect(layer).toHaveAttribute("aria-hidden", "true");
   });
 
   it("senza movimento non tocca una sola lettera", () => {

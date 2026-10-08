@@ -2,7 +2,7 @@ import { CATEGORIES } from "@/lib/news/types";
 import type { NewsCopy } from "./types";
 
 /** La `t` di next-intl sul namespace `notizie`: serve anche `raw`, per i modelli. */
-type Traduci = { (chiave: string): string; raw(chiave: string): unknown };
+type Translate = { (key: string): string; raw(key: string): unknown };
 
 /**
  * I testi della sezione dal namespace `notizie`. Sta fuori dal componente
@@ -12,8 +12,8 @@ type Traduci = { (chiave: string): string; raw(chiave: string): unknown };
  * I modelli con le graffe passano crudi: li riempie la macchina, con valori
  * che il server non conosce (quante palline restano, a che ora sono arrivate).
  */
-export function newsCopy(t: Traduci): NewsCopy {
-  const modello = (chiave: string) => String(t.raw(chiave));
+export function newsCopy(t: Translate): NewsCopy {
+  const template = (key: string) => String(t.raw(key));
   return {
     categories: Object.fromEntries(
       CATEGORIES.map((c) => [c, { name: t(`categorie.${c}.nome`), masthead: t(`categorie.${c}.testata`) }]),
@@ -33,14 +33,14 @@ export function newsCopy(t: Traduci): NewsCopy {
       lettura: t("dati.lettura"),
       versione: t("dati.versione"),
     },
-    minutes: modello("minuti"),
-    release: modello("rilascio"),
-    readOn: modello("leggiSu"),
-    plate: modello("targa"),
-    plateOne: modello("targaUna"),
-    exhausted: modello("finite"),
-    collectedToday: modello("raccolteOggi"),
-    collectedOn: modello("raccolteIl"),
+    minutes: template("minuti"),
+    release: template("rilascio"),
+    readOn: template("leggiSu"),
+    plate: template("targa"),
+    plateOne: template("targaUna"),
+    exhausted: template("finite"),
+    collectedToday: template("raccolteOggi"),
+    collectedOn: template("raccolteIl"),
     group: t("gruppo"),
     knob: t("manopola"),
     help: t("aiuto"),

@@ -55,12 +55,12 @@ export const GRID_SIDE = 12;
 export const RADIUS = 0.205;
 
 /** Quanto il foglio si attorciglia mentre collassa, in radianti. */
-const TORSIONE = 2.6;
+const TWIST = 2.6;
 
 /** Lo stesso generatore del resto del sito: seme fisso, pieghe identiche a
  *  ogni caricamento e diverse da lettera a lettera. */
-export function rng(seme: number): () => number {
-  let s = seme >>> 0;
+export function rng(seed: number): () => number {
+  let s = seed >>> 0;
   return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 }
 
@@ -101,7 +101,7 @@ export type Vertex = {
   /** Profondita' finta: decide chi sta sopra e quanta luce prende. */
   z: number;
   /** La carta non cede tutta insieme. */
-  ritardo: number;
+  delay: number;
 };
 
 /**
@@ -115,8 +115,8 @@ export type Vertex = {
  * pallina smette di essere leggibile, che e' tutto il punto. Una prova misura
  * quella scorrelazione, perche' e' la proprieta' e non un dettaglio.
  */
-export function buildMesh(seme: number): Vertex[] {
-  const r = rng(seme);
+export function buildMesh(seed: number): Vertex[] {
+  const r = rng(seed);
   const cZ = noiseField(r, 3);
   const cR = noiseField(r, 3);
   const cA = noiseField(r, 4);
@@ -125,7 +125,7 @@ export function buildMesh(seme: number): Vertex[] {
     for (let i = 0; i <= GRID_SIDE; i++) {
       const u = i / GRID_SIDE;
       const w = j / GRID_SIDE;
-      const ang = Math.atan2(w - 0.5, u - 0.5) + (cA(u, w) - 0.5) * TORSIONE;
+      const ang = Math.atan2(w - 0.5, u - 0.5) + (cA(u, w) - 0.5) * TWIST;
       const rr = 0.18 + 0.82 * cR(u, w);
       v.push({
         u,
@@ -133,7 +133,7 @@ export function buildMesh(seme: number): Vertex[] {
         bx: Math.cos(ang) * RADIUS * rr,
         by: Math.sin(ang) * RADIUS * rr,
         z: cZ(u, w),
-        ritardo: r() * 0.4,
+        delay: r() * 0.4,
       });
     }
   }
@@ -146,16 +146,16 @@ export type Placed = PaperPoint & { z: number };
 export function positions(
   mesh: readonly Vertex[],
   t: number,
-  centro: PaperPoint,
-  lato: number,
+  center: PaperPoint,
+  side: number,
 ): Placed[] {
   return mesh.map((v) => {
-    const tt = smooth(Math.max(0, (t - v.ritardo) / (1 - v.ritardo)));
+    const tt = smooth(Math.max(0, (t - v.delay) / (1 - v.delay)));
     const px = v.u - 0.5;
     const py = v.w - 0.5;
     return {
-      x: centro.x + (px + (v.bx - px) * tt) * lato,
-      y: centro.y + (py + (v.by - py) * tt) * lato,
+      x: center.x + (px + (v.bx - px) * tt) * side,
+      y: center.y + (py + (v.by - py) * tt) * side,
       z: v.z,
     };
   });
@@ -170,15 +170,15 @@ export type Cell = { i: number; j: number; z: number };
  * risultato e' un collage piatto: e' l'ordinamento in profondita' (piu'
  * dell'ombra) a far leggere una pallina invece di un'immagine schiacciata.
  */
-export function cellsByDepth(punti: readonly Placed[]): Cell[] {
-  const celle: Cell[] = [];
-  const a = (i: number, j: number) => punti[j * (GRID_SIDE + 1) + i].z;
+export function cellsByDepth(points: readonly Placed[]): Cell[] {
+  const cells: Cell[] = [];
+  const a = (i: number, j: number) => points[j * (GRID_SIDE + 1) + i].z;
   for (let j = 0; j < GRID_SIDE; j++) {
     for (let i = 0; i < GRID_SIDE; i++) {
-      celle.push({ i, j, z: (a(i, j) + a(i + 1, j) + a(i + 1, j + 1) + a(i, j + 1)) / 4 });
+      cells.push({ i, j, z: (a(i, j) + a(i + 1, j) + a(i + 1, j + 1) + a(i, j + 1)) / 4 });
     }
   }
-  return celle.sort((p, q) => p.z - q.z);
+  return cells.sort((p, q) => p.z - q.z);
 }
 
 /** Quanti gradini di opacita' del foglio si tengono in cache. */

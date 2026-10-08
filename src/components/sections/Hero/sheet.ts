@@ -7,7 +7,7 @@
  * restituisce valori a chi lo importa dal server (vedi finestre.ts).
  */
 
-type Rettangolo = { top: number; bottom: number; height: number };
+type Rect = { top: number; bottom: number; height: number };
 
 /**
  * Quanto la seconda sezione ha coperto la prima, da 0 a 1: 0 quando la cima
@@ -15,9 +15,9 @@ type Rettangolo = { top: number; bottom: number; height: number };
  * Si misura sul rettangolo della sezione e non su quello che si rimpicciolisce:
  * la sezione sta ferma, il contenuto scalato cambierebbe misura mentre si misura.
  */
-export function sheetCoverage(prima: Rettangolo, seconda: { top: number }): number {
-  if (prima.height <= 0) return 0;
-  return Math.min(1, Math.max(0, (prima.bottom - seconda.top) / prima.height));
+export function sheetCoverage(first: Rect, second: { top: number }): number {
+  if (first.height <= 0) return 0;
+  return Math.min(1, Math.max(0, (first.bottom - second.top) / first.height));
 }
 
 /**
@@ -30,16 +30,16 @@ export function sheetCoverage(prima: Rettangolo, seconda: { top: number }): numb
  * quando la barra di Safari compare e sparisce a meta' scroll.
  */
 export function stickyTop({
-  header: testata,
-  stage: palco,
-  bottomBar: barraBassa,
-  height: altezza,
+  header,
+  stage,
+  bottomBar,
+  height,
 }: {
   header: number;
   stage: number;
   bottomBar: number;
   height: number;
 }): number {
-  const spazio = palco - testata - barraBassa;
-  return testata + Math.min(0, spazio - altezza);
+  const space = stage - header - bottomBar;
+  return header + Math.min(0, space - height);
 }

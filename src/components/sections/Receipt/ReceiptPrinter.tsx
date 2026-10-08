@@ -8,15 +8,15 @@ import {
   DROP_MS,
   FIGURE_MS,
   TICK_MS,
+  initialPrinter,
   linesAtTicks,
+  printerReducer,
   receiptLines,
   ticksToFigure,
   totalTicks,
-  printerReducer,
-  initialPrinter,
   type PrinterEvent,
-  type ReceiptLine,
   type PrinterState,
+  type ReceiptLine,
 } from "./receipt";
 
 export type PrintableService = {
@@ -51,13 +51,13 @@ export type PrinterCopy = {
  * classe; la figura e' il disegno del servizio, che il CSS mostra solo sul
  * telefono.
  */
-function Corpo({ righe, servizio }: { righe: ReceiptLine[]; servizio: PrintableService }) {
+function Body({ lines, service }: { lines: ReceiptLine[]; service: PrintableService }) {
   return (
     <div data-receipt-body aria-hidden="true">
-      {righe.map((r, k) => (
+      {lines.map((r, k) => (
         <div key={k} data-line={r.kind}>
           {r.kind === "figure" ? (
-            <ReceiptFigure shape={servizio.id} count={servizio.pieces.length} />
+            <ReceiptFigure shape={service.id} count={service.pieces.length} />
           ) : (
             r.text
           )}
@@ -83,8 +83,8 @@ function Corpo({ righe, servizio }: { righe: ReceiptLine[]; servizio: PrintableS
  * della pagina, e le scene agganciate piu' sotto non si sfasano.
  */
 export function ReceiptPrinter({
-  services: servizi,
-  copy: testi,
+  services,
+  copy,
   locale,
 }: {
   services: PrintableService[];
@@ -92,56 +92,56 @@ export function ReceiptPrinter({
   locale: string;
 }) {
   const level = useMotionLevel();
-  const fermo = level === "none";
-  const macchina = useRef<HTMLDivElement | null>(null);
-  const carta = useRef<HTMLDivElement | null>(null);
-  const uscita = useRef<HTMLDivElement | null>(null);
-  const tasti = useRef<(HTMLButtonElement | null)[]>([]);
+  const stopped = level === "none";
+  const machine = useRef<HTMLDivElement | null>(null);
+  const paper = useRef<HTMLDivElement | null>(null);
+  const outlet = useRef<HTMLDivElement | null>(null);
+  const keys = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Vuota sul server e al primo render: la pagina e' statica, e la data del
   // server sarebbe quella della build (e un errore di idratazione).
-  const [data, setData] = useState("");
+  const [date, setDate] = useState("");
   useEffect(() => {
-    setData(
+    setDate(
       new Intl.DateTimeFormat(locale, { day: "2-digit", month: "2-digit", year: "numeric" }).format(
         new Date(),
       ),
     );
   }, [locale]);
 
-  const righe = useMemo(
+  const lines = useMemo(
     () =>
-      servizi.map((s, indice) =>
+      services.map((s, index) =>
         receiptLines({
-          name: testi.name,
-          trade: testi.trade,
-          date: data,
-          number: testi.number,
-          index: indice,
-          count: servizi.length,
+          name: copy.name,
+          trade: copy.trade,
+          date,
+          number: copy.number,
+          index,
+          count: services.length,
           title: s.title,
           text: s.text,
           pieces: s.pieces,
-          total: testi.total,
-          toDiscuss: testi.toDiscuss,
+          total: copy.total,
+          toDiscuss: copy.toDiscuss,
         }),
       ),
-    [servizi, testi, data],
+    [services, copy, date],
   );
-  const totali = useMemo(() => righe.map(totalTicks), [righe]);
-  const soglie = useMemo(() => righe.map(ticksToFigure), [righe]);
+  const totals = useMemo(() => lines.map(totalTicks), [lines]);
+  const figureTicks = useMemo(() => lines.map(ticksToFigure), [lines]);
 
-  const [stato, manda] = useReducer(
-    (s: PrinterState, e: PrinterEvent) => printerReducer(s, e, totali),
-    totali,
+  const [state, dispatch] = useReducer(
+    (s: PrinterState, e: PrinterEvent) => printerReducer(s, e, totals),
+    totals,
     initialPrinter,
   );
 
   // Il livello cambia dopo il montaggio (e puo' cambiare ancora): spento,
   // quello che c'e' resta intero.
   useEffect(() => {
-    if (fermo) manda({ type: "completa" });
-  }, [fermo]);
+    if (stopped) dispatch({ type: "complete" });
+  }, [stopped]);
 
   /* Acceso, decide la prima osservazione della stampante. Gia' a meta' in
      vista (una ricarica con lo scroll ripristinato, un link a #scontrino) lo
@@ -149,82 +149,82 @@ export function ReceiptPrinter({
      guarda sarebbe un salto. Ancora sotto lo schermo, si toglie e la stampante
      aspetta chi arriva da sopra: l'autostampa e' per lui. */
   useEffect(() => {
-    const el = macchina.current;
-    if (fermo || !el || typeof IntersectionObserver === "undefined") return;
-    let prima = true;
-    const osservatore = new IntersectionObserver(
-      (voci) => {
-        const dentro = voci.some((v) => v.isIntersecting);
-        if (prima) {
-          prima = false;
-          if (dentro) {
-            osservatore.disconnect();
+    const el = machine.current;
+    if (stopped || !el || typeof IntersectionObserver === "undefined") return;
+    let first = true;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const inView = entries.some((v) => v.isIntersecting);
+        if (first) {
+          first = false;
+          if (inView) {
+            observer.disconnect();
             return;
           }
-          manda({ type: "svuota" });
+          dispatch({ type: "clear" });
           return;
         }
-        if (!dentro) return;
-        osservatore.disconnect();
-        manda({ type: "autostampa" });
+        if (!inView) return;
+        observer.disconnect();
+        dispatch({ type: "autoprint" });
       },
       { threshold: 0.5 },
     );
-    osservatore.observe(el);
-    return () => osservatore.disconnect();
-  }, [fermo]);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [stopped]);
 
   // Il colpo che ha appena stampato la figura: la carta deve uscire sopra il disegno.
-  const allaFigura =
-    stato.phase === "printing" && stato.service !== null && stato.ticks === soglie[stato.service];
+  const atFigure =
+    state.phase === "printing" && state.service !== null && state.ticks === figureTicks[state.service];
 
   // I colpi gia' stampati, per il timer che riparte: letti al suo avvio, non
   // un motivo per rilanciarlo a ogni colpo.
-  const scattiOra = useRef(stato.ticks);
+  const ticksRef = useRef(state.ticks);
   useLayoutEffect(() => {
-    scattiOra.current = stato.ticks;
-  }, [stato.ticks]);
+    ticksRef.current = state.ticks;
+  }, [state.ticks]);
 
   // I due tempi della stampante. Ognuno porta la generazione in cui e' nato:
   // se nel frattempo e' cambiata, il riduttore lo ignora.
   useEffect(() => {
-    if (stato.phase !== "printing" || stato.service === null) return;
-    const gen = stato.gen;
+    if (state.phase !== "printing" || state.service === null) return;
+    const gen = state.gen;
     /* Sulla figura la stampa aspetta che la carta sia uscita. Solo se la
        figura si vede (il telefono): e' il CSS a deciderlo, e chiederlo al
        DOM evita di ripetere qui il suo breakpoint. Si guarda quella di un
        fantasma, che c'e' sempre: sulla carta vera arriva solo con il suo colpo. */
-    const figura = uscita.current?.querySelector<HTMLElement>('[data-ghost] [data-line="figure"]');
-    const siVede = !!figura?.offsetHeight;
-    const soglia = soglie[stato.service];
-    let fatti = scattiOra.current;
-    let colpo = 0;
+    const figure = outlet.current?.querySelector<HTMLElement>('[data-ghost] [data-line="figure"]');
+    const visible = !!figure?.offsetHeight;
+    const figureTick = figureTicks[state.service];
+    let done = ticksRef.current;
+    let interval = 0;
     /* I colpi si contano qui, e il timer si ferma da solo nel colpo che
        stampa la figura: su un telefono lento piu' colpi possono arrivare
        prima che React ridisegni e pulisca l'effetto, e il colpo dopo
        farebbe saltare l'attesa. */
-    const batti = () => {
-      colpo = window.setInterval(() => {
-        fatti += 1;
-        manda({ type: "scatto", gen });
-        if (siVede && fatti === soglia) window.clearInterval(colpo);
+    const startTicking = () => {
+      interval = window.setInterval(() => {
+        done += 1;
+        dispatch({ type: "tick", gen });
+        if (visible && done === figureTick) window.clearInterval(interval);
       }, TICK_MS);
     };
-    const aspetta = allaFigura && siVede;
-    const attesa = aspetta ? window.setTimeout(batti, FIGURE_MS) : 0;
-    if (!aspetta) batti();
+    const shouldWait = atFigure && visible;
+    const waitTimer = shouldWait ? window.setTimeout(startTicking, FIGURE_MS) : 0;
+    if (!shouldWait) startTicking();
     return () => {
-      window.clearTimeout(attesa);
-      window.clearInterval(colpo);
+      window.clearTimeout(waitTimer);
+      window.clearInterval(interval);
     };
-  }, [stato.phase, stato.gen, stato.service, soglie, allaFigura]);
+  }, [state.phase, state.gen, state.service, figureTicks, atFigure]);
 
   useEffect(() => {
-    if (stato.phase !== "tearing") return;
-    const gen = stato.gen;
-    const caduta = window.setTimeout(() => manda({ type: "caduto", gen }), DROP_MS);
-    return () => window.clearTimeout(caduta);
-  }, [stato.phase, stato.gen]);
+    if (state.phase !== "tearing") return;
+    const gen = state.gen;
+    const dropTimer = window.setTimeout(() => dispatch({ type: "dropped", gen }), DROP_MS);
+    return () => window.clearTimeout(dropTimer);
+  }, [state.phase, state.gen]);
 
   /* La carta esce dalla fessura quanto e' stato stampato, prima del paint: la
      riga nuova non deve comparire per un fotogramma sotto il bordo. Parte da
@@ -234,70 +234,70 @@ export function ReceiptPrinter({
      transizione; poi il tetto si toglie, perche' un carattere che arriva
      tardi non tagli l'ultima riga. */
   useLayoutEffect(() => {
-    const el = carta.current;
+    const el = paper.current;
     if (!el) return;
-    if (stato.phase === "printing") {
-      el.style.maxHeight = stato.ticks === 0 ? "0px" : `${el.scrollHeight + 4}px`;
+    if (state.phase === "printing") {
+      el.style.maxHeight = state.ticks === 0 ? "0px" : `${el.scrollHeight + 4}px`;
       return;
     }
-    if (stato.phase !== "idle") return;
+    if (state.phase !== "idle") return;
     if (!el.style.maxHeight) return;
     el.style.maxHeight = `${el.scrollHeight + 4}px`;
-    const libera = () => el.style.removeProperty("max-height");
-    const dopo = window.setTimeout(libera, 200);
-    return () => window.clearTimeout(dopo);
-  }, [stato.phase, stato.ticks, stato.traced]);
+    const release = () => el.style.removeProperty("max-height");
+    const releaseTimer = window.setTimeout(release, 200);
+    return () => window.clearTimeout(releaseTimer);
+  }, [state.phase, state.ticks, state.traced]);
 
-  const premi = (servizio: number) => manda({ type: "premi", service: servizio, immediate: fermo });
+  const press = (service: number) => dispatch({ type: "press", service, immediate: stopped });
 
-  const strappa = () => {
-    const premuto = stato.service;
-    manda({ type: "strappa", immediate: fermo });
+  const tear = () => {
+    const pressed = state.service;
+    dispatch({ type: "tear", immediate: stopped });
     // Il bottone se ne va con lo scontrino: il fuoco torna al tasto che l'ha stampato.
-    if (premuto !== null) tasti.current[premuto]?.focus({ preventScroll: true });
+    if (pressed !== null) keys.current[pressed]?.focus({ preventScroll: true });
   };
 
-  const sulTasto = stato.phase === "tearing" ? stato.next : stato.service;
-  const inCarta = stato.service === null ? null : servizi[stato.service];
-  const finito = stato.service !== null && stato.ticks >= (totali[stato.service] ?? 0);
-  const disegnato = servizi[stato.drawing] ?? servizi[0];
-  const annuncio =
-    inCarta && stato.phase !== "tearing"
-      ? `${inCarta.title}. ${inCarta.text} ${inCarta.pieces.join(", ")}.`
+  const activeKey = state.phase === "tearing" ? state.next : state.service;
+  const onPaper = state.service === null ? null : services[state.service];
+  const finished = state.service !== null && state.ticks >= (totals[state.service] ?? 0);
+  const drawn = services[state.drawing] ?? services[0];
+  const announcement =
+    onPaper && state.phase !== "tearing"
+      ? `${onPaper.title}. ${onPaper.text} ${onPaper.pieces.join(", ")}.`
       : "";
 
   return (
     <>
       <div data-receipt-object>
-        {disegnato && (
+        {drawn && (
           <ReceiptSchema
-            key={stato.traced}
-            shape={disegnato.id}
-            title={disegnato.title}
-            pieces={disegnato.pieces}
-            label={disegnato.drawing}
-            number={pad2(stato.drawing + 1)}
-            animate={!fermo}
-            wait={stato.emptyPlate}
-            plate={testi.plate}
-            scale={testi.scale}
-            signature={testi.signature}
+            key={state.traced}
+            shape={drawn.id}
+            title={drawn.title}
+            pieces={drawn.pieces}
+            label={drawn.drawing}
+            number={pad2(state.drawing + 1)}
+            animate={!stopped}
+            wait={state.emptyPlate}
+            plate={copy.plate}
+            scale={copy.scale}
+            signature={copy.signature}
           />
         )}
       </div>
 
       <div data-receipt-bench>
-        <div role="group" aria-label={testi.keys} data-receipt-keys>
-          {servizi.map((s, i) => (
+        <div role="group" aria-label={copy.keys} data-receipt-keys>
+          {services.map((s, i) => (
             <button
               key={s.id}
               ref={(el) => {
-                tasti.current[i] = el;
+                keys.current[i] = el;
               }}
               type="button"
               data-receipt-key
-              aria-pressed={sulTasto === i}
-              onClick={() => premi(i)}
+              aria-pressed={activeKey === i}
+              onClick={() => press(i)}
             >
               <span aria-hidden="true">{pad2(i + 1)}</span>
               {s.title}
@@ -306,64 +306,64 @@ export function ReceiptPrinter({
         </div>
 
         <div
-          ref={macchina}
+          ref={machine}
           data-receipt-machine
-          data-busy={stato.phase === "printing" ? "" : undefined}
+          data-busy={state.phase === "printing" ? "" : undefined}
           aria-hidden="true"
         >
-          <span data-brand>{testi.brand}</span>
+          <span data-brand>{copy.brand}</span>
           <span data-indicator />
           <span data-slot />
         </div>
 
-        <div ref={uscita} data-receipt-outlet>
+        <div ref={outlet} data-receipt-outlet>
           {/* I fantasmi: i quattro scontrini interi, invisibili, uno sopra
               l'altro nella stessa cella. Tengono l'uscita alta quanto il piu'
               lungo, qualunque sia la lingua e la larghezza. */}
-          {righe.map((r, i) => (
-            <div key={servizi[i].id} data-receipt-paper data-ghost aria-hidden="true">
-              <Corpo righe={r} servizio={servizi[i]} />
+          {lines.map((r, i) => (
+            <div key={services[i].id} data-receipt-paper data-ghost aria-hidden="true">
+              <Body lines={r} service={services[i]} />
               <div data-receipt-actions>
-                <span>{testi.letsTalk}</span>
-                <span>{testi.tear}</span>
+                <span>{copy.letsTalk}</span>
+                <span>{copy.tear}</span>
               </div>
             </div>
           ))}
 
-          {stato.service !== null && (
+          {state.service !== null && (
             <div
-              key={stato.traced}
-              ref={carta}
+              key={state.traced}
+              ref={paper}
               data-receipt-paper
-              data-phase={stato.phase}
-              data-finished={finito ? "" : undefined}
+              data-phase={state.phase}
+              data-finished={finished ? "" : undefined}
               // Sopra la figura la carta esce in tutto il tempo dell'attesa, a
               // velocita' costante: e' cosi' che il disegno sembra stampato.
               // Scritto qui e non nel CSS perche' resti uguale a FIGURA.
-              style={allaFigura ? { transitionDuration: `${FIGURE_MS}ms` } : undefined}
+              style={atFigure ? { transitionDuration: `${FIGURE_MS}ms` } : undefined}
             >
-              <Corpo
-                righe={linesAtTicks(righe[stato.service], stato.ticks)}
-                servizio={servizi[stato.service]}
+              <Body
+                lines={linesAtTicks(lines[state.service], state.ticks)}
+                service={services[state.service]}
               />
               {/* Fuori portata finche' la stampa non e' finita: fino ad allora
                   sono fuori dal flusso (sezioni/scontrino.css), e un fuoco su un bottone
                   che non si vede non serve a nessuno. */}
-              <div data-receipt-actions inert={stato.phase !== "idle"}>
-                <a href="#contact">{testi.letsTalk}</a>
-                <button type="button" onClick={strappa}>
-                  {testi.tear}
+              <div data-receipt-actions inert={state.phase !== "idle"}>
+                <a href="#contact">{copy.letsTalk}</a>
+                <button type="button" onClick={tear}>
+                  {copy.tear}
                 </button>
               </div>
             </div>
           )}
 
-          {stato.service === null && <p data-receipt-invite>{testi.hint}</p>}
+          {state.service === null && <p data-receipt-invite>{copy.hint}</p>}
 
           {/* Il servizio stampato si annuncia una volta, intero: la stampa a
               colpi e' per gli occhi, e letta cosi' sarebbe un balbettio. */}
           <p className="sr-only" aria-live="polite">
-            {annuncio}
+            {announcement}
           </p>
         </div>
       </div>

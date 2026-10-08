@@ -14,15 +14,15 @@ import { pad2 } from "@/lib/format";
  * - "annullo": gg.mm.aa, come su un timbro postale.
  * - "anno": l'anno a quattro cifre, per il copyright.
  */
-export function Today({ format: formato }: { format: "annullo" | "anno" }) {
-  const [testo, setTesto] = useState("");
+export function Today({ format }: { format: "postmark" | "year" }) {
+  const [text, setText] = useState("");
   useEffect(() => {
-    const oggi = new Date();
-    if (formato === "anno") {
-      setTesto(String(oggi.getFullYear()));
+    const now = new Date();
+    if (format === "year") {
+      setText(String(now.getFullYear()));
       return;
     }
-    setTesto(`${pad2(oggi.getDate())}.${pad2(oggi.getMonth() + 1)}.${String(oggi.getFullYear()).slice(-2)}`);
-  }, [formato]);
-  return <>{testo}</>;
+    setText(`${pad2(now.getDate())}.${pad2(now.getMonth() + 1)}.${String(now.getFullYear()).slice(-2)}`);
+  }, [format]);
+  return <>{text}</>;
 }

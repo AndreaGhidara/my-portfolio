@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import type { CategoryId, StoryFigure, Story } from "@/lib/news/types";
-import { sourceName, timeAgo, fillTemplate, storyTitle } from "./format";
+import type { CategoryId, Story, StoryFigure } from "@/lib/news/types";
+import { fillTemplate, sourceName, storyTitle, timeAgo } from "./format";
 import type { NewsCopy } from "./types";
 
 /**
@@ -13,12 +13,12 @@ import type { NewsCopy } from "./types";
  * pagina non apre connessioni verso terzi, e il link si apre solo se lo premi.
  */
 export function NewsClipping({
-  story: notizia,
+  story,
   cat,
-  tilt: storto,
-  copy: testi,
+  tilt,
+  copy,
   locale,
-  now: adesso,
+  now,
 }: {
   story: Story;
   cat: CategoryId;
@@ -28,48 +28,48 @@ export function NewsClipping({
   locale: string;
   now: Date;
 }) {
-  const numero = new Intl.NumberFormat(locale);
-  const valore = (d: StoryFigure) =>
+  const numberFormat = new Intl.NumberFormat(locale);
+  const figureValue = (d: StoryFigure) =>
     d.code === "versione"
       ? d.value
       : d.code === "lettura"
-        ? fillTemplate(testi.minutes, { n: numero.format(d.value) })
-        : numero.format(d.value);
-  const titolo = storyTitle(notizia, testi);
+        ? fillTemplate(copy.minutes, { n: numberFormat.format(d.value) })
+        : numberFormat.format(d.value);
+  const title = storyTitle(story, copy);
 
   return (
-    <article data-news-clipping data-cat={cat} style={{ "--tilt": `${storto}deg` } as CSSProperties}>
+    <article data-news-clipping data-cat={cat} style={{ "--tilt": `${tilt}deg` } as CSSProperties}>
       <div data-clipping-under data-clipping-line>
         <span>
-          {sourceName(notizia.source)} · {timeAgo(notizia.when, locale, adesso)}
+          {sourceName(story.source)} · {timeAgo(story.when, locale, now)}
         </span>
-        <span data-clipping-stamp>{testi.stamps[notizia.stamp]}</span>
+        <span data-clipping-stamp>{copy.stamps[story.stamp]}</span>
       </div>
       {/* La notizia resta nella sua lingua, che e' l'inglese. Il titolo di una
           release no: «e' uscito» lo scrive la pagina, nella sua. */}
-      <h3 lang={notizia.stamp === "release" ? undefined : "en"}>{titolo}</h3>
+      <h3 lang={story.stamp === "release" ? undefined : "en"}>{title}</h3>
       <div data-clipping-body>
-        {notizia.summary ? (
+        {story.summary ? (
           <p data-clipping-summary lang="en">
-            {notizia.summary}
+            {story.summary}
           </p>
         ) : (
           <div data-clipping-empty>
-            <b>{notizia.hostname}</b>
-            <span>{testi.noSummary}</span>
+            <b>{story.hostname}</b>
+            <span>{copy.noSummary}</span>
           </div>
         )}
       </div>
       <div data-clipping-foot>
         <p data-clipping-figures>
-          {notizia.figures.map((d) => (
+          {story.figures.map((d) => (
             <span key={d.code}>
-              <b>{valore(d)}</b> {testi.figures[d.code]}
+              <b>{figureValue(d)}</b> {copy.figures[d.code]}
             </span>
           ))}
         </p>
-        <a href={notizia.url} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">
-          {fillTemplate(testi.readOn, { sito: notizia.hostname })} <span aria-hidden="true">↗</span>
+        <a href={story.url} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">
+          {fillTemplate(copy.readOn, { sito: story.hostname })} <span aria-hidden="true">↗</span>
         </a>
       </div>
     </article>

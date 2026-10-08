@@ -6,8 +6,8 @@ import { UnderSheet } from "../UnderSheet";
 import { HeroView } from "../HeroView";
 import { rules } from "@/test/css";
 
-const radice = path.resolve(__dirname, "../../../../..");
-const leggi = (percorso: string) => readFileSync(path.resolve(radice, percorso), "utf8");
+const root = path.resolve(__dirname, "../../../../..");
+const read = (file: string) => readFileSync(path.resolve(root, file), "utf8");
 
 const props = {
   eyebrow: "Sviluppatore web",
@@ -34,9 +34,9 @@ describe("la seconda sezione che passa sopra la prima", () => {
         <section id="scontrino" />
       </UnderSheet>,
     );
-    const palco = container.querySelector("[data-under-sheet]");
-    expect(palco).not.toBeNull();
-    expect(palco, "acceso gia' nel markup: senza JavaScript Hero resterebbe incollato").not.toHaveAttribute(
+    const stage = container.querySelector("[data-under-sheet]");
+    expect(stage).not.toBeNull();
+    expect(stage, "acceso gia' nel markup: senza JavaScript Hero resterebbe incollato").not.toHaveAttribute(
       "data-lit",
     );
     expect(container.querySelector("#hero")).not.toHaveAttribute("style");
@@ -54,54 +54,54 @@ describe("la seconda sezione che passa sopra la prima", () => {
   it("nella pagina Hero e la stampante stanno nello stesso contenitore, e solo loro", () => {
     // Lo sticky di Hero vale fino alla fine del suo contenitore: dentro <main>
     // resterebbe incollato dietro tutte le sezioni fino in fondo alla pagina.
-    const pagina = leggi("src/app/[locale]/page.tsx");
-    expect(pagina).toMatch(/<UnderSheet>\s*<Hero \/>\s*<Receipt \/>\s*<\/UnderSheet>/);
+    const page = read("src/app/[locale]/page.tsx");
+    expect(page).toMatch(/<UnderSheet>\s*<Hero \/>\s*<Receipt \/>\s*<\/UnderSheet>/);
   });
 
   it("il gioco delle lettere sta fuori da quello che si rimpicciolisce", () => {
     // Una trasformazione sul contenitore diventa il riferimento dello strato
     // fisso della carta, che smetterebbe di coprire lo schermo.
     const { container } = render(<HeroView {...props} />);
-    const strato = container.querySelector("[data-hero-layer]");
-    expect(strato, "il contenuto di Hero non ha piu' il suo strato").not.toBeNull();
-    expect(strato?.querySelector("h1")).not.toBeNull();
-    expect(strato?.querySelector("[data-paper]")).toBeNull();
+    const layer = container.querySelector("[data-hero-layer]");
+    expect(layer, "il contenuto di Hero non ha piu' il suo strato").not.toBeNull();
+    expect(layer?.querySelector("h1")).not.toBeNull();
+    expect(layer?.querySelector("[data-paper]")).toBeNull();
   });
 });
 
 describe("le regole dell'effetto in sections/under-sheet.css", () => {
-  const blocco = rules().filter((r) => r.file.endsWith(path.join("sections", "under-sheet.css")));
-  const dove = (selettore: RegExp) => blocco.filter((r) => selettore.test(r.selector));
+  const block = rules().filter((r) => r.file.endsWith(path.join("sections", "under-sheet.css")));
+  const matching = (selector: RegExp) => block.filter((r) => selector.test(r.selector));
 
   it("hanno un blocco loro", () => {
-    expect(blocco.length, "il blocco dell'effetto non c'e'").toBeGreaterThan(0);
+    expect(block.length, "il blocco dell'effetto non c'e'").toBeGreaterThan(0);
   });
 
   it("non danno a #hero ne' z-index ne' isolation", () => {
     // Sticky, Hero apre gia' un contesto suo, e lo strato fisso della carta a
     // "full" sta per questo in <body> (CartaStropicciata). Un livello dato a
     // mano alla sezione non serve a niente e confonderebbe chi legge.
-    const sezione = dove(/#hero$/);
-    expect(sezione.length, "nessuna regola su #hero: lo sticky dov'e'?").toBeGreaterThan(0);
-    for (const { body: corpo } of sezione) {
-      expect(corpo).not.toMatch(/z-index/);
-      expect(corpo).not.toMatch(/isolation/);
+    const section = matching(/#hero$/);
+    expect(section.length, "nessuna regola su #hero: lo sticky dov'e'?").toBeGreaterThan(0);
+    for (const { body } of section) {
+      expect(body).not.toMatch(/z-index/);
+      expect(body).not.toMatch(/isolation/);
     }
   });
 
   it("muovono Hero e la stampante solo sotto l'attributo di accensione", () => {
-    for (const { selector: selettore } of dove(/#hero|#scontrino|\[data-hero-layer\]/)) {
-      expect(selettore, `${selettore} vale anche a effetto spento`).toContain("[data-lit]");
+    for (const { selector } of matching(/#hero|#scontrino|\[data-hero-layer\]/)) {
+      expect(selector, `${selector} vale anche a effetto spento`).toContain("[data-lit]");
     }
   });
 
   it("il contenuto di Hero apre un contesto suo, o il ritratto buca il velo", () => {
-    expect(dove(/\[data-hero-layer\]$/).map((r) => r.body).join("\n")).toMatch(/isolation:\s*isolate/);
+    expect(matching(/\[data-hero-layer\]$/).map((r) => r.body).join("\n")).toMatch(/isolation:\s*isolate/);
   });
 
   it("velo e ombra sono inchiostro, non nero scritto a mano", () => {
-    expect(blocco.map((r) => r.body).join("\n")).not.toMatch(/#000\b|rgba?\(/);
-    expect(dove(/#hero::after$/).map((r) => r.body).join("\n")).toMatch(/var\(--ink\)/);
-    expect(dove(/#scontrino$/).map((r) => r.body).join("\n")).toMatch(/box-shadow:[^;]*var\(--ink\)/);
+    expect(block.map((r) => r.body).join("\n")).not.toMatch(/#000\b|rgba?\(/);
+    expect(matching(/#hero::after$/).map((r) => r.body).join("\n")).toMatch(/var\(--ink\)/);
+    expect(matching(/#scontrino$/).map((r) => r.body).join("\n")).toMatch(/box-shadow:[^;]*var\(--ink\)/);
   });
 });

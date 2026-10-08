@@ -16,13 +16,13 @@ export function HeroMotion({ children }: { children: ReactNode }) {
     const root = scope.current;
     if (!root) return;
 
-    const lettere = root.querySelectorAll(".wordmark-letter");
-    const cerchio = root.querySelector("[data-ink-circle-fill]");
-    const ritratto = root.querySelector("[data-hero-avatar] img");
+    const letters = root.querySelectorAll(".wordmark-letter");
+    const circle = root.querySelector("[data-ink-circle-fill]");
+    const portrait = root.querySelector("[data-hero-avatar] img");
 
     const intro = gsap.timeline();
-    intro.add(stamp(lettere, { level, stagger: 0.09 }) ?? gsap.timeline());
-    intro.add(paint(cerchio, { level }) ?? gsap.timeline(), "-=0.35");
+    intro.add(stamp(letters, { level, stagger: 0.09 }) ?? gsap.timeline());
+    intro.add(paint(circle, { level }) ?? gsap.timeline(), "-=0.35");
     /* La testa cresce DENTRO il cerchio che si sta ancora dipingendo: entra a
        un terzo di quella pennellata, cosi' le due cose si leggono come un
        gesto solo invece che come due animazioni in fila.
@@ -35,7 +35,7 @@ export function HeroMotion({ children }: { children: ReactNode }) {
        66% dell'altezza dell'immagine. Crescendo dal 50% la testa si aprirebbe
        a cavallo del bordo. */
     intro.add(
-      grow(ritratto, { level, origin: "50% 66%" }) ?? gsap.timeline(),
+      grow(portrait, { level, origin: "50% 66%" }) ?? gsap.timeline(),
       "-=0.55",
     );
     /* Il claim e il resto della copia entrano insieme, ma in due modi diversi,
@@ -51,7 +51,7 @@ export function HeroMotion({ children }: { children: ReactNode }) {
        copia (sottotitolo e bottoni) non e' l'elemento piu' grande e puo'
        continuare a comparire. */
     const claim = root.querySelector<HTMLElement>("[data-hero-claim]");
-    const resto = [...root.querySelectorAll<HTMLElement>("[data-hero-copy] > *")].filter(
+    const rest = [...root.querySelectorAll<HTMLElement>("[data-hero-copy] > *")].filter(
       (el) => el !== claim,
     );
 
@@ -66,8 +66,8 @@ export function HeroMotion({ children }: { children: ReactNode }) {
         "-=0.4",
       );
     }
-    if (resto.length) {
-      intro.add(reveal(resto, { level, stagger: 0.08 }) ?? gsap.timeline(), "-=0.5");
+    if (rest.length) {
+      intro.add(reveal(rest, { level, stagger: 0.08 }) ?? gsap.timeline(), "-=0.5");
     }
     // Le frecce per ultime, e senza sovrapposizione: invitano a scorrere, e
     // ha senso invitare solo quando c'e' gia' qualcosa da guardare.
@@ -80,7 +80,7 @@ export function HeroMotion({ children }: { children: ReactNode }) {
     const move = (event: PointerEvent) => {
       const x = (event.clientX / window.innerWidth - 0.5) * 2;
       const y = (event.clientY / window.innerHeight - 0.5) * 2;
-      gsap.to(lettere, { x: x * 6, y: y * 3, duration: 0.8, overwrite: "auto" });
+      gsap.to(letters, { x: x * 6, y: y * 3, duration: 0.8, overwrite: "auto" });
       gsap.to(root.querySelectorAll("[data-hero-avatar]"), {
         x: x * -10, y: y * -5, duration: 0.8, overwrite: "auto",
       });

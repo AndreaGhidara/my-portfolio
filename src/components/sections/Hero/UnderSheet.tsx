@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { MEDIA, useMotionLevel } from "@/animations/motionPolicy";
-import { stickyTop, sheetCoverage } from "./sheet";
+import { sheetCoverage, stickyTop } from "./sheet";
 
 /**
  * La seconda sezione passa sopra la prima. Hero si ferma sotto la testata,
@@ -22,53 +22,53 @@ import { stickyTop, sheetCoverage } from "./sheet";
  */
 export function UnderSheet({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement | null>(null);
-  const sonda = useRef<HTMLDivElement | null>(null);
+  const probe = useRef<HTMLDivElement | null>(null);
   const level = useMotionLevel();
 
   useEffect(() => {
     const root = scope.current;
-    const sondaEl = sonda.current;
+    const probeEl = probe.current;
     const hero = root?.querySelector<HTMLElement>("#hero");
-    const sopra = root?.querySelector<HTMLElement>("#scontrino");
-    if (level === "none" || !root || !sondaEl || !hero || !sopra) return;
+    const sheet = root?.querySelector<HTMLElement>("#scontrino");
+    if (level === "none" || !root || !probeEl || !hero || !sheet) return;
 
-    let testata = 0;
-    let fermo = 0;
-    let fotogramma = 0;
-    let scritta = -1;
+    let headerHeight = 0;
+    let stick = 0;
+    let frame = 0;
+    let written = -1;
 
-    const quanto = () => sheetCoverage(hero.getBoundingClientRect(), sopra.getBoundingClientRect());
+    const coverage = () => sheetCoverage(hero.getBoundingClientRect(), sheet.getBoundingClientRect());
 
-    const muovi = () => {
+    const update = () => {
       // Tre decimali bastano all'occhio, e risparmiano le scritture (e il
       // ricalcolo degli stili di tutto Hero) quando lo scroll non cambia niente.
-      const c = Math.round(quanto() * 1000) / 1000;
-      if (c === scritta) return;
-      scritta = c;
+      const c = Math.round(coverage() * 1000) / 1000;
+      if (c === written) return;
+      written = c;
       hero.style.setProperty("--coverage", String(c));
     };
     // `fotogramma` si azzera solo dentro il suo callback: azzerato altrove
     // (una chiamata diretta a muovi con un fotogramma in coda) la pulizia non
     // saprebbe piu' cosa cancellare, e un callback orfano riscriverebbe
     // --copertura dopo che e' stata tolta.
-    const alloScroll = () => {
-      if (fotogramma) return;
-      fotogramma = requestAnimationFrame(() => {
-        fotogramma = 0;
-        muovi();
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        update();
       });
     };
 
-    const misura = () => {
-      const altezza = hero.offsetHeight;
-      testata = document.querySelector<HTMLElement>("[data-site-header]")?.offsetHeight ?? 0;
+    const measure = () => {
+      const height = hero.offsetHeight;
+      headerHeight = document.querySelector<HTMLElement>("[data-site-header]")?.offsetHeight ?? 0;
       // offsetHeight e' zero dove la barra in basso non c'e' (sopra i 768px):
       // la media query la dice gia' il CSS, qui non si ripete. E' zero anche
       // mentre un dossier aperto la nasconde: per questo si rimisura alla
       // chiusura (vedi il MutationObserver sotto).
-      const barraBassa = document.querySelector<HTMLElement>("[data-nav-bottom]")?.offsetHeight ?? 0;
-      fermo = stickyTop({ header: testata, stage: sondaEl.offsetHeight, bottomBar: barraBassa, height: altezza });
-      hero.style.setProperty("--stick", `${fermo}px`);
+      const bottomBar = document.querySelector<HTMLElement>("[data-nav-bottom]")?.offsetHeight ?? 0;
+      stick = stickyTop({ header: headerHeight, stage: probeEl.offsetHeight, bottomBar, height });
+      hero.style.setProperty("--stick", `${stick}px`);
     };
 
     /* Con il puntatore fine si rimisura a ogni resize. Su touch solo quando
@@ -77,19 +77,19 @@ export function UnderSheet({ children }: { children: ReactNode }) {
        che il palco si legge in svh dalla sonda). La copertura invece si
        ricalcola sempre, perche' e' solo una lettura. */
     const fine = window.matchMedia(MEDIA.finePointer);
-    let larghezza = window.innerWidth;
-    const alResize = () => {
-      const cambiata = window.innerWidth !== larghezza;
-      larghezza = window.innerWidth;
-      if (cambiata || fine.matches) misura();
-      muovi();
+    let width = window.innerWidth;
+    const onResize = () => {
+      const changed = window.innerWidth !== width;
+      width = window.innerWidth;
+      if (changed || fine.matches) measure();
+      update();
     };
 
     /* Hero cresce anche da solo (un carattere che arriva tardi, il claim che va
        a capo): l'attacco lo deve sapere. */
-    const osservatore = new ResizeObserver(() => {
-      misura();
-      muovi();
+    const resizeObserver = new ResizeObserver(() => {
+      measure();
+      update();
     });
 
     /* Mentre un dossier e' aperto la barra in basso e' nascosta
@@ -99,10 +99,10 @@ export function UnderSheet({ children }: { children: ReactNode }) {
        Scelto al posto di leggere l'altezza «teorica» della barra: quella e'
        3,25rem piu' la tacca, cioe' un conto che vive nel CSS e andrebbe
        ripetuto qui. */
-    const dossier = new MutationObserver(() => {
+    const dialogObserver = new MutationObserver(() => {
       if (document.documentElement.hasAttribute("data-dialog-open")) return;
-      misura();
-      muovi();
+      measure();
+      update();
     });
 
     /* Il fuoco svela. Da tastiera si arriva ai bottoni di Hero anche quando il
@@ -117,35 +117,35 @@ export function UnderSheet({ children }: { children: ReactNode }) {
        in cui Hero e' sotto. Solo da tastiera, come nel tavolo: :focus-visible
        e' falso per un click. "instant" e non "auto": auto obbedisce a
        scroll-behavior. */
-    const alFuoco = (event: FocusEvent) => {
-      const preso = event.target as HTMLElement | null;
-      if (!preso?.matches(":focus-visible") || quanto() <= 0) return;
-      const appenaFermo = root.getBoundingClientRect().top + window.scrollY - fermo;
-      window.scrollTo({ top: Math.max(0, appenaFermo), behavior: "instant" });
-      const nascosto = testata - preso.getBoundingClientRect().top;
-      if (nascosto > 0) window.scrollBy({ top: -nascosto, behavior: "instant" });
+    const onFocus = (event: FocusEvent) => {
+      const focused = event.target as HTMLElement | null;
+      if (!focused?.matches(":focus-visible") || coverage() <= 0) return;
+      const stuckAt = root.getBoundingClientRect().top + window.scrollY - stick;
+      window.scrollTo({ top: Math.max(0, stuckAt), behavior: "instant" });
+      const hidden = headerHeight - focused.getBoundingClientRect().top;
+      if (hidden > 0) window.scrollBy({ top: -hidden, behavior: "instant" });
     };
 
-    misura();
+    measure();
     root.setAttribute("data-lit", "");
     // Dopo l'accensione: il rettangolo di Hero e' quello sticky solo da qui.
-    muovi();
+    update();
 
-    window.addEventListener("scroll", alloScroll, { passive: true });
-    window.addEventListener("resize", alResize);
-    osservatore.observe(hero);
-    dossier.observe(document.documentElement, { attributeFilter: ["data-dialog-open"] });
-    hero.addEventListener("focusin", alFuoco);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    resizeObserver.observe(hero);
+    dialogObserver.observe(document.documentElement, { attributeFilter: ["data-dialog-open"] });
+    hero.addEventListener("focusin", onFocus);
 
     // All'uscita dal livello (anche solo verso "none") non basta smettere di
     // scrivere: le proprieta' resterebbero appiccicate all'ultimo valore.
     return () => {
-      cancelAnimationFrame(fotogramma);
-      window.removeEventListener("scroll", alloScroll);
-      window.removeEventListener("resize", alResize);
-      osservatore.disconnect();
-      dossier.disconnect();
-      hero.removeEventListener("focusin", alFuoco);
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      resizeObserver.disconnect();
+      dialogObserver.disconnect();
+      hero.removeEventListener("focusin", onFocus);
       root.removeAttribute("data-lit");
       hero.style.removeProperty("--coverage");
       hero.style.removeProperty("--stick");
@@ -156,7 +156,7 @@ export function UnderSheet({ children }: { children: ReactNode }) {
     <div ref={scope} data-under-sheet>
       {/* Alta 100svh, larga zero: il palco visibile che non cambia con la
           barra del browser, come la sonda del percorso. */}
-      <div ref={sonda} data-sheet-probe aria-hidden="true" />
+      <div ref={probe} data-sheet-probe aria-hidden="true" />
       {children}
     </div>
   );

@@ -3,10 +3,10 @@ import {
   GRID_SIDE,
   RADIUS,
   SHADE_STEPS,
+  affineMap,
+  buildMesh,
   cellsByDepth,
   noiseField,
-  buildMesh,
-  affineMap,
   positions,
   rng,
   veilFor,
@@ -15,7 +15,7 @@ import {
 } from "../geometry";
 
 const p = (x: number, y: number): PaperPoint => ({ x, y });
-const applica = (m: readonly number[], q: PaperPoint) => ({
+const apply = (m: readonly number[], q: PaperPoint) => ({
   x: m[0] * q.x + m[2] * q.y + m[4],
   y: m[1] * q.x + m[3] * q.y + m[5],
 });
@@ -32,19 +32,19 @@ describe("la mappa affine", () => {
   });
 
   it("porta davvero ogni vertice sul suo, comunque sia messo il triangolo", () => {
-    const casi: Array<[string, Triple]> = [
+    const cases: Array<[string, Triple]> = [
       ["traslato", [p(5, 7), p(15, 7), p(5, 17)]],
       ["scalato", [p(0, 0), p(20, 0), p(0, 20)]],
       ["ruotato di 90", [p(0, 0), p(0, 10), p(-10, 0)]],
       ["deformato", [p(3, 1), p(12, 4), p(-2, 9)]],
     ];
-    for (const [nome, D] of casi) {
+    for (const [name, D] of cases) {
       const m = affineMap(S, D);
-      expect(m, nome).not.toBeNull();
+      expect(m, name).not.toBeNull();
       for (let k = 0; k < 3; k++) {
-        const q = applica(m!, S[k]);
-        expect(q.x, `${nome}: x del vertice ${k}`).toBeCloseTo(D[k].x, 9);
-        expect(q.y, `${nome}: y del vertice ${k}`).toBeCloseTo(D[k].y, 9);
+        const q = apply(m!, S[k]);
+        expect(q.x, `${name}: x del vertice ${k}`).toBeCloseTo(D[k].x, 9);
+        expect(q.y, `${name}: y del vertice ${k}`).toBeCloseTo(D[k].y, 9);
       }
     }
   });
@@ -69,22 +69,22 @@ describe("il generatore e il campo", () => {
     // La grana grossa e' quello che tiene insieme le facce. Se il campo fosse
     // rumore puro la carta si sbriciolerebbe invece di piegarsi a pezzi.
     const f = noiseField(rng(5), 3);
-    let salto = 0;
+    let jump = 0;
     for (let i = 0; i < 40; i++) {
       const u = i / 40;
-      salto = Math.max(salto, Math.abs(f(u, 0.5) - f(u + 0.025, 0.5)));
+      jump = Math.max(jump, Math.abs(f(u, 0.5) - f(u + 0.025, 0.5)));
     }
-    expect(salto).toBeLessThan(0.2);
+    expect(jump).toBeLessThan(0.2);
   });
 });
 
 describe("la pallina", () => {
-  const semi = [11, 24, 37, 50];
+  const seeds = [11, 24, 37, 50];
 
   it("e' piccola: il diametro sta sotto la meta' del foglio", () => {
     // A 0,46 di raggio (la prima stesura) il foglio restava un quadrato
     // rimpicciolito e si vedeva il suo bordo accartocciarsi.
-    for (const s of semi) {
+    for (const s of seeds) {
       const r = Math.max(...buildMesh(s).map((v) => Math.hypot(v.bx, v.by)));
       expect(2 * r, `seme ${s}`).toBeLessThan(0.5);
       expect(2 * r, `seme ${s}`).toBeGreaterThan(0.25);
@@ -96,21 +96,21 @@ describe("la pallina", () => {
     // come carta appallottolata. Se il raggio d'arrivo seguisse quello di
     // partenza (mappatura quadrato -> disco) la correlazione sarebbe circa
     // +1 e la forma del foglio sopravviverebbe intatta.
-    for (const s of semi) {
+    for (const s of seeds) {
       const v = buildMesh(s);
-      const da = v.map((q) => Math.hypot(q.u - 0.5, q.w - 0.5));
-      const a = v.map((q) => Math.hypot(q.bx, q.by));
-      const md = da.reduce((x, y) => x + y) / da.length;
-      const ma = a.reduce((x, y) => x + y) / a.length;
+      const start = v.map((q) => Math.hypot(q.u - 0.5, q.w - 0.5));
+      const end = v.map((q) => Math.hypot(q.bx, q.by));
+      const meanStart = start.reduce((x, y) => x + y) / start.length;
+      const meanEnd = end.reduce((x, y) => x + y) / end.length;
       let cov = 0;
-      let sd = 0;
-      let sa = 0;
+      let ssStart = 0;
+      let ssEnd = 0;
       for (let i = 0; i < v.length; i++) {
-        cov += (da[i] - md) * (a[i] - ma);
-        sd += (da[i] - md) ** 2;
-        sa += (a[i] - ma) ** 2;
+        cov += (start[i] - meanStart) * (end[i] - meanEnd);
+        ssStart += (start[i] - meanStart) ** 2;
+        ssEnd += (end[i] - meanEnd) ** 2;
       }
-      const corr = cov / Math.sqrt(sd * sa);
+      const corr = cov / Math.sqrt(ssStart * ssEnd);
       expect(Math.abs(corr), `seme ${s}: correlazione partenza→arrivo`).toBeLessThan(0.6);
     }
   });
@@ -118,31 +118,31 @@ describe("la pallina", () => {
   it("il bordo del foglio finisce dentro la pallina", () => {
     // L'altra faccia della stessa proprieta', detta in modo che si veda: se il
     // bordo restasse fuori, il quadrato resterebbe riconoscibile.
-    for (const s of semi) {
+    for (const s of seeds) {
       const v = buildMesh(s);
-      const raggioMax = Math.max(...v.map((q) => Math.hypot(q.bx, q.by)));
-      const bordo = v.filter((q) => Math.hypot(q.u - 0.5, q.w - 0.5) > 0.45);
-      const dentro = bordo.filter((q) => Math.hypot(q.bx, q.by) < raggioMax * 0.5);
-      expect(dentro.length, `seme ${s}`).toBeGreaterThan(bordo.length * 0.1);
+      const maxRadius = Math.max(...v.map((q) => Math.hypot(q.bx, q.by)));
+      const edge = v.filter((q) => Math.hypot(q.u - 0.5, q.w - 0.5) > 0.45);
+      const inside = edge.filter((q) => Math.hypot(q.bx, q.by) < maxRadius * 0.5);
+      expect(inside.length, `seme ${s}`).toBeGreaterThan(edge.length * 0.1);
     }
   });
 });
 
 describe("il collasso", () => {
   const mesh = buildMesh(11);
-  const centro = { x: 100, y: 100 };
+  const center = { x: 100, y: 100 };
 
   it("a foglio disteso i vertici sono dove il foglio li mette", () => {
-    const q = positions(mesh, 0, centro, 200);
+    const q = positions(mesh, 0, center, 200);
     expect(q[0].x).toBeCloseTo(0, 6);
     expect(q[0].y).toBeCloseTo(0, 6);
     expect(q[q.length - 1].x).toBeCloseTo(200, 6);
   });
 
   it("appallottolato, tutto sta dentro il raggio della pallina", () => {
-    const lato = 200;
-    for (const q of positions(mesh, 1, centro, lato)) {
-      expect(Math.hypot(q.x - centro.x, q.y - centro.y)).toBeLessThanOrEqual(RADIUS * lato + 0.001);
+    const side = 200;
+    for (const q of positions(mesh, 1, center, side)) {
+      expect(Math.hypot(q.x - center.x, q.y - center.y)).toBeLessThanOrEqual(RADIUS * side + 0.001);
     }
   });
 
@@ -150,10 +150,10 @@ describe("il collasso", () => {
     // A meta' strada i vertici non sono tutti allo stesso punto del loro
     // viaggio: e' il ritardo per vertice, ed e' quello che fa sembrare che
     // ceda a pieghe invece di sgonfiarsi.
-    const meta = positions(mesh, 0.5, centro, 200);
-    const distese = positions(mesh, 0, centro, 200);
-    const fatto = meta.map((q, i) => Math.hypot(q.x - distese[i].x, q.y - distese[i].y));
-    expect(Math.max(...fatto) - Math.min(...fatto)).toBeGreaterThan(5);
+    const half = positions(mesh, 0.5, center, 200);
+    const flat = positions(mesh, 0, center, 200);
+    const progress = half.map((q, i) => Math.hypot(q.x - flat[i].x, q.y - flat[i].y));
+    expect(Math.max(...progress) - Math.min(...progress)).toBeGreaterThan(5);
   });
 });
 
@@ -162,10 +162,10 @@ describe("l'ordine di disegno", () => {
     // Senza quest'ordine le facce si coprono nell'ordine della griglia e il
     // risultato e' un collage piatto: e' questo, piu' dell'ombra, a far
     // leggere una pallina.
-    const celle = cellsByDepth(positions(buildMesh(24), 1, { x: 0, y: 0 }, 100));
-    expect(celle).toHaveLength(GRID_SIDE * GRID_SIDE);
-    for (let i = 1; i < celle.length; i++) {
-      expect(celle[i].z).toBeGreaterThanOrEqual(celle[i - 1].z);
+    const cells = cellsByDepth(positions(buildMesh(24), 1, { x: 0, y: 0 }, 100));
+    expect(cells).toHaveLength(GRID_SIDE * GRID_SIDE);
+    for (let i = 1; i < cells.length; i++) {
+      expect(cells[i].z).toBeGreaterThanOrEqual(cells[i - 1].z);
     }
   });
 });
@@ -183,11 +183,11 @@ describe("quando compare il foglio", () => {
   });
 
   it("in mezzo non torna mai indietro", () => {
-    let prima = -1;
+    let prev = -1;
     for (let t = 0; t <= 1.0001; t += 0.02) {
       const v = veilFor(t);
-      expect(v).toBeGreaterThanOrEqual(prima);
-      prima = v;
+      expect(v).toBeGreaterThanOrEqual(prev);
+      prev = v;
     }
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { stickyTop, sheetCoverage } from "../sheet";
+import { sheetCoverage, stickyTop } from "../sheet";
 
 /**
  * Un Hero da 700px e una testata da 60: i numeri non contano, contano i
@@ -43,8 +43,8 @@ describe("attacco", () => {
 
   it("sul telefono il fondo visibile e' sopra la barra in basso", () => {
     // 548 - 60 - 52 = 436 di spazio, Hero da 600: fondo sul bordo della barra.
-    const cima = stickyTop({ header: 60, stage: 548, bottomBar: 52, height: 600 });
-    expect(cima).toBe(60 + 436 - 600);
-    expect(cima + 600).toBe(548 - 52);
+    const top = stickyTop({ header: 60, stage: 548, bottomBar: 52, height: 600 });
+    expect(top).toBe(60 + 436 - 600);
+    expect(top + 600).toBe(548 - 52);
   });
 });

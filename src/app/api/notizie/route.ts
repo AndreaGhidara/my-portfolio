@@ -14,7 +14,7 @@ import { collectNews } from "@/lib/news/collector";
  */
 export const dynamic = "force-dynamic";
 
-const chiedi = createFetcher(
+const fetcher = createFetcher(
   (url, init) => fetch(url, init),
   (url) => {
     const headers: Record<string, string> = {
@@ -30,5 +30,5 @@ const chiedi = createFetcher(
 );
 
 export async function GET() {
-  return NextResponse.json(await collectNews(chiedi, new Date()));
+  return NextResponse.json(await collectNews(fetcher, new Date()));
 }

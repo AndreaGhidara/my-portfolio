@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TITLE_BLOCK, FRAME, DIVIDER, FIGURE_SHAPES, DELAYS, callout } from "./receipt";
+import { DELAYS, DIVIDER, FIGURE_SHAPES, FRAME, TITLE_BLOCK, callout } from "./receipt";
 
 /** Il ritardo scritto come lo scrivono server e client: due decimali, sempre uguali. */
-const ritardo = (secondi: number) => ({ transitionDelay: `${secondi.toFixed(2)}s` });
+const delay = (seconds: number) => ({ transitionDelay: `${seconds.toFixed(2)}s` });
 
 /**
  * La tavola da progetto: il disegno del servizio al centro, i pezzi annotati
@@ -23,16 +23,16 @@ const ritardo = (secondi: number) => ({ transitionDelay: `${secondi.toFixed(2)}s
  * ripeterebbero lo scontrino un pezzo alla volta.
  */
 export function ReceiptSchema({
-  shape: forma,
-  title: titolo,
-  pieces: pezzi,
-  label: etichetta,
-  number: numero,
-  animate: anima,
-  wait: aspetta = false,
-  plate: tavola,
-  scale: scala,
-  signature: firma,
+  shape,
+  title,
+  pieces,
+  label,
+  number,
+  animate,
+  wait = false,
+  plate,
+  scale,
+  signature,
 }: {
   /** L'id del servizio: sceglie il disegno in FORME. */
   shape: string;
@@ -48,67 +48,67 @@ export function ReceiptSchema({
   scale: string;
   signature: string;
 }) {
-  const [traccia, setTraccia] = useState(!anima && !aspetta);
+  const [traced, setTraced] = useState(!animate && !wait);
 
   useEffect(() => {
-    if (traccia || aspetta) return;
-    let secondo = 0;
-    const primo = requestAnimationFrame(() => {
-      secondo = requestAnimationFrame(() => setTraccia(true));
+    if (traced || wait) return;
+    let second = 0;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => setTraced(true));
     });
     return () => {
-      cancelAnimationFrame(primo);
-      cancelAnimationFrame(secondo);
+      cancelAnimationFrame(first);
+      cancelAnimationFrame(second);
     };
-  }, [traccia, aspetta]);
+  }, [traced, wait]);
 
   return (
-    <div data-receipt-plate role="img" aria-label={etichetta}>
+    <div data-receipt-plate role="img" aria-label={label}>
       <svg
         viewBox="0 0 600 460"
         preserveAspectRatio="xMidYMid meet"
         aria-hidden="true"
         focusable="false"
-        data-trace={traccia ? "" : undefined}
+        data-trace={traced ? "" : undefined}
       >
         <path data-stroke="faint" pathLength={1} d={FRAME} />
         <path data-stroke="faint" pathLength={1} d={TITLE_BLOCK} />
         <path data-stroke="faint" data-divider pathLength={1} d={DIVIDER} />
 
-        {(FIGURE_SHAPES[forma] ?? []).map((d, k) => (
+        {(FIGURE_SHAPES[shape] ?? []).map((d, k) => (
           <path
             key={k}
             data-stroke={k === 0 ? "full" : "faint"}
             pathLength={1}
             d={d}
-            style={ritardo(DELAYS.line(k))}
+            style={delay(DELAYS.line(k))}
           />
         ))}
 
-        {pezzi.map((pezzo, k) => {
+        {pieces.map((piece, k) => {
           const r = callout(k);
           return (
             <g key={k}>
-              <path data-callout pathLength={1} d={r.d} style={ritardo(r.delay)} />
-              <circle data-point cx={r.point[0]} cy={r.point[1]} r={3} style={ritardo(r.delay)} />
-              <text data-note x={r.x} y={r.y} textAnchor={r.anchor} style={ritardo(r.textDelay)}>
-                {`${k + 1} · ${pezzo.toUpperCase()}`}
+              <path data-callout pathLength={1} d={r.d} style={delay(r.delay)} />
+              <circle data-point cx={r.point[0]} cy={r.point[1]} r={3} style={delay(r.delay)} />
+              <text data-note x={r.x} y={r.y} textAnchor={r.anchor} style={delay(r.textDelay)}>
+                {`${k + 1} · ${piece.toUpperCase()}`}
               </text>
             </g>
           );
         })}
 
         <text data-title-block="small" x={298} y={404}>
-          {`${tavola} ${numero}`}
+          {`${plate} ${number}`}
         </text>
         <text data-title-block="title" x={298} y={428}>
-          {titolo}
+          {title}
         </text>
         <text data-title-block="small" data-divider x={508} y={408}>
-          {scala}
+          {scale}
         </text>
         <text data-title-block="small" data-divider x={508} y={424}>
-          {firma}
+          {signature}
         </text>
       </svg>
     </div>
@@ -124,13 +124,13 @@ export function ReceiptSchema({
  * Non si traccia: esce intera, e la scopre la carta che esce dalla fessura.
  * Sta nel corpo dello scontrino, che non si legge: il contenuto e' la lista.
  */
-export function ReceiptFigure({ shape: forma, count: quanti }: { shape: string; count: number }) {
+export function ReceiptFigure({ shape, count }: { shape: string; count: number }) {
   return (
     <svg viewBox="124 60 352 304" aria-hidden="true" focusable="false">
-      {(FIGURE_SHAPES[forma] ?? []).map((d, k) => (
+      {(FIGURE_SHAPES[shape] ?? []).map((d, k) => (
         <path key={k} data-stroke={k === 0 ? "full" : "faint"} d={d} />
       ))}
-      {Array.from({ length: quanti }, (_, k) => {
+      {Array.from({ length: count }, (_, k) => {
         const r = callout(k);
         return (
           <g key={k}>

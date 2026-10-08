@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { palette } from "@/styles/palette";
-import { SHADE_STEPS, RADIUS, buildMesh, veilFor, type Vertex } from "./paper/geometry";
+import { RADIUS, SHADE_STEPS, buildMesh, veilFor, type Vertex } from "./paper/geometry";
 import { crumple, drawSource } from "./paper/drawing";
 import { atRest, fling, physicsStep, type Piece } from "./paper/physics";
 
@@ -27,121 +27,121 @@ import { atRest, fling, physicsStep, type Piece } from "./paper/physics";
  * una tela li' non ha un contesto 2D.
  */
 export function CrumpledPaper() {
-  const livello = useMotionLevel();
-  const strato = useRef<HTMLDivElement | null>(null);
+  const level = useMotionLevel();
+  const layer = useRef<HTMLDivElement | null>(null);
 
   /** Rimette il nome com'era. Vive fuori dall'effetto perche' lo chiamano in
    *  tre: il ritorno in cima, lo smontaggio e il cambio di livello. */
-  const rimetti = useRef<() => void>(() => {});
+  const restore = useRef<() => void>(() => {});
 
   useEffect(() => {
-    if (livello !== "full") return;
-    const overlay = strato.current;
+    if (level !== "full") return;
+    const overlay = layer.current;
     if (!overlay) return;
 
-    const nome = document.querySelector<HTMLElement>("#hero [role='img']");
-    const immagini = Array.from(
+    const wordmark = document.querySelector<HTMLElement>("#hero [role='img']");
+    const images = Array.from(
       document.querySelectorAll<HTMLImageElement>("#hero .wordmark-letter"),
     );
-    if (!nome || immagini.length === 0) return;
+    if (!wordmark || images.length === 0) return;
 
-    const stile = getComputedStyle(document.body);
-    const carta = stile.getPropertyValue("--bg").trim() || palette.paper;
-    const riga = stile.getPropertyValue("--line").trim() || palette.graph;
+    const style = getComputedStyle(document.body);
+    const paperColor = style.getPropertyValue("--bg").trim() || palette.paper;
+    const lineColor = style.getPropertyValue("--line").trim() || palette.graph;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
 
-    type Lettera = {
+    type Letter = {
       img: HTMLImageElement;
       mesh: Vertex[];
-      tele: Map<number, HTMLCanvasElement>;
-      tela: HTMLCanvasElement | null;
+      textures: Map<number, HTMLCanvasElement>;
+      canvas: HTMLCanvasElement | null;
       t: number;
-      mira: number;
-      via: boolean;
-      indice: number;
+      target: number;
+      detached: boolean;
+      index: number;
     };
 
-    const lettere: Lettera[] = immagini.map((img, indice) => ({
+    const letters: Letter[] = images.map((img, index) => ({
       img,
-      mesh: buildMesh(11 + indice * 13),
-      tele: new Map(),
-      tela: null,
+      mesh: buildMesh(11 + index * 13),
+      textures: new Map(),
+      canvas: null,
       t: 0,
-      mira: 0,
-      via: false,
-      indice,
+      target: 0,
+      detached: false,
+      index,
     }));
 
-    const pezzi: Array<Piece & { el: HTMLCanvasElement; misura: number; L: Lettera }> = [];
-    let presa: (typeof pezzi)[number] | null = null;
-    let storia: Array<{ x: number; y: number; t: number }> = [];
-    let scarto = 0;
-    let ultimoY = window.scrollY;
-    let vivo = false;
-    let ticchetta = 0;
+    const pieces: Array<Piece & { el: HTMLCanvasElement; size: number; L: Letter }> = [];
+    let grabbed: (typeof pieces)[number] | null = null;
+    let trail: Array<{ x: number; y: number; t: number }> = [];
+    let scrollDelta = 0;
+    let lastY = window.scrollY;
+    let running = false;
+    let frame = 0;
 
-    const tessuto = (L: Lettera, t: number) => {
+    const texture = (L: Letter, t: number) => {
       const k = veilFor(t);
-      let tex = L.tele.get(k);
+      let tex = L.textures.get(k);
       if (!tex) {
-        tex = drawSource(L.img, k / (SHADE_STEPS - 1), carta, riga);
-        L.tele.set(k, tex);
+        tex = drawSource(L.img, k / (SHADE_STEPS - 1), paperColor, lineColor);
+        L.textures.set(k, tex);
       }
       return tex;
     };
 
     /** Una tela grande quanto la lettera, appoggiata dove sta adesso. */
-    const tela = (L: Lettera) => {
+    const placeCanvas = (L: Letter) => {
       const r = L.img.getBoundingClientRect();
-      const misura = Math.max(r.width, r.height);
-      if (!L.tela) {
-        L.tela = document.createElement("canvas");
-        L.tela.setAttribute("data-paper-letter", "");
-        overlay.appendChild(L.tela);
+      const size = Math.max(r.width, r.height);
+      if (!L.canvas) {
+        L.canvas = document.createElement("canvas");
+        L.canvas.setAttribute("data-paper-letter", "");
+        overlay.appendChild(L.canvas);
       }
-      const px = Math.round(misura * dpr);
-      if (L.tela.width !== px) {
-        L.tela.width = px;
-        L.tela.height = px;
+      const px = Math.round(size * dpr);
+      if (L.canvas.width !== px) {
+        L.canvas.width = px;
+        L.canvas.height = px;
       }
-      L.tela.style.width = `${misura}px`;
-      L.tela.style.height = `${misura}px`;
-      L.tela.style.transform = `translate(${r.left + r.width / 2 - misura / 2}px,${
-        r.top + r.height / 2 - misura / 2
+      L.canvas.style.width = `${size}px`;
+      L.canvas.style.height = `${size}px`;
+      L.canvas.style.transform = `translate(${r.left + r.width / 2 - size / 2}px,${
+        r.top + r.height / 2 - size / 2
       }px)`;
-      return { el: L.tela, misura };
+      return { el: L.canvas, size };
     };
 
-    const disegna = (L: Lettera) => {
-      const { el, misura } = tela(L);
+    const draw = (L: Letter) => {
+      const { el, size } = placeCanvas(L);
       const g = el.getContext("2d");
       if (!g) return;
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
-      crumple(g, tessuto(L, L.t), L.mesh, L.t, misura, misura * 0.94);
+      crumple(g, texture(L, L.t), L.mesh, L.t, size, size * 0.94);
       L.img.style.opacity = L.t > 0.012 ? "0" : "";
     };
 
-    const stacca = (L: Lettera) => {
-      if (L.via) return null;
+    const detach = (L: Letter) => {
+      if (L.detached) return null;
       const r = L.img.getBoundingClientRect();
-      const misura = Math.max(r.width, r.height);
+      const size = Math.max(r.width, r.height);
       const el = document.createElement("canvas");
       el.setAttribute("data-paper-piece", "");
-      el.width = el.height = Math.round(misura * dpr);
-      el.style.width = el.style.height = `${misura}px`;
+      el.width = el.height = Math.round(size * dpr);
+      el.style.width = el.style.height = `${size}px`;
       const g = el.getContext("2d");
       if (g) {
         g.setTransform(dpr, 0, 0, dpr, 0, 0);
-        crumple(g, tessuto(L, 1), L.mesh, 1, misura, misura * 0.94);
+        crumple(g, texture(L, 1), L.mesh, 1, size, size * 0.94);
       }
       overlay.appendChild(el);
-      L.via = true;
+      L.detached = true;
       L.img.style.opacity = "0";
-      L.tela?.remove();
-      L.tela = null;
+      L.canvas?.remove();
+      L.canvas = null;
       const p = {
         el,
-        misura,
+        size,
         L,
         x: r.left + r.width / 2,
         y: r.top + r.height / 2,
@@ -149,58 +149,58 @@ export function CrumpledPaper() {
         vy: 0,
         rot: 0,
         vrot: 0,
-        radius: misura * (RADIUS + 0.04),
+        radius: size * (RADIUS + 0.04),
         held: false,
       };
-      pezzi.push(p);
+      pieces.push(p);
       return p;
     };
 
-    const sveglia = () => {
-      if (vivo) return;
-      vivo = true;
-      ticchetta = requestAnimationFrame(giro);
+    const wake = () => {
+      if (running) return;
+      running = true;
+      frame = requestAnimationFrame(loop);
     };
 
-    let prima = performance.now();
-    function giro(ora: number) {
-      const dt = Math.min(0.032, (ora - prima) / 1000);
-      prima = ora;
-      const muri = { width: window.innerWidth, height: window.innerHeight };
-      const applica = scarto;
-      scarto = 0;
-      let daFare = false;
+    let lastTime = performance.now();
+    function loop(time: number) {
+      const dt = Math.min(0.032, (time - lastTime) / 1000);
+      lastTime = time;
+      const walls = { width: window.innerWidth, height: window.innerHeight };
+      const delta = scrollDelta;
+      scrollDelta = 0;
+      let pending = false;
 
-      for (const L of lettere) {
-        if (L.via) continue;
+      for (const L of letters) {
+        if (L.detached) continue;
         const p = L.t;
-        L.t += (L.mira - L.t) * 0.16;
-        if (Math.abs(L.t - L.mira) < 0.003) L.t = L.mira;
-        if (Math.abs(L.t - p) > 0.0005 || (L.t > 0 && L.tela)) {
-          disegna(L);
-          if (L.t === 0 && L.mira === 0) {
-            L.tela?.remove();
-            L.tela = null;
+        L.t += (L.target - L.t) * 0.16;
+        if (Math.abs(L.t - L.target) < 0.003) L.t = L.target;
+        if (Math.abs(L.t - p) > 0.0005 || (L.t > 0 && L.canvas)) {
+          draw(L);
+          if (L.t === 0 && L.target === 0) {
+            L.canvas?.remove();
+            L.canvas = null;
             L.img.style.opacity = "";
           }
         }
-        if (L.t !== L.mira) daFare = true;
+        if (L.t !== L.target) pending = true;
       }
 
-      for (const p of pezzi) {
-        physicsStep(p, dt, muri, applica);
-        p.el.style.transform = `translate(${(p.x - p.misura / 2).toFixed(1)}px,${(
-          p.y - p.misura / 2
+      for (const p of pieces) {
+        physicsStep(p, dt, walls, delta);
+        p.el.style.transform = `translate(${(p.x - p.size / 2).toFixed(1)}px,${(
+          p.y - p.size / 2
         ).toFixed(1)}px) rotate(${p.rot.toFixed(1)}deg)`;
-        if (!atRest(p, muri)) daFare = true;
+        if (!atRest(p, walls)) pending = true;
       }
 
-      if (daFare || presa) ticchetta = requestAnimationFrame(giro);
-      else vivo = false;
+      if (pending || grabbed) frame = requestAnimationFrame(loop);
+      else running = false;
     }
 
-    const dentro = (e: PointerEvent) =>
-      lettere.find((L) => !L.via && L.img === (e.target as Node));
+    const letterAt = (e: PointerEvent) =>
+      letters.find((L) => !L.detached && L.img === (e.target as Node));
 
     /* Una lettera che sta andando sotto il foglio della stampante (SottoIlFoglio
        scrive --copertura su #hero) non si sgualcisce e non si prende: la tela
@@ -208,109 +208,109 @@ export function CrumpledPaper() {
        in mezzo alle altre scurite. Lo stile inline e non quello calcolato:
        e' li' che il componente lo scrive, e leggerlo non costa un layout. */
     const hero = document.getElementById("hero");
-    const sottoIlFoglio = () =>
+    const underSheet = () =>
       (parseFloat(hero?.style.getPropertyValue("--coverage") ?? "") || 0) > 0;
 
-    const sopra = (e: PointerEvent) => {
-      const L = dentro(e);
-      if (L && !sottoIlFoglio()) { L.mira = 0.55; sveglia(); }
+    const onOver = (e: PointerEvent) => {
+      const L = letterAt(e);
+      if (L && !underSheet()) { L.target = 0.55; wake(); }
     };
-    const fuori = (e: PointerEvent) => {
-      const L = dentro(e);
-      if (L && !presa) { L.mira = 0; sveglia(); }
+    const onOut = (e: PointerEvent) => {
+      const L = letterAt(e);
+      if (L && !grabbed) { L.target = 0; wake(); }
     };
-    const giu = (e: PointerEvent) => {
-      const L = dentro(e);
-      if (!L || sottoIlFoglio()) return;
+    const onDown = (e: PointerEvent) => {
+      const L = letterAt(e);
+      if (!L || underSheet()) return;
       e.preventDefault();
       L.t = 1;
-      const p = stacca(L);
+      const p = detach(L);
       if (!p) return;
       p.held = true;
-      storia = [];
-      presa = p;
+      trail = [];
+      grabbed = p;
       // Trascinando sopra il claim partiva la selezione del testo e il gesto
       // si rompeva a meta'.
       document.body.setAttribute("data-paper-grabbed", "");
       (p as unknown as { dx: number; dy: number }).dx = p.x - e.clientX;
       (p as unknown as { dx: number; dy: number }).dy = p.y - e.clientY;
-      sveglia();
+      wake();
     };
-    const muovi = (e: PointerEvent) => {
-      if (!presa) return;
-      const d = presa as unknown as { dx: number; dy: number };
-      presa.x = e.clientX + d.dx;
-      presa.y = e.clientY + d.dy;
-      presa.el.style.transform = `translate(${presa.x - presa.misura / 2}px,${
-        presa.y - presa.misura / 2
-      }px) rotate(${presa.rot}deg)`;
-      storia.push({ x: e.clientX, y: e.clientY, t: performance.now() });
-      if (storia.length > 6) storia.shift();
+    const onMove = (e: PointerEvent) => {
+      if (!grabbed) return;
+      const d = grabbed as unknown as { dx: number; dy: number };
+      grabbed.x = e.clientX + d.dx;
+      grabbed.y = e.clientY + d.dy;
+      grabbed.el.style.transform = `translate(${grabbed.x - grabbed.size / 2}px,${
+        grabbed.y - grabbed.size / 2
+      }px) rotate(${grabbed.rot}deg)`;
+      trail.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+      if (trail.length > 6) trail.shift();
     };
-    const su = () => {
-      if (!presa) return;
-      const v = fling(storia);
-      presa.vx = v.vx;
-      presa.vy = v.vy;
-      presa.vrot = v.vx * 1.4;
-      presa.held = false;
-      presa = null;
+    const onUp = () => {
+      if (!grabbed) return;
+      const v = fling(trail);
+      grabbed.vx = v.vx;
+      grabbed.vy = v.vy;
+      grabbed.vrot = v.vx * 1.4;
+      grabbed.held = false;
+      grabbed = null;
       document.body.removeAttribute("data-paper-grabbed");
-      sveglia();
+      wake();
     };
-    const scorri = () => {
+    const onScroll = () => {
       const y = window.scrollY;
-      scarto += Math.max(-160, Math.min(160, y - ultimoY));
-      ultimoY = y;
-      if (pezzi.length) sveglia();
+      scrollDelta += Math.max(-160, Math.min(160, y - lastY));
+      lastY = y;
+      if (pieces.length) wake();
       // Tornando in cima il nome si rimette da solo: non puo' restare rotto
       // per chi torna indietro a cercarlo.
-      if (y < 40 && pezzi.length && pezzi.every((p) => !p.held && Math.abs(p.vy) < 25)) {
-        rimetti.current();
+      if (y < 40 && pieces.length && pieces.every((p) => !p.held && Math.abs(p.vy) < 25)) {
+        restore.current();
       }
     };
 
-    rimetti.current = () => {
-      for (const p of pezzi) p.el.remove();
-      pezzi.length = 0;
-      presa = null;
-      for (const L of lettere) {
-        L.via = false;
+    restore.current = () => {
+      for (const p of pieces) p.el.remove();
+      pieces.length = 0;
+      grabbed = null;
+      for (const L of letters) {
+        L.detached = false;
         L.t = 0;
-        L.mira = 0;
-        L.tela?.remove();
-        L.tela = null;
+        L.target = 0;
+        L.canvas?.remove();
+        L.canvas = null;
         L.img.style.opacity = "";
       }
     };
 
-    nome.addEventListener("pointerover", sopra);
-    nome.addEventListener("pointerout", fuori);
-    nome.addEventListener("pointerdown", giu);
-    window.addEventListener("pointermove", muovi);
-    window.addEventListener("pointerup", su);
-    window.addEventListener("scroll", scorri, { passive: true });
+    wordmark.addEventListener("pointerover", onOver);
+    wordmark.addEventListener("pointerout", onOut);
+    wordmark.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
-      cancelAnimationFrame(ticchetta);
-      nome.removeEventListener("pointerover", sopra);
-      nome.removeEventListener("pointerout", fuori);
-      nome.removeEventListener("pointerdown", giu);
-      window.removeEventListener("pointermove", muovi);
-      window.removeEventListener("pointerup", su);
-      window.removeEventListener("scroll", scorri);
+      cancelAnimationFrame(frame);
+      wordmark.removeEventListener("pointerover", onOver);
+      wordmark.removeEventListener("pointerout", onOut);
+      wordmark.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("scroll", onScroll);
       // Lo stile inline sulle immagini non lo toglierebbe nessun altro:
       // restasse appiccicato a opacity 0, il nome sparirebbe per sempre.
-      rimetti.current();
-      rimetti.current = () => {};
+      restore.current();
+      restore.current = () => {};
       document.body.removeAttribute("data-paper-grabbed");
     };
-  }, [livello]);
+  }, [level]);
 
   // Lo strato c'e' sempre nel DOM ma e' vuoto e non riceve il puntatore: e'
   // solo il posto dove le tele vanno a stare. Decorativo per intero: il nome
   // che uno screen reader legge resta quello del wordmark.
-  const tela = <div ref={strato} data-paper aria-hidden="true" />;
+  const overlayNode = <div ref={layer} data-paper aria-hidden="true" />;
   /* A "full" lo strato va in fondo a <body>, fuori da #hero. Quando la
      stampante passa sopra Hero (SottoIlFoglio), #hero e' sticky, e un elemento sticky
      apre sempre un contesto di impilamento suo, z-index o no: lo z-index 40
@@ -318,5 +318,5 @@ export function CrumpledPaper() {
      sotto il foglio arancione. Da <body> se la gioca con il resto della
      pagina, com'era prima. Solo a "full" perche' e' l'unico livello in cui
      lo strato disegna qualcosa; negli altri resta dov'e', anche sul server. */
-  return livello === "full" ? createPortal(tela, document.body) : tela;
+  return level === "full" ? createPortal(overlayNode, document.body) : overlayNode;
 }

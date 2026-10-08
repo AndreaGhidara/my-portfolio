@@ -17,7 +17,7 @@ export type NewsViewProps = {
  * variante A (la macchina), e docs/prototipi/2026-09-29-notizie-impaginate.html,
  * variante B (il foglio).
  */
-export function NewsView({ eyebrow, title, intro, locale, copy: testi }: NewsViewProps) {
+export function NewsView({ eyebrow, title, intro, locale, copy }: NewsViewProps) {
   return (
     <section
       id="notizie"
@@ -32,7 +32,7 @@ export function NewsView({ eyebrow, title, intro, locale, copy: testi }: NewsVie
         </h2>
         <p>{intro}</p>
       </Reveal>
-      <NewsStand copy={testi} locale={locale} />
+      <NewsStand copy={copy} locale={locale} />
     </section>
   );
 }

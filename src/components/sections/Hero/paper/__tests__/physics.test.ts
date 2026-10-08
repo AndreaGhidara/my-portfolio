@@ -1,13 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { GRAVITY, atRest, fling, physicsStep, type Walls, type Piece } from "../physics";
+import { GRAVITY, atRest, fling, physicsStep, type Piece, type Walls } from "../physics";
 
-const MURI: Walls = { width: 1200, height: 800 };
-const pezzo = (p: Partial<Piece> = {}): Piece => ({
+const WALLS: Walls = { width: 1200, height: 800 };
+const piece = (p: Partial<Piece> = {}): Piece => ({
   x: 600, y: 100, vx: 0, vy: 0, rot: 0, vrot: 0, radius: 30, held: false, ...p,
 });
 /** Manda avanti la simulazione, di default senza scorrimento. */
-const avanti = (p: Piece, giri: number, scorrimento = 0) => {
-  for (let i = 0; i < giri; i++) physicsStep(p, 1 / 60, MURI, scorrimento);
+const advance = (p: Piece, frames: number, scrollDelta = 0) => {
+  for (let i = 0; i < frames; i++) physicsStep(p, 1 / 60, WALLS, scrollDelta);
   return p;
 };
 
@@ -15,61 +15,61 @@ describe("la caduta", () => {
   it("cade, e accelera", () => {
     // Dopo un fotogramma la velocita' e' la gravita' meno un po' d'aria: il
     // confronto e' con GRAVITA/60 a meno di quella, non con GRAVITA/60 esatta.
-    const dopoUno = physicsStep(pezzo(), 1 / 60, MURI, 0).vy;
-    expect(dopoUno).toBeGreaterThan(0);
-    expect(dopoUno).toBeLessThanOrEqual(GRAVITY / 60);
-    expect(dopoUno).toBeGreaterThan((GRAVITY / 60) * 0.98);
-    const p = pezzo();
-    const primi = avanti(p, 10).y - 100;
-    const dopo = avanti(p, 10).y - 100 - primi;
-    expect(dopo, "il secondo decimo di secondo copre piu' strada del primo").toBeGreaterThan(primi);
+    const afterOne = physicsStep(piece(), 1 / 60, WALLS, 0).vy;
+    expect(afterOne).toBeGreaterThan(0);
+    expect(afterOne).toBeLessThanOrEqual(GRAVITY / 60);
+    expect(afterOne).toBeGreaterThan((GRAVITY / 60) * 0.98);
+    const p = piece();
+    const first = advance(p, 10).y - 100;
+    const second = advance(p, 10).y - 100 - first;
+    expect(second, "il secondo decimo di secondo copre piu' strada del primo").toBeGreaterThan(first);
   });
 
   it("in mano non cade e non si sposta", () => {
-    const p = pezzo({ held: true, vy: 900 });
-    const prima = { ...p };
-    avanti(p, 60);
-    expect(p.x).toBe(prima.x);
-    expect(p.y).toBe(prima.y);
+    const p = piece({ held: true, vy: 900 });
+    const before = { ...p };
+    advance(p, 60);
+    expect(p.x).toBe(before.x);
+    expect(p.y).toBe(before.y);
   });
 
   it("si posa sul fondo e ci resta", () => {
-    const p = avanti(pezzo(), 600);
-    expect(p.y).toBeCloseTo(MURI.height - p.radius - 10, 0);
-    expect(atRest(p, MURI)).toBe(true);
+    const p = advance(piece(), 600);
+    expect(p.y).toBeCloseTo(WALLS.height - p.radius - 10, 0);
+    expect(atRest(p, WALLS)).toBe(true);
   });
 
   it("rimbalza molto meno di come arriva: e' carta, non gomma", () => {
     // Il paragone giusto e' fra la velocita' d'IMPATTO e quella di rimbalzo.
     // Confrontarla con la velocita' iniziale non direbbe niente: cadendo
     // accelera, e il rimbalzo puo' superare la partenza restando ben smorzato.
-    const p = pezzo({ y: 400, vy: 300 });
-    let impatto = 0;
-    let rimbalzo = 0;
+    const p = piece({ y: 400, vy: 300 });
+    let impact = 0;
+    let bounce = 0;
     for (let i = 0; i < 400; i++) {
-      const prima = p.vy;
-      physicsStep(p, 1 / 60, MURI, 0);
-      if (prima > 0 && p.vy < 0) {
-        impatto = prima;
-        rimbalzo = -p.vy;
+      const before = p.vy;
+      physicsStep(p, 1 / 60, WALLS, 0);
+      if (before > 0 && p.vy < 0) {
+        impact = before;
+        bounce = -p.vy;
         break;
       }
     }
-    expect(impatto, "deve toccare terra").toBeGreaterThan(0);
-    expect(rimbalzo).toBeLessThan(impatto * 0.5);
+    expect(impact, "deve toccare terra").toBeGreaterThan(0);
+    expect(bounce).toBeLessThan(impact * 0.5);
   });
 
   it("lanciata di lato non esce dallo schermo", () => {
-    const destra = avanti(pezzo({ vx: 4000 }), 300);
-    expect(destra.x).toBeLessThanOrEqual(MURI.width - destra.radius + 0.001);
-    const sinistra = avanti(pezzo({ vx: -4000 }), 300);
-    expect(sinistra.x).toBeGreaterThanOrEqual(sinistra.radius - 0.001);
+    const right = advance(piece({ vx: 4000 }), 300);
+    expect(right.x).toBeLessThanOrEqual(WALLS.width - right.radius + 0.001);
+    const left = advance(piece({ vx: -4000 }), 300);
+    expect(left.x).toBeGreaterThanOrEqual(left.radius - 0.001);
   });
 
   it("ferma a terra smette anche di girare", () => {
     // Senza questo la pallina posata continuava a ruotare per conto suo, che
     // e' il dettaglio che rovina tutto il resto.
-    const p = avanti(pezzo({ vx: 300, vrot: 900 }), 600);
+    const p = advance(piece({ vx: 300, vrot: 900 }), 600);
     expect(Math.abs(p.vrot)).toBeLessThan(20);
   });
 });
@@ -79,19 +79,19 @@ describe("lo scorrimento se la porta dietro", () => {
     // E' il gesto che l'utente ha chiesto: «mentre scorriamo vedremo i pezzi di
     // carta che scendono giu' con noi». Il bordo basso della finestra scappa,
     // la pallina resta indietro, la gravita' la richiama.
-    const p = avanti(pezzo(), 600);
-    const posata = p.y;
-    physicsStep(p, 1 / 60, MURI, 400);
-    expect(p.y, "appena scorri, resta indietro").toBeLessThan(posata - 100);
-    avanti(p, 600);
-    expect(p.y, "poi torna in fondo").toBeCloseTo(posata, 0);
+    const p = advance(piece(), 600);
+    const rested = p.y;
+    physicsStep(p, 1 / 60, WALLS, 400);
+    expect(p.y, "appena scorri, resta indietro").toBeLessThan(rested - 100);
+    advance(p, 600);
+    expect(p.y, "poi torna in fondo").toBeCloseTo(rested, 0);
   });
 
   it("senza scorrimento non si muove da sola", () => {
-    const p = avanti(pezzo(), 600);
-    const ferma = p.y;
-    avanti(p, 120);
-    expect(p.y).toBeCloseTo(ferma, 6);
+    const p = advance(piece(), 600);
+    const still = p.y;
+    advance(p, 120);
+    expect(p.y).toBeCloseTo(still, 6);
   });
 });
 

@@ -8,12 +8,12 @@ import { services } from "@/content/services";
  * Qui il movimento e' acceso: la stampa a colpi gira con i timer finti. Negli
  * altri test il livello e' "none" (vitest.setup.ts) e lo scontrino esce intero.
  */
-vi.mock("@/animations/motionPolicy", async (originale) => ({
-  ...(await originale<typeof import("@/animations/motionPolicy")>()),
+vi.mock("@/animations/motionPolicy", async (original) => ({
+  ...(await original<typeof import("@/animations/motionPolicy")>()),
   useMotionLevel: () => "full",
 }));
 
-const servizi = services.map((s, i) => ({
+const printable = services.map((s, i) => ({
   id: s.id,
   title: `Titolo ${i}`,
   text: `Testo ${i}`,
@@ -21,7 +21,7 @@ const servizi = services.map((s, i) => ({
   drawing: `Schema ${i}`,
 }));
 
-const testi = {
+const copy = {
   hint: "La stampante è pronta",
   keys: "Scegli il servizio da stampare",
   brand: "ANDREA GHIDARA · SERVIZI",
@@ -37,7 +37,7 @@ const testi = {
   signature: "A. GHIDARA",
 };
 
-const vero = (container: HTMLElement) =>
+const realPaper = (container: HTMLElement) =>
   container.querySelector<HTMLElement>("[data-receipt-paper]:not([data-ghost])");
 
 describe("la figura sulla carta, con il movimento acceso", () => {
@@ -59,17 +59,17 @@ describe("la figura sulla carta, con il movimento acceso", () => {
   it("la stampa si ferma sulla figura anche se i colpi arrivano prima del render", () => {
     // Un telefono lento: molti colpi del timer prima che React ridisegni e
     // rilanci gli effetti. Il colpo dopo la figura non deve passare.
-    const { container } = render(<ReceiptPrinter services={servizi} copy={testi} locale="it" />);
+    const { container } = render(<ReceiptPrinter services={printable} copy={copy} locale="it" />);
     fireEvent.click(screen.getByRole("button", { name: /Titolo 1/ }));
     act(() => vi.advanceTimersByTime(DROP_MS));
     act(() => vi.advanceTimersByTime(20000));
-    expect(vero(container)?.querySelector('[data-line="figure"]')).not.toBeNull();
-    expect(vero(container)?.querySelector('[data-line="item"]')).toBeNull();
+    expect(realPaper(container)?.querySelector('[data-line="figure"]')).not.toBeNull();
+    expect(realPaper(container)?.querySelector('[data-line="item"]')).toBeNull();
 
     act(() => vi.advanceTimersByTime(FIGURE_MS - 10));
-    expect(vero(container)?.querySelector('[data-line="item"]')).toBeNull();
+    expect(realPaper(container)?.querySelector('[data-line="item"]')).toBeNull();
     act(() => vi.advanceTimersByTime(20000));
-    expect(vero(container)?.querySelectorAll('[data-line="item"]')).toHaveLength(servizi[1].pieces.length);
-    expect(vero(container)).toHaveAttribute("data-finished");
+    expect(realPaper(container)?.querySelectorAll('[data-line="item"]')).toHaveLength(printable[1].pieces.length);
+    expect(realPaper(container)).toHaveAttribute("data-finished");
   });
 });

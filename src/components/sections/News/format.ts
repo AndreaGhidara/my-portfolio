@@ -1,16 +1,16 @@
-import { CATEGORIES, type CategoryId, type StorySource, type Story } from "@/lib/news/types";
+import { CATEGORIES, type CategoryId, type Story, type StorySource } from "@/lib/news/types";
 import type { NewsCopy } from "./types";
 
 /** Riempie un modello dei messaggi: «Leggi su {sito}». */
-export function fillTemplate(modello: string, valori: Record<string, string | number>): string {
-  return modello.replace(/\{(\w+)\}/g, (tutto, chiave: string) =>
-    chiave in valori ? String(valori[chiave]) : tutto,
+export function fillTemplate(template: string, values: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (match, key: string) =>
+    key in values ? String(values[key]) : match,
   );
 }
 
 /** Il titolo come si stampa: per una release «e' uscito» lo aggiunge la pagina, nella sua lingua. */
-export function storyTitle(n: Story, testi: Pick<NewsCopy, "release">): string {
-  return n.stamp === "release" ? fillTemplate(testi.release, { titolo: n.title }) : n.title;
+export function storyTitle(n: Story, copy: Pick<NewsCopy, "release">): string {
+  return n.stamp === "release" ? fillTemplate(copy.release, { titolo: n.title }) : n.title;
 }
 
 /** I nomi delle fonti sono nomi propri: non si traducono. */
@@ -28,15 +28,15 @@ export function sourceName(f: StorySource): string {
 }
 
 /** «3 giorni fa», «ieri», «2 hours ago»: nella lingua della pagina. */
-export function timeAgo(quando: string, locale: string, adesso: Date): string {
+export function timeAgo(when: string, locale: string, now: Date): string {
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
-  const s = (adesso.getTime() - Date.parse(quando)) / 1000;
+  const s = (now.getTime() - Date.parse(when)) / 1000;
   if (s < 3600) return rtf.format(-Math.max(1, Math.round(s / 60)), "minute");
   if (s < 86400) return rtf.format(-Math.round(s / 3600), "hour");
   return rtf.format(-Math.round(s / 86400), "day");
 }
 
-const stessoGiorno = (a: Date, b: Date) =>
+const sameDay = (a: Date, b: Date) =>
   a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 
 /**
@@ -46,14 +46,14 @@ const stessoGiorno = (a: Date, b: Date) =>
 export function collectedLabel(
   iso: string,
   locale: string,
-  adesso: Date,
-  modelli: { collectedToday: string; collectedOn: string },
+  now: Date,
+  templates: { collectedToday: string; collectedOn: string },
 ): string {
-  const quando = new Date(iso);
-  const ora = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(quando);
-  if (stessoGiorno(quando, adesso)) return fillTemplate(modelli.collectedToday, { ora });
-  const giorno = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long" }).format(quando);
-  return fillTemplate(modelli.collectedOn, { giorno, ora });
+  const when = new Date(iso);
+  const time = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(when);
+  if (sameDay(when, now)) return fillTemplate(templates.collectedToday, { ora: time });
+  const day = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long" }).format(when);
+  return fillTemplate(templates.collectedOn, { giorno: day, ora: time });
 }
 
 export type Ball = { cat: CategoryId; i: number; x: number; y: number };
@@ -63,21 +63,21 @@ export type Ball = { cat: CategoryId; i: number; x: number; y: number };
  * percentuali del globo. Il caso entra qui, e solo sul client quando le
  * notizie sono arrivate: nel markup del server il globo e' vuoto.
  */
-export function layoutBalls(conte: Record<CategoryId, number>, caso: () => number = Math.random): Ball[] {
-  const tutte = CATEGORIES.flatMap((cat) => Array.from({ length: conte[cat] }, (_, i) => ({ cat, i })));
-  for (let k = tutte.length - 1; k > 0; k--) {
-    const j = Math.floor(caso() * (k + 1));
-    [tutte[k], tutte[j]] = [tutte[j], tutte[k]];
+export function layoutBalls(counts: Record<CategoryId, number>, random: () => number = Math.random): Ball[] {
+  const all = CATEGORIES.flatMap((cat) => Array.from({ length: counts[cat] }, (_, i) => ({ cat, i })));
+  for (let k = all.length - 1; k > 0; k--) {
+    const j = Math.floor(random() * (k + 1));
+    [all[k], all[j]] = [all[j], all[k]];
   }
   const d = 16.5;
-  const perRiga = 5;
-  return tutte.map((p, k) => {
-    const riga = Math.floor(k / perRiga);
-    const colonna = k % perRiga;
+  const perRow = 5;
+  return all.map((p, k) => {
+    const row = Math.floor(k / perRow);
+    const col = k % perRow;
     return {
       ...p,
-      x: 7 + colonna * d + (riga % 2) * d * 0.45 + caso() * 1.2,
-      y: 100 - d * (riga + 1) * 0.9 - 6 + caso() * 1.2,
+      x: 7 + col * d + (row % 2) * d * 0.45 + random() * 1.2,
+      y: 100 - d * (row + 1) * 0.9 - 6 + random() * 1.2,
     };
   });
 }
