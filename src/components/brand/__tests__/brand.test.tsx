@@ -53,10 +53,10 @@ describe("elementi decorativi", () => {
     // chiaro: un file solo, giusto in tutti e due. E' la stessa strada del
     // cerchio d'inchiostro.
     const { container } = render(<QuoteFrame variant="open" />);
-    const segno = container.querySelector("[data-quote-fill]") as HTMLElement | null;
-    expect(segno, "manca il segno mascherato").not.toBeNull();
-    expect(segno!.style.backgroundColor).toBe("var(--fg)");
-    expect(segno!.style.mask || segno!.style.webkitMask).toContain("quote-open");
+    const mark = container.querySelector("[data-quote-fill]") as HTMLElement | null;
+    expect(mark, "manca il segno mascherato").not.toBeNull();
+    expect(mark!.style.backgroundColor).toBe("var(--fg)");
+    expect(mark!.style.mask || mark!.style.webkitMask).toContain("quote-open");
     expect(container.querySelector("img"), "e' ancora un'immagine").toBeNull();
   });
 

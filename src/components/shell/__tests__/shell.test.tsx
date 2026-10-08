@@ -57,17 +57,17 @@ describe("TopStateScript", () => {
     // confronto darebbe sempre false e l'header nascerebbe opaco. Qui lo si
     // esegue davvero, ai due lati della soglia.
     const { container } = render(<TopStateScript />);
-    const codice = container.querySelector("script")?.innerHTML ?? "";
+    const code = container.querySelector("script")?.innerHTML ?? "";
     const root = document.documentElement;
 
     Object.defineProperty(window, "scrollY", { value: AT_TOP_THRESHOLD - 1, configurable: true });
     root.removeAttribute("data-at-top");
-    new Function(codice)();
+    new Function(code)();
     expect(root.hasAttribute("data-at-top")).toBe(true);
 
     Object.defineProperty(window, "scrollY", { value: AT_TOP_THRESHOLD, configurable: true });
     root.removeAttribute("data-at-top");
-    new Function(codice)();
+    new Function(code)();
     expect(root.hasAttribute("data-at-top")).toBe(false);
 
     Object.defineProperty(window, "scrollY", { value: 0, configurable: true });

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { pad2 } from "../format";
 
-describe("due", () => {
+describe("pad2", () => {
   it("porta a due cifre i numeri da una", () => {
     expect(pad2(0)).toBe("00");
     expect(pad2(7)).toBe("07");

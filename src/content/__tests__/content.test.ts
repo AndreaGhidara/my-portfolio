@@ -65,9 +65,9 @@ describe("servizi", () => {
     for (const service of services) {
       expect(service.pieces.length, service.id).toBeGreaterThanOrEqual(4);
       expect(service.pieces.length, service.id).toBeLessThanOrEqual(6);
-      for (const pezzo of service.pieces) {
-        expect(itKeys).toContain(`services.list.${service.id}.pezzi.${pezzo}`);
-        expect(enKeys).toContain(`services.list.${service.id}.pezzi.${pezzo}`);
+      for (const piece of service.pieces) {
+        expect(itKeys).toContain(`services.list.${service.id}.pezzi.${piece}`);
+        expect(enKeys).toContain(`services.list.${service.id}.pezzi.${piece}`);
       }
     }
   });
@@ -81,9 +81,9 @@ describe("lavori", () => {
     // l'unico modo di far entrare qui dentro qualcosa che non venga da D.lab,
     // finita ad aprile: senza, la sezione racconterebbe solo un posto lasciato.
     expect(works).toHaveLength(4);
-    const senzaNome = works.filter((w) => !w.url && !w.screenshot);
-    expect(senzaNome).toHaveLength(1);
-    expect(senzaNome[0].id).toBe("riservato");
+    const unnamed = works.filter((w) => !w.url && !w.screenshot);
+    expect(unnamed).toHaveLength(1);
+    expect(unnamed[0].id).toBe("riservato");
   });
 
   it("lo stato e' scritto, non ricavato dall'anno: in corso solo il lavoro di adesso", () => {
@@ -96,15 +96,15 @@ describe("lavori", () => {
   });
 
   it("la pratica ha le sue etichette in entrambe le lingue", () => {
-    const chiavi = [
+    const keys = [
       "archivio", "pratica", "comEra", "cliente", "anno", "stato", "online", "allegato",
       "rilevato", "rilevatoFinora", "stima", "consegnato", "inCorso", "firmaNome", "firmaRuolo",
     ];
-    for (const dizionario of [it_, en_]) {
-      for (const chiave of chiavi) {
-        const valore = valueAt(dizionario, `works.labels.${chiave}`);
-        expect(typeof valore, `works.labels.${chiave}`).toBe("string");
-        expect(valore).not.toBe("");
+    for (const dict of [it_, en_]) {
+      for (const key of keys) {
+        const value = valueAt(dict, `works.labels.${key}`);
+        expect(typeof value, `works.labels.${key}`).toBe("string");
+        expect(value).not.toBe("");
       }
     }
   });
@@ -232,9 +232,9 @@ describe("il tavolo", () => {
   });
 
   it("c'e' un oggetto muto e uno solo: il post-it bianco", () => {
-    const muti = deskLayers.flatMap((l) => l.objects.filter((o) => o.mute));
-    expect(muti).toHaveLength(1);
-    expect(muti[0].id).toBe("blank");
+    const mute = deskLayers.flatMap((l) => l.objects.filter((o) => o.mute));
+    expect(mute).toHaveLength(1);
+    expect(mute[0].id).toBe("blank");
   });
 
   it("l'oggetto muto non ha un'etichetta appesa da nessuna parte", () => {
@@ -258,12 +258,12 @@ describe("il dominio sta in un posto solo", () => {
    */
   const APP = path.resolve(__dirname, "../../app");
 
-  function file(dir: string): string[] {
-    return readdirSync(dir, { withFileTypes: true }).flatMap((voce) =>
-      voce.isDirectory()
-        ? file(path.join(dir, voce.name))
-        : /\.tsx?$/.test(voce.name)
-          ? [path.join(dir, voce.name)]
+  function sourceFiles(dir: string): string[] {
+    return readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? sourceFiles(path.join(dir, entry.name))
+        : /\.tsx?$/.test(entry.name)
+          ? [path.join(dir, entry.name)]
           : [],
     );
   }
@@ -274,13 +274,13 @@ describe("il dominio sta in un posto solo", () => {
   });
 
   it("nessuna pagina si scrive un dominio suo", () => {
-    for (const percorso of file(APP)) {
-      const codice = readFileSync(percorso, "utf8");
-      const domini = [...codice.matchAll(/https?:\/\/[a-z0-9.-]+/gi)]
+    for (const filePath of sourceFiles(APP)) {
+      const code = readFileSync(filePath, "utf8");
+      const domains = [...code.matchAll(/https?:\/\/[a-z0-9.-]+/gi)]
         .map((m) => m[0])
         // schema.org non e' il sito: e' il vocabolario dei dati strutturati.
         .filter((u) => !u.startsWith("https://schema.org"));
-      expect(domini, `${path.basename(percorso)} caccia un dominio a mano`).toEqual([]);
+      expect(domains, `${path.basename(filePath)} caccia un dominio a mano`).toEqual([]);
     }
   });
 });

@@ -4,23 +4,23 @@ import en_ from "../../../messages/en.json";
 import { TOOLS, GARMENTS, CROSSINGS, ROOT, BRANCHES, LOOSE, JUNCTIONS, ZONES } from "../toolbox";
 import { garmentStops, pathTo } from "../../components/sections/Services/toolbox/graph";
 
-type Albero = Record<string, unknown>;
+type Tree = Record<string, unknown>;
 
 /** La foglia a un percorso puntato, o undefined. Le chiavi degli attrezzi hanno trattini, non punti. */
-function foglia(obj: unknown, percorso: string[]): unknown {
-  return percorso.reduce<unknown>(
-    (acc, parte) => (typeof acc === "object" && acc !== null ? (acc as Albero)[parte] : undefined),
+function leaf(obj: unknown, keyPath: string[]): unknown {
+  return keyPath.reduce<unknown>(
+    (acc, part) => (typeof acc === "object" && acc !== null ? (acc as Tree)[part] : undefined),
     obj,
   );
 }
 
-const lingue = { it: it_, en: en_ } as const;
+const dictionaries = { it: it_, en: en_ } as const;
 
-function testo(lingua: keyof typeof lingue, ...percorso: string[]): unknown {
-  return foglia(lingue[lingua], ["cassetta", ...percorso]);
+function text(lang: keyof typeof dictionaries, ...keyPath: string[]): unknown {
+  return leaf(dictionaries[lang], ["cassetta", ...keyPath]);
 }
 
-const idNodi = new Set<string>([ROOT.id, ...JUNCTIONS.map((s) => s.id), ...TOOLS.map((a) => a.id)]);
+const nodeIds = new Set<string>([ROOT.id, ...JUNCTIONS.map((s) => s.id), ...TOOLS.map((a) => a.id)]);
 
 describe("la cassetta: i dati", () => {
   it("sono trentacinque attrezzi in nove scomparti, ognuno con uno snodo", () => {
@@ -35,7 +35,7 @@ describe("la cassetta: i dati", () => {
   it("gli id sono slug senza punto, e unici", () => {
     // Un punto nell'id diventa un livello in piu' nelle chiavi di traduzione:
     // cassetta.attrezzi.next.js non e' la chiave di Next.js.
-    const ids = [...idNodi];
+    const ids = [...nodeIds];
     expect(new Set(ids).size).toBe(1 + JUNCTIONS.length + TOOLS.length);
     for (const id of ids) expect(id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
   });
@@ -53,8 +53,8 @@ describe("la cassetta: i dati", () => {
 
   it("rami e incroci uniscono solo nodi che esistono, e mai un nodo con se stesso", () => {
     for (const [a, b] of [...BRANCHES, ...CROSSINGS]) {
-      expect(idNodi.has(a), a).toBe(true);
-      expect(idNodi.has(b), b).toBe(true);
+      expect(nodeIds.has(a), a).toBe(true);
+      expect(nodeIds.has(b), b).toBe(true);
       expect(a).not.toBe(b);
     }
   });
@@ -62,10 +62,10 @@ describe("la cassetta: i dati", () => {
   it("nessun nodo e' isolato dall'albero, tranne quelli dichiarati sciolti", () => {
     // Ogni nodo sale fino al cartellino, o a uno scomparto dichiarato sciolto.
     // Un nodo che non ci arriva e' un'etichetta cucita nel vuoto.
-    const cime = new Set([ROOT.id, ...LOOSE]);
-    for (const id of idNodi) {
+    const tops = new Set([ROOT.id, ...LOOSE]);
+    for (const id of nodeIds) {
       const s = pathTo(id);
-      expect(cime.has(s[s.length - 1]), `${id} non arriva ne' al cartellino ne' a uno sciolto`).toBe(true);
+      expect(tops.has(s[s.length - 1]), `${id} non arriva ne' al cartellino ne' a uno sciolto`).toBe(true);
     }
     // E gli sciolti si attaccano al resto almeno con un incrocio.
     for (const id of LOOSE) {
@@ -92,17 +92,17 @@ describe("la cassetta: i capi", () => {
 
   it("ogni zona con un peso ha almeno un attrezzo nel capo, e viceversa", () => {
     for (const c of GARMENTS) {
-      const zoneUsate = new Set(c.uses.map((id) => TOOLS.find((a) => a.id === id)!.zone));
-      expect([...zoneUsate].sort(), c.id).toEqual(Object.keys(c.weight).sort());
+      const usedZones = new Set(c.uses.map((id) => TOOLS.find((a) => a.id === id)!.zone));
+      expect([...usedZones].sort(), c.id).toEqual(Object.keys(c.weight).sort());
     }
   });
 
   it("ogni alternativa sostituisce un attrezzo che e' nel capo con uno che non c'e'", () => {
     for (const c of GARMENTS) {
-      for (const { from: da, to: a } of c.alt) {
-        expect(c.uses, `${c.id}: ${da}`).toContain(da);
-        expect(c.uses, `${c.id}: ${a}`).not.toContain(a);
-        expect(TOOLS.some((x) => x.id === a), a).toBe(true);
+      for (const { from, to } of c.alt) {
+        expect(c.uses, `${c.id}: ${from}`).toContain(from);
+        expect(c.uses, `${c.id}: ${to}`).not.toContain(to);
+        expect(TOOLS.some((x) => x.id === to), to).toBe(true);
       }
     }
   });
@@ -119,48 +119,48 @@ describe("la cassetta: i capi", () => {
 });
 
 describe("la cassetta: i testi", () => {
-  for (const lingua of ["it", "en"] as const) {
-    it(`in ${lingua} ogni scomparto ha nome, snodo, nome corto, chiave e descrizione`, () => {
+  for (const lang of ["it", "en"] as const) {
+    it(`in ${lang} ogni scomparto ha nome, snodo, nome corto, chiave e descrizione`, () => {
       for (const z of ZONES) {
-        for (const campo of ["nome", "snodo", "corto", "chiave", "cosa"]) {
-          expect(testo(lingua, "zone", z.id, campo), `${z.id}.${campo}`).toEqual(expect.any(String));
+        for (const field of ["nome", "snodo", "corto", "chiave", "cosa"]) {
+          expect(text(lang, "zone", z.id, field), `${z.id}.${field}`).toEqual(expect.any(String));
         }
       }
     });
 
-    it(`in ${lingua} ogni attrezzo ha la sua descrizione e quella breve`, () => {
+    it(`in ${lang} ogni attrezzo ha la sua descrizione e quella breve`, () => {
       for (const a of TOOLS) {
-        expect(testo(lingua, "attrezzi", a.id, "cosa"), a.id).toEqual(expect.any(String));
-        expect(testo(lingua, "attrezzi", a.id, "breve"), a.id).toEqual(expect.any(String));
+        expect(text(lang, "attrezzi", a.id, "cosa"), a.id).toEqual(expect.any(String));
+        expect(text(lang, "attrezzi", a.id, "breve"), a.id).toEqual(expect.any(String));
       }
-      expect(Object.keys(testo(lingua, "attrezzi") as Albero).sort()).toEqual(TOOLS.map((a) => a.id).sort());
+      expect(Object.keys(text(lang, "attrezzi") as Tree).sort()).toEqual(TOOLS.map((a) => a.id).sort());
     });
 
-    it(`in ${lingua} ogni capo ha nome, perche' e il testo di ogni alternativa`, () => {
+    it(`in ${lang} ogni capo ha nome, perche' e il testo di ogni alternativa`, () => {
       for (const c of GARMENTS) {
-        expect(testo(lingua, "capi", c.id, "nome"), c.id).toEqual(expect.any(String));
-        expect(testo(lingua, "capi", c.id, "perche"), c.id).toEqual(expect.any(String));
+        expect(text(lang, "capi", c.id, "nome"), c.id).toEqual(expect.any(String));
+        expect(text(lang, "capi", c.id, "perche"), c.id).toEqual(expect.any(String));
         // Lo slug finisce nel codice finto dell'editor: una stringa da identificatore.
-        expect(testo(lingua, "capi", c.id, "slug"), c.id).toMatch(/^[a-z][a-z-]*$/);
-        for (const { from: da } of c.alt) {
-          expect(testo(lingua, "capi", c.id, "alt", da), `${c.id}.alt.${da}`).toEqual(expect.any(String));
+        expect(text(lang, "capi", c.id, "slug"), c.id).toMatch(/^[a-z][a-z-]*$/);
+        for (const { from } of c.alt) {
+          expect(text(lang, "capi", c.id, "alt", from), `${c.id}.alt.${from}`).toEqual(expect.any(String));
         }
       }
     });
 
-    it(`in ${lingua} la chiave di ogni scomparto e' un identificatore valido nel codice finto`, () => {
-      for (const z of ZONES) expect(testo(lingua, "zone", z.id, "chiave")).toMatch(/^[a-zA-Z][a-zA-Z0-9]*$/);
+    it(`in ${lang} la chiave di ogni scomparto e' un identificatore valido nel codice finto`, () => {
+      for (const z of ZONES) expect(text(lang, "zone", z.id, "chiave")).toMatch(/^[a-zA-Z][a-zA-Z0-9]*$/);
     });
   }
 
   it("la pagina dice che le ricette sono un punto di partenza, e che i pesi sono una stima", () => {
-    expect(testo("it", "partenza")).toMatch(/punto di partenza, non una ricetta fissa/);
-    expect(testo("it", "etichetta", "stima")).toBe("stima");
+    expect(text("it", "partenza")).toMatch(/punto di partenza, non una ricetta fissa/);
+    expect(text("it", "etichetta", "stima")).toBe("stima");
   });
 
   it("i testi della cassetta non usano il trattino lungo", () => {
-    const lungo = String.fromCharCode(0x2014);
-    expect(JSON.stringify(testo("it"))).not.toContain(lungo);
-    expect(JSON.stringify(testo("en"))).not.toContain(lungo);
+    const emDash = String.fromCharCode(0x2014);
+    expect(JSON.stringify(text("it"))).not.toContain(emDash);
+    expect(JSON.stringify(text("en"))).not.toContain(emDash);
   });
 });

@@ -19,13 +19,13 @@
  * Sta qui e non nelle sezioni perche' le sezioni che cambiano forma sono due, e
  * ognuna deve compensare da se': l'altra non sa quando succede.
  */
-export function withoutShift(sezione: HTMLElement, cambia: () => void) {
-  const prima = sezione.getBoundingClientRect().bottom;
-  const sotto = prima <= 1;
-  cambia();
-  if (!sotto) return;
-  const scarto = sezione.getBoundingClientRect().bottom - prima;
+export function withoutShift(section: HTMLElement, change: () => void) {
+  const before = section.getBoundingClientRect().bottom;
+  const below = before <= 1;
+  change();
+  if (!below) return;
+  const delta = section.getBoundingClientRect().bottom - before;
   // "instant" e non "auto", come nel tavolo: auto obbedisce a scroll-behavior,
   // e il giorno che diventa smooth questa correzione sarebbe un'animazione.
-  if (Math.abs(scarto) >= 1) window.scrollBy({ top: scarto, behavior: "instant" });
+  if (Math.abs(delta) >= 1) window.scrollBy({ top: delta, behavior: "instant" });
 }

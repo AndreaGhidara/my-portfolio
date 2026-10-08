@@ -7,55 +7,55 @@ import path from "node:path";
  * traduzioni, ne' nel README. Scritto qui come escape, cosi' questo file non
  * fa cadere se stesso.
  */
-const TRATTINO_LUNGO = "\u2014";
+const EM_DASH = "\u2014";
 
-const radice = path.resolve(__dirname, "../../..");
+const root = path.resolve(__dirname, "../../..");
 
 /** Le cartelle lette per intero. docs/ e public/ restano fuori apposta. */
-const CARTELLE = ["src", "scripts", "messages"];
+const FOLDERS = ["src", "scripts", "messages"];
 /** In radice solo questi: config, setup dei test, README. */
-const IN_RADICE = /\.(ts|mjs|md)$/;
+const AT_ROOT = /\.(ts|mjs|md)$/;
 /** Font, immagini e documenti: byte, non testo. */
-const BINARI = /\.(ico|woff2?|ttf|otf|png|jpe?g|gif|webp|avif|pdf)$/i;
-const MAI = new Set(["node_modules", ".next"]);
+const BINARY = /\.(ico|woff2?|ttf|otf|png|jpe?g|gif|webp|avif|pdf)$/i;
+const NEVER = new Set(["node_modules", ".next"]);
 
-function sotto(cartella: string): string[] {
-  return readdirSync(cartella, { withFileTypes: true }).flatMap((voce) => {
-    const percorso = path.join(cartella, voce.name);
-    if (voce.isDirectory()) return MAI.has(voce.name) ? [] : sotto(percorso);
-    return voce.isFile() && !BINARI.test(voce.name) ? [percorso] : [];
+function filesUnder(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const filePath = path.join(dir, entry.name);
+    if (entry.isDirectory()) return NEVER.has(entry.name) ? [] : filesUnder(filePath);
+    return entry.isFile() && !BINARY.test(entry.name) ? [filePath] : [];
   });
 }
 
-function daControllare(): string[] {
-  const inRadice = readdirSync(radice, { withFileTypes: true })
-    .filter((voce) => voce.isFile() && IN_RADICE.test(voce.name))
-    .map((voce) => path.join(radice, voce.name));
-  return [...CARTELLE.flatMap((c) => sotto(path.join(radice, c))), ...inRadice];
+function filesToCheck(): string[] {
+  const atRoot = readdirSync(root, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && AT_ROOT.test(entry.name))
+    .map((entry) => path.join(root, entry.name));
+  return [...FOLDERS.flatMap((c) => filesUnder(path.join(root, c))), ...atRoot];
 }
 
 describe("il trattino lungo", () => {
   it("non compare in src/, scripts/, messages/ ne' nei file in radice", () => {
-    const colpevoli: string[] = [];
-    for (const percorso of daControllare()) {
-      readFileSync(percorso, "utf8")
+    const offenders: string[] = [];
+    for (const filePath of filesToCheck()) {
+      readFileSync(filePath, "utf8")
         .split("\n")
-        .forEach((riga, i) => {
-          if (riga.includes(TRATTINO_LUNGO)) {
-            colpevoli.push(`${path.relative(radice, percorso)}:${i + 1}`);
+        .forEach((line, i) => {
+          if (line.includes(EM_DASH)) {
+            offenders.push(`${path.relative(root, filePath)}:${i + 1}`);
           }
         });
     }
-    expect(colpevoli).toEqual([]);
+    expect(offenders).toEqual([]);
   });
 
   it("legge davvero tutti i posti che dice di leggere", () => {
     // Una cartella sbagliata darebbe zero colpevoli anche col trattino dentro.
-    const letti = daControllare().map((p) => path.relative(radice, p));
-    expect(letti).toContain("README.md");
-    expect(letti).toContain("vitest.setup.ts");
-    expect(letti).toContain(path.join("scripts", "build-desk.mjs"));
-    expect(letti).toContain(path.join("messages", "it.json"));
-    expect(letti).toContain(path.join("src", "styles", "tokens.css"));
+    const checked = filesToCheck().map((p) => path.relative(root, p));
+    expect(checked).toContain("README.md");
+    expect(checked).toContain("vitest.setup.ts");
+    expect(checked).toContain(path.join("scripts", "build-desk.mjs"));
+    expect(checked).toContain(path.join("messages", "it.json"));
+    expect(checked).toContain(path.join("src", "styles", "tokens.css"));
   });
 });

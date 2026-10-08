@@ -42,7 +42,7 @@ export function Reveal({
   className,
   delay = 0,
   stagger = 0.07,
-  motion: moto = "sale",
+  motion = "sale",
   clearProps = false,
   ...rest
 }: RevealProps) {
@@ -53,28 +53,28 @@ export function Reveal({
       const { fromBehind, fromSide, fromAbove, reveal } = presets;
       const root = scope.current;
       if (!root) return;
-      const figli = Array.from(root.children);
+      const items = Array.from(root.children);
 
-      if (moto === "lati") {
+      if (motion === "lati") {
         // Un trigger per figlio, e non uno per il gruppo: le quattro voci si
         // compongono UNA ALLA VOLTA mentre scendi, che e' tutto il punto.
         // Con un trigger solo entrerebbero insieme appena il blocco si
         // affaccia, e chi scorre piano le troverebbe gia' tutte a posto.
-        for (const figlio of figli) {
-          const verso = figlio.getAttribute("data-side") === "left" ? "sx" : "dx";
-          fromSide(figlio, { level, trigger: figlio, direction: verso, delay, clearProps });
+        for (const item of items) {
+          const direction = item.getAttribute("data-side") === "left" ? "left" : "right";
+          fromSide(item, { level, trigger: item, direction, delay, clearProps });
         }
         return;
       }
 
-      const targets = figli.length > 1 ? figli : root;
-      const comune = { level, trigger: root, delay, stagger, clearProps };
-      if (moto === "dietro") fromBehind(targets, comune);
-      else if (moto === "alto") fromAbove(targets, comune);
-      else reveal(targets, comune);
+      const targets = items.length > 1 ? items : root;
+      const common = { level, trigger: root, delay, stagger, clearProps };
+      if (motion === "dietro") fromBehind(targets, common);
+      else if (motion === "alto") fromAbove(targets, common);
+      else reveal(targets, common);
     },
     scope,
-    [moto],
+    [motion],
   );
 
   // Tutto quello che Reveal non conosce arriva all'elemento reso. Un involucro

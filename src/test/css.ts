@@ -34,69 +34,69 @@ export interface Options {
   after?: string;
 }
 
-type Voce = { regola: Rule } | { commento: string };
+type Entry = { rule: Rule } | { comment: string };
 
-const spazi = (testo: string) => testo.replace(/\s+/g, " ").trim();
+const squash = (text: string) => text.replace(/\s+/g, " ").trim();
 
-function leggiFoglio(file: string, dentro: string[], voci: Voce[]) {
-  const visita = (nodi: ChildNode[], dentro: string[]) => {
-    for (const nodo of nodi) {
-      if (nodo.type === "comment") {
-        voci.push({ commento: nodo.text });
-      } else if (nodo.type === "rule") {
-        const dichiarazioni: Record<string, string> = {};
-        const righe: string[] = [];
-        for (const figlio of nodo.nodes) {
-          if (figlio.type !== "decl") continue;
-          const valore = figlio.important ? `${figlio.value} !important` : figlio.value;
-          dichiarazioni[figlio.prop] = valore;
-          righe.push(`${figlio.prop}: ${valore};`);
+function readSheet(file: string, inside: string[], entries: Entry[]) {
+  const visit = (nodes: ChildNode[], inside: string[]) => {
+    for (const node of nodes) {
+      if (node.type === "comment") {
+        entries.push({ comment: node.text });
+      } else if (node.type === "rule") {
+        const declarations: Record<string, string> = {};
+        const lines: string[] = [];
+        for (const child of node.nodes) {
+          if (child.type !== "decl") continue;
+          const value = child.important ? `${child.value} !important` : child.value;
+          declarations[child.prop] = value;
+          lines.push(`${child.prop}: ${value};`);
         }
-        const selettori = nodo.selectors.map(spazi);
-        voci.push({
-          regola: {
-            selectors: selettori,
-            selector: selettori.join(", "),
-            body: righe.join("\n"),
-            declarations: dichiarazioni,
-            inside: dentro,
+        const selectors = node.selectors.map(squash);
+        entries.push({
+          rule: {
+            selectors,
+            selector: selectors.join(", "),
+            body: lines.join("\n"),
+            declarations,
+            inside,
             file,
           },
         });
-      } else if (nodo.type === "atrule" && nodo.name === "import") {
+      } else if (node.type === "atrule" && node.name === "import") {
         // Solo i percorsi relativi sono fogli del sito: il resto e' un pacchetto.
-        const dove = nodo.params.match(/^["']([^"']+)["']/)?.[1];
-        if (dove?.startsWith(".")) leggiFoglio(path.resolve(path.dirname(file), dove), dentro, voci);
-      } else if (nodo.type === "atrule" && nodo.nodes) {
-        visita(nodo.nodes, [...dentro, spazi(`@${nodo.name} ${nodo.params}`)]);
+        const href = node.params.match(/^["']([^"']+)["']/)?.[1];
+        if (href?.startsWith(".")) readSheet(path.resolve(path.dirname(file), href), inside, entries);
+      } else if (node.type === "atrule" && node.nodes) {
+        visit(node.nodes, [...inside, squash(`@${node.name} ${node.params}`)]);
       }
     }
   };
-  visita(postcss.parse(readFileSync(file, "utf8"), { from: file }).nodes, dentro);
+  visit(postcss.parse(readFileSync(file, "utf8"), { from: file }).nodes, inside);
 }
 
-const letti = new Map<string, Voce[]>();
+const cache = new Map<string, Entry[]>();
 
 /** Il lettore di un CSS qualunque a partire dal suo ingresso. Il sito usa `regole`. */
-export function cssReader(ingresso: string) {
-  return (cerca?: string | RegExp, { media, after: dopo }: Options = {}): Rule[] => {
-    let voci = letti.get(ingresso);
-    if (!voci) {
-      voci = [];
-      leggiFoglio(ingresso, [], voci);
-      letti.set(ingresso, voci);
+export function cssReader(entryFile: string) {
+  return (match?: string | RegExp, { media, after }: Options = {}): Rule[] => {
+    let entries = cache.get(entryFile);
+    if (!entries) {
+      entries = [];
+      readSheet(entryFile, [], entries);
+      cache.set(entryFile, entries);
     }
-    if (dopo !== undefined) {
-      const da = voci.findIndex((v) => "commento" in v && v.commento.includes(dopo));
-      voci = da < 0 ? [] : voci.slice(da + 1);
+    if (after !== undefined) {
+      const start = entries.findIndex((v) => "comment" in v && v.comment.includes(after));
+      entries = start < 0 ? [] : entries.slice(start + 1);
     }
-    const cercato = typeof cerca === "string" ? spazi(cerca) : cerca;
-    const query = media === undefined ? undefined : `@media ${spazi(media)}`;
-    return voci.flatMap((v) => {
-      if (!("regola" in v)) return [];
-      const r = v.regola;
-      if (typeof cercato === "string" && !r.selectors.includes(cercato)) return [];
-      if (cercato instanceof RegExp && !cercato.test(r.selector)) return [];
+    const wanted = typeof match === "string" ? squash(match) : match;
+    const query = media === undefined ? undefined : `@media ${squash(media)}`;
+    return entries.flatMap((v) => {
+      if (!("rule" in v)) return [];
+      const r = v.rule;
+      if (typeof wanted === "string" && !r.selectors.includes(wanted)) return [];
+      if (wanted instanceof RegExp && !wanted.test(r.selector)) return [];
       if (query !== undefined && !r.inside.includes(query)) return [];
       return [r];
     });

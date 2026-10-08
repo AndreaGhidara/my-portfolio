@@ -59,7 +59,7 @@ const monoLight = JetBrains_Mono({
    che compare solo a chi gioca. Senza preload il file si scarica quando quel
    testo compare, non con la pagina; e i pesi sono solo quelli che il sito
    finto chiede, perche' un peso mancante il browser lo finge. */
-const fintoFraunces = Fraunces({
+const fakeFraunces = Fraunces({
   subsets: ["latin"],
   weight: "600",
   style: ["normal", "italic"],
@@ -67,14 +67,14 @@ const fintoFraunces = Fraunces({
   display: "swap",
   preload: false,
 });
-const fintoGrotesk = Space_Grotesk({
+const fakeGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["500", "700"],
   variable: "--font-fake-grotesk",
   display: "swap",
   preload: false,
 });
-const fintoPlayfair = Playfair_Display({
+const fakePlayfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["700", "800"],
   variable: "--font-fake-playfair",
@@ -90,7 +90,7 @@ const fintoPlayfair = Playfair_Display({
  * Quella di prima ("progetti, competenze e contatti") descriveva la STRUTTURA
  * del sito invece del mestiere, e nessuno cerca "progetti competenze contatti".
  */
-function descrizione(locale: string): string {
+function siteDescription(locale: string): string {
   return locale === "en"
     ? "Andrea Ghidara, full stack web developer in Italy. Custom websites, online stores and platforms, built with React, Next.js and TypeScript."
     : "Andrea Ghidara, sviluppatore e programmatore web full stack in Italia. Siti, e-commerce e piattaforme su misura, in React, Next.js e TypeScript.";
@@ -109,7 +109,7 @@ export async function generateMetadata({
   );
 
   const title = "Andrea Ghidara";
-  const description = descrizione(locale);
+  const description = siteDescription(locale);
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -195,7 +195,7 @@ export default async function RootLayout({
     name: site.name,
     url: `${SITE_URL}/${locale}`,
     jobTitle: locale === "en" ? "Full Stack Web Developer" : "Sviluppatore web full stack",
-    description: descrizione(locale),
+    description: siteDescription(locale),
     image: `${SITE_URL}/brand/avatar.webp`,
     email: site.email,
     knowsAbout: [
@@ -225,7 +225,7 @@ export default async function RootLayout({
         <ThemeScript />
         <TopStateScript />
       </head>
-      <body className={`${archivo.variable} ${archivoBlack.variable} ${monoFull.variable} ${monoLight.variable} ${fintoFraunces.variable} ${fintoGrotesk.variable} ${fintoPlayfair.variable} relative min-h-dvh`}>
+      <body className={`${archivo.variable} ${archivoBlack.variable} ${monoFull.variable} ${monoLight.variable} ${fakeFraunces.variable} ${fakeGrotesk.variable} ${fakePlayfair.variable} relative min-h-dvh`}>
         <Script
           id="ld-person"
           type="application/ld+json"

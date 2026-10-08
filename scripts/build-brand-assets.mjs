@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import { mkdir, readdir, stat } from "node:fs/promises";
+import { mkdir, stat } from "node:fs/promises";
 import path from "node:path";
 
 const SRC = "assets-source";

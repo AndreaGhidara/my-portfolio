@@ -10,48 +10,48 @@ import { vi } from "vitest";
  * Si toglie con vi.unstubAllGlobals(), come ogni altro stub globale.
  */
 export function installIntersectionObserver() {
-  const vivi = new Set<Osservatore>();
+  const live = new Set<FakeObserver>();
 
-  class Osservatore {
-    readonly osservati = new Set<Element>();
-    constructor(private readonly richiamo: IntersectionObserverCallback) {
-      vivi.add(this);
+  class FakeObserver {
+    readonly observed = new Set<Element>();
+    constructor(private readonly callback: IntersectionObserverCallback) {
+      live.add(this);
     }
     observe(el: Element) {
-      this.osservati.add(el);
+      this.observed.add(el);
     }
     unobserve(el: Element) {
-      this.osservati.delete(el);
+      this.observed.delete(el);
     }
     disconnect() {
-      this.osservati.clear();
-      vivi.delete(this);
+      this.observed.clear();
+      live.delete(this);
     }
     takeRecords(): IntersectionObserverEntry[] {
       return [];
     }
-    avvisa(dentro: boolean, el?: Element) {
-      const bersagli = [...this.osservati].filter((o) => !el || o === el);
-      if (!bersagli.length) return;
-      const voci = bersagli.map(
-        (target) => ({ target, isIntersecting: dentro, intersectionRatio: dentro ? 1 : 0 }) as IntersectionObserverEntry,
+    notify(intersecting: boolean, el?: Element) {
+      const targets = [...this.observed].filter((o) => !el || o === el);
+      if (!targets.length) return;
+      const entries = targets.map(
+        (target) => ({ target, isIntersecting: intersecting, intersectionRatio: intersecting ? 1 : 0 }) as IntersectionObserverEntry,
       );
-      this.richiamo(voci, this as unknown as IntersectionObserver);
+      this.callback(entries, this as unknown as IntersectionObserver);
     }
   }
 
-  vi.stubGlobal("IntersectionObserver", Osservatore);
+  vi.stubGlobal("IntersectionObserver", FakeObserver);
 
-  const avvisa = (dentro: boolean, el?: Element) =>
+  const notify = (intersecting: boolean, el?: Element) =>
     act(() => {
-      for (const o of [...vivi]) o.avvisa(dentro, el);
+      for (const o of [...live]) o.notify(intersecting, el);
     });
 
   return {
-    enter: (el?: Element) => avvisa(true, el),
-    exit: (el?: Element) => avvisa(false, el),
+    enter: (el?: Element) => notify(true, el),
+    exit: (el?: Element) => notify(false, el),
     /** Quanti osservatori sono ancora attaccati: zero dopo lo smontaggio. */
-    active: () => vivi.size,
+    active: () => live.size,
   };
 }
 

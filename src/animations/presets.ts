@@ -1,6 +1,6 @@
 "use client";
 
-import { gsap, ScrollTrigger } from "./gsap";
+import { gsap } from "./gsap";
 import type { MotionLevel } from "./motionPolicy";
 // La riga d'innesco sta in ./finestre: e' un modulo di soli dati, senza
 // "use client", cosi' la possono leggere anche i Server Component.
@@ -38,7 +38,7 @@ export { ENTRANCE_START } from "./timing";
  * dell'apertura, finita l'entrata, tornava dentro il cerchio da cui doveva
  * sporgere. Verificato leggendo lo stile in linea a fine tween.
  */
-const PROPRIETA_DEL_MOTO = "transform,opacity,translate,rotate,scale,transform-origin";
+const MOTION_PROPS = "transform,opacity,translate,rotate,scale,transform-origin";
 
 export function cleanup(
   targets: gsap.TweenTarget,
@@ -46,23 +46,23 @@ export function cleanup(
 ): gsap.TweenVars {
   if (!clearProps) return {};
 
-  const quali = (typeof clearProps === "string" ? clearProps : PROPRIETA_DEL_MOTO)
+  const props = (typeof clearProps === "string" ? clearProps : MOTION_PROPS)
     .split(",")
-    .map((nome) => nome.trim())
+    .map((name) => name.trim())
     .filter(Boolean);
 
   return {
     onComplete: () => {
-      for (const bersaglio of gsap.utils.toArray<Element>(targets)) {
-        if (!(bersaglio instanceof HTMLElement)) continue;
-        for (const prop of quali) bersaglio.style.removeProperty(prop);
+      for (const el of gsap.utils.toArray<Element>(targets)) {
+        if (!(el instanceof HTMLElement)) continue;
+        for (const prop of props) el.style.removeProperty(prop);
       }
     },
   };
 }
 
 /** La riga d'innesco che tocca a questo livello. Vedi INIZIO_ENTRATA. */
-function inizio(level: MotionLevel): string {
+function entranceStart(level: MotionLevel): string {
   return level === "full" ? ENTRANCE_START.full : ENTRANCE_START.reduced;
 }
 
@@ -110,8 +110,8 @@ export function weave(
   if (level === "none" || paths.length === 0) return null;
 
   paths.forEach((path) => {
-    const lunghezza = path.getTotalLength?.() ?? 0;
-    gsap.set(path, { strokeDasharray: lunghezza, strokeDashoffset: lunghezza });
+    const length = path.getTotalLength?.() ?? 0;
+    gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
   });
 
   const timeline = gsap.timeline({
@@ -169,7 +169,7 @@ export function grow(
   {
     level,
     trigger,
-    origin: origine = "50% 50%",
+    origin = "50% 50%",
     delay = 0,
   }: Common & { origin?: string; delay?: number },
 ): gsap.core.Tween | null {
@@ -180,7 +180,7 @@ export function grow(
        "era gia' li' e si e' assestato". */
     scale: level === "full" ? 0.05 : 0.08,
     opacity: 0,
-    transformOrigin: origine,
+    transformOrigin: origin,
     duration: level === "full" ? 0.8 : 0.6,
     ease: "back.out(1.4)",
     delay,
@@ -191,7 +191,7 @@ export function grow(
        resterebbe alzata dei pixel di prima. Si toglie, e il CSS torna
        padrone. */
     ...cleanup(target, true),
-    scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
+    scrollTrigger: trigger ? { trigger, start: entranceStart(level), once: true } : undefined,
   });
 }
 
@@ -225,7 +225,7 @@ export function reveal(
        translate(0,0) e quel sollevamento non succede piu'. Qui si ripulisce
        quello che l'entrata ha scritto, e il CSS torna padrone. */
     ...cleanup(targets, clearProps),
-    scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
+    scrollTrigger: trigger ? { trigger, start: entranceStart(level), once: true } : undefined,
   });
 }
 
@@ -245,25 +245,25 @@ export function fromSide(
   {
     level,
     trigger,
-    direction: verso,
+    direction,
     stagger = 0,
     delay = 0,
     clearProps = false,
-  }: Common & { direction: "sx" | "dx"; stagger?: number; delay?: number; clearProps?: boolean | string },
+  }: Common & { direction: "left" | "right"; stagger?: number; delay?: number; clearProps?: boolean | string },
 ): gsap.core.Tween | null {
   if (level === "none") return null;
 
-  const distanza = (level === "full" ? 90 : 56) * (verso === "sx" ? -1 : 1);
+  const distance = (level === "full" ? 90 : 56) * (direction === "left" ? -1 : 1);
 
   return gsap.from(targets, {
     opacity: 0,
-    x: distanza,
+    x: distance,
     duration: level === "full" ? 0.85 : 0.68,
     ease: "power3.out",
     delay,
     stagger,
     ...cleanup(targets, clearProps),
-    scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
+    scrollTrigger: trigger ? { trigger, start: entranceStart(level), once: true } : undefined,
   });
 }
 
@@ -295,7 +295,7 @@ export function fromBehind(
     delay,
     stagger,
     ...cleanup(targets, clearProps),
-    scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
+    scrollTrigger: trigger ? { trigger, start: entranceStart(level), once: true } : undefined,
   });
 }
 
@@ -328,11 +328,6 @@ export function fromAbove(
     delay,
     stagger,
     ...cleanup(targets, clearProps),
-    scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
+    scrollTrigger: trigger ? { trigger, start: entranceStart(level), once: true } : undefined,
   });
-}
-
-/** Da chiamare quando cambia il layout in un modo che ScrollTrigger non può dedurre. */
-export function refreshTriggers(): void {
-  ScrollTrigger.refresh();
 }

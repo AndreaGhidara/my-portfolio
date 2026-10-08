@@ -4,7 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import it from "../../messages/it.json";
 import en from "../../messages/en.json";
 
-const MESSAGGI = { it, en } as const;
+const MESSAGES = { it, en } as const;
 
 /**
  * Il render dei componenti che si leggono i testi da soli, con
@@ -17,14 +17,14 @@ const MESSAGGI = { it, en } as const;
  */
 export function renderWithMessages(
   ui: ReactElement,
-  { locale = "it", ...opzioni }: { locale?: keyof typeof MESSAGGI } & Omit<RenderOptions, "wrapper"> = {},
+  { locale = "it", ...options }: { locale?: keyof typeof MESSAGES } & Omit<RenderOptions, "wrapper"> = {},
 ) {
-  function Testi({ children }: { children: ReactNode }) {
+  function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <NextIntlClientProvider locale={locale} messages={MESSAGGI[locale]} timeZone="Europe/Rome">
+      <NextIntlClientProvider locale={locale} messages={MESSAGES[locale]} timeZone="Europe/Rome">
         {children}
       </NextIntlClientProvider>
     );
   }
-  return render(ui, { wrapper: Testi, ...opzioni });
+  return render(ui, { wrapper: Wrapper, ...options });
 }

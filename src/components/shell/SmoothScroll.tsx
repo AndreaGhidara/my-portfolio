@@ -17,10 +17,10 @@ import { whenIdle } from "@/animations/whenIdle";
  * sopra non porta Lenis nel pacchetto: arriva ancora solo col caricamento al
  * volo qui sotto.
  */
-let attiva: Lenis | null = null;
+let active: Lenis | null = null;
 
 export function activeLenis(): Lenis | null {
-  return attiva;
+  return active;
 }
 
 /**
@@ -42,19 +42,19 @@ export function SmoothScroll() {
   useEffect(() => {
     if (level !== "full") return;
 
-    let vivo = true;
-    let smonta: (() => void) | undefined;
+    let alive = true;
+    let teardown: (() => void) | undefined;
 
-    const avvia = async () => {
+    const start = async () => {
       const [{ default: Lenis }, { gsap, registerGsap, ScrollTrigger }] = await Promise.all([
         import("lenis"),
         import("@/animations/gsap"),
       ]);
-      if (!vivo) return;
+      if (!alive) return;
 
       registerGsap();
       const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
-      attiva = lenis;
+      active = lenis;
 
       lenis.on("scroll", ScrollTrigger.update);
 
@@ -81,8 +81,8 @@ export function SmoothScroll() {
       observer.observe(root, { attributeFilter: ["data-dialog-open"] });
       syncDialogState();
 
-      smonta = () => {
-        attiva = null;
+      teardown = () => {
+        active = null;
         observer.disconnect();
         gsap.ticker.remove(tick);
         gsap.ticker.lagSmoothing(500, 33);
@@ -93,12 +93,12 @@ export function SmoothScroll() {
     // Dopo la prima pittura, come le animazioni: qui non c'e' niente da
     // mostrare, c'e' solo da rendere piu' morbido un gesto che l'utente non ha
     // ancora fatto.
-    const annulla = whenIdle(() => void avvia());
+    const cancel = whenIdle(() => void start());
 
     return () => {
-      vivo = false;
-      annulla();
-      smonta?.();
+      alive = false;
+      cancel();
+      teardown?.();
     };
   }, [level]);
 

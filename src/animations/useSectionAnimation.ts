@@ -42,10 +42,10 @@ export type SectionScene = {
  * Qui dentro non si fa lavoro pesante: si prenota soltanto il momento libero
  * in cui caricare GSAP.
  */
-const useEffettoDiLayout = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function useSectionAnimation(
-  build: (scena: SectionScene) => void | (() => void),
+  build: (scene: SectionScene) => void | (() => void),
   scope: RefObject<HTMLElement | null>,
   /** Dipendenze aggiuntive oltre al livello di movimento. */
   deps: unknown[] = [],
@@ -58,36 +58,36 @@ export function useSectionAnimation(
   const buildRef = useRef(build);
   buildRef.current = build;
 
-  useEffettoDiLayout(() => {
+  useIsomorphicLayoutEffect(() => {
     if (level === "none") return;
 
-    let vivo = true;
-    let contesto: { revert: () => void } | undefined;
-    let pulizia: (() => void) | void;
+    let alive = true;
+    let context: { revert: () => void } | undefined;
+    let teardown: (() => void) | void;
 
-    const avvia = async () => {
+    const start = async () => {
       const [{ gsap, ScrollTrigger, registerGsap }, presets] = await Promise.all([
         import("./gsap"),
         import("./presets"),
       ]);
-      if (!vivo) return;
+      if (!alive) return;
 
       registerGsap();
-      contesto = gsap.context(() => {
-        pulizia = buildRef.current({ level, gsap, ScrollTrigger, presets });
+      context = gsap.context(() => {
+        teardown = buildRef.current({ level, gsap, ScrollTrigger, presets });
       }, scope.current ?? undefined);
     };
 
-    const annulla = whenIdle(() => void avvia());
+    const cancel = whenIdle(() => void start());
 
     return () => {
-      vivo = false;
-      annulla();
+      alive = false;
+      cancel();
       // Prima quello che ha registrato `build` (ascoltatori, guide), poi il
       // contesto: al contrario, il revert toglierebbe di mezzo gli elementi su
       // cui la pulizia deve ancora lavorare.
-      if (typeof pulizia === "function") pulizia();
-      contesto?.revert();
+      if (typeof teardown === "function") teardown();
+      context?.revert();
     };
   }, [level, scope, ...deps]);
 }

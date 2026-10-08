@@ -44,7 +44,7 @@ if (sources.length === 0) {
 }
 
 const entries = [];
-let oltreIlTetto = false;
+let overBudget = false;
 
 for (const file of sources) {
   const name = path.basename(file, ".png");
@@ -63,7 +63,7 @@ for (const file of sources) {
 
   const { size } = await stat(outPath);
   const kb = size / 1024;
-  if (kb > MAX_KB) oltreIlTetto = true;
+  if (kb > MAX_KB) overBudget = true;
 
   entries.push({
     src: `/works/${name}.webp`,
@@ -129,7 +129,7 @@ export function shotBySrc(src: string): WorkShot {
 await writeFile(MANIFEST, manifest, "utf8");
 console.log(`\n${MANIFEST} riscritto: ${entries.length} schermate.`);
 
-if (oltreIlTetto) {
+if (overBudget) {
   console.error(`Almeno una schermata supera i ${MAX_KB} KB.`);
   process.exit(1);
 }

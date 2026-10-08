@@ -29,13 +29,13 @@ describe("le sagome del tavolo", () => {
     // un pieno vecchio sotto un contorno nuovo non e' un disegno vecchio, e'
     // un alone.
     for (const name of Object.keys(SHAPES)) {
-      const contorno = resolve(process.cwd(), `public/brand/desk/${name}.svg`);
-      expect(readFileSync(contorno, "utf8"), `${name}.svg e' da rigenerare: npm run assets`).toBe(
+      const outlinePath = resolve(process.cwd(), `public/brand/desk/${name}.svg`);
+      expect(readFileSync(outlinePath, "utf8"), `${name}.svg e' da rigenerare: npm run assets`).toBe(
         buildShape(name),
       );
-      const pieno = resolve(process.cwd(), `public/brand/desk/${name}-fill.svg`);
+      const fillPath = resolve(process.cwd(), `public/brand/desk/${name}-fill.svg`);
       expect(
-        readFileSync(pieno, "utf8"),
+        readFileSync(fillPath, "utf8"),
         `${name}-fill.svg e' da rigenerare: npm run assets`,
       ).toBe(buildFill(name));
     }
