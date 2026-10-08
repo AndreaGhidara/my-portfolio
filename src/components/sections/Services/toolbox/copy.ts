@@ -3,14 +3,14 @@ import { toolsIn } from "./graph";
 import type { ToolboxCopy } from "./types";
 
 /** Quello che serve per tradurre: la `t` di next-intl, sul namespace `cassetta`. */
-type Traduci = (chiave: string, valori?: Record<string, number>) => string;
+type Translate = (key: string, values?: Record<string, number>) => string;
 
 /**
  * Tutti i testi della cassetta, dal namespace `cassetta` di messages. Sta fuori
  * dal componente server perche' le prove lo costruiscono dagli stessi file di
  * lingua, con lo stesso codice: una chiave che manca si vede nei test.
  */
-export function toolboxCopy(tc: Traduci): ToolboxCopy {
+export function toolboxCopy(tc: Translate): ToolboxCopy {
   return {
     sewFor: tc("cuciPer"),
     whole: tc("tutta"),
@@ -47,7 +47,7 @@ export function toolboxCopy(tc: Traduci): ToolboxCopy {
           slug: tc(`capi.${c.id}.slug`),
           why: tc(`capi.${c.id}.perche`),
           alt: Object.fromEntries(
-            c.alt.map(({ from: da }) => [da, tc(`capi.${c.id}.alt.${da}`)]),
+            c.alt.map(({ from }) => [from, tc(`capi.${c.id}.alt.${from}`)]),
           ),
           size: tc("etichetta.taglia", { n: c.uses.length }),
           status: tc("editor.stato", { n: c.uses.length }),

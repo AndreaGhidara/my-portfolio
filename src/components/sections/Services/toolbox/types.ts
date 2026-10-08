@@ -73,4 +73,4 @@ export type ToolboxCopy = {
 };
 
 /** Un passo della cronologia: un nodo della mappa (attrezzo, snodo, cartellino) o un capo. */
-export type ToolboxStep = { kind: "nodo"; id: string } | { kind: "capo"; id: string };
+export type ToolboxStep = { kind: "node"; id: string } | { kind: "garment"; id: string };

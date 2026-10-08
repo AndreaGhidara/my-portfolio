@@ -25,7 +25,7 @@ export type DeskLayerData = {
  * una cosa sola, guardata in due modi.
  *
  * Il mondo si disegna solo largo, da desktop. Sotto i 1024px la sezione e' il
- * gioco (gioco/Gioco.tsx) e il CSS toglie questo mondo dall'impaginato.
+ * gioco (game/Game.tsx) e il CSS toglie questo mondo dall'impaginato.
  *
  * Sotto il piano ci sono le didascalie dei quattro strati, in quattro
  * colonne. Il piano e' un elemento a se':

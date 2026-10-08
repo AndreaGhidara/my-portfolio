@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
-import type { ScrollTrigger as TipoScrollTrigger } from "gsap/ScrollTrigger";
+import type { ScrollTrigger as ScrollTriggerType } from "gsap/ScrollTrigger";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import { DeskTable, type DeskLayerData } from "./DeskTable";
@@ -108,7 +108,7 @@ export function DeskStage({
   const scope = useRef<HTMLDivElement | null>(null);
   const track = useRef<HTMLDivElement | null>(null);
   const stage = useRef<HTMLDivElement | null>(null);
-  const camera = useRef<TipoScrollTrigger | null>(null);
+  const camera = useRef<ScrollTriggerType | null>(null);
   const level = useMotionLevel();
 
   /**
@@ -121,7 +121,7 @@ export function DeskStage({
    * ritroverebbe mezzo trasparente. E il vecchio ScrollTrigger continuerebbe a
    * riscriverla a ogni giro di rotellina.
    */
-  const spegni = useCallback(() => {
+  const teardown = useCallback(() => {
     camera.current?.kill();
     camera.current = null;
     stage.current?.style.removeProperty("--p");
@@ -142,8 +142,8 @@ export function DeskStage({
   // mezzo trasparente. In SSR non gira, e non e' un problema: un cambio di
   // livello sul server non esiste.
   useLayoutEffect(() => {
-    if (level !== "full") spegni();
-  }, [level, spegni]);
+    if (level !== "full") teardown();
+  }, [level, teardown]);
 
   useSectionAnimation(({ level: resolved, ScrollTrigger, presets }) => {
     const { fromBehind } = presets;
@@ -160,11 +160,11 @@ export function DeskStage({
          un palco alto zero non e' sullo schermo di nessuno. */
       if (!scope.current || scope.current.offsetHeight === 0) return;
 
-      const testata = scope.current?.querySelector<HTMLElement>("[data-desk-title]");
-      if (testata) {
-        fromBehind(Array.from(testata.children), {
+      const header = scope.current?.querySelector<HTMLElement>("[data-desk-title]");
+      if (header) {
+        fromBehind(Array.from(header.children), {
           level: resolved,
-          trigger: testata,
+          trigger: header,
           stagger: 0.08,
         });
       }
@@ -185,8 +185,8 @@ export function DeskStage({
 
     const measure = () => {
       const laptop = (surface?.clientWidth ?? 0) * LAPTOP_ON_SURFACE;
-      const voluta = (stageEl.clientHeight * OPENING_FILL) / laptop;
-      from = laptop > 0 ? Math.min(Math.max(voluta, OPENING.min), OPENING.max) : OPENING_FALLBACK;
+      const wanted = (stageEl.clientHeight * OPENING_FILL) / laptop;
+      from = laptop > 0 ? Math.min(Math.max(wanted, OPENING.min), OPENING.max) : OPENING_FALLBACK;
       // Si rimisura insieme all'apertura, cosi' ruotare un portatile o aprire
       // gli strumenti da sviluppatore ricalcola anche dove la camera si ferma.
       // Il corpo della tesi si adatta da se' con un min() sull'altezza: qui non
@@ -217,7 +217,7 @@ export function DeskStage({
     // Anche lo smontaggio passa di qui: useSectionAnimation chiama quello che
     // la build restituisce, allo smontaggio e a ogni cambio di livello. Le due property nessun altro le toglierebbe, e restassero
     // appiccicate a --p = 0 il tavolo resterebbe vuoto per sempre.
-    return spegni;
+    return teardown;
   }, scope);
 
   /**
@@ -253,19 +253,19 @@ export function DeskStage({
     const trackEl = track.current;
     if (level !== "full" || !stageEl || !trackEl) return;
 
-    const alFotogrammaDiRiposo = (event: FocusEvent) => {
-      const preso = event.target as HTMLElement | null;
-      if (!preso?.closest("[data-desk-blank]") || !preso.matches(":focus-visible")) return;
-      const fine = trackEl.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+    const jumpToRestFrame = (event: FocusEvent) => {
+      const focused = event.target as HTMLElement | null;
+      if (!focused?.closest("[data-desk-blank]") || !focused.matches(":focus-visible")) return;
+      const restTop = trackEl.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
       // "instant" e non "auto": auto vuol dire "quello che dice scroll-behavior",
       // e il giorno che qualcuno scrive smooth su html questo salto diventerebbe
       // un'animazione, proprio quella che chi ha ridotto il movimento non deve
       // vedere. Qui non ci arriva, ma la riga deve reggere da sola.
-      window.scrollTo({ top: fine, behavior: "instant" });
+      window.scrollTo({ top: restTop, behavior: "instant" });
     };
 
-    stageEl.addEventListener("focusin", alFotogrammaDiRiposo);
-    return () => stageEl.removeEventListener("focusin", alFotogrammaDiRiposo);
+    stageEl.addEventListener("focusin", jumpToRestFrame);
+    return () => stageEl.removeEventListener("focusin", jumpToRestFrame);
   }, [level]);
 
   return (

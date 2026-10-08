@@ -12,9 +12,9 @@ import type { CloudIcon } from "./icons";
 
 /** Un passo ogni 60 ms, tre minuti di notte a passo: otto ore in 9,6 s. */
 export const STEP_MS = 60;
-const MINUTI_A_PASSO = 3;
+const MINUTES_PER_STEP = 3;
 export const NIGHT_MINUTES = 8 * 60;
-export const NIGHT_STEPS = NIGHT_MINUTES / MINUTI_A_PASSO;
+export const NIGHT_STEPS = NIGHT_MINUTES / MINUTES_PER_STEP;
 export const NIGHT_DURATION = NIGHT_STEPS * STEP_MS;
 
 /** Le sei voci, nell'ordine degli interruttori e della notte. */
@@ -31,19 +31,19 @@ export const NIGHT_EVENTS: readonly { item: NightItem; minute: number; damage: n
   { item: "velocita", minute: 455, damage: 24 },
 ];
 
-export const minuteOfStep = (passo: number) => passo * MINUTI_A_PASSO;
+export const minuteOfStep = (step: number) => step * MINUTES_PER_STEP;
 
 /** «23:40», «07:00»: l'ora del muro, dai minuti dalle 23. */
-export function clockTime(minuto: number): string {
-  const ore = (23 + Math.floor(minuto / 60)) % 24;
-  return `${pad2(ore)}:${pad2(minuto % 60)}`;
+export function clockTime(minute: number): string {
+  const hour = (23 + Math.floor(minute / 60)) % 24;
+  return `${pad2(hour)}:${pad2(minute % 60)}`;
 }
 
-type Taglio = readonly [inizio: number, fine: number];
+type Outage = readonly [start: number, end: number];
 
 /** I pezzi di notte col sito giu': uno per ogni colpo arrivato a chi non era pronto. */
-export function outages(pronti: ReadonlySet<NightItem>, adesso: number): Taglio[] {
-  return NIGHT_EVENTS.filter((e) => e.minute <= adesso && !pronti.has(e.item)).map(
+export function outages(ready: ReadonlySet<NightItem>, now: number): Outage[] {
+  return NIGHT_EVENTS.filter((e) => e.minute <= now && !ready.has(e.item)).map(
     (e) => [e.minute, Math.min(NIGHT_MINUTES, e.minute + e.damage)] as const,
   );
 }
@@ -52,25 +52,25 @@ export function outages(pronti: ReadonlySet<NightItem>, adesso: number): Taglio[
  * La striscia fino ad adesso, a pezzi verdi e rossi, in minuti. Due tagli che
  * si sovrappongono fanno un rosso solo: il sito non va giu' due volte.
  */
-export function uptimeStrip(pezzi: readonly Taglio[], adesso: number): { down: boolean; minutes: number }[] {
-  const fuori: { down: boolean; minutes: number }[] = [];
-  let fin = 0;
-  for (const [inizio, fine] of [...pezzi].sort((a, b) => a[0] - b[0])) {
-    if (inizio >= adesso) break;
-    if (inizio > fin) fuori.push({ down: false, minutes: inizio - fin });
-    const da = Math.max(inizio, fin);
-    const a = Math.min(fine, adesso);
-    if (a > da) fuori.push({ down: true, minutes: a - da });
-    fin = Math.max(fin, a);
+export function uptimeStrip(cuts: readonly Outage[], now: number): { down: boolean; minutes: number }[] {
+  const strip: { down: boolean; minutes: number }[] = [];
+  let cursor = 0;
+  for (const [start, end] of [...cuts].sort((a, b) => a[0] - b[0])) {
+    if (start >= now) break;
+    if (start > cursor) strip.push({ down: false, minutes: start - cursor });
+    const from = Math.max(start, cursor);
+    const a = Math.min(end, now);
+    if (a > from) strip.push({ down: true, minutes: a - from });
+    cursor = Math.max(cursor, a);
   }
-  if (adesso > fin) fuori.push({ down: false, minutes: adesso - fin });
-  return fuori;
+  if (now > cursor) strip.push({ down: false, minutes: now - cursor });
+  return strip;
 }
 
 /** Le ore col sito su, su otto, a un decimale. */
-export function hoursOnline(pronti: ReadonlySet<NightItem>): number {
-  const giu = uptimeStrip(outages(pronti, NIGHT_MINUTES), NIGHT_MINUTES)
+export function hoursOnline(ready: ReadonlySet<NightItem>): number {
+  const down = uptimeStrip(outages(ready, NIGHT_MINUTES), NIGHT_MINUTES)
     .filter((p) => p.down)
-    .reduce((somma, p) => somma + p.minutes, 0);
-  return Math.round(((NIGHT_MINUTES - giu) / 60) * 10) / 10;
+    .reduce((sum, p) => sum + p.minutes, 0);
+  return Math.round(((NIGHT_MINUTES - down) / 60) * 10) / 10;
 }

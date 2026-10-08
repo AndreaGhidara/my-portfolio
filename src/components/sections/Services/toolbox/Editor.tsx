@@ -16,9 +16,9 @@ import { toolById, sortedWeights } from "./graph";
 import type { ToolboxStep, ToolboxCopy } from "./types";
 
 /** Il ritmo a cui il file si riscrive, riga dopo riga. */
-const PASSO_RIGA = 70;
+const LINE_INTERVAL = 70;
 
-type Aperto = { tipo: "config" } | { tipo: "zona"; zona: ZoneId };
+type OpenFile = { kind: "config" } | { kind: "zone"; zone: ZoneId };
 
 /**
  * La cassetta sul telefono, e sul computer sotto i 1280px o senza mouse: una
@@ -31,18 +31,18 @@ type Aperto = { tipo: "config" } | { tipo: "zona"; zona: ZoneId };
  * fissa e il codice scorre dentro: scegliere un lavoro non sposta la pagina.
  */
 export function Editor({
-  copy: testi,
-  garment: capo,
-  step: passo,
-  sheetOpen: foglioAperto,
-  canGoBack: puoIndietro,
-  onOpen: onApri,
-  onNode: onNodo,
-  onGarment: onCapo,
-  onBack: onIndietro,
-  onClose: onChiudi,
+  copy,
+  garment,
+  step,
+  sheetOpen,
+  canGoBack,
+  onOpen,
+  onNode,
+  onGarment,
+  onBack,
+  onClose,
   level,
-  active: attiva,
+  active,
 }: {
   copy: ToolboxCopy;
   garment: Garment | null;
@@ -57,57 +57,57 @@ export function Editor({
   level: MotionLevel;
   active: boolean;
 }) {
-  const e = testi.editor;
-  const [aperto, setAperto] = useState<Aperto>({ tipo: "config" });
-  const [visibili, setVisibili] = useState(Number.POSITIVE_INFINITY);
-  const codice = useRef<HTMLDivElement | null>(null);
-  const dialogo = useRef<HTMLDialogElement | null>(null);
-  const tastoFile = useRef<HTMLButtonElement | null>(null);
-  const titoloId = useId();
+  const e = copy.editor;
+  const [opened, setOpened] = useState<OpenFile>({ kind: "config" });
+  const [visible, setVisible] = useState(Number.POSITIVE_INFINITY);
+  const code = useRef<HTMLDivElement | null>(null);
+  const dialog = useRef<HTMLDialogElement | null>(null);
+  const fileButton = useRef<HTMLButtonElement | null>(null);
+  const titleId = useId();
 
-  const righe: CodeLine[] = useMemo(
+  const lines: CodeLine[] = useMemo(
     () =>
-      aperto.tipo === "config"
-        ? configLines(capo, testi)
-        : zoneLines(aperto.zona, capo, testi),
-    [aperto, capo, testi],
+      opened.kind === "config"
+        ? configLines(garment, copy)
+        : zoneLines(opened.zone, garment, copy),
+    [opened, garment, copy],
   );
 
   /* Un lavoro nuovo riapre il file del sito e lo riscrive. A "none" e' gia'
      scritto; altrove una riga ogni 70ms, cioe' un file intero in poco piu' di
      un secondo. In fase di layout, o il file nuovo si vedrebbe intero per un
      fotogramma prima di sparire e ricominciare. */
-  const primoGiro = useRef(true);
+  const firstRun = useRef(true);
   useLayoutEffect(() => {
-    if (primoGiro.current) {
-      primoGiro.current = false;
+    if (firstRun.current) {
+      firstRun.current = false;
       return;
     }
-    setAperto({ tipo: "config" });
-    if (!capo || level === "none" || !attiva) {
-      setVisibili(Number.POSITIVE_INFINITY);
+    setOpened({ kind: "config" });
+    if (!garment || level === "none" || !active) {
+      setVisible(Number.POSITIVE_INFINITY);
       return;
     }
-    setVisibili(0);
-  }, [capo, level, attiva]);
+    setVisible(0);
+  }, [garment, level, active]);
 
   useEffect(() => {
-    if (visibili >= righe.length) return;
-    const id = window.setTimeout(() => setVisibili((v) => v + 1), PASSO_RIGA);
+    if (visible >= lines.length) return;
+    const id = window.setTimeout(() => setVisible((v) => v + 1), LINE_INTERVAL);
     return () => window.clearTimeout(id);
-  }, [visibili, righe.length]);
+  }, [visible, lines.length]);
 
   // Il codice scorre con la scrittura, come in un editor vero: l'ultima riga
   // nuova resta in vista. Solo dentro la finestra, mai la pagina.
   useEffect(() => {
-    const el = codice.current;
-    if (el && visibili < righe.length) el.scrollTop = el.scrollHeight;
-  }, [visibili, righe.length]);
+    const el = code.current;
+    if (el && visible < lines.length) el.scrollTop = el.scrollHeight;
+  }, [visible, lines.length]);
 
-  const apri = (nuovo: Aperto) => {
-    setAperto(nuovo);
-    setVisibili(Number.POSITIVE_INFINITY);
-    if (codice.current) codice.current.scrollTop = 0;
+  const openFile = (next: OpenFile) => {
+    setOpened(next);
+    setVisible(Number.POSITIVE_INFINITY);
+    if (code.current) code.current.scrollTop = 0;
   };
 
   /* Il foglio e' un <dialog> nativo aperto con showModal(), come il dossier
@@ -115,9 +115,9 @@ export function Editor({
      browser. html[data-dialog-open] ferma la pagina sotto e nasconde la barra
      in basso, e si toglie anche se il componente se ne va con il foglio aperto. */
   useEffect(() => {
-    const d = dialogo.current;
+    const d = dialog.current;
     if (!d) return;
-    if (!foglioAperto) {
+    if (!sheetOpen) {
       if (d.open) d.close();
       return;
     }
@@ -126,28 +126,28 @@ export function Editor({
     return () => {
       document.documentElement.removeAttribute("data-dialog-open");
     };
-  }, [foglioAperto]);
+  }, [sheetOpen]);
 
   useEffect(() => {
-    const d = dialogo.current;
+    const d = dialog.current;
     return () => {
       if (d?.open) d.close();
       document.documentElement.removeAttribute("data-dialog-open");
     };
   }, []);
 
-  const titolo =
-    aperto.tipo === "config"
+  const title =
+    opened.kind === "config"
       ? e.file
-      : `${e.folder}/${testi.zones[aperto.zona].short}.ts`;
-  const scritte = righe.slice(0, visibili);
-  const scrivendo = visibili < righe.length;
+      : `${e.folder}/${copy.zones[opened.zone].short}.ts`;
+  const written = lines.slice(0, visible);
+  const writing = visible < lines.length;
 
   return (
     <div data-toolbox-view-editor>
       <div
         data-toolbox-editor
-        data-garment={capo ? "" : undefined}
+        data-garment={garment ? "" : undefined}
         role="group"
         aria-label={e.name}
       >
@@ -155,16 +155,16 @@ export function Editor({
           <i />
           <i />
           <i />
-          <span>{titolo}</span>
+          <span>{title}</span>
         </div>
 
         <div data-editor-tree role="toolbar" aria-label={e.folders}>
           <button
             type="button"
-            ref={tastoFile}
+            ref={fileButton}
             data-file
-            aria-pressed={aperto.tipo === "config"}
-            onClick={() => apri({ tipo: "config" })}
+            aria-pressed={opened.kind === "config"}
+            onClick={() => openFile({ kind: "config" })}
           >
             {e.file}
           </button>
@@ -174,40 +174,40 @@ export function Editor({
               type="button"
               data-zone={z.id}
               data-needed={
-                (capo && capo.uses.some((id) => toolById(id)?.zone === z.id)) ||
+                (garment && garment.uses.some((id) => toolById(id)?.zone === z.id)) ||
                 undefined
               }
-              aria-pressed={aperto.tipo === "zona" && aperto.zona === z.id}
-              onClick={() => apri({ tipo: "zona", zona: z.id })}
+              aria-pressed={opened.kind === "zone" && opened.zone === z.id}
+              onClick={() => openFile({ kind: "zone", zone: z.id })}
             >
-              {testi.zones[z.id].short}
+              {copy.zones[z.id].short}
             </button>
           ))}
         </div>
 
-        <div ref={codice} data-editor-code aria-busy={scrivendo || undefined}>
-          {scritte.map((riga, i) => (
+        <div ref={code} data-editor-code aria-busy={writing || undefined}>
+          {written.map((line, i) => (
             <span
-              key={`${aperto.tipo}-${i}`}
+              key={`${opened.kind}-${i}`}
               data-code-line
               data-new={
-                (riga.isNew && capo && aperto.tipo === "config") || undefined
+                (line.isNew && garment && opened.kind === "config") || undefined
               }
             >
-              {riga.pieces.map((p, k) =>
-                p.tipo === "a" ? (
+              {line.pieces.map((p, k) =>
+                p.kind === "a" ? (
                   <button
                     key={k}
                     type="button"
                     data-syntax="s"
                     data-tool
-                    onClick={() => onApri(p.id)}
+                    onClick={() => onOpen(p.id)}
                   >
-                    {p.testo}
+                    {p.text}
                   </button>
                 ) : (
-                  <span key={k} data-syntax={p.tipo}>
-                    {p.testo}
+                  <span key={k} data-syntax={p.kind}>
+                    {p.text}
                   </span>
                 ),
               )}
@@ -216,10 +216,10 @@ export function Editor({
         </div>
 
         <div data-editor-state>
-          <span>✓ {capo ? testi.garments[capo.id].status : e.zeroErrors}</span>
+          <span>✓ {garment ? copy.garments[garment.id].status : e.zeroErrors}</span>
           <span data-editor-mix aria-hidden="true">
-            {capo &&
-              sortedWeights(capo).map(([z, pc]) => (
+            {garment &&
+              sortedWeights(garment).map(([z, pc]) => (
                 <i key={z} data-zone={z} style={{ width: `${pc}%` }} />
               ))}
           </span>
@@ -228,46 +228,46 @@ export function Editor({
       </div>
 
       <dialog
-        ref={dialogo}
+        ref={dialog}
         data-toolbox-sheet
-        aria-labelledby={titoloId}
+        aria-labelledby={titleId}
         onClose={() => {
-          onChiudi();
+          onClose();
           // Scelto un capo dentro il foglio, il file si e' riscritto e il nome
           // che l'aveva aperto non c'e' piu': il browser rimetterebbe il fuoco
           // sul body. Si torna al file del sito, che c'e' sempre.
-          const fuoco = document.activeElement;
-          if (!fuoco || fuoco === document.body) tastoFile.current?.focus();
+          const focused = document.activeElement;
+          if (!focused || focused === document.body) fileButton.current?.focus();
         }}
         onClick={(ev) => {
-          if (ev.target === dialogo.current) dialogo.current?.close();
+          if (ev.target === dialog.current) dialog.current?.close();
         }}
       >
-        {foglioAperto && (
+        {sheetOpen && (
           <NodeLabel
-            key={`${passo.kind}-${passo.id}`}
-            step={passo}
-            copy={testi}
-            onNode={onNodo}
-            onGarment={onCapo}
-            titleId={titoloId}
+            key={`${step.kind}-${step.id}`}
+            step={step}
+            copy={copy}
+            onNode={onNode}
+            onGarment={onGarment}
+            titleId={titleId}
             toolsOnly
             actions={
               <>
                 <button
                   type="button"
-                  onClick={onIndietro}
-                  hidden={!puoIndietro}
+                  onClick={onBack}
+                  hidden={!canGoBack}
                 >
                   <span aria-hidden="true">‹ </span>
-                  {testi.label.back}
+                  {copy.label.back}
                 </button>
                 <button
                   type="button"
                   data-label-close
-                  onClick={() => dialogo.current?.close()}
+                  onClick={() => dialog.current?.close()}
                 >
-                  {testi.label.close}
+                  {copy.label.close}
                   <span aria-hidden="true"> ✕</span>
                 </button>
               </>

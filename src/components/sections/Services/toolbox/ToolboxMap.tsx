@@ -23,8 +23,8 @@ import { useNeedle } from "./useNeedle";
 import { ENTRANCE, useEntrance } from "./useEntrance";
 import { useDrag } from "./useDrag";
 
-const LARGO = 1200;
-const ALTO = 820;
+const WIDTH = 1200;
+const HEIGHT = 820;
 
 /**
  * La mappa della cassetta: nove pezze di stoffa, gli attrezzi cuciti sopra
@@ -45,14 +45,14 @@ const ALTO = 820;
  * che da ogni nodo porta ai suoi vicini; chi legge ha l'elenco per scomparti.
  */
 export function ToolboxMap({
-  copy: testi,
-  garment: capo,
-  step: passo,
-  onNode: onNodo,
-  onGarment: onCapo,
-  actions: azioni,
+  copy,
+  garment,
+  step,
+  onNode,
+  onGarment,
+  actions,
   level,
-  active: attiva,
+  active,
 }: {
   copy: ToolboxCopy;
   garment: Garment | null;
@@ -64,16 +64,16 @@ export function ToolboxMap({
   /** Se e' la vista che il CSS mostra adesso: l'altra non si anima. */
   active: boolean;
 }) {
-  const banco = useRef<HTMLDivElement | null>(null);
+  const bench = useRef<HTMLDivElement | null>(null);
   const svg = useRef<SVGSVGElement | null>(null);
   const gsapRef = useRef<typeof import("gsap").gsap | null>(null);
-  const [acceso, setAcceso] = useState<string | null>(null);
-  const idMaschera = useId().replace(/:/g, "");
+  const [hovered, setHovered] = useState<string | null>(null);
+  const idPrefix = useId().replace(/:/g, "");
 
-  const percorso = useMemo(() => (capo ? garmentStops(capo) : []), [capo]);
-  const disegnoCucitura = useMemo(
-    () => seam(percorso.map((id) => restPositions.get(id)!)),
-    [percorso],
+  const stops = useMemo(() => (garment ? garmentStops(garment) : []), [garment]);
+  const seamPath = useMemo(
+    () => seam(stops.map((id) => restPositions.get(id)!)),
+    [stops],
   );
 
   // GSAP arriva dopo la prima pittura: la mappa lo tiene a portata di mano
@@ -83,63 +83,63 @@ export function ToolboxMap({
     return () => {
       gsapRef.current = null;
     };
-  }, banco);
+  }, bench);
 
-  const pieno = level === "full" && attiva;
+  const full = level === "full" && active;
 
-  const entrata = useEntrance(banco, pieno);
-  const { cucituraRef, mascheraRef, agoRef, cuciti } = useNeedle({
-    garment: capo,
-    full: pieno,
-    seam: disegnoCucitura,
-    stops: percorso.length,
+  const entrance = useEntrance(bench, full);
+  const { seamRef, maskRef, needleRef, sewn } = useNeedle({
+    garment,
+    full,
+    seam: seamPath,
+    stops: stops.length,
     svg,
     gsapRef,
   });
-  const { gruppi, tracciati, presa, giu, muovi, su, annulla } =
+  const { groups, paths, grab, pointerDown, pointerMove, pointerUp, pointerCancel } =
     useDrag({
       svg,
       gsapRef,
-      full: pieno,
+      full,
       onTap: (id) => {
-        onNodo(id);
-        if (!capo) setAcceso(id);
+        onNode(id);
+        if (!garment) setHovered(id);
       },
     });
 
   /* La strada fino al cartellino, e i vicini: solo senza un capo scelto,
      perche' con un capo la mappa racconta gia' un'altra cosa. */
-  const luce = !capo && acceso ? acceso : null;
-  const stradaAccesa = luce ? pathTo(luce) : [];
-  const nodiAccesi = new Set(luce ? [...stradaAccesa, ...neighbours(luce)] : []);
-  const filoAcceso = (f: Thread) =>
-    !!luce &&
-    (f.a === luce ||
-      f.b === luce ||
-      (stradaAccesa.includes(f.a) &&
-        stradaAccesa.includes(f.b) &&
+  const lit = !garment && hovered ? hovered : null;
+  const litPath = lit ? pathTo(lit) : [];
+  const litNodes = new Set(lit ? [...litPath, ...neighbours(lit)] : []);
+  const isThreadLit = (f: Thread) =>
+    !!lit &&
+    (f.a === lit ||
+      f.b === lit ||
+      (litPath.includes(f.a) &&
+        litPath.includes(f.b) &&
         (parentOf(f.b) === f.a || parentOf(f.a) === f.b)));
 
-  const tappaDi = new Map(percorso.map((id, i) => [id, i]));
-  const zoneUsate = new Set(
-    capo ? capo.uses.map((id) => toolById(id)!.zone) : [],
+  const stopIndex = new Map(stops.map((id, i) => [id, i]));
+  const usedZones = new Set(
+    garment ? garment.uses.map((id) => toolById(id)!.zone) : [],
   );
-  const scelto = passo.kind === "nodo" ? passo.id : null;
+  const chosen = step.kind === "node" ? step.id : null;
 
   return (
     <div data-toolbox-map>
-      <div ref={banco} data-toolbox-bench>
+      <div ref={bench} data-toolbox-bench>
         <svg
           ref={svg}
-          viewBox={`0 0 ${LARGO} ${ALTO}`}
+          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           aria-hidden="true"
           focusable="false"
-          data-state={capo ? "chosen" : luce ? "off" : undefined}
-          data-entrance={entrata ?? undefined}
+          data-state={garment ? "chosen" : lit ? "off" : undefined}
+          data-entrance={entrance ?? undefined}
         >
           <defs>
             <pattern
-              id={`${idMaschera}-righe`}
+              id={`${idPrefix}-lines`}
               width="8"
               height="8"
               patternUnits="userSpaceOnUse"
@@ -148,7 +148,7 @@ export function ToolboxMap({
               <path d="M0 0 V8" data-texture />
             </pattern>
             <pattern
-              id={`${idMaschera}-punti`}
+              id={`${idPrefix}-dots`}
               width="9"
               height="9"
               patternUnits="userSpaceOnUse"
@@ -156,7 +156,7 @@ export function ToolboxMap({
               <circle cx="4.5" cy="4.5" r="0.9" data-texture-point />
             </pattern>
             <pattern
-              id={`${idMaschera}-quadretti`}
+              id={`${idPrefix}-grid`}
               width="12"
               height="12"
               patternUnits="userSpaceOnUse"
@@ -164,16 +164,16 @@ export function ToolboxMap({
               <path d="M0 0 H12 M0 0 V12" data-texture />
             </pattern>
             <mask
-              id={`${idMaschera}-cucito`}
+              id={`${idPrefix}-sewn`}
               maskUnits="userSpaceOnUse"
               x="0"
               y="0"
-              width={LARGO}
-              height={ALTO}
+              width={WIDTH}
+              height={HEIGHT}
             >
               <path
-                ref={mascheraRef}
-                d={disegnoCucitura.d}
+                ref={maskRef}
+                d={seamPath.d}
                 fill="none"
                 stroke="white"
                 strokeWidth="8"
@@ -189,10 +189,10 @@ export function ToolboxMap({
                   key={z.id}
                   data-patch
                   data-zone={z.id}
-                  data-used={zoneUsate.has(z.id) || undefined}
+                  data-used={usedZones.has(z.id) || undefined}
                 >
                   <rect x={x} y={y} width={w} height={h} rx="10" data-fabric />
-                  {TRAMA[z.id] && (
+                  {TEXTURE[z.id] && (
                     <rect
                       x={x}
                       y={y}
@@ -200,7 +200,7 @@ export function ToolboxMap({
                       height={h}
                       rx="10"
                       data-texture-bg
-                      fill={`url(#${idMaschera}-${TRAMA[z.id]})`}
+                      fill={`url(#${idPrefix}-${TEXTURE[z.id]})`}
                     />
                   )}
                   <rect
@@ -217,7 +217,7 @@ export function ToolboxMap({
                     textAnchor="end"
                     data-count
                   >
-                    {testi.zones[z.id].count}
+                    {copy.zones[z.id].count}
                   </text>
                 </g>
               );
@@ -229,68 +229,68 @@ export function ToolboxMap({
               <path
                 key={`${f.a}-${f.b}`}
                 ref={(el) => {
-                  tracciati.current[i] = el;
+                  paths.current[i] = el;
                 }}
                 d={curve(restPositions.get(f.a)!, restPositions.get(f.b)!)}
                 data-thread={f.crossing ? "crossing" : "branch"}
-                data-lit={filoAcceso(f) || undefined}
+                data-lit={isThreadLit(f) || undefined}
               />
             ))}
           </g>
 
-          {capo && (
+          {garment && (
             <path
-              ref={cucituraRef}
-              d={disegnoCucitura.d}
+              ref={seamRef}
+              d={seamPath.d}
               data-seam
-              mask={`url(#${idMaschera}-cucito)`}
+              mask={`url(#${idPrefix}-sewn)`}
             />
           )}
 
           <g>
             {NODES.map((n) => {
-              const testo =
+              const text =
                 n.kind === "root"
-                  ? testi.root.name
+                  ? copy.root.name
                   : n.kind === "junction"
-                    ? testi.zones[n.zone!].junction
+                    ? copy.zones[n.zone!].junction
                     : toolById(n.id)!.name;
-              const w = nodeWidth(n.kind, testo);
+              const w = nodeWidth(n.kind, text);
               const h = nodeHeight(n.kind);
-              const genitore = restPositions.get(parentOf(n.id) ?? n.id)!;
-              const passo = tappaDi.get(n.id);
+              const parent = restPositions.get(parentOf(n.id) ?? n.id)!;
+              const stop = stopIndex.get(n.id);
               return (
                 <g
                   key={n.id}
                   ref={(el) => {
-                    if (el) gruppi.current.set(n.id, el);
-                    else gruppi.current.delete(n.id);
+                    if (el) groups.current.set(n.id, el);
+                    else groups.current.delete(n.id);
                   }}
                   transform={`translate(${n.x} ${n.y})`}
                   data-node={n.kind}
                   data-zone={n.zone ?? undefined}
-                  data-lit={nodiAccesi.has(n.id) || undefined}
-                  data-chosen={(!capo && scelto === n.id) || undefined}
+                  data-lit={litNodes.has(n.id) || undefined}
+                  data-chosen={(!garment && chosen === n.id) || undefined}
                   data-sewn={
-                    (passo !== undefined && passo < cuciti) || undefined
+                    (stop !== undefined && stop < sewn) || undefined
                   }
                   onPointerEnter={() => {
-                    if (!presa.current) setAcceso(n.id);
+                    if (!grab.current) setHovered(n.id);
                   }}
                   onPointerLeave={() => {
-                    if (!presa.current) setAcceso(null);
+                    if (!grab.current) setHovered(null);
                   }}
-                  onPointerDown={giu(n.id)}
-                  onPointerMove={muovi}
-                  onPointerUp={su}
-                  onPointerCancel={annulla}
+                  onPointerDown={pointerDown(n.id)}
+                  onPointerMove={pointerMove}
+                  onPointerUp={pointerUp}
+                  onPointerCancel={pointerCancel}
                 >
                   <g
                     data-body
                     style={
                       {
-                        "--dx": `${genitore.x - n.x}px`,
-                        "--dy": `${genitore.y - n.y}px`,
+                        "--dx": `${parent.x - n.x}px`,
+                        "--dy": `${parent.y - n.y}px`,
                         "--i": ENTRANCE.get(n.id) ?? 0,
                       } as React.CSSProperties
                     }
@@ -312,7 +312,7 @@ export function ToolboxMap({
                       data-points
                     />
                     <text y={n.kind === "root" ? 5 : 4} textAnchor="middle">
-                      {testo}
+                      {text}
                     </text>
                   </g>
                 </g>
@@ -320,7 +320,7 @@ export function ToolboxMap({
             })}
           </g>
 
-          <g ref={agoRef} data-needle style={{ opacity: 0 }}>
+          <g ref={needleRef} data-needle style={{ opacity: 0 }}>
             <path d="M-2 -22 L2 -22 L1.2 14 L0 20 L-1.2 14 Z" />
             <ellipse cx="0" cy="-16" rx="0.9" ry="3" />
           </g>
@@ -331,15 +331,15 @@ export function ToolboxMap({
         <aside
           data-toolbox-panel
           aria-live="polite"
-          aria-label={testi.label.name}
+          aria-label={copy.label.name}
         >
           <NodeLabel
-            key={`${passo.kind}-${passo.id}`}
-            step={passo}
-            copy={testi}
-            onNode={onNodo}
-            onGarment={onCapo}
-            actions={azioni}
+            key={`${step.kind}-${step.id}`}
+            step={step}
+            copy={copy}
+            onNode={onNode}
+            onGarment={onGarment}
+            actions={actions}
           />
         </aside>
       </div>
@@ -348,14 +348,14 @@ export function ToolboxMap({
 }
 
 /** La trama di ogni pezza: pieni e vuoti, righe, punti, quadretti. Il colore lo decide il CSS. */
-const TRAMA: Record<ZoneId, "righe" | "punti" | "quadretti" | null> = {
+const TEXTURE: Record<ZoneId, "lines" | "dots" | "grid" | null> = {
   front: null,
-  stili: "punti",
+  stili: "dots",
   mezzo: null,
   back: null,
-  auth: "righe",
-  dati: "righe",
-  casa: "quadretti",
+  auth: "lines",
+  dati: "lines",
+  casa: "grid",
   ovunque: null,
-  ai: "quadretti",
+  ai: "grid",
 };

@@ -14,94 +14,94 @@ type Gsap = typeof import("gsap").gsap;
  * percorso sono cucite (tutte, a riposo).
  */
 export function useNeedle({
-  garment: capo,
-  full: pieno,
-  seam: cucitura,
-  stops: tappe,
+  garment,
+  full,
+  seam,
+  stops,
   svg,
   gsapRef,
 }: {
   garment: Garment | null;
   full: boolean;
   /** La cucitura del capo, con le curve parziali fino a ogni tappa. */
-  seam: { d: string; parziali: string[] };
+  seam: { d: string; partials: string[] };
   /** Quante tappe ha il percorso. */
   stops: number;
   svg: RefObject<SVGSVGElement | null>;
   gsapRef: RefObject<Gsap | null>;
 }) {
-  const cucituraRef = useRef<SVGPathElement | null>(null);
-  const mascheraRef = useRef<SVGPathElement | null>(null);
-  const agoRef = useRef<SVGGElement | null>(null);
-  const [cuciti, setCuciti] = useState(Number.POSITIVE_INFINITY);
+  const seamRef = useRef<SVGPathElement | null>(null);
+  const maskRef = useRef<SVGPathElement | null>(null);
+  const needleRef = useRef<SVGGElement | null>(null);
+  const [sewn, setSewn] = useState(Number.POSITIVE_INFINITY);
 
   useLayoutEffect(() => {
-    const maschera = mascheraRef.current;
-    const filo = cucituraRef.current;
-    const ago = agoRef.current;
+    const mask = maskRef.current;
+    const thread = seamRef.current;
+    const needle = needleRef.current;
     const gsap = gsapRef.current;
-    if (!capo || !maschera || !filo || !ago) {
+    if (!garment || !mask || !thread || !needle) {
       // Via il capo a meta' corsa: l'ago non deve restare fermo sulla mappa.
-      if (agoRef.current) agoRef.current.style.opacity = "0";
+      if (needleRef.current) needleRef.current.style.opacity = "0";
       return;
     }
 
-    const tutto = () => {
-      maschera.style.strokeDasharray = "none";
-      maschera.style.strokeDashoffset = "0";
-      ago.style.opacity = "0";
-      setCuciti(Number.POSITIVE_INFINITY);
+    const showAll = () => {
+      mask.style.strokeDasharray = "none";
+      mask.style.strokeDashoffset = "0";
+      needle.style.opacity = "0";
+      setSewn(Number.POSITIVE_INFINITY);
     };
-    if (!pieno || !gsap || typeof filo.getTotalLength !== "function") {
-      tutto();
+    if (!full || !gsap || typeof thread.getTotalLength !== "function") {
+      showAll();
       return;
     }
 
-    const lunghezza = filo.getTotalLength();
+    const length = thread.getTotalLength();
     // Dove sta ogni tappa lungo il filo: le curve parziali misurate da un
     // tracciato di servizio, dentro l'SVG perche' fuori il browser non misura.
-    const prova = document.createElementNS(
+    const probe = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "path",
     );
-    svg.current?.appendChild(prova);
-    const soglie = cucitura.parziali.map((d) => {
-      prova.setAttribute("d", d);
-      return prova.getTotalLength();
+    svg.current?.appendChild(probe);
+    const thresholds = seam.partials.map((d) => {
+      probe.setAttribute("d", d);
+      return probe.getTotalLength();
     });
-    prova.remove();
+    probe.remove();
 
-    maschera.style.strokeDasharray = `${lunghezza} ${lunghezza}`;
-    maschera.style.strokeDashoffset = `${lunghezza}`;
-    ago.style.opacity = "1";
-    setCuciti(1);
+    mask.style.strokeDasharray = `${length} ${length}`;
+    mask.style.strokeDashoffset = `${length}`;
+    needle.style.opacity = "1";
+    setSewn(1);
 
-    const stato = { q: 0 };
-    let fatti = 1;
-    const tween = gsap.to(stato, {
+    const state = { q: 0 };
+    let done = 1;
+    const tween = gsap.to(state, {
       q: 1,
-      duration: needleDuration(tappe),
+      duration: needleDuration(stops),
       ease: "none",
       onUpdate: () => {
-        const l = stato.q * lunghezza;
-        maschera.style.strokeDashoffset = `${lunghezza - l}`;
-        const p = filo.getPointAtLength(l);
-        const p2 = filo.getPointAtLength(advance(l, lunghezza));
-        ago.setAttribute("transform", needlePose(stato.q, p, p2));
-        const n = sewnStops(soglie, l, fatti);
-        if (n !== fatti) {
-          fatti = n;
-          setCuciti(n);
+        const l = state.q * length;
+        mask.style.strokeDashoffset = `${length - l}`;
+        const p = thread.getPointAtLength(l);
+        const p2 = thread.getPointAtLength(advance(l, length));
+        needle.setAttribute("transform", needlePose(state.q, p, p2));
+        const n = sewnStops(thresholds, l, done);
+        if (n !== done) {
+          done = n;
+          setSewn(n);
         }
       },
-      onComplete: tutto,
+      onComplete: showAll,
     });
     return () => {
       tween.kill();
-      ago.style.opacity = "0";
-      setCuciti(Number.POSITIVE_INFINITY);
+      needle.style.opacity = "0";
+      setSewn(Number.POSITIVE_INFINITY);
     };
-  }, [capo, pieno, cucitura, tappe, svg, gsapRef]);
+  }, [garment, full, seam, stops, svg, gsapRef]);
 
-  return { cucituraRef, mascheraRef, agoRef, cuciti };
+  return { seamRef, maskRef, needleRef, sewn };
 }

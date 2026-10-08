@@ -10,7 +10,7 @@
  * quello che c'e' qui va usato fuori dal sito finto.
  *
  * Nei componenti il sito finto legge cinque variabili, scritte sul suo
- * contenitore con `variabiliSito`: --sf fondo, --ss superficie, --st testo,
+ * contenitore con `siteVariables`: --sf fondo, --ss superficie, --st testo,
  * --sa accento, --sm grigio. Le illustrazioni le seguono, cosi' cambiando
  * palette cambiano anche loro.
  */
@@ -27,19 +27,19 @@ export type PaletteId = "bottega" | "notte" | "salvia" | "cipria" | "oceano" | "
 
 export type FakePalette = { id: PaletteId; colors: FakeColors };
 
-const paletta = (id: PaletteId, [fondo, superficie, testo, accento, grigio]: string[]): FakePalette => ({
+const makePalette = (id: PaletteId, [background, surface, text, accent, grey]: string[]): FakePalette => ({
   id,
-  colors: { background: fondo, surface: superficie, text: testo, accent: accento, grey: grigio },
+  colors: { background, surface, text, accent, grey },
 });
 
 /** Le sei palette, nell'ordine dell'attrezzo «colori». La prima e' quella di partenza. */
 export const FAKE_PALETTES: readonly FakePalette[] = [
-  paletta("bottega", ["#F5F1E8", "#E9E1D2", "#14120F", "#E4572E", "#6E6759"]),
-  paletta("notte", ["#16140F", "#26221B", "#F3EDE0", "#F2C94C", "#A79E8C"]),
-  paletta("salvia", ["#EEF0E8", "#DCE4D5", "#1D2A20", "#3E7D57", "#5F6F63"]),
-  paletta("cipria", ["#F8EDE8", "#F0DCD3", "#2B1D1A", "#C4553F", "#7D625B"]),
-  paletta("oceano", ["#EEF3F6", "#D9E5EC", "#0F2233", "#1F6FB2", "#587083"]),
-  paletta("terracotta", ["#F4E7D9", "#E7D0B8", "#3A1F12", "#B8532A", "#7A5A45"]),
+  makePalette("bottega", ["#F5F1E8", "#E9E1D2", "#14120F", "#E4572E", "#6E6759"]),
+  makePalette("notte", ["#16140F", "#26221B", "#F3EDE0", "#F2C94C", "#A79E8C"]),
+  makePalette("salvia", ["#EEF0E8", "#DCE4D5", "#1D2A20", "#3E7D57", "#5F6F63"]),
+  makePalette("cipria", ["#F8EDE8", "#F0DCD3", "#2B1D1A", "#C4553F", "#7D625B"]),
+  makePalette("oceano", ["#EEF3F6", "#D9E5EC", "#0F2233", "#1F6FB2", "#587083"]),
+  makePalette("terracotta", ["#F4E7D9", "#E7D0B8", "#3A1F12", "#B8532A", "#7A5A45"]),
 ];
 
 /** La palette con cui il Forno Aurora nasce, e con cui il livello 2 lo mostra. */
@@ -61,18 +61,18 @@ export type FontPairId = "archivo" | "fraunces" | "grotesk" | "playfair";
  * il sito non carica, e un quinto carattere solo per tre righe finte non vale
  * il suo peso.
  *
- * `peso` e' il peso del titolo, ed e' quello caricato: chiederne un altro
+ * `weight` e' il peso del titolo, ed e' quello caricato: chiederne un altro
  * vorrebbe dire un grassetto finto disegnato dal browser.
  */
 export type FakeFontPair = { id: FontPairId; name: string; heading: string; weight: number; body: string };
 
-const PARAGRAFO = "var(--font-body), system-ui, sans-serif";
+const BODY_FONT = "var(--font-body), system-ui, sans-serif";
 
 export const FAKE_FONTS: readonly FakeFontPair[] = [
-  { id: "archivo", name: "Archivo", heading: "var(--font-display), sans-serif", weight: 400, body: PARAGRAFO },
-  { id: "fraunces", name: "Fraunces", heading: "var(--font-fake-fraunces), Georgia, serif", weight: 600, body: PARAGRAFO },
-  { id: "grotesk", name: "Grotesk", heading: "var(--font-fake-grotesk), sans-serif", weight: 700, body: PARAGRAFO },
-  { id: "playfair", name: "Playfair", heading: "var(--font-fake-playfair), Georgia, serif", weight: 800, body: PARAGRAFO },
+  { id: "archivo", name: "Archivo", heading: "var(--font-display), sans-serif", weight: 400, body: BODY_FONT },
+  { id: "fraunces", name: "Fraunces", heading: "var(--font-fake-fraunces), Georgia, serif", weight: 600, body: BODY_FONT },
+  { id: "grotesk", name: "Grotesk", heading: "var(--font-fake-grotesk), sans-serif", weight: 700, body: BODY_FONT },
+  { id: "playfair", name: "Playfair", heading: "var(--font-fake-playfair), Georgia, serif", weight: 800, body: BODY_FONT },
 ];
 
 export type ScaleId = "compatta" | "equilibrata" | "generosa";
@@ -157,11 +157,11 @@ export const ILLUSTRATION_VIEWBOX = "0 0 120 90";
 // disegna l'illustrazione mette quindi `color: var(--st)` sull'svg.
 const f = (v: string) => `style="fill:var(--${v})"`;
 const t = (v = "st") => (v === "st" ? `stroke="currentColor"` : `style="stroke:var(--${v})"`);
-const MOLLICA = "color-mix(in oklab, var(--sa) 22%, #FFF8EC)";
+const CRUMB = "color-mix(in oklab, var(--sa) 22%, #FFF8EC)";
 
 /**
  * Le quattro illustrazioni del sito finto, come markup SVG da mettere dentro
- * un <svg viewBox={VIEWBOX_ILLUSTRAZIONI}>. Sono stringhe fisse scritte qui,
+ * un <svg viewBox={ILLUSTRATION_VIEWBOX}>. Sono stringhe fisse scritte qui,
  * nessun dato da fuori: dangerouslySetInnerHTML su di loro e' sicuro.
  *
  * `pane` e' anche la foto della schermata di partenza del livello 2.
@@ -184,7 +184,7 @@ export const ILLUSTRATIONS: Record<IllustrationId, string> = {
       .join("")}
     <path d="M24 64 h66 q6 0 6 4 q0 4 -6 4 h-66 q-6 0 -6 -4 q0 -4 6 -4z" ${f("sm")} ${t()} stroke-width="1.6"/><circle cx="92" cy="68" r="1.4" ${f("ss")} ${t()} stroke-width=".8"/>
     <path d="M26 64 C 20 30, 78 30, 72 64 Z" ${f("sa")} ${t()} stroke-width="2" stroke-linejoin="round"/><path d="M27 61 C 40 64, 58 64, 71 61" fill="none" ${t()} stroke-width="1" opacity=".5"/>
-    <path d="M49 43 V59 M49 46 l-6 -3.5 M49 51 l-7 -4 M49 56 l-7 -4 M49 46 l6 -3.5 M49 51 l7 -4 M49 56 l7 -4" fill="none" style="stroke:${MOLLICA}" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M49 43 V59 M49 46 l-6 -3.5 M49 51 l-7 -4 M49 56 l-7 -4 M49 46 l6 -3.5 M49 51 l7 -4 M49 56 l7 -4" fill="none" style="stroke:${CRUMB}" stroke-width="2.2" stroke-linecap="round"/>
     ${[
       [38, 48, 0.9],
       [44, 45, 0.7],
@@ -195,10 +195,10 @@ export const ILLUSTRATIONS: Record<IllustrationId, string> = {
       [34, 54, 0.6],
       [55, 49, 0.5],
     ]
-      .map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" style="fill:${MOLLICA}" opacity=".85"/>`)
+      .map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" style="fill:${CRUMB}" opacity=".85"/>`)
       .join("")}
     <path d="M74 64 V52 q0 -11 11 -11 q11 0 11 11 V64 Z" ${f("sa")} ${t()} stroke-width="1.8" stroke-linejoin="round"/>
-    <path d="M77 64 V53 q0 -8.5 8 -8.5 q8 0 8 8.5 V64 Z" style="fill:${MOLLICA}"/>${[
+    <path d="M77 64 V53 q0 -8.5 8 -8.5 q8 0 8 8.5 V64 Z" style="fill:${CRUMB}"/>${[
       [82, 52, 1.2, 0.8],
       [88, 55, 1, 0.7],
       [84, 59, 1.4, 0.9],

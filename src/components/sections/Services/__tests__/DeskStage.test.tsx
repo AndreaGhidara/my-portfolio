@@ -12,19 +12,19 @@ import { cameraScale } from "../layers";
  * vero quando accende la riduzione del movimento o stringe la finestra.
  */
 function mockMedia(matches: (q: string) => boolean) {
-  const ascoltatori = new Set<() => void>();
-  let risponde = matches;
+  const listeners = new Set<() => void>();
+  let answer = matches;
   vi.stubGlobal("matchMedia", (query: string) => ({
     get matches() {
-      return risponde(query);
+      return answer(query);
     },
     media: query,
-    addEventListener: (_: string, h: () => void) => ascoltatori.add(h),
-    removeEventListener: (_: string, h: () => void) => ascoltatori.delete(h),
+    addEventListener: (_: string, h: () => void) => listeners.add(h),
+    removeEventListener: (_: string, h: () => void) => listeners.delete(h),
   }));
-  return (poi: (q: string) => boolean) => {
-    risponde = poi;
-    act(() => ascoltatori.forEach((h) => h()));
+  return (next: (q: string) => boolean) => {
+    answer = next;
+    act(() => listeners.forEach((h) => h()));
   };
 }
 
@@ -53,7 +53,7 @@ const props = {
   layers,
 };
 
-const palco = (container: HTMLElement) =>
+const stageOf = (container: HTMLElement) =>
   container.querySelector("[data-desk-stage]") as HTMLElement;
 
 /**
@@ -71,27 +71,27 @@ const palco = (container: HTMLElement) =>
  * nascere proprio, non dice niente. Sono le due guardie in fondo, e poggiano
  * tutte e due su questo conto.
  */
-function ascoltatoriDelFuoco() {
-  const vivi = new Set<unknown>();
-  const suPalco = (el: HTMLElement, tipo: string) =>
-    tipo === "focusin" && el.hasAttribute("data-desk-stage");
-  const attacca = HTMLElement.prototype.addEventListener;
-  const stacca = HTMLElement.prototype.removeEventListener;
+function focusListeners() {
+  const live = new Set<unknown>();
+  const onStage = (el: HTMLElement, type: string) =>
+    type === "focusin" && el.hasAttribute("data-desk-stage");
+  const attach = HTMLElement.prototype.addEventListener;
+  const detach = HTMLElement.prototype.removeEventListener;
   vi.spyOn(HTMLElement.prototype, "addEventListener").mockImplementation(function (
     this: HTMLElement,
     ...args: Parameters<HTMLElement["addEventListener"]>
   ) {
-    if (suPalco(this, args[0])) vivi.add(args[1]);
-    return attacca.apply(this, args);
+    if (onStage(this, args[0])) live.add(args[1]);
+    return attach.apply(this, args);
   });
   vi.spyOn(HTMLElement.prototype, "removeEventListener").mockImplementation(function (
     this: HTMLElement,
     ...args: Parameters<HTMLElement["removeEventListener"]>
   ) {
-    if (suPalco(this, args[0])) vivi.delete(args[1]);
-    return stacca.apply(this, args);
+    if (onStage(this, args[0])) live.delete(args[1]);
+    return detach.apply(this, args);
   });
-  return vivi;
+  return live;
 }
 
 beforeEach(() => vi.unstubAllGlobals());
@@ -104,7 +104,7 @@ describe("sotto i 1024px la sezione e' il gioco", () => {
   it("il gioco sta nel palco al posto del gemello verticale, e il tavolo largo resta", () => {
     mockMedia(() => false);
     const { container } = renderWithMessages(<DeskStage {...props} />);
-    const stage = palco(container);
+    const stage = stageOf(container);
     expect(stage.querySelector("[data-game]")).not.toBeNull();
     expect(stage.querySelector('[data-desk-world][data-layout="tall"]')).toBeNull();
     expect(stage.querySelectorAll("[data-desk-world]")).toHaveLength(1);
@@ -114,10 +114,10 @@ describe("sotto i 1024px la sezione e' il gioco", () => {
   it("viene dopo la testata e prima della tesi: e' li' che il gemello stava", () => {
     mockMedia(() => false);
     const { container } = renderWithMessages(<DeskStage {...props} />);
-    const figli = [...palco(container).children];
-    const gioco = figli.findIndex((el) => el.hasAttribute("data-game"));
-    expect(gioco).toBeGreaterThan(figli.findIndex((el) => el.hasAttribute("data-desk-title")));
-    expect(gioco).toBeLessThan(figli.findIndex((el) => el.hasAttribute("data-desk-punch")));
+    const children = [...stageOf(container).children];
+    const game = children.findIndex((el) => el.hasAttribute("data-game"));
+    expect(game).toBeGreaterThan(children.findIndex((el) => el.hasAttribute("data-desk-title")));
+    expect(game).toBeLessThan(children.findIndex((el) => el.hasAttribute("data-desk-punch")));
   });
 });
 
@@ -146,8 +146,8 @@ describe("il patto del fallback regge anche sul palco", () => {
   it("a movimento ridotto nessuno scrive --p: vale 1, e il tavolo si vede intero", () => {
     mockMedia((q) => q.includes("min-width"));
     const { container } = renderWithMessages(<DeskStage {...props} />);
-    expect(palco(container).style.getPropertyValue("--p")).toBe("");
-    expect(palco(container).style.getPropertyValue("--s")).toBe("");
+    expect(stageOf(container).style.getPropertyValue("--p")).toBe("");
+    expect(stageOf(container).style.getPropertyValue("--s")).toBe("");
   });
 });
 
@@ -155,7 +155,7 @@ describe("la camera", () => {
   it("al fotogramma zero il piano e' ingrandito e il tavolo e' ancora vuoto", async () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = renderWithMessages(<DeskStage {...props} />);
-    const stage = palco(container);
+    const stage = stageOf(container);
     // La camera non parte piu' durante il render: GSAP si carica al volo dopo
     // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
     await waitFor(() => expect(stage.style.getPropertyValue("--p")).toBe("0.0000"));
@@ -171,8 +171,8 @@ describe("la camera", () => {
     // La camera non parte piu' durante il render: GSAP si carica al volo dopo
     // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
     await waitFor(() => {
-      const scritte = [...palco(container).style].filter((p) => p.startsWith("--"));
-      expect(scritte.sort()).toEqual(["--p", "--s"]);
+      const written = [...stageOf(container).style].filter((p) => p.startsWith("--"));
+      expect(written.sort()).toEqual(["--p", "--s"]);
     });
 
     // Gli oggetti restano quelli che React ha reso: l'opacita' e' ancora la
@@ -183,20 +183,20 @@ describe("la camera", () => {
   });
 
   it("chi accende la riduzione del movimento a meta' strada ritrova il tavolo intero", async () => {
-    const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
+    const changeMind = mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = renderWithMessages(<DeskStage {...props} />);
     // La camera non parte piu' durante il render: GSAP si carica al volo dopo
     // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
-    await waitFor(() => expect(palco(container).style.getPropertyValue("--p")).not.toBe(""));
+    await waitFor(() => expect(stageOf(container).style.getPropertyValue("--p")).not.toBe(""));
 
-    cambiaIdea((q) => q.includes("prefers-reduced-motion"));
+    changeMind((q) => q.includes("prefers-reduced-motion"));
 
     expect(container.querySelector("[data-desk]")).toHaveAttribute("data-motion", "none");
     // Il CSS del movimento si spegne da solo, ma l'opacita' degli oggetti legge
     // --p SEMPRE: lasciarla appiccicata all'ultimo valore vorrebbe dire un
     // tavolo fermo e mezzo trasparente, che e' peggio di tutti e due gli stati.
-    expect(palco(container).style.getPropertyValue("--p")).toBe("");
-    expect(palco(container).style.getPropertyValue("--s")).toBe("");
+    expect(stageOf(container).style.getPropertyValue("--p")).toBe("");
+    expect(stageOf(container).style.getPropertyValue("--s")).toBe("");
   });
 
   it("chi esce dal movimento pieno non si porta dietro il salto al fuoco", () => {
@@ -206,26 +206,26 @@ describe("la camera", () => {
     // stesso salto diventa una pagina che si muove senza che nessuno l'abbia
     // chiesto: nei due stati in cui questa sezione deve stare ferma, e sotto i
     // 1024px per una fermata del Tab che nemmeno si vede.
-    const vivi = ascoltatoriDelFuoco();
-    const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
+    const live = focusListeners();
+    const changeMind = mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = renderWithMessages(<DeskStage {...props} />);
-    expect(vivi.size).toBe(1);
+    expect(live.size).toBe(1);
 
-    cambiaIdea((q) => q.includes("prefers-reduced-motion"));
+    changeMind((q) => q.includes("prefers-reduced-motion"));
 
     expect(container.querySelector("[data-desk]")).toHaveAttribute("data-motion", "none");
-    expect(vivi.size).toBe(0);
+    expect(live.size).toBe(0);
   });
 
   it("il fuoco da tastiera sul post-it porta la pagina al fotogramma di riposo, e smette all'uscita da «full»", () => {
     // La prova di sopra misura quanti ascoltatori vivono; questa misura cosa
     // sente un utente. Servono tutte e due: la prima passerebbe anche con una
     // correzione sbagliata (l'ascoltatore lasciato dentro la build della camera
-    // e un removeEventListener appiccicato a spegni()) e non guarda ne' la
+    // e un removeEventListener appiccicato a teardown()) e non guarda ne' la
     // guardia del :focus-visible ne' dove si va a finire.
-    const salta = vi.fn();
-    vi.stubGlobal("scrollTo", salta);
-    const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
+    const jump = vi.fn();
+    vi.stubGlobal("scrollTo", jump);
+    const changeMind = mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container } = renderWithMessages(<DeskStage {...props} />);
     const postit = container.querySelector(
       '[data-desk-world][data-layout="wide"] [data-desk-blank]',
@@ -235,21 +235,21 @@ describe("la camera", () => {
     // Che la guardia sia passata davvero, e non che l'evento non sia mai
     // arrivato: senza questa riga il verde qui sotto non direbbe niente.
     expect(postit.matches(":focus-visible")).toBe(true);
-    expect(salta).toHaveBeenCalledTimes(1);
+    expect(jump).toHaveBeenCalledTimes(1);
 
-    cambiaIdea((q) => q.includes("prefers-reduced-motion"));
+    changeMind((q) => q.includes("prefers-reduced-motion"));
 
     // Fuori da "full" il track e' tornato alto quanto il suo contenuto: lo stesso
     // salto diventa una pagina che si muove senza che nessuno l'abbia chiesto.
-    const arrivati: Event[] = [];
-    palco(container).addEventListener("focusin", (e) => arrivati.push(e));
+    const arrived: Event[] = [];
+    stageOf(container).addEventListener("focusin", (e) => arrived.push(e));
     postit.blur();
     postit.focus();
     // Il fuoco c'e' ancora e il focusin arriva ancora al palco: quello che manca
     // e' solo chi lo ascoltava.
-    expect(arrivati).toHaveLength(1);
+    expect(arrived).toHaveLength(1);
     expect(postit.matches(":focus-visible")).toBe(true);
-    expect(salta).toHaveBeenCalledTimes(1);
+    expect(jump).toHaveBeenCalledTimes(1);
   });
 
   // Le due che seguono non provano la correzione: erano gia' vere prima, perche'
@@ -257,25 +257,25 @@ describe("la camera", () => {
   // non gira nemmeno. Sono guardie: tengono i due lati che la correzione avrebbe
   // potuto rompere spostando l'ascoltatore in un effetto suo.
   it("guardia: smontando il palco l'ascoltatore se ne va con lui", () => {
-    const vivi = ascoltatoriDelFuoco();
+    const live = focusListeners();
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { unmount } = renderWithMessages(<DeskStage {...props} />);
-    expect(vivi.size).toBe(1);
+    expect(live.size).toBe(1);
     unmount();
-    expect(vivi.size).toBe(0);
+    expect(live.size).toBe(0);
   });
 
   it("guardia: a movimento ridotto non viene attaccato per niente", () => {
-    const vivi = ascoltatoriDelFuoco();
+    const live = focusListeners();
     mockMedia((q) => q.includes("prefers-reduced-motion"));
     renderWithMessages(<DeskStage {...props} />);
-    expect(vivi.size).toBe(0);
+    expect(live.size).toBe(0);
   });
 
   it("smontando il palco le due property se ne vanno con lui", async () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
     const { container, unmount } = renderWithMessages(<DeskStage {...props} />);
-    const stage = palco(container);
+    const stage = stageOf(container);
     // La camera non parte piu' durante il render: GSAP si carica al volo dopo
     // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
     await waitFor(() => expect(stage.style.getPropertyValue("--p")).not.toBe(""));
@@ -293,11 +293,11 @@ describe("cameraScale e' una camera, non una curva qualsiasi", () => {
   });
 
   it("arretra sempre, senza mai tornare indietro", () => {
-    let prima = cameraScale(0, 4, 1);
+    let previous = cameraScale(0, 4, 1);
     for (let p = 0.05; p <= 1.0001; p += 0.05) {
-      const ora = cameraScale(p, 4, 1);
-      expect(ora).toBeLessThan(prima);
-      prima = ora;
+      const current = cameraScale(p, 4, 1);
+      expect(current).toBeLessThan(previous);
+      previous = current;
     }
   });
 });
@@ -310,10 +310,10 @@ describe("il post-it dice una cosa sola per volta", () => {
     // movimento, chi arriva con un puntatore grosso), e li' l'hover non
     // succede mai: senza una regola che spenga la nota nello stesso caso, le
     // due scritte si leggono una sopra l'altra.
-    const ferma = rules(/\[data-desk\]:not\(\[data-motion="full"\]\)/).find((r) =>
+    const still = rules(/\[data-desk\]:not\(\[data-motion="full"\]\)/).find((r) =>
       /\[data-desk-note\]/.test(r.selector),
     );
-    expect(ferma, "manca la regola che spegne la nota a tavolo fermo").toBeDefined();
-    expect(ferma!.body).toMatch(/opacity:\s*0/);
+    expect(still, "manca la regola che spegne la nota a tavolo fermo").toBeDefined();
+    expect(still!.body).toMatch(/opacity:\s*0/);
   });
 });

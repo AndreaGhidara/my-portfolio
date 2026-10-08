@@ -29,31 +29,31 @@ export { LEVELS, type LevelId, type LevelProps };
  *
  * IL CONTRATTO DEI LIVELLI (Schermo, Logiche, Pannello, Notte, Finale):
  *
- * - Props: `LivelloProps = { onAvanti: () => void; visibile: boolean }`, e
- *   nient'altro. onAvanti porta al livello dopo (nel finale ricomincia dal
+ * - Props: `LevelProps = { onNext: () => void; visible: boolean }`, e
+ *   nient'altro. onNext porta al livello dopo (nel finale ricomincia dal
  *   primo); visibile e' false quando il gioco e' uscito dallo schermo, e li'
  *   i timer del livello si fermano.
- * - Radice: un solo elemento `.banco` con `data-gioco-livello="<id>"`
+ * - Radice: un solo elemento `.bench` con `data-game-level="<id>"`
  *   (schermo, logiche, pannello, notte, finale). Ogni regola del suo CSS
- *   (src/styles/gioco/<id>.css) sta sotto quell'attributo; i pezzi comuni
- *   sono in base.css, sotto [data-gioco].
+ *   (un file per livello in src/styles/game/) sta sotto quell'attributo; i pezzi comuni
+ *   sono in base.css, sotto [data-game].
  * - Testi: ognuno se li legge da se' con
  *   `useTranslations("services.gioco.<id>")`, e `t.raw` per le strutture.
  *   Il provider di layout.tsx passa gia' tutti i messaggi al client.
  * - Stato: cambiando livello il componente si rimonta (la key e' l'id), quindi
  *   riparte pulito ogni volta. Niente stato da tenere fra un'apertura e
  *   l'altra.
- * - Prove: `renderConTesti` (src/test/renderConTesti.tsx) per i testi veri,
- *   `installaIntersectionObserver` (src/test/intersectionObserver.ts) per
- *   pilotare `visibile` passando dal guscio.
+ * - Prove: `renderWithMessages` (src/test/renderWithMessages.tsx) per i testi veri,
+ *   `installIntersectionObserver` (src/test/intersectionObserver.ts) per
+ *   pilotare `visible` passando dal guscio.
  */
 
 /** I quattro livelli e il finale, nell'ordine. Il finale e' il quinto passo. */
-type Passo = LevelId | "finale";
-const PASSI: readonly Passo[] = [...LEVELS, "finale"];
-const FINALE = LEVELS.length;
+type Step = LevelId | "finale";
+const STEPS: readonly Step[] = [...LEVELS, "finale"];
+const ENDING = LEVELS.length;
 
-const COMPONENTI: Record<Passo, ComponentType<LevelProps>> = {
+const COMPONENTS: Record<Step, ComponentType<LevelProps>> = {
   schermo: Screen,
   logiche: Logic,
   pannello: Panel,
@@ -67,7 +67,7 @@ const COMPONENTI: Record<Passo, ComponentType<LevelProps>> = {
  * tema scuro. Il banco non segue il tema, quindi li prende da palette.ts e li
  * scrive sulla sua radice, dove base.css e i livelli li trovano.
  */
-const TOKEN_FISSI = {
+const FIXED_TOKENS = {
   "--mutedDark": palette.mutedDark,
   "--green": palette.green,
   "--greenDark": palette.greenDark,
@@ -79,25 +79,25 @@ const TOKEN_FISSI = {
  * il secondo tocco di un doppio tocco premerebbe quello appena comparso
  * («avanti» e poi «fai» del nodo dopo, «livello 4» e poi «vai a dormire»).
  */
-const DOPPIO_TOCCO = 350;
+const DOUBLE_TAP = 350;
 
 export function Game() {
   const t = useTranslations("services.gioco.comune");
-  const radice = useRef<HTMLDivElement | null>(null);
-  const visibile = useVisible(radice);
+  const root = useRef<HTMLDivElement | null>(null);
+  const visible = useVisible(root);
 
-  // `qui` e' il passo aperto (0..3 i livelli, 4 il finale); `raggiunto` il
+  // `current` e' il passo aperto (0..3 i livelli, 4 il finale); `reached` il
   // piu' lontano a cui si e' arrivati, ed e' quello che decide cosa si riapre.
-  const [qui, setQui] = useState(0);
-  const [raggiunto, setRaggiunto] = useState(0);
+  const [current, setCurrent] = useState(0);
+  const [reached, setReached] = useState(0);
 
-  const passo = PASSI[qui];
-  const Livello = COMPONENTI[passo];
+  const step = STEPS[current];
+  const Level = COMPONENTS[step];
 
   // Il timeStamp dell'ultimo tocco accettato su un pulsante delle azioni, e se
   // da allora il livello e' cambiato.
-  const ultimoTocco = useRef<number | null>(null);
-  const appenaCambiato = useRef(false);
+  const lastTap = useRef<number | null>(null);
+  const justChanged = useRef(false);
 
   /*
    * In cattura sulla radice, prima che il pulsante lo senta. La guardia vale
@@ -107,18 +107,18 @@ export function Game() {
    * cosi' le barrette, che non stanno nel banco. timeStamp e non Date: e'
    * l'ora dell'evento, non quella in cui lo si guarda.
    */
-  const guardia = (e: MouseEvent<HTMLDivElement>) => {
-    const premuto = (e.target as Element).closest("button, a");
-    if (!premuto || !premuto.closest("[data-game-level]")) return;
-    const azione = premuto.closest(".actions") !== null;
-    const dentro = ultimoTocco.current !== null && e.timeStamp - ultimoTocco.current < DOPPIO_TOCCO;
-    if (dentro && (azione || appenaCambiato.current)) {
+  const guard = (e: MouseEvent<HTMLDivElement>) => {
+    const pressed = (e.target as Element).closest("button, a");
+    if (!pressed || !pressed.closest("[data-game-level]")) return;
+    const isAction = pressed.closest(".actions") !== null;
+    const tooSoon = lastTap.current !== null && e.timeStamp - lastTap.current < DOUBLE_TAP;
+    if (tooSoon && (isAction || justChanged.current)) {
       e.preventDefault();
       e.stopPropagation();
       return;
     }
-    appenaCambiato.current = false;
-    if (azione) ultimoTocco.current = e.timeStamp;
+    justChanged.current = false;
+    if (isAction) lastTap.current = e.timeStamp;
   };
 
   /*
@@ -127,48 +127,48 @@ export function Game() {
    * il fuoco finirebbe sul body: chi naviga da tastiera ripartirebbe dalla
    * cima della pagina. preventScroll perche' il banco e' gia' dove si guarda.
    */
-  const primo = useRef(true);
+  const isFirst = useRef(true);
   useEffect(() => {
-    appenaCambiato.current = true;
-    if (primo.current) {
-      primo.current = false;
+    justChanged.current = true;
+    if (isFirst.current) {
+      isFirst.current = false;
       return;
     }
-    const nuovo = radice.current?.querySelector<HTMLElement>("[data-game-level]");
-    if (!nuovo) return;
-    nuovo.tabIndex = -1;
-    nuovo.focus({ preventScroll: true });
-  }, [passo]);
+    const bench = root.current?.querySelector<HTMLElement>("[data-game-level]");
+    if (!bench) return;
+    bench.tabIndex = -1;
+    bench.focus({ preventScroll: true });
+  }, [step]);
 
-  const vai = (i: number) => {
-    setQui(i);
-    setRaggiunto((r) => Math.max(r, i));
+  const go = (i: number) => {
+    setCurrent(i);
+    setReached((r) => Math.max(r, i));
   };
 
   // «Torna al sito»: il giro da capo, e i livelli dopo il primo si richiudono.
-  const ricomincia = () => {
-    setQui(0);
-    setRaggiunto(0);
+  const restart = () => {
+    setCurrent(0);
+    setReached(0);
   };
 
   return (
-    <div ref={radice} data-game style={TOKEN_FISSI} onClickCapture={guardia}>
+    <div ref={root} data-game style={FIXED_TOKENS} onClickCapture={guard}>
       <div data-game-bars role="group" aria-label={t("barrette")}>
         {LEVELS.map((id, i) => {
           // Nel finale nessuna barretta e' «qui»: sono tutte fatte.
-          const stato = i === qui ? "current" : i <= raggiunto ? "done" : "next";
+          const state = i === current ? "current" : i <= reached ? "done" : "next";
           return (
             <button
               key={id}
               type="button"
-              data-state={stato}
-              aria-current={stato === "current" ? "step" : undefined}
+              data-state={state}
+              aria-current={state === "current" ? "step" : undefined}
               // Il livello aperto non si disabilita: chi ci e' arrivato da
               // tastiera perderebbe il fuoco nel momento in cui lo apre.
-              aria-disabled={stato === "current" || undefined}
-              disabled={stato === "next"}
+              aria-disabled={state === "current" || undefined}
+              disabled={state === "next"}
               onClick={() => {
-                if (stato === "done") vai(i);
+                if (state === "done") go(i);
               }}
             >
               <i aria-hidden="true" />
@@ -182,13 +182,13 @@ export function Game() {
           appena nata non la annuncia nessuno. Il testo ha la sua key per
           rientrare in dissolvenza. */}
       <div data-game-line aria-live="polite">
-        <p key={`riga-${passo}`}>{t(`righe.${passo}`)}</p>
+        <p key={`line-${step}`}>{t(`righe.${step}`)}</p>
       </div>
 
-      <Livello
-        key={`banco-${passo}`}
-        visible={visibile}
-        onNext={qui === FINALE ? ricomincia : () => vai(qui + 1)}
+      <Level
+        key={`bench-${step}`}
+        visible={visible}
+        onNext={current === ENDING ? restart : () => go(current + 1)}
       />
     </div>
   );

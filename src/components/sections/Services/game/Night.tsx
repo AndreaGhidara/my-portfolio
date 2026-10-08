@@ -18,10 +18,10 @@ import {
   type NightItem,
 } from "./nightData";
 
-type Testi = Record<NightItem, { fatto: string; parato: string }>;
+type NightCopy = Record<NightItem, { fatto: string; parato: string }>;
 
 /** Le ore scritte sotto la striscia: una ogni due, dalle 23 alle 7. */
-const ORE = [23, 1, 3, 5, 7];
+const HOURS = [23, 1, 3, 5, 7];
 
 /**
  * Livello 4, il cloud: la notte del forno. Alle 23 si sceglie cosa preparare,
@@ -29,84 +29,84 @@ const ORE = [23, 1, 3, 5, 7];
  * pronto le para, il resto manda giu' il sito e la striscia diventa rossa. La
  * mattina il resoconto, e si puo' rifare la notte con le scelte di prima.
  *
- * Tutto quello che si vede discende da `passo`: la cronaca, gli esiti, la
+ * Tutto quello che si vede discende da `step`: la cronaca, gli esiti, la
  * striscia e la luna si ricalcolano, e l'intervallo non fa altro che contare.
  * Per questo fermarlo e farlo ripartire (fuori dallo schermo, in StrictMode)
  * non perde niente e non conta doppio.
  */
-export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
+export function Night({ onNext, visible }: LevelProps) {
   const t = useTranslations("services.gioco.notte");
-  const comune = useTranslations("services.gioco.comune");
-  const eventi = t.raw("eventi") as Testi;
+  const common = useTranslations("services.gioco.comune");
+  const events = t.raw("eventi") as NightCopy;
 
-  const [pronti, setPronti] = useState<ReadonlySet<NightItem>>(() => new Set());
-  const [dorme, setDorme] = useState(false);
-  const [passo, setPasso] = useState(0);
+  const [ready, setReady] = useState<ReadonlySet<NightItem>>(() => new Set());
+  const [asleep, setAsleep] = useState(false);
+  const [step, setStep] = useState(0);
 
-  const mattina = dorme && passo >= NIGHT_STEPS;
-  const corre = dorme && !mattina && visibile;
+  const morning = asleep && step >= NIGHT_STEPS;
+  const running = asleep && !morning && visible;
 
   useEffect(() => {
-    if (!corre) return;
-    const id = setInterval(() => setPasso((p) => Math.min(p + 1, NIGHT_STEPS)), STEP_MS);
+    if (!running) return;
+    const id = setInterval(() => setStep((p) => Math.min(p + 1, NIGHT_STEPS)), STEP_MS);
     return () => clearInterval(id);
-  }, [corre]);
+  }, [running]);
 
-  const adesso = minuteOfStep(passo);
-  const accaduti = NIGHT_EVENTS.filter((e) => e.minute <= adesso);
-  const pezzi = uptimeStrip(outages(pronti, adesso), adesso);
-  const lungo = adesso / NIGHT_MINUTES;
-  const tutto = pronti.size === NIGHT_ITEMS.length;
+  const now = minuteOfStep(step);
+  const happened = NIGHT_EVENTS.filter((e) => e.minute <= now);
+  const segments = uptimeStrip(outages(ready, now), now);
+  const progress = now / NIGHT_MINUTES;
+  const allReady = ready.size === NIGHT_ITEMS.length;
 
-  const accendi = (voce: NightItem) =>
-    setPronti((prima) => {
-      const dopo = new Set(prima);
-      if (!dopo.delete(voce)) dopo.add(voce);
-      return dopo;
+  const toggle = (item: NightItem) =>
+    setReady((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(item)) next.add(item);
+      return next;
     });
 
-  const preparaDaCapo = () => {
-    setDorme(false);
-    setPasso(0);
+  const prepareAgain = () => {
+    setAsleep(false);
+    setStep(0);
   };
 
-  const danno = (minuti: number) =>
-    minuti < 60 ? t("giuMin", { min: minuti }) : t("giuOre", { ore: minuti / 60 });
+  const damageLabel = (minutes: number) =>
+    minutes < 60 ? t("giuMin", { min: minutes }) : t("giuOre", { ore: minutes / 60 });
 
   return (
     <div className="bench" data-game-level="notte">
       <div className="above">
         <div className="stars" aria-hidden="true" />
         <div className="head">
-          <span className="level">{comune("etichetta", { numero: levelNumber("notte"), nome: comune("livelli.notte") })}</span>
-          <span className="right">{mattina ? t("cielo.apre") : t("titolo")}</span>
+          <span className="level">{common("etichetta", { numero: levelNumber("notte"), nome: common("livelli.notte") })}</span>
+          <span className="right">{morning ? t("cielo.apre") : t("titolo")}</span>
         </div>
         <div className="clock">
-          <b data-night-time>{clockTime(adesso)}</b>
+          <b data-night-time>{clockTime(now)}</b>
           <span>{t("cielo.orologio")}</span>
         </div>
         <span
           className="moon"
           aria-hidden="true"
-          style={{ left: `${50 + lungo * 40}%`, top: `${3.4 - Math.sin(lungo * Math.PI) * 1.1}rem` }}
+          style={{ left: `${50 + progress * 40}%`, top: `${3.4 - Math.sin(progress * Math.PI) * 1.1}rem` }}
         />
         <div className="trace" aria-hidden="true">
-          {pezzi.map((p, i) => (
+          {segments.map((p, i) => (
             <i key={i} className={p.down ? "down" : "up"} style={{ inlineSize: `${(p.minutes / NIGHT_MINUTES) * 100}%` }} />
           ))}
         </div>
         <div className="hours" aria-hidden="true">
-          {ORE.map((o) => (
+          {HOURS.map((o) => (
             <span key={o}>{o}</span>
           ))}
         </div>
         <div className="log" data-night-log>
-          {accaduti.map((e) => {
-            const ok = pronti.has(e.item);
+          {happened.map((e) => {
+            const ok = ready.has(e.item);
             return (
               <p key={e.item}>
                 <b>{clockTime(e.minute)}</b>
-                <span>{eventi[e.item].fatto}</span>
+                <span>{events[e.item].fatto}</span>
                 <span className={`shield ${ok ? "yes" : "no"}`}>{ok ? t("parato") : t("giu")}</span>
               </p>
             );
@@ -115,7 +115,7 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
       </div>
 
       <div className="console">
-        {!dorme ? (
+        {!asleep ? (
           <>
             <div>
               <p className="mono">{t("prepara.occhiello")}</p>
@@ -124,19 +124,19 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
             <p className="explain">{t("prepara.spiega")}</p>
             <div className="stage">
               <div className="list">
-                {NIGHT_ITEMS.map((voce) => (
+                {NIGHT_ITEMS.map((item) => (
                   <button
-                    key={voce}
+                    key={item}
                     type="button"
                     className="line"
-                    aria-pressed={pronti.has(voce)}
-                    onClick={() => accendi(voce)}
+                    aria-pressed={ready.has(item)}
+                    onClick={() => toggle(item)}
                   >
                     <span className="ic">
-                      <Icon name={voce} />
+                      <Icon name={item} />
                     </span>
                     <span>
-                      <b>{t(`voci.${voce}`)}</b>
+                      <b>{t(`voci.${item}`)}</b>
                     </span>
                     <span className="interr" aria-hidden="true" />
                   </button>
@@ -144,7 +144,7 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
               </div>
             </div>
             <div className="actions">
-              <button type="button" className="yellow" onClick={() => setDorme(true)}>
+              <button type="button" className="yellow" onClick={() => setAsleep(true)}>
                 <b aria-hidden="true">☾</b>
                 {t("prepara.vai")}
               </button>
@@ -153,16 +153,16 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
         ) : (
           <>
             <div>
-              <p className="mono">{mattina ? t("mattina.occhiello") : t("corsa.occhiello")}</p>
-              <h3>{mattina ? (tutto ? t("mattina.tutto") : t("mattina.ore", { ore: hoursOnline(pronti) })) : t("corsa.titolo")}</h3>
+              <p className="mono">{morning ? t("mattina.occhiello") : t("corsa.occhiello")}</p>
+              <h3>{morning ? (allReady ? t("mattina.tutto") : t("mattina.ore", { ore: hoursOnline(ready) })) : t("corsa.titolo")}</h3>
             </div>
             <p className="explain">
-              {mattina ? (tutto ? t("mattina.spiegaTutto") : t("mattina.spiegaParte")) : t("corsa.spiega")}
+              {morning ? (allReady ? t("mattina.spiegaTutto") : t("mattina.spiegaParte")) : t("corsa.spiega")}
             </p>
             <div className="stage">
               <div className="list" aria-live="polite">
-                {accaduti.map((e) => {
-                  const ok = pronti.has(e.item);
+                {happened.map((e) => {
+                  const ok = ready.has(e.item);
                   return (
                     <div key={e.item} className="line short">
                       <span className="ic">
@@ -170,7 +170,7 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
                       </span>
                       <span>
                         <b>{t(`voci.${e.item}`)}</b>
-                        <small>{ok ? eventi[e.item].parato : danno(e.damage)}</small>
+                        <small>{ok ? events[e.item].parato : damageLabel(e.damage)}</small>
                       </span>
                       <span className={ok ? "yes" : "no"} aria-hidden="true">
                         {ok ? "✓" : "✗"}
@@ -180,13 +180,13 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
                 })}
               </div>
             </div>
-            {mattina ? (
+            {morning ? (
               <div className="actions two">
-                <button type="button" onClick={preparaDaCapo}>
+                <button type="button" onClick={prepareAgain}>
                   <b aria-hidden="true">↺</b>
-                  {tutto ? t("mattina.rifai") : t("mattina.meglio")}
+                  {allReady ? t("mattina.rifai") : t("mattina.meglio")}
                 </button>
-                <button type="button" className="yellow" onClick={onAvanti}>
+                <button type="button" className="yellow" onClick={onNext}>
                   {t("mattina.finale")} <b aria-hidden="true">→</b>
                 </button>
               </div>

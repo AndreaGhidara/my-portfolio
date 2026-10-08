@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 /**
  * Le sei scene del livello 2: quello che si vede nel palco a ogni nodo,
  * finche' non lo copre l'incidente. Sono solo disegno: lo stato e i testi
- * arrivano da Logiche.tsx.
+ * arrivano da Logic.tsx.
  */
 
 export type NodeState = { ok?: boolean; broken?: boolean; choice?: number; day?: number };
@@ -27,7 +27,7 @@ export type SceneCopy = {
 };
 
 /** Quanto e' gia' prenotato ogni giorno, da lunedi' a domenica. */
-const PIENO = [20, 35, 40, 30, 60, 85, 100];
+const BOOKED = [20, 35, 40, 30, 60, 85, 100];
 
 /** La torta che non c'e' piu' e il giorno tutto pieno: toccarli e' rompere. */
 export const CAKE_DONE = 2;
@@ -41,35 +41,35 @@ type Props = {
   onDay: (i: number) => void;
 };
 
-export function LogicScene({ node: nodo, state: stato, copy: testi, onCake: onTorta, onDay: onGiorno }: Props) {
-  switch (nodo) {
+export function LogicScene({ node, state, copy, onCake, onDay }: Props) {
+  switch (node) {
     case 0:
       return (
         <div className="scene">
-          <div className={`field${stato.ok ? " correct" : ""}`}>
-            <span aria-hidden="true">✉</span> {testi.email}
+          <div className={`field${state.ok ? " correct" : ""}`}>
+            <span aria-hidden="true">✉</span> {copy.email}
           </div>
-          <div className={`field${stato.ok ? " correct" : ""}`}>
+          <div className={`field${state.ok ? " correct" : ""}`}>
             <span aria-hidden="true">🔒</span> ••••••••
-            {stato.ok && <small>{testi.dentro} ✓</small>}
+            {state.ok && <small>{copy.dentro} ✓</small>}
           </div>
         </div>
       );
     case 1:
       return (
         <div className="scene cakes">
-          {testi.torte.map((torta, i) => (
+          {copy.torte.map((cake, i) => (
             <button
-              key={torta.nome}
+              key={cake.nome}
               type="button"
-              className={`cake${stato.choice === i ? " choice" : ""}${i === CAKE_DONE ? " finished" : ""}`}
-              aria-pressed={stato.choice === i}
-              onClick={() => onTorta(i)}
+              className={`cake${state.choice === i ? " choice" : ""}${i === CAKE_DONE ? " finished" : ""}`}
+              aria-pressed={state.choice === i}
+              onClick={() => onCake(i)}
             >
               <span className="disk" aria-hidden="true" />
-              {torta.nome}
-              <small>{torta.prezzo}</small>
-              {i === CAKE_DONE && <em className="stamp">{testi.finita}</em>}
+              {cake.nome}
+              <small>{cake.prezzo}</small>
+              {i === CAKE_DONE && <em className="stamp">{copy.finita}</em>}
             </button>
           ))}
         </div>
@@ -77,20 +77,20 @@ export function LogicScene({ node: nodo, state: stato, copy: testi, onCake: onTo
     case 2:
       return (
         <div className="scene days">
-          {testi.giorni.map((g, i) => {
-            const p = PIENO[i];
+          {copy.giorni.map((g, i) => {
+            const p = BOOKED[i];
             return (
               <button
                 // Le iniziali si ripetono (M, M): la chiave e' la posizione.
                 key={i}
                 type="button"
-                className={`day${p === 100 ? " full" : ""}${stato.day === i ? " chosen" : ""}`}
-                aria-pressed={stato.day === i}
+                className={`day${p === 100 ? " full" : ""}${state.day === i ? " chosen" : ""}`}
+                aria-pressed={state.day === i}
                 style={{ "--full": `${p}%` } as CSSProperties}
-                onClick={() => onGiorno(i)}
+                onClick={() => onDay(i)}
               >
                 {g}
-                <small>{p === 100 ? testi.pieno : `${100 - p}%`}</small>
+                <small>{p === 100 ? copy.pieno : `${100 - p}%`}</small>
                 <span className="bar" aria-hidden="true" />
               </button>
             );
@@ -100,29 +100,29 @@ export function LogicScene({ node: nodo, state: stato, copy: testi, onCake: onTo
     case 3:
       return (
         <div className="scene paper">
-          <span className="imp">{testi.importo}</span>
-          <span className="num">{testi.carta}</span>
-          {stato.ok && <span className="state">{testi.pagato}</span>}
+          <span className="imp">{copy.importo}</span>
+          <span className="num">{copy.carta}</span>
+          {state.ok && <span className="state">{copy.pagato}</span>}
         </div>
       );
     case 4:
       return (
         <div className="scene mail">
           <div className="intest">
-            {testi.mailA} <b>{testi.email}</b> · {testi.mailDa}
+            {copy.mailA} <b>{copy.email}</b> · {copy.mailDa}
           </div>
           <p>
-            <b>{testi.mailTitolo}</b> {testi.mailTesto}
+            <b>{copy.mailTitolo}</b> {copy.mailTesto}
           </p>
         </div>
       );
     default:
       return (
         <div className="scene register">
-          {[...testi.registro, ...(stato.ok ? [testi.nuovo] : [])].map((riga, i) => (
-            <div key={riga[0]} className={i === testi.registro.length ? "new" : undefined}>
-              {riga.map((cella, j) => (
-                <span key={j}>{cella}</span>
+          {[...copy.registro, ...(state.ok ? [copy.nuovo] : [])].map((row, i) => (
+            <div key={row[0]} className={i === copy.registro.length ? "new" : undefined}>
+              {row.map((cell, j) => (
+                <span key={j}>{cell}</span>
               ))}
             </div>
           ))}

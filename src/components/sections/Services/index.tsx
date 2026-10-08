@@ -14,7 +14,7 @@ export async function Services() {
   // del sito, l'unita' nelle traduzioni come tutte le altre etichette di
   // metrica: "caffe'" in inglese e' "coffees", e un campione scritto a mano nel
   // componente sarebbe l'unico del tavolo che non sa girare lingua.
-  const caffe = metricById("coffees");
+  const coffees = metricById("coffees");
 
   const layers: DeskLayerData[] = deskLayers.map((layer) => ({
     id: layer.id,
@@ -30,7 +30,7 @@ export async function Services() {
     })),
   }));
 
-  const cassetta = toolboxCopy(tc);
+  const copy = toolboxCopy(tc);
 
   return (
     <ServicesView
@@ -39,14 +39,14 @@ export async function Services() {
       stageLead={t("stageLead")}
       centre={t("centre")}
       blank={t("blank")}
-      note={`${caffe.value} ${tMetrics(caffe.id)}`}
+      note={`${coffees.value} ${tMetrics(coffees.id)}`}
       punch={t("punch")}
       layers={layers}
       toolbox={{
         eyebrow: tc("eyebrow"),
         title: tc("title"),
         lead: tc("lead"),
-        copy: cassetta,
+        copy,
       }}
     />
   );

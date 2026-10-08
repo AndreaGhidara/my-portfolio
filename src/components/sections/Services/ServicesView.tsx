@@ -37,7 +37,7 @@ export function ServicesView({
   note,
   punch,
   layers,
-  toolbox: cassetta,
+  toolbox,
 }: ServicesViewProps) {
   return (
     // Il nome della sezione e' il titolo del tavolo: l'id sta in DeskStage.
@@ -55,7 +55,7 @@ export function ServicesView({
         punch={punch}
         layers={layers}
       />
-      <ToolboxView {...cassetta} />
+      <ToolboxView {...toolbox} />
     </section>
   );
 }

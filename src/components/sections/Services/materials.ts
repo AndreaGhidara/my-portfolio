@@ -52,7 +52,7 @@ export const THEME_TOKENS: Record<Theme, Record<Token, string>> = {
 /** Un token nudo, oppure una miscela in oklab fra due token. Mai un hex. */
 export type Recipe = { token: Token } | { a: Token; pct: number; b: Token };
 
-export type Family = "carta" | "apparecchio" | "fisso";
+export type Family = "paper" | "device" | "fixed";
 
 export type Coat = {
   /** `--desk-pieno`: la superficie. */
@@ -63,7 +63,7 @@ export type Coat = {
 
 export type Surface = {
   /**
-   * Il selettore della regola che porta la ricetta in `sezioni/tavolo.css`,
+   * Il selettore della regola che porta la ricetta in `sections/desk.css`,
    * come lo si scrive in testa alla regola: la graffa o la virgola in coda
    * la prova del contratto le toglie, e cerca il selettore intero fra quelli
    * della lista. La regola del tema scuro e' la stessa preceduta da
@@ -108,28 +108,28 @@ export const SURFACES: Record<SurfaceName, Surface> = {
   /* Il foglio: la carta piu' chiara della famiglia, bordo grafite. */
   sheet: {
     anchor: '[data-desk-piece][data-shape="sheet"] {',
-    family: "carta",
+    family: "paper",
     light: { fill: PALEST_PAPER.light, line: { token: "fg-muted" } },
     dark: { fill: PALEST_PAPER.dark, line: mix("ink", 60, "fg-muted") },
   },
   /* La scheda: cartoncino, e il bordo di inchiostro: e' stampata. */
   card: {
     anchor: '[data-desk-piece][data-shape="card"] {',
-    family: "carta",
+    family: "paper",
     light: { fill: mix("fg", 20, "bg"), line: mix("fg", 80, "bg") },
     dark: { fill: mix("fg", 58, "bg"), line: mix("ink", 85, "fg-muted") },
   },
   /* La piastra: l'unica cosa di metallo sul tavolo. */
   plate: {
     anchor: '[data-desk-piece][data-shape="plate"] {',
-    family: "carta",
+    family: "paper",
     light: { fill: mix("fg-muted", 55, "bg"), line: mix("fg-muted", 80, "fg") },
     dark: { fill: mix("fg-muted", 75, "bg"), line: mix("ink", 62, "fg-muted") },
   },
   /* La scocca: rack, telefono e laptop sono la stessa cosa, scatole scure. */
   shell: {
     anchor: '[data-desk-piece][data-shape="rack"],',
-    family: "apparecchio",
+    family: "device",
     light: { fill: mix("ink", 78, "fg-muted"), line: mix("ink", 42, "fg-muted") },
     dark: { fill: mix("ink", 82, "fg-muted"), line: mix("ink", 30, "fg-muted") },
   },
@@ -137,7 +137,7 @@ export const SURFACES: Record<SurfaceName, Surface> = {
      notte, ed e' l'unico calore del tavolo che non sia arancio. */
   postit: {
     anchor: '[data-desk-piece][data-shape="postit"] {',
-    family: "fisso",
+    family: "fixed",
     light: { fill: { token: "bulb" }, line: mix("bulb", 55, "ink") },
     dark: { fill: { token: "bulb" }, line: mix("bulb", 55, "ink") },
   },
@@ -149,7 +149,7 @@ export const SURFACES: Record<SurfaceName, Surface> = {
      dire il giorno in cui sono arrivati. */
   blank: {
     anchor: '[data-desk-piece][data-shape="postit"] [data-desk-blank] {',
-    family: "carta",
+    family: "paper",
     light: { fill: PALEST_PAPER.light, line: null },
     dark: { fill: PALEST_PAPER.dark, line: null },
   },

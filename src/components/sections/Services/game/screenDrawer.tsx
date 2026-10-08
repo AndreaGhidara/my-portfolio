@@ -20,7 +20,7 @@ export type DrawerToolId = (typeof DRAWER_TOOLS)[number];
 
 export type Viewport = "pc" | "cell";
 
-/** Quello che gli attrezzi hanno scelto: indici nelle liste di sitoFinto.ts. */
+/** Quello che gli attrezzi hanno scelto: indici nelle liste di fakeSite.ts. */
 export type Choices = {
   palette: number;
   fonts: number;
@@ -30,7 +30,7 @@ export type Choices = {
   view: Viewport;
 };
 
-const TONI: Record<MiniTone, string> = {
+const TONES: Record<MiniTone, string> = {
   ink: "var(--ink)",
   muted: "var(--muted)",
   mutedDark: "var(--mutedDark)",
@@ -46,14 +46,14 @@ function Mini({ mini }: { mini: MiniLayout }) {
       style={{
         gridTemplateColumns: mini.columns,
         gridTemplateRows: mini.rows,
-        background: mini.background && TONI[mini.background],
+        background: mini.background && TONES[mini.background],
       }}
     >
       {mini.cells.map((c, i) => (
         <i
           key={i}
           style={{
-            background: c.tone && TONI[c.tone],
+            background: c.tone && TONES[c.tone],
             gridColumn: c.column,
             gridRow: c.row,
             inlineSize: c.width,
@@ -65,32 +65,32 @@ function Mini({ mini }: { mini: MiniLayout }) {
   );
 }
 
-type CassettoProps = {
+type DrawerProps = {
   active: DrawerToolId;
   choices: Choices;
   tried: boolean;
   /** La riga scura in fondo: le viti, o il ritorno al computer. */
   message: ReactNode;
-  onChoose: <C extends keyof Choices>(campo: C, valore: Choices[C]) => void;
+  onChoose: <C extends keyof Choices>(field: C, value: Choices[C]) => void;
 };
 
 /** Il cassetto dell'attrezzo aperto: cosa fa, e le sue scelte. */
-export function Drawer({ active: attivo, choices: scelte, tried: provato, message: messaggio, onChoose: onScegli }: CassettoProps) {
+export function Drawer({ active, choices, tried, message, onChoose }: DrawerProps) {
   const t = useTranslations("services.gioco.schermo");
-  const titolo = t(`attrezzo.${attivo}.titolo`);
+  const title = t(`attrezzo.${active}.titolo`);
 
-  const scelta = <C extends keyof Choices>(campo: C, valore: Choices[C], contenuto: ReactNode, chiave: string) => (
-    <button key={chiave} type="button" aria-pressed={scelte[campo] === valore} onClick={() => onScegli(campo, valore)}>
-      {contenuto}
+  const choice = <C extends keyof Choices>(field: C, value: Choices[C], content: ReactNode, key: string) => (
+    <button key={key} type="button" aria-pressed={choices[field] === value} onClick={() => onChoose(field, value)}>
+      {content}
     </button>
   );
 
-  let corpo: ReactNode = null;
-  if (attivo === "colori") {
-    corpo = (
-      <div className="choices three" role="group" aria-label={titolo}>
+  let body: ReactNode = null;
+  if (active === "colori") {
+    body = (
+      <div className="choices three" role="group" aria-label={title}>
         {FAKE_PALETTES.map((p, i) =>
-          scelta(
+          choice(
             "palette",
             i,
             <>
@@ -106,11 +106,11 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
         )}
       </div>
     );
-  } else if (attivo === "caratteri") {
-    corpo = (
-      <div className="choices" role="group" aria-label={titolo}>
+  } else if (active === "caratteri") {
+    body = (
+      <div className="choices" role="group" aria-label={title}>
         {FAKE_FONTS.map((c, i) =>
-          scelta(
+          choice(
             "fonts",
             i,
             <>
@@ -124,13 +124,13 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
         )}
       </div>
     );
-  } else if (attivo === "testi") {
-    const s = FAKE_SCALES[scelte.scale];
-    corpo = (
+  } else if (active === "testi") {
+    const s = FAKE_SCALES[choices.scale];
+    body = (
       <>
-        <div className="choices three" role="group" aria-label={titolo}>
+        <div className="choices three" role="group" aria-label={title}>
           {FAKE_SCALES.map((x, i) =>
-            scelta(
+            choice(
               "scale",
               i,
               <>
@@ -163,11 +163,11 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
         </div>
       </>
     );
-  } else if (attivo === "sezioni") {
-    corpo = (
-      <div className="choices" role="group" aria-label={titolo}>
+  } else if (active === "sezioni") {
+    body = (
+      <div className="choices" role="group" aria-label={title}>
         {FAKE_LAYOUTS.map((l, i) =>
-          scelta(
+          choice(
             "layout",
             i,
             <>
@@ -179,11 +179,11 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
         )}
       </div>
     );
-  } else if (attivo === "immagini") {
-    corpo = (
-      <div className="choices" role="group" aria-label={titolo}>
+  } else if (active === "immagini") {
+    body = (
+      <div className="choices" role="group" aria-label={title}>
         {ILLUSTRATION_ORDER.map((k) =>
-          scelta(
+          choice(
             "img",
             k,
             <>
@@ -198,9 +198,9 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
       </div>
     );
   } else {
-    corpo = (
-      <div className="view-lever" role="group" aria-label={titolo}>
-        {(["pc", "cell"] as const).map((v) => scelta("view", v, t(`vista.${v}`), v))}
+    body = (
+      <div className="view-lever" role="group" aria-label={title}>
+        {(["pc", "cell"] as const).map((v) => choice("view", v, t(`vista.${v}`), v))}
       </div>
     );
   }
@@ -208,16 +208,16 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
   return (
     <div className="drawer">
       <p className="mono">
-        {t(`attrezzo.${attivo}.nome`)} · {t(provato ? "stato.provato" : "stato.prova")}
+        {t(`attrezzo.${active}.nome`)} · {t(tried ? "stato.provato" : "stato.prova")}
       </p>
-      <h3>{titolo}</h3>
-      <p className="explain">{t(`attrezzo.${attivo}.testo`)}</p>
-      {corpo}
-      <div className="ok" data-lit={messaggio ? true : undefined} aria-live="polite">
-        {messaggio && (
+      <h3>{title}</h3>
+      <p className="explain">{t(`attrezzo.${active}.testo`)}</p>
+      {body}
+      <div className="ok" data-lit={message ? true : undefined} aria-live="polite">
+        {message && (
           <>
             <span aria-hidden="true">✦</span>
-            <span>{messaggio}</span>
+            <span>{message}</span>
           </>
         )}
       </div>

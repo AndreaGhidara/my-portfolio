@@ -4,7 +4,7 @@ import { useEffect, useReducer, useState } from "react";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { GARMENTS, ROOT, ZONES } from "@/content/toolbox";
 import { Editor } from "./Editor";
-import { toolsIn, garmentById as capoPerId } from "./graph";
+import { toolsIn, garmentById } from "./graph";
 import { ToolboxMap } from "./ToolboxMap";
 import type { ToolboxStep, ToolboxCopy } from "./types";
 
@@ -16,28 +16,28 @@ import type { ToolboxStep, ToolboxCopy } from "./types";
  */
 export const MAP_QUERY = "(pointer: fine) and (min-width: 1280px)";
 
-type Stato = {
+type State = {
   history: ToolboxStep[];
   garment: string | null;
   /** Da quale passo della storia e' partito il foglio del telefono, se e' aperto. */
   sheet: number | null;
 };
 
-type Azione =
-  | { type: "nodo"; id: string }
-  | { type: "capo"; id: string | null }
-  | { type: "indietro" }
-  | { type: "apri"; id: string }
-  | { type: "chiudi" };
+type Action =
+  | { type: "node"; id: string }
+  | { type: "garment"; id: string | null }
+  | { type: "back" }
+  | { type: "open"; id: string }
+  | { type: "close" };
 
-const INIZIO: ToolboxStep = { kind: "nodo", id: ROOT.id };
+const START: ToolboxStep = { kind: "node", id: ROOT.id };
 
-function uguale(a: ToolboxStep | undefined, b: ToolboxStep) {
+function sameStep(a: ToolboxStep | undefined, b: ToolboxStep) {
   return !!a && a.kind === b.kind && a.id === b.id;
 }
 
-function avanti(storia: ToolboxStep[], p: ToolboxStep): ToolboxStep[] {
-  return uguale(storia[storia.length - 1], p) ? storia : [...storia, p];
+function push(history: ToolboxStep[], p: ToolboxStep): ToolboxStep[] {
+  return sameStep(history[history.length - 1], p) ? history : [...history, p];
 }
 
 /**
@@ -49,45 +49,45 @@ function avanti(storia: ToolboxStep[], p: ToolboxStep): ToolboxStep[] {
  * «indietro» riporta per ultimo. Tornando su un capo la mappa lo ricuce; tornando
  * al cartellino con un capo scelto, torna la cassetta intera.
  */
-export function toolboxReducer(s: Stato, a: Azione): Stato {
-  switch (a.type) {
-    case "nodo":
-      return { ...s, history: avanti(s.history, { kind: "nodo", id: a.id }) };
-    case "capo":
+export function toolboxReducer(s: State, action: Action): State {
+  switch (action.type) {
+    case "node":
+      return { ...s, history: push(s.history, { kind: "node", id: action.id }) };
+    case "garment":
       return {
         ...s,
-        garment: a.id,
-        history: avanti(s.history, a.id ? { kind: "capo", id: a.id } : INIZIO),
+        garment: action.id,
+        history: push(s.history, action.id ? { kind: "garment", id: action.id } : START),
       };
-    case "apri": {
-      const storia = avanti(s.history, { kind: "nodo", id: a.id });
-      return { ...s, history: storia, sheet: storia.length - 1 };
+    case "open": {
+      const history = push(s.history, { kind: "node", id: action.id });
+      return { ...s, history, sheet: history.length - 1 };
     }
-    case "chiudi":
+    case "close":
       return { ...s, sheet: null };
-    case "indietro": {
-      const fondo = s.sheet ?? 0;
-      if (s.history.length - 1 <= fondo) return s;
-      const storia = s.history.slice(0, -1);
-      const cima = storia[storia.length - 1];
-      let capo = s.garment;
-      if (cima.kind === "capo") capo = cima.id;
-      else if (cima.id === ROOT.id) capo = null;
-      return { ...s, history: storia, garment: capo };
+    case "back": {
+      const floor = s.sheet ?? 0;
+      if (s.history.length - 1 <= floor) return s;
+      const history = s.history.slice(0, -1);
+      const top = history[history.length - 1];
+      let garment = s.garment;
+      if (top.kind === "garment") garment = top.id;
+      else if (top.id === ROOT.id) garment = null;
+      return { ...s, history, garment };
     }
   }
 }
 
-function useVistaMappa(): boolean | null {
-  const [mappa, setMappa] = useState<boolean | null>(null);
+function useMapView(): boolean | null {
+  const [isMap, setIsMap] = useState<boolean | null>(null);
   useEffect(() => {
-    const lista = window.matchMedia(MAP_QUERY);
-    const aggiorna = () => setMappa(lista.matches);
-    aggiorna();
-    lista.addEventListener("change", aggiorna);
-    return () => lista.removeEventListener("change", aggiorna);
+    const query = window.matchMedia(MAP_QUERY);
+    const update = () => setIsMap(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
   }, []);
-  return mappa;
+  return isMap;
 }
 
 /**
@@ -97,28 +97,28 @@ function useVistaMappa(): boolean | null {
  * L'elenco per scomparti e' quello che legge uno screen reader, e quello che si
  * vede senza JavaScript.
  */
-export function Toolbox({ copy: testi }: { copy: ToolboxCopy }) {
+export function Toolbox({ copy }: { copy: ToolboxCopy }) {
   const level = useMotionLevel();
-  const vistaMappa = useVistaMappa();
-  const [stato, manda] = useReducer(toolboxReducer, {
-    history: [INIZIO],
+  const mapView = useMapView();
+  const [state, dispatch] = useReducer(toolboxReducer, {
+    history: [START],
     garment: null,
     sheet: null,
   });
-  const capo = stato.garment ? (capoPerId(stato.garment) ?? null) : null;
-  const passo = stato.history[stato.history.length - 1];
+  const garment = state.garment ? (garmentById(state.garment) ?? null) : null;
+  const step = state.history[state.history.length - 1];
 
   // Il foglio e' del telefono: se la finestra si allarga fino alla mappa, si chiude.
   useEffect(() => {
-    if (vistaMappa && stato.sheet !== null) manda({ type: "chiudi" });
-  }, [vistaMappa, stato.sheet]);
+    if (mapView && state.sheet !== null) dispatch({ type: "close" });
+  }, [mapView, state.sheet]);
 
-  const e = testi.label;
-  const indietroMappa =
-    stato.history.length > 1 ? (
+  const e = copy.label;
+  const mapBack =
+    state.history.length > 1 ? (
       <button
         type="button"
-        onClick={() => manda({ type: "indietro" })}
+        onClick={() => dispatch({ type: "back" })}
       >
         <span aria-hidden="true">‹ </span>
         {e.back}
@@ -127,70 +127,70 @@ export function Toolbox({ copy: testi }: { copy: ToolboxCopy }) {
 
   return (
     <div data-toolbox data-motion={level}>
-      <div data-toolbox-sew role="group" aria-label={testi.sewFor}>
-        <span aria-hidden="true">{testi.sewFor}</span>
+      <div data-toolbox-sew role="group" aria-label={copy.sewFor}>
+        <span aria-hidden="true">{copy.sewFor}</span>
         {GARMENTS.map((c) => (
           <button
             key={c.id}
             type="button"
-            aria-pressed={stato.garment === c.id}
-            onClick={() => manda({ type: "capo", id: c.id })}
+            aria-pressed={state.garment === c.id}
+            onClick={() => dispatch({ type: "garment", id: c.id })}
           >
-            {testi.garments[c.id].name}
+            {copy.garments[c.id].name}
           </button>
         ))}
         <button
           type="button"
           data-whole
-          aria-pressed={stato.garment === null}
-          onClick={() => manda({ type: "capo", id: null })}
+          aria-pressed={state.garment === null}
+          onClick={() => dispatch({ type: "garment", id: null })}
         >
-          {testi.whole}
+          {copy.whole}
         </button>
       </div>
-      <p data-toolbox-start>{testi.start}</p>
+      <p data-toolbox-start>{copy.start}</p>
 
       <div data-toolbox-scene>
         <ToolboxMap
-          copy={testi}
-          garment={capo}
-          step={passo}
-          onNode={(id) => manda({ type: "nodo", id })}
-          onGarment={(id) => manda({ type: "capo", id })}
-          actions={indietroMappa}
+          copy={copy}
+          garment={garment}
+          step={step}
+          onNode={(id) => dispatch({ type: "node", id })}
+          onGarment={(id) => dispatch({ type: "garment", id })}
+          actions={mapBack}
           level={level}
-          active={vistaMappa === true}
+          active={mapView === true}
         />
         <Editor
-          copy={testi}
-          garment={capo}
-          step={passo}
-          sheetOpen={stato.sheet !== null && vistaMappa === false}
+          copy={copy}
+          garment={garment}
+          step={step}
+          sheetOpen={state.sheet !== null && mapView === false}
           canGoBack={
-            stato.sheet !== null && stato.history.length - 1 > stato.sheet
+            state.sheet !== null && state.history.length - 1 > state.sheet
           }
-          onOpen={(id) => manda({ type: "apri", id })}
-          onNode={(id) => manda({ type: "nodo", id })}
-          onGarment={(id) => manda({ type: "capo", id })}
-          onBack={() => manda({ type: "indietro" })}
-          onClose={() => manda({ type: "chiudi" })}
+          onOpen={(id) => dispatch({ type: "open", id })}
+          onNode={(id) => dispatch({ type: "node", id })}
+          onGarment={(id) => dispatch({ type: "garment", id })}
+          onBack={() => dispatch({ type: "back" })}
+          onClose={() => dispatch({ type: "close" })}
           level={level}
-          active={vistaMappa === false}
+          active={mapView === false}
         />
       </div>
 
       <div data-toolbox-list>
-        <h3>{testi.list}</h3>
+        <h3>{copy.list}</h3>
         {ZONES.map((z) => (
           // Un div e non una section: nove scomparti sarebbero nove landmark,
           // e la mappa della pagina ne resterebbe sommersa. Basta l'h4.
           <div key={z.id}>
-            <h4>{testi.zones[z.id].name}</h4>
-            <p>{testi.zones[z.id].what}</p>
+            <h4>{copy.zones[z.id].name}</h4>
+            <p>{copy.zones[z.id].what}</p>
             <ul>
               {toolsIn(z.id).map((a) => (
                 <li key={a.id}>
-                  <b>{a.name}</b>: {testi.tools[a.id].what}{" "}
+                  <b>{a.name}</b>: {copy.tools[a.id].what}{" "}
                   <span>
                     ({a.experience === "work" ? e.atWork : e.known})
                   </span>

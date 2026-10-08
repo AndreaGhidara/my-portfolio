@@ -15,19 +15,19 @@ import { useEffect, useState, type RefObject } from "react";
  * prefisso che il linter riconosce un hook e ne controlla le regole.
  */
 export function useVisible(ref: RefObject<Element | null>): boolean {
-  const [visibile, setVisibile] = useState(true);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const el = ref.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
-    const osservatore = new IntersectionObserver((voci) => {
+    const observer = new IntersectionObserver((entries) => {
       // Con piu' voci in coda conta l'ultima: e' lo stato di adesso.
-      const ultima = voci[voci.length - 1];
-      if (ultima) setVisibile(ultima.isIntersecting);
+      const last = entries[entries.length - 1];
+      if (last) setVisible(last.isIntersecting);
     });
-    osservatore.observe(el);
-    return () => osservatore.disconnect();
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [ref]);
 
-  return visibile;
+  return visible;
 }

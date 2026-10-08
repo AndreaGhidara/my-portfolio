@@ -6,13 +6,13 @@ import { LEVELS, type LevelProps } from "./levels";
 /**
  * La fine del giro: il cielo della notte del livello 4 si fa giorno, e sotto
  * i quattro strati in fila, uno per livello. Il cielo e' tutto CSS
- * (finale.css): qui non c'e' un timer.
+ * (ending.css): qui non c'e' un timer.
  *
- * Per il finale `onAvanti` e' «torna al sito», cioe' il giro da capo dal
+ * Per il finale `onNext` e' «torna al sito», cioe' il giro da capo dal
  * livello 1. «Parliamone» non e' un pulsante: e' il link ai Contatti, e sul
  * telefono e' l'unica via ai Contatti dentro la sezione.
  */
-export function Ending({ onNext: onAvanti }: LevelProps) {
+export function Ending({ onNext }: LevelProps) {
   const t = useTranslations("services.gioco.finale");
 
   return (
@@ -48,7 +48,7 @@ export function Ending({ onNext: onAvanti }: LevelProps) {
           </ol>
         </div>
         <div className="actions two">
-          <button type="button" onClick={onAvanti}>
+          <button type="button" onClick={onNext}>
             <b aria-hidden="true">↺</b>
             {t("tornaAlSito")}
           </button>

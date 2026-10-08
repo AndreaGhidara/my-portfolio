@@ -10,7 +10,7 @@ export function ToolboxView({
   eyebrow,
   title,
   lead,
-  copy: testi,
+  copy,
 }: {
   eyebrow: string;
   title: string;
@@ -24,7 +24,7 @@ export function ToolboxView({
         <h2 className="section-title">{title}</h2>
         <p>{lead}</p>
       </Reveal>
-      <Toolbox copy={testi} />
+      <Toolbox copy={copy} />
     </div>
   );
 }

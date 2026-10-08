@@ -22,29 +22,29 @@ export const restPositions = new Map(NODES.map((n) => [n.id, { x: n.x, y: n.y }]
 export const DRAG_THRESHOLD = 6;
 
 /** Secondi d'ago per ogni tappa: abbastanza per vedere un'etichetta accendersi. */
-const SECONDI_PER_TAPPA = 0.26;
+const SECONDS_PER_STOP = 0.26;
 /** Il tetto: un capo con venti attrezzi non deve far aspettare venti secondi. */
-const DURATA_MASSIMA = 5.2;
+const MAX_DURATION = 5.2;
 /**
  * Il dondolio dell'ago, su e giu' come un punto a mano: la fase cresce di
  * sessanta radianti lungo tutta la corsa (una decina di punti), alto quattro
  * unita' della mappa.
  */
-const DONDOLII = 60;
-const ALTEZZA_DONDOLIO = 4;
+const SWAY_CYCLES = 60;
+const SWAY_HEIGHT = 4;
 /** Quanto avanti si guarda sul filo per sapere dove punta l'ago. */
-const ANTICIPO = 2;
+const LOOKAHEAD = 2;
 /** Mezza unita' di tolleranza: la tappa si accende quando l'ago ci arriva, non dopo. */
-const TOLLERANZA_TAPPA = 0.5;
+const STOP_TOLERANCE = 0.5;
 
 /** Quanto dura la corsa dell'ago su un percorso di tante tappe. */
-export function needleDuration(tappe: number): number {
-  return Math.min(DURATA_MASSIMA, SECONDI_PER_TAPPA * tappe);
+export function needleDuration(stops: number): number {
+  return Math.min(MAX_DURATION, SECONDS_PER_STOP * stops);
 }
 
 /** Il punto del filo che dice la direzione dell'ago, senza uscire dalla fine. */
-export function advance(l: number, lunghezza: number): number {
-  return Math.min(lunghezza, l + ANTICIPO);
+export function advance(l: number, length: number): number {
+  return Math.min(length, l + LOOKAHEAD);
 }
 
 /**
@@ -53,24 +53,24 @@ export function advance(l: number, lunghezza: number): number {
  * giro in piu'.
  */
 export function needlePose(q: number, p: MapPoint, p2: MapPoint): string {
-  const angolo = (Math.atan2(p2.y - p.y, p2.x - p.x) * 180) / Math.PI + 90;
-  const su = Math.sin(q * DONDOLII) * ALTEZZA_DONDOLIO;
-  return `translate(${p.x} ${p.y + su}) rotate(${angolo})`;
+  const angle = (Math.atan2(p2.y - p.y, p2.x - p.x) * 180) / Math.PI + 90;
+  const lift = Math.sin(q * SWAY_CYCLES) * SWAY_HEIGHT;
+  return `translate(${p.x} ${p.y + lift}) rotate(${angle})`;
 }
 
 /**
  * Quante tappe ha cucito l'ago arrivato a l lungo il filo, contando da quelle
  * gia' fatte: le soglie sono le lunghezze delle curve parziali, in ordine.
  */
-export function sewnStops(soglie: number[], l: number, fatti: number): number {
-  let n = fatti;
-  while (n < soglie.length && soglie[n] <= l + TOLLERANZA_TAPPA) n++;
+export function sewnStops(thresholds: number[], l: number, done: number): number {
+  let n = done;
+  while (n < thresholds.length && thresholds[n] <= l + STOP_TOLERANCE) n++;
   return n;
 }
 
 /** Se il puntatore si e' allontanato abbastanza da dove e' stato premuto. */
-export function pastThreshold(da: MapPoint, a: MapPoint): boolean {
-  return Math.hypot(a.x - da.x, a.y - da.y) >= DRAG_THRESHOLD;
+export function pastThreshold(from: MapPoint, to: MapPoint): boolean {
+  return Math.hypot(to.x - from.x, to.y - from.y) >= DRAG_THRESHOLD;
 }
 
 /**
@@ -78,12 +78,12 @@ export function pastThreshold(da: MapPoint, a: MapPoint): boolean {
  * matrice schermo dell'SVG (i sei numeri di un DOMMatrix 2D).
  */
 export function toMapPoint(
-  inversa: { a: number; b: number; c: number; d: number; e: number; f: number },
+  inverse: { a: number; b: number; c: number; d: number; e: number; f: number },
   x: number,
   y: number,
 ): MapPoint {
   return {
-    x: inversa.a * x + inversa.c * y + inversa.e,
-    y: inversa.b * x + inversa.d * y + inversa.f,
+    x: inverse.a * x + inverse.c * y + inverse.e,
+    y: inverse.b * x + inverse.d * y + inverse.f,
   };
 }

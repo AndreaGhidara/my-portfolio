@@ -24,7 +24,7 @@ import { Icon, type ServiceIcon } from "./icons";
  */
 
 /** I cinque moduli, nell'ordine del pannello. */
-const SERVIZI = ["assistenza", "automazioni", "numeri", "trovare", "manutenzione"] as const satisfies readonly ServiceIcon[];
+const SERVICES = ["assistenza", "automazioni", "numeri", "trovare", "manutenzione"] as const satisfies readonly ServiceIcon[];
 
 /**
  * Di chi e' ogni avviso, nell'ordine in cui arrivano. I testi stanno nei
@@ -40,161 +40,161 @@ export const SEQUENCE: readonly ServiceIcon[] = [
   "manutenzione",
 ];
 
-const BATTITO = 200;
-const CALO = 1.2;
-const MINIMO = 40;
-const PRIMA_ATTESA = 1400;
-const ATTESA_DOPO = 2600;
+const TICK = 200;
+const DROP = 1.2;
+const MIN_HEALTH = 40;
+const FIRST_WAIT = 1400;
+const WAIT_AFTER = 2600;
 /** Sotto questa soglia il numero e il tubo diventano rossi. */
-const SOGLIA_GIU = 80;
+const LOW_THRESHOLD = 80;
 /** Da qui in su, a fine mese, «il sito non se n'e' accorto». */
-const SOGLIA_BENE = 90;
+const GOOD_THRESHOLD = 90;
 
-type Evento = { testo: string; intervento: string; esito: string };
+type PanelEvent = { testo: string; intervento: string; esito: string };
 
-type Stato = {
-  fase: "spento" | "acceso" | "fine";
-  salute: number;
-  battiti: number;
-  /** Il prossimo avviso da accendere, indice in SEQUENZA. */
-  prossimo: number;
+type State = {
+  phase: "off" | "on" | "done";
+  health: number;
+  ticks: number;
+  /** Il prossimo avviso da accendere, indice in SEQUENCE. */
+  next: number;
   /** L'avviso con la spia accesa adesso. */
-  attivo: number | null;
-  /** L'ultimo avviso risolto: lo dice la coda, e la console finche' `fatto`. */
-  risolto: number | null;
-  fatto: boolean;
-  scelto: ServiceIcon | null;
+  active: number | null;
+  /** L'ultimo avviso risolto: lo dice la coda, e la console finche' `done`. */
+  solved: number | null;
+  done: boolean;
+  chosen: ServiceIcon | null;
   /** Millisecondi al prossimo avviso; null se non se ne aspetta uno. */
-  attesa: number | null;
+  wait: number | null;
 };
 
-type Azione =
-  | { tipo: "accendi" }
-  | { tipo: "batti" }
-  | { tipo: "tocca"; servizio: ServiceIcon }
-  | { tipo: "intervieni" }
-  | { tipo: "ricomincia" };
+type Action =
+  | { type: "switchOn" }
+  | { type: "tick" }
+  | { type: "select"; service: ServiceIcon }
+  | { type: "intervene" }
+  | { type: "restart" };
 
-const INIZIO: Stato = {
-  fase: "spento",
-  salute: 100,
-  battiti: 0,
-  prossimo: 0,
-  attivo: null,
-  risolto: null,
-  fatto: false,
-  scelto: null,
-  attesa: null,
+const INITIAL: State = {
+  phase: "off",
+  health: 100,
+  ticks: 0,
+  next: 0,
+  active: null,
+  solved: null,
+  done: false,
+  chosen: null,
+  wait: null,
 };
 
-function arriva(s: Stato): Stato {
-  if (s.prossimo >= SEQUENCE.length) return { ...s, fase: "fine", attesa: null, scelto: null, fatto: false };
-  return { ...s, attivo: s.prossimo, prossimo: s.prossimo + 1, attesa: null, scelto: null, fatto: false };
+function arrive(s: State): State {
+  if (s.next >= SEQUENCE.length) return { ...s, phase: "done", wait: null, chosen: null, done: false };
+  return { ...s, active: s.next, next: s.next + 1, wait: null, chosen: null, done: false };
 }
 
-function avanza(s: Stato, a: Azione): Stato {
-  switch (a.tipo) {
-    case "accendi":
-      return s.fase === "spento" ? { ...s, fase: "acceso", attesa: PRIMA_ATTESA } : s;
-    case "batti": {
-      if (s.fase !== "acceso") return s;
-      const battiti = s.battiti + 1;
-      const cala = s.attivo !== null && battiti % 2 === 0;
-      let dopo: Stato = { ...s, battiti, salute: cala ? Math.max(MINIMO, s.salute - CALO) : s.salute };
-      if (dopo.attesa !== null) {
-        const attesa = dopo.attesa - BATTITO;
-        dopo = attesa > 0 ? { ...dopo, attesa } : arriva(dopo);
+function reduce(s: State, a: Action): State {
+  switch (a.type) {
+    case "switchOn":
+      return s.phase === "off" ? { ...s, phase: "on", wait: FIRST_WAIT } : s;
+    case "tick": {
+      if (s.phase !== "on") return s;
+      const ticks = s.ticks + 1;
+      const drops = s.active !== null && ticks % 2 === 0;
+      let after: State = { ...s, ticks, health: drops ? Math.max(MIN_HEALTH, s.health - DROP) : s.health };
+      if (after.wait !== null) {
+        const wait = after.wait - TICK;
+        after = wait > 0 ? { ...after, wait } : arrive(after);
       }
-      return dopo;
+      return after;
     }
-    case "tocca":
-      return s.fase === "acceso" ? { ...s, scelto: a.servizio, fatto: false } : s;
-    case "intervieni":
-      if (s.attivo === null || SEQUENCE[s.attivo] !== s.scelto) return s;
-      return { ...s, risolto: s.attivo, attivo: null, fatto: true, attesa: ATTESA_DOPO };
-    case "ricomincia":
-      return INIZIO;
+    case "select":
+      return s.phase === "on" ? { ...s, chosen: a.service, done: false } : s;
+    case "intervene":
+      if (s.active === null || SEQUENCE[s.active] !== s.chosen) return s;
+      return { ...s, solved: s.active, active: null, done: true, wait: WAIT_AFTER };
+    case "restart":
+      return INITIAL;
   }
 }
 
-export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
+export function Panel({ onNext, visible }: LevelProps) {
   const t = useTranslations("services.gioco.pannello");
-  const comune = useTranslations("services.gioco.comune");
-  const eventi = t.raw("eventi") as Evento[];
-  const [s, manda] = useReducer(avanza, INIZIO);
+  const common = useTranslations("services.gioco.comune");
+  const events = t.raw("eventi") as PanelEvent[];
+  const [s, dispatch] = useReducer(reduce, INITIAL);
 
-  const corre = s.fase === "acceso" && visibile;
+  const running = s.phase === "on" && visible;
   useEffect(() => {
-    if (!corre) return;
-    const id = setInterval(() => manda({ tipo: "batti" }), BATTITO);
+    if (!running) return;
+    const id = setInterval(() => dispatch({ type: "tick" }), TICK);
     return () => clearInterval(id);
-  }, [corre]);
+  }, [running]);
 
-  const nome = (k: ServiceIcon) => t(`servizi.${k}`);
-  const allarme = s.attivo !== null ? SEQUENCE[s.attivo] : null;
-  const giu = s.salute < SOGLIA_GIU;
-  const salute = Math.round(s.salute);
+  const name = (k: ServiceIcon) => t(`servizi.${k}`);
+  const alarm = s.active !== null ? SEQUENCE[s.active] : null;
+  const low = s.health < LOW_THRESHOLD;
+  const health = Math.round(s.health);
 
-  const conta =
-    s.fase === "spento"
+  const counter =
+    s.phase === "off"
       ? t("conta.spento")
-      : s.fase === "fine"
+      : s.phase === "done"
         ? t("conta.fine")
-        : s.prossimo === 0
+        : s.next === 0
           ? t("conta.acceso")
-          : t("conta.avviso", { n: s.prossimo, totale: SEQUENCE.length });
+          : t("conta.avviso", { n: s.next, totale: SEQUENCE.length });
 
   // La riga di coda: una chiave per testo, cosi' ogni cambio rientra.
-  const coda =
-    s.fase === "fine" ? (
-      <span key="fine">{t("coda.fine")}</span>
-    ) : s.attivo !== null ? (
-      <span key={`avviso-${s.attivo}`}>
-        <b>{nome(SEQUENCE[s.attivo])}</b> · {eventi[s.attivo].testo}
+  const tail =
+    s.phase === "done" ? (
+      <span key="done">{t("coda.fine")}</span>
+    ) : s.active !== null ? (
+      <span key={`warning-${s.active}`}>
+        <b>{name(SEQUENCE[s.active])}</b> · {events[s.active].testo}
       </span>
-    ) : s.risolto !== null ? (
-      <span key={`risolto-${s.risolto}`}>{t("coda.risolto", { nome: nome(SEQUENCE[s.risolto]) })}</span>
+    ) : s.solved !== null ? (
+      <span key={`solved-${s.solved}`}>{t("coda.risolto", { nome: name(SEQUENCE[s.solved]) })}</span>
     ) : (
-      <span key="attesa">{t("coda.attesa")}</span>
+      <span key="waiting">{t("coda.attesa")}</span>
     );
 
   return (
     <div className="bench" data-game-level="pannello">
       <div className="above lattice">
         <div className="head">
-          <span className="level">{comune("etichetta", { numero: levelNumber("pannello"), nome: comune("livelli.pannello") })}</span>
-          <span className="right">{conta}</span>
+          <span className="level">{common("etichetta", { numero: levelNumber("pannello"), nome: common("livelli.pannello") })}</span>
+          <span className="right">{counter}</span>
         </div>
 
         <div className="health">
-          <b className={giu ? "down" : undefined}>{salute}%</b>
+          <b className={low ? "down" : undefined}>{health}%</b>
           <div className="tube" aria-hidden="true">
-            <i className={giu ? "down" : undefined} style={{ "--p": `${s.salute}%` } as CSSProperties} />
+            <i className={low ? "down" : undefined} style={{ "--p": `${s.health}%` } as CSSProperties} />
           </div>
           <small>{t("salute")}</small>
         </div>
 
         <div className="tail" role="status">
           <span aria-hidden="true">›</span>
-          {coda}
+          {tail}
         </div>
 
         <div className="modules">
-          {SERVIZI.map((k) => (
+          {SERVICES.map((k) => (
             <button
               key={k}
               type="button"
-              className={[allarme === k && "alarm", s.scelto === k && "chosen"].filter(Boolean).join(" ") || undefined}
+              className={[alarm === k && "alarm", s.chosen === k && "chosen"].filter(Boolean).join(" ") || undefined}
               data-form
-              aria-pressed={s.scelto === k}
-              disabled={s.fase !== "acceso"}
-              onClick={() => manda({ tipo: "tocca", servizio: k })}
+              aria-pressed={s.chosen === k}
+              disabled={s.phase !== "on"}
+              onClick={() => dispatch({ type: "select", service: k })}
             >
               <span className="led" aria-hidden="true" />
               <span className="ic">
                 <Icon name={k} />
               </span>
-              {nome(k)}
+              {name(k)}
               <span className="screws" aria-hidden="true" />
             </button>
           ))}
@@ -202,7 +202,7 @@ export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
       </div>
 
       <div className="console">
-        {s.fase === "spento" ? (
+        {s.phase === "off" ? (
           <>
             <div>
               <p className="mono">{t("spento.occhiello")}</p>
@@ -210,70 +210,70 @@ export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
             </div>
             <p className="explain">{t("spento.spiega")}</p>
             <div className="stage">
-              <Calma segno="🔌" testo={t("spento.calma")} />
+              <Calm sign="🔌" text={t("spento.calma")} />
             </div>
             <div className="actions">
-              <button type="button" className="green" onClick={() => manda({ tipo: "accendi" })}>
+              <button type="button" className="green" onClick={() => dispatch({ type: "switchOn" })}>
                 <b aria-hidden="true">⏻</b>
                 {t("spento.accendi")}
               </button>
             </div>
           </>
-        ) : s.fase === "fine" ? (
+        ) : s.phase === "done" ? (
           <>
             <div>
               <p className="mono">{t("fine.occhiello")}</p>
-              <h3>{s.salute >= SOGLIA_BENE ? t("fine.bene") : t("fine.male")}</h3>
+              <h3>{s.health >= GOOD_THRESHOLD ? t("fine.bene") : t("fine.male")}</h3>
             </div>
-            <p className="explain">{t("fine.spiega", { salute })}</p>
+            <p className="explain">{t("fine.spiega", { salute: health })}</p>
             <div className="stage">
               <ul className="report">
-                {SERVIZI.map((k) => (
+                {SERVICES.map((k) => (
                   <li key={k}>
                     <span className="ic">
                       <Icon name={k} />
                     </span>
                     <span>
-                      <b>{nome(k)}</b> · {t("fine.avvisi", { n: SEQUENCE.filter((x) => x === k).length })}
+                      <b>{name(k)}</b> · {t("fine.avvisi", { n: SEQUENCE.filter((x) => x === k).length })}
                     </span>
                   </li>
                 ))}
               </ul>
             </div>
             <div className="actions two">
-              <button type="button" onClick={() => manda({ tipo: "ricomincia" })}>
+              <button type="button" onClick={() => dispatch({ type: "restart" })}>
                 <b aria-hidden="true">↺</b>
                 {t("fine.ricomincia")}
               </button>
-              <button type="button" className="yellow" onClick={onAvanti}>
+              <button type="button" className="yellow" onClick={onNext}>
                 {t("fine.avanti")} <b aria-hidden="true">→</b>
               </button>
             </div>
           </>
-        ) : s.scelto === null ? (
+        ) : s.chosen === null ? (
           <>
             <div>
               <p className="mono">{t("acceso.occhiello")}</p>
-              <h3>{allarme ? t("acceso.spia.titolo") : t("acceso.verde.titolo")}</h3>
+              <h3>{alarm ? t("acceso.spia.titolo") : t("acceso.verde.titolo")}</h3>
             </div>
-            <p className="explain">{allarme ? t("acceso.spia.spiega") : t("acceso.verde.spiega")}</p>
+            <p className="explain">{alarm ? t("acceso.spia.spiega") : t("acceso.verde.spiega")}</p>
             <div className="stage">
-              {allarme ? (
-                <Calma key="spia" segno="👆" testo={t("acceso.spia.calma")} />
+              {alarm ? (
+                <Calm key="alarm" sign="👆" text={t("acceso.spia.calma")} />
               ) : (
-                <Calma key="verde" segno="☕" testo={t("acceso.verde.calma")} />
+                <Calm key="green" sign="☕" text={t("acceso.verde.calma")} />
               )}
             </div>
             <div />
           </>
         ) : (
-          <Modulo
-            scelto={s.scelto}
-            nome={nome(s.scelto)}
-            attivo={s.attivo}
-            risolto={s.fatto ? s.risolto : null}
-            eventi={eventi}
-            intervieni={() => manda({ tipo: "intervieni" })}
+          <ServiceModule
+            chosen={s.chosen}
+            name={name(s.chosen)}
+            active={s.active}
+            solved={s.done ? s.solved : null}
+            events={events}
+            onIntervene={() => dispatch({ type: "intervene" })}
           />
         )}
       </div>
@@ -282,12 +282,12 @@ export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
 }
 
 /** Il palco tranquillo: un segno e una riga, al centro. */
-function Calma({ segno, testo }: { segno: string; testo: string }) {
+function Calm({ sign, text }: { sign: string; text: string }) {
   return (
     <div className="calm">
       <p>
-        <span aria-hidden="true">{segno}</span>
-        {testo}
+        <span aria-hidden="true">{sign}</span>
+        {text}
       </p>
     </div>
   );
@@ -297,64 +297,64 @@ function Calma({ segno, testo }: { segno: string; testo: string }) {
  * La console di un modulo toccato: il suo avviso se la spia e' la sua, il
  * «fatto» dopo l'intervento, altrimenti che li' e' tutto a posto.
  */
-function Modulo({
-  scelto,
-  nome,
-  attivo,
-  risolto,
-  eventi,
-  intervieni,
+function ServiceModule({
+  chosen,
+  name,
+  active,
+  solved,
+  events,
+  onIntervene,
 }: {
-  scelto: ServiceIcon;
-  nome: string;
-  attivo: number | null;
-  risolto: number | null;
-  eventi: Evento[];
-  intervieni: () => void;
+  chosen: ServiceIcon;
+  name: string;
+  active: number | null;
+  solved: number | null;
+  events: PanelEvent[];
+  onIntervene: () => void;
 }) {
   const t = useTranslations("services.gioco.pannello.modulo");
-  const avviso = attivo !== null && SEQUENCE[attivo] === scelto ? eventi[attivo] : null;
-  const tocca = avviso !== null;
+  const warning = active !== null && SEQUENCE[active] === chosen ? events[active] : null;
+  const isTheirs = warning !== null;
 
   return (
     <>
       <div>
-        <p className="mono">{t("occhiello", { nome })}</p>
-        <h3>{risolto !== null ? t("fatto") : tocca ? t("cosa") : t("aPosto")}</h3>
+        <p className="mono">{t("occhiello", { nome: name })}</p>
+        <h3>{solved !== null ? t("fatto") : isTheirs ? t("cosa") : t("aPosto")}</h3>
       </div>
       {/* Nel prototipo questa riga c'e' anche col pannello tutto verde; qui
           solo quando la spia accesa e' davvero un'altra. */}
-      <p className="explain">{risolto === null && !tocca && attivo !== null ? t("altra") : ""}</p>
+      <p className="explain">{solved === null && !isTheirs && active !== null ? t("altra") : ""}</p>
       <div className="stage">
-        {risolto !== null ? (
-          <div key="risolto" className="problem solved">
+        {solved !== null ? (
+          <div key="solved" className="problem solved">
             <small>
               <span aria-hidden="true">✓ </span>
               {t("risolto")}
             </small>
-            <p>{eventi[risolto].esito}</p>
+            <p>{events[solved].esito}</p>
           </div>
-        ) : avviso ? (
-          <div key="avviso" className="problem">
+        ) : warning ? (
+          <div key="warning" className="problem">
             <small>
               <span aria-hidden="true">⚠ </span>
               {t("avviso")}
             </small>
-            <p>{avviso.testo}</p>
+            <p>{warning.testo}</p>
           </div>
         ) : (
-          <Calma key="calma" segno="✓" testo={t("nessuno", { nome: nome.toLowerCase() })} />
+          <Calm key="calm" sign="✓" text={t("nessuno", { nome: name.toLowerCase() })} />
         )}
       </div>
       <div className="actions">
-        {avviso ? (
-          <button type="button" className="yellow" onClick={intervieni}>
+        {warning ? (
+          <button type="button" className="yellow" onClick={onIntervene}>
             <b aria-hidden="true">⚡</b>
-            {avviso.intervento}
+            {warning.intervento}
           </button>
         ) : (
           <button type="button" disabled>
-            {risolto !== null ? t("aspetta") : t("niente")}
+            {solved !== null ? t("aspetta") : t("niente")}
           </button>
         )}
       </div>

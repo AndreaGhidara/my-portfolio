@@ -4,26 +4,26 @@ import { render, screen } from "@testing-library/react";
 import { installIntersectionObserver, removeIntersectionObserver } from "@/test/intersectionObserver";
 import { useVisible } from "../useVisible";
 
-function Prova() {
+function Probe() {
   const ref = useRef<HTMLDivElement | null>(null);
-  const visibile = useVisible(ref);
-  return <div ref={ref}>{visibile ? "in vista" : "fuori"}</div>;
+  const visible = useVisible(ref);
+  return <div ref={ref}>{visible ? "in vista" : "fuori"}</div>;
 }
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("useVisibile", () => {
+describe("useVisible", () => {
   it("parte in vista: nessuno ha ancora detto il contrario", () => {
     installIntersectionObserver();
-    render(<Prova />);
+    render(<Probe />);
     expect(screen.getByText("in vista")).toBeInTheDocument();
   });
 
   it("diventa fuori quando l'osservatore lo dice, e torna in vista al rientro", () => {
     const io = installIntersectionObserver();
-    render(<Prova />);
+    render(<Probe />);
     io.exit();
     expect(screen.getByText("fuori")).toBeInTheDocument();
     io.enter();
@@ -32,13 +32,13 @@ describe("useVisibile", () => {
 
   it("senza IntersectionObserver resta in vista: i timer non si fermano mai", () => {
     removeIntersectionObserver();
-    render(<Prova />);
+    render(<Probe />);
     expect(screen.getByText("in vista")).toBeInTheDocument();
   });
 
   it("smontando, l'osservatore si stacca", () => {
     const io = installIntersectionObserver();
-    const { unmount } = render(<Prova />);
+    const { unmount } = render(<Probe />);
     expect(io.active()).toBe(1);
     unmount();
     expect(io.active()).toBe(0);

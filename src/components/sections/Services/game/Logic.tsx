@@ -15,10 +15,10 @@ import { FULL_DAY, LogicScene, CAKE_DONE, type NodeState, type SceneCopy } from 
  *
  * Nessun timer: il pacco si sposta con una transizione CSS, e il suo
  * pulsare riparte a ogni nodo perche' l'onda ha per chiave il nodo. Per
- * questo `visibile` qui non serve.
+ * questo `visible` qui non serve.
  */
 
-type Nodo = {
+type LogicNode = {
   nome: string;
   titolo: string;
   spiega: string;
@@ -28,7 +28,7 @@ type Nodo = {
   regola: { se: string; allora: string };
 };
 
-const ICONE: readonly NodeIcon[] = ["area", "catalogo", "prenotazioni", "pagamenti", "contatti", "gestionale"];
+const ICONS: readonly NodeIcon[] = ["area", "catalogo", "prenotazioni", "pagamenti", "contatti", "gestionale"];
 
 /** Dove stanno i sei nodi nel circuito, in percentuale: un anello. */
 const POS: readonly (readonly [number, number])[] = [
@@ -40,64 +40,64 @@ const POS: readonly (readonly [number, number])[] = [
   [16, 74],
 ];
 
-const PARTENZA = -1;
-const FINE = ICONE.length;
+const START = -1;
+const END = ICONS.length;
 
 /** Il pacco prima di partire sta sopra il circuito, alla fine sotto. */
-const dovePacco = (n: number): readonly [number, number] =>
-  n === PARTENZA ? [50, -10] : n === FINE ? [50, 112] : POS[n];
+const parcelPosition = (n: number): readonly [number, number] =>
+  n === START ? [50, -10] : n === END ? [50, 112] : POS[n];
 
-const vuoti = (): NodeState[] => ICONE.map(() => ({}));
+const emptyStates = (): NodeState[] => ICONS.map(() => ({}));
 
-const STILE_SITO = siteVariables(SHOP_PALETTE.colors) as CSSProperties;
+const SITE_STYLE = siteVariables(SHOP_PALETTE.colors) as CSSProperties;
 
-export function Logic({ onNext: onAvanti }: LevelProps) {
+export function Logic({ onNext }: LevelProps) {
   const t = useTranslations("services.gioco.logiche");
-  const comune = useTranslations("services.gioco.comune");
+  const common = useTranslations("services.gioco.comune");
   const locale = useLocale();
-  const nodi = t.raw("nodi") as Nodo[];
-  const scene = t.raw("scene") as SceneCopy;
+  const nodes = t.raw("nodi") as LogicNode[];
+  const sceneCopy = t.raw("scene") as SceneCopy;
 
   // `n` e' dove sta l'ordine: PARTENZA, un nodo (0..5) o FINE.
-  const [n, setN] = useState(PARTENZA);
-  const [stati, setStati] = useState<NodeState[]>(vuoti);
+  const [n, setN] = useState(START);
+  const [states, setStates] = useState<NodeState[]>(emptyStates);
   // Rotto in questa visita: su un nodo gia' fatto l'incidente si vede solo
   // appena rotto, e tornandoci non c'e' piu'.
-  const [appena, setAppena] = useState(false);
+  const [justBroken, setJustBroken] = useState(false);
 
-  const s = stati[n] ?? {};
-  const rotti = stati.filter((x) => x.broken).length;
+  const s = states[n] ?? {};
+  const brokenCount = states.filter((x) => x.broken).length;
 
-  const cambia = (dati: NodeState) => setStati((v) => v.map((x, i) => (i === n ? { ...x, ...dati } : x)));
+  const update = (patch: NodeState) => setStates((v) => v.map((x, i) => (i === n ? { ...x, ...patch } : x)));
 
-  const vai = (i: number) => {
+  const go = (i: number) => {
     setN(i);
-    setAppena(false);
+    setJustBroken(false);
   };
 
-  const fai = () => {
-    cambia({ ok: true, ...(n === 1 && { choice: 1 }), ...(n === 2 && { day: 5 }) });
-    setAppena(false);
+  const complete = () => {
+    update({ ok: true, ...(n === 1 && { choice: 1 }), ...(n === 2 && { day: 5 }) });
+    setJustBroken(false);
   };
 
-  const rompi = () => {
+  const breakNode = () => {
     if (s.broken) return;
-    cambia({ broken: true });
-    setAppena(true);
+    update({ broken: true });
+    setJustBroken(true);
     if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") navigator.vibrate([20, 40, 20]);
   };
 
-  const sceglie = (dati: NodeState) => {
-    cambia({ ...dati, ok: true });
-    setAppena(false);
+  const pick = (patch: NodeState) => {
+    update({ ...patch, ok: true });
+    setJustBroken(false);
   };
 
-  const ricomincia = () => {
-    setStati(vuoti());
-    vai(PARTENZA);
+  const restart = () => {
+    setStates(emptyStates());
+    go(START);
   };
 
-  const [px, py] = dovePacco(n);
+  const [px, py] = parcelPosition(n);
 
   return (
     <div className="bench" data-game-level="logiche">
@@ -110,7 +110,7 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
           </g>
           <g className="done-group">
             {POS.slice(1).map(([x2, y2], i) =>
-              stati[i].ok ? (
+              states[i].ok ? (
                 <line key={i} x1={POS[i][0]} y1={POS[i][1]} x2={x2} y2={y2} vectorEffect="non-scaling-stroke" />
               ) : null,
             )}
@@ -118,70 +118,70 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
         </svg>
 
         <div className="head">
-          <span className="level">{comune("etichetta", { numero: levelNumber("logiche"), nome: comune("livelli.logiche") })}</span>
+          <span className="level">{common("etichetta", { numero: levelNumber("logiche"), nome: common("livelli.logiche") })}</span>
           <span className="right rules">
             {t("regole")}
-            {stati.map((x, i) => (
+            {states.map((x, i) => (
               <i key={i} className={x.broken ? "yes" : undefined} aria-hidden="true" />
             ))}
           </span>
         </div>
 
-        {nodi.map((nodo, i) => {
-          const stato = stati[i];
-          const classi = ["node", i === n && "here", stato.ok && "done", stato.broken && "broken"].filter(Boolean);
+        {nodes.map((node, i) => {
+          const state = states[i];
+          const classes = ["node", i === n && "here", state.ok && "done", state.broken && "broken"].filter(Boolean);
           return (
             <button
               key={i}
               type="button"
-              className={classi.join(" ")}
+              className={classes.join(" ")}
               style={{ left: `${POS[i][0]}%`, top: `${POS[i][1]}%` }}
-              aria-label={t("nodo", { numero: i + 1, nome: nodo.nome })}
+              aria-label={t("nodo", { numero: i + 1, nome: node.nome })}
               aria-current={i === n ? "step" : undefined}
               // Un nodo gia' fatto si riapre, per rompere quello che manca;
               // quelli dopo no.
-              disabled={!stato.ok && i !== n}
+              disabled={!state.ok && i !== n}
               onClick={() => {
-                if (i !== n) vai(i);
+                if (i !== n) go(i);
               }}
             >
               <span className="chip">
-                <Icon name={ICONE[i]} />
+                <Icon name={ICONS[i]} />
                 <i className="num">{i + 1}</i>
               </span>
-              <span className="name">{nodo.nome}</span>
+              <span className="name">{node.nome}</span>
             </button>
           );
         })}
 
         <span className="parcel" style={{ left: `${px}%`, top: `${py}%` }} aria-hidden="true">
           🎂
-          {n >= 0 && n < FINE && <i key={n} className="wave" />}
+          {n >= 0 && n < END && <i key={n} className="wave" />}
         </span>
       </div>
 
-      {n === PARTENZA ? (
-        <Partenza onVia={() => vai(0)} />
-      ) : n === FINE ? (
+      {n === START ? (
+        <Start onGo={() => go(0)} />
+      ) : n === END ? (
         <div className="console">
           <div className="garment">
             <span className="chip" aria-hidden="true">
               🧾
             </span>
             <div>
-              <p className="mono">{t("fine.occhiello", { trovate: rotti })}</p>
+              <p className="mono">{t("fine.occhiello", { trovate: brokenCount })}</p>
               <h3>{t("fine.titolo")}</h3>
             </div>
           </div>
-          <p className="explain">{rotti < ICONE.length ? t("fine.mancano") : t("fine.tutte")}</p>
+          <p className="explain">{brokenCount < ICONS.length ? t("fine.mancano") : t("fine.tutte")}</p>
           <div className="stage">
             <div className="slip">
               <b>{t("fine.negozio")}</b>
               <hr />
               <span>{t("fine.ordine")}</span>
               <span>
-                {scene.torte[stati[1].choice ?? 1].nome.toLocaleUpperCase(locale)} ·{" "}
-                {(t.raw("fine.giorni") as string[])[stati[2].day ?? 5].toLocaleUpperCase(locale)}
+                {sceneCopy.torte[states[1].choice ?? 1].nome.toLocaleUpperCase(locale)} ·{" "}
+                {(t.raw("fine.giorni") as string[])[states[2].day ?? 5].toLocaleUpperCase(locale)}
               </span>
               <span>{t("fine.caparra")}</span>
               <hr />
@@ -189,11 +189,11 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
             </div>
           </div>
           <div className="actions two">
-            <button type="button" onClick={ricomincia}>
+            <button type="button" onClick={restart}>
               <b aria-hidden="true">↺</b>
               {t("fine.ricomincia")}
             </button>
-            <button type="button" className="break" onClick={onAvanti}>
+            <button type="button" className="break" onClick={onNext}>
               {t("fine.livello3")} <b aria-hidden="true">→</b>
             </button>
           </div>
@@ -202,30 +202,30 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
         <div className="console">
           <div className="garment">
             <span className="chip">
-              <Icon name={ICONE[n]} />
+              <Icon name={ICONS[n]} />
             </span>
             <div>
-              <p className="mono">{t("nodo", { numero: n + 1, nome: nodi[n].nome })}</p>
-              <h3>{nodi[n].titolo}</h3>
+              <p className="mono">{t("nodo", { numero: n + 1, nome: nodes[n].nome })}</p>
+              <h3>{nodes[n].titolo}</h3>
             </div>
           </div>
-          <p className="explain">{nodi[n].spiega}</p>
+          <p className="explain">{nodes[n].spiega}</p>
           <div className="stage">
             {/* L'incidente prende il posto della scena, nella stessa scatola. */}
-            {s.broken && (!s.ok || appena) ? (
+            {s.broken && (!s.ok || justBroken) ? (
               <div className="incident" role="status">
                 <div className="error">
                   <span aria-hidden="true">⚠</span>
-                  {nodi[n].errore}
+                  {nodes[n].errore}
                 </div>
                 <div className="rule">
                   <p>
                     <span>{t("incidente.se")}</span>
-                    {nodi[n].regola.se}
+                    {nodes[n].regola.se}
                   </p>
                   <p>
                     <span>{t("incidente.allora")}</span>
-                    {nodi[n].regola.allora}
+                    {nodes[n].regola.allora}
                   </p>
                 </div>
                 <p className="saved">
@@ -238,9 +238,9 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
                 <LogicScene
                   node={n}
                   state={s}
-                  copy={scene}
-                  onCake={(i) => (i === CAKE_DONE ? rompi() : sceglie({ choice: i }))}
-                  onDay={(i) => (i === FULL_DAY ? rompi() : sceglie({ day: i }))}
+                  copy={sceneCopy}
+                  onCake={(i) => (i === CAKE_DONE ? breakNode() : pick({ choice: i }))}
+                  onDay={(i) => (i === FULL_DAY ? breakNode() : pick({ day: i }))}
                 />
                 {s.broken && (
                   <span className="found">
@@ -253,19 +253,19 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
           </div>
           <div className={`actions${s.ok && s.broken ? "" : " two"}`}>
             {s.ok ? (
-              <button type="button" className={s.broken ? "only" : "green"} onClick={() => vai(n + 1)}>
-                {n === FINE - 1 ? t("stampa") : t("avanti", { nome: nodi[n + 1].nome })} <b aria-hidden="true">→</b>
+              <button type="button" className={s.broken ? "only" : "green"} onClick={() => go(n + 1)}>
+                {n === END - 1 ? t("stampa") : t("avanti", { nome: nodes[n + 1].nome })} <b aria-hidden="true">→</b>
               </button>
             ) : (
-              <button type="button" onClick={fai}>
+              <button type="button" onClick={complete}>
                 <b aria-hidden="true">✓</b>
-                {nodi[n].fai}
+                {nodes[n].fai}
               </button>
             )}
             {!(s.ok && s.broken) && (
-              <button type="button" className="break" disabled={s.broken} onClick={rompi}>
+              <button type="button" className="break" disabled={s.broken} onClick={breakNode}>
                 <b aria-hidden="true">⚡</b>
-                {s.broken ? t("giaRotto") : nodi[n].rompi}
+                {s.broken ? t("giaRotto") : nodes[n].rompi}
               </button>
             )}
           </div>
@@ -276,13 +276,13 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
 }
 
 /** La partenza: lo schermo costruito al livello 1, e sotto l'appunto. */
-function Partenza({ onVia }: { onVia: () => void }) {
+function Start({ onGo }: { onGo: () => void }) {
   const t = useTranslations("services.gioco.logiche.partenza");
   return (
     <div className="console">
       <div className="start">
         <p className="mono">{t("occhiello")}</p>
-        <div className="phone" style={STILE_SITO}>
+        <div className="phone" style={SITE_STYLE}>
           <div className="bar" aria-hidden="true">
             <i />
             <i />
@@ -302,7 +302,7 @@ function Partenza({ onVia }: { onVia: () => void }) {
                 <em>{t("titoloAccento")}</em>
               </h4>
               <p>{t("testo")}</p>
-              <button type="button" className="book" onClick={onVia}>
+              <button type="button" className="book" onClick={onGo}>
                 {t("prenota")} <span aria-hidden="true">→</span>
                 <span className="finger" aria-hidden="true">
                   👆
@@ -314,13 +314,13 @@ function Partenza({ onVia }: { onVia: () => void }) {
                 viewBox={ILLUSTRATION_VIEWBOX}
                 aria-hidden="true"
                 focusable="false"
-                // Il pane e' una stringa fissa di sitoFinto.ts, nessun dato da fuori.
+                // Il pane e' una stringa fissa di fakeSite.ts, nessun dato da fuori.
                 dangerouslySetInnerHTML={{ __html: ILLUSTRATIONS.pane }}
               />
             </div>
           </div>
         </div>
-        <button type="button" className="note" onClick={onVia}>
+        <button type="button" className="note" onClick={onGo}>
           <span className="ic" aria-hidden="true">
             🎂
           </span>
@@ -329,8 +329,8 @@ function Partenza({ onVia }: { onVia: () => void }) {
             <span>{t("appuntoTesto")}</span>
           </span>
           <span className="mini" aria-hidden="true">
-            {[true, true, false, true, false, true].map((si, i) => (
-              <i key={i} className={si ? "yes" : undefined} />
+            {[true, true, false, true, false, true].map((yes, i) => (
+              <i key={i} className={yes ? "yes" : undefined} />
             ))}
           </span>
         </button>

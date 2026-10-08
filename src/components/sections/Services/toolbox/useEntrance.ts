@@ -7,16 +7,16 @@ import { NODES } from "./graph";
  * si apre. Ogni nodo parte dal punto in cui sta suo padre.
  */
 export const ENTRANCE = (() => {
-  const ordine: string[] = [ROOT.id];
-  for (let i = 0; i < ordine.length; i++) {
+  const order: string[] = [ROOT.id];
+  for (let i = 0; i < order.length; i++) {
     for (const [a, b] of BRANCHES)
-      if (a === ordine[i] && !ordine.includes(b)) ordine.push(b);
+      if (a === order[i] && !order.includes(b)) order.push(b);
   }
-  for (const n of NODES) if (!ordine.includes(n.id)) ordine.push(n.id);
-  return new Map(ordine.map((id, i) => [id, i]));
+  for (const n of NODES) if (!order.includes(n.id)) order.push(n.id);
+  return new Map(order.map((id, i) => [id, i]));
 })();
 
-type Entrata = "waiting" | "entering" | null;
+type Entrance = "waiting" | "entering" | null;
 
 /**
  * L'entrata, una volta sola e solo se la mappa non e' gia' in vista: chi
@@ -27,33 +27,33 @@ type Entrata = "waiting" | "entering" | null;
  * movimento torna, si riparte da capo come al primo montaggio.
  */
 export function useEntrance(
-  banco: RefObject<HTMLElement | null>,
-  pieno: boolean,
-): Entrata {
-  const [entrata, setEntrata] = useState<Entrata>(null);
+  bench: RefObject<HTMLElement | null>,
+  full: boolean,
+): Entrance {
+  const [entrance, setEntrance] = useState<Entrance>(null);
 
   useEffect(() => {
-    if (!pieno) {
-      setEntrata(null);
+    if (!full) {
+      setEntrance(null);
       return;
     }
-    const el = banco.current;
+    const el = bench.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
     const r = el.getBoundingClientRect();
     if (r.top < window.innerHeight && r.bottom > 0) return;
-    setEntrata("waiting");
-    const osservatore = new IntersectionObserver(
-      ([voce]) => {
-        if (!voce.isIntersecting) return;
-        setEntrata("entering");
-        osservatore.disconnect();
+    setEntrance("waiting");
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setEntrance("entering");
+        observer.disconnect();
       },
       { threshold: 0.2 },
     );
-    osservatore.observe(el);
-    return () => osservatore.disconnect();
-  }, [pieno, banco]);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [full, bench]);
 
   // Il valore di prima non vale piu' nel render in cui il movimento si spegne.
-  return pieno ? entrata : null;
+  return full ? entrance : null;
 }

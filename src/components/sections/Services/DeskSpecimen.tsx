@@ -26,24 +26,24 @@ import type { SampleId } from "@/content/desk";
  * elementi sarebbero ventidue disegni da mantenere; qui sono composizioni di
  * poche marche ricorrenti (una riga, un blocco, una tessera, un testo mono) e
  * il foglio di stile ne dichiara la forma una volta sola. Quello che cambia da
- * un campione all'altro e' la DISPOSIZIONE, che sta in sezioni/tavolo.css accanto a
+ * un campione all'altro e' la DISPOSIZIONE, che sta in sections/desk.css accanto a
  * tutto il resto del tavolo.
  */
 
 /** Una riga di testo finto, larga quanto le si dice. La larghezza e' un dato del
  *  disegno (quanto e' lunga quella riga), non una scelta di stile. */
-const Riga = ({ w }: { w: number }) => (
+const Line = ({ w }: { w: number }) => (
   <i data-m="line" style={{ "--w": `${w}%` } as CSSProperties} />
 );
 
 /** Una barra dell'istogramma, alta quanto le si dice. Stessa ragione. */
-const Barra = ({ h }: { h: number }) => (
+const Bar = ({ h }: { h: number }) => (
   <i data-m="bar" style={{ "--h": `${h}%` } as CSSProperties} />
 );
 
-const griglia = (n: number, marca: string, preso?: number) =>
+const grid = (n: number, mark: string, grabbed?: number) =>
   Array.from({ length: n }, (_, i) => (
-    <i key={i} data-m={marca} data-grabbed={i === preso ? "" : undefined} />
+    <i key={i} data-m={mark} data-grabbed={i === grabbed ? "" : undefined} />
   ));
 
 /**
@@ -80,10 +80,10 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
    *  e' esattamente quello che questo oggetto e'. */
   testi: (
     <>
-      <Riga w={100} />
-      <Riga w={88} />
-      <Riga w={96} />
-      <Riga w={58} />
+      <Line w={100} />
+      <Line w={88} />
+      <Line w={96} />
+      <Line w={58} />
     </>
   ),
   immagini: (
@@ -99,9 +99,9 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   telefono: (
     <>
       <i data-m="block" data-b="header" />
-      <Riga w={100} />
-      <Riga w={100} />
-      <Riga w={80} />
+      <Line w={100} />
+      <Line w={100} />
+      <Line w={80} />
       <i data-m="cta" />
     </>
   ),
@@ -119,7 +119,7 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   riservata: (
     <>
       <i data-m="field" />
-      <span data-m="dots">{griglia(6, "dot")}</span>
+      <span data-m="dots">{grid(6, "dot")}</span>
       <i data-m="cta" data-small="" />
     </>
   ),
@@ -131,8 +131,8 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
     <span data-m="card">
       <i data-m="tile" data-large="" />
       <span data-m="detail">
-        <Riga w={100} />
-        <Riga w={70} />
+        <Line w={100} />
+        <Line w={70} />
         <i data-m="price" />
       </span>
     </span>
@@ -153,12 +153,12 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
    */
   pagamenti: (
     <span data-m="receipt">
-      <Riga w={78} />
-      <Riga w={62} />
-      <Riga w={70} />
+      <Line w={78} />
+      <Line w={62} />
+      <Line w={70} />
       <i data-m="tear" />
       <span data-m="item" data-total="">
-        <Riga w={38} />
+        <Line w={38} />
         <i data-m="amount" />
       </span>
     </span>
@@ -168,7 +168,7 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   prenotazioni: (
     <>
       <i data-m="line" data-head="" style={{ "--w": "100%" } as CSSProperties} />
-      <span data-m="month">{griglia(18, "day", 9)}</span>
+      <span data-m="month">{grid(18, "day", 9)}</span>
     </>
   ),
   /**
@@ -182,9 +182,9 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   gestionale: (
     <>
       <b data-m="mono">ART-0412</b>
-      <Riga w={64} />
+      <Line w={64} />
       <span data-m="qty">
-        <Riga w={34} />
+        <Line w={34} />
         <b data-m="mono" data-small="">
           ×24
         </b>
@@ -193,7 +193,7 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   ),
 
   // ── L'infrastruttura ─────────────────────────────────────────────────────
-  dati: <span data-m="table" data-dense="">{griglia(18, "cell")}</span>,
+  dati: <span data-m="table" data-dense="">{grid(18, "cell")}</span>,
   /** La stessa sagoma tre volte, sfalsata. Nessun simbolo: una copia e' una
    *  ripetizione, e mostrarne tre e' letteralmente mostrare delle copie. */
   copie: (
@@ -228,11 +228,11 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   ),
   numeri: (
     <span data-m="histogram">
-      <Barra h={38} />
-      <Barra h={58} />
-      <Barra h={46} />
-      <Barra h={78} />
-      <Barra h={100} />
+      <Bar h={38} />
+      <Bar h={58} />
+      <Bar h={46} />
+      <Bar h={78} />
+      <Bar h={100} />
     </span>
   ),
   /**
@@ -247,9 +247,9 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
         [86, 52],
         [64, 40],
         [58, 44],
-      ].map(([titolo, url], i) => (
+      ].map(([title, url], i) => (
         <span key={i} data-m="result" data-first={i === 0 ? "" : undefined}>
-          <i data-m="line" style={{ "--w": `${titolo}%` } as CSSProperties} />
+          <i data-m="line" style={{ "--w": `${title}%` } as CSSProperties} />
           <i data-m="line" data-url="" style={{ "--w": `${url}%` } as CSSProperties} />
         </span>
       ))}

@@ -15,7 +15,7 @@ import { levelNumber } from "./levels";
  * larghezza.
  */
 
-const NODI: Record<NodeIcon, [number, number]> = {
+const NODES: Record<NodeIcon, [number, number]> = {
   contatti: [70, 110],
   area: [150, 96],
   catalogo: [230, 110],
@@ -24,13 +24,13 @@ const NODI: Record<NodeIcon, [number, number]> = {
   gestionale: [150, 318],
 };
 
-type Punto = NodeIcon | "ingresso";
-const PUNTI: Record<Punto, [number, number]> = { ...NODI, ingresso: [150, 40] };
+type Point = NodeIcon | "entry";
+const POINTS: Record<Point, [number, number]> = { ...NODES, entry: [150, 40] };
 
-const FILI: [Punto, Punto][] = [
-  ["ingresso", "contatti"],
-  ["ingresso", "area"],
-  ["ingresso", "catalogo"],
+const WIRES: [Point, Point][] = [
+  ["entry", "contatti"],
+  ["entry", "area"],
+  ["entry", "catalogo"],
   ["catalogo", "pagamenti"],
   ["area", "prenotazioni"],
   ["contatti", "gestionale"],
@@ -38,36 +38,36 @@ const FILI: [Punto, Punto][] = [
   ["prenotazioni", "gestionale"],
 ];
 
-const filo = ([a, b]: [Punto, Punto]) => {
-  const [x1, y1] = PUNTI[a];
-  const [x2, y2] = PUNTI[b];
+const wirePath = ([a, b]: [Point, Point]) => {
+  const [x1, y1] = POINTS[a];
+  const [x2, y2] = POINTS[b];
   const my = (y1 + y2) / 2;
   return `M${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`;
 };
 
 /** Le scintille che corrono sui fili: tre colori a giro. */
-const SCINTILLE = ["var(--bulb)", "var(--orange)", "var(--screen-light-green)"];
+const SPARKS = ["var(--bulb)", "var(--orange)", "var(--screen-light-green)"];
 
 /** Il lato della tessera di un nodo, in unita' del disegno. */
-const LATO = 28;
+const SIDE = 28;
 
-export function ScreenBack({ onRestart: onRicomincia }: { onRestart: () => void }) {
+export function ScreenBack({ onRestart }: { onRestart: () => void }) {
   const t = useTranslations("services.gioco.schermo.dietro");
-  const comune = useTranslations("services.gioco.comune");
+  const common = useTranslations("services.gioco.comune");
   // useId porta caratteri che in url(#...) e in href non tutti digeriscono.
-  const id = `schermo-${useId().replace(/[^\w-]/g, "")}`;
-  const reticolo = `${id}-reticolo`;
+  const id = `screen-${useId().replace(/[^\w-]/g, "")}`;
+  const grid = `${id}-grid`;
 
   return (
     <>
       <svg className="circuit" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
         <defs>
-          <pattern id={reticolo} width="15" height="15" patternUnits="userSpaceOnUse">
+          <pattern id={grid} width="15" height="15" patternUnits="userSpaceOnUse">
             <path d="M15 0V15M0 15H15" strokeWidth="1" style={{ stroke: "var(--game-grid)" }} />
           </pattern>
         </defs>
         <rect width="300" height="400" style={{ fill: "var(--game-dark)" }} />
-        <rect width="300" height="400" fill={`url(#${reticolo})`} />
+        <rect width="300" height="400" fill={`url(#${grid})`} />
         {/* Il bordo dello schermo visto da dietro. */}
         <rect
           x="10"
@@ -86,11 +86,11 @@ export function ScreenBack({ onRestart: onRicomincia }: { onRestart: () => void 
         <text x="150" y="62" textAnchor="middle" fontSize="6.5" className="lettering">
           {t("ingresso")}
         </text>
-        {FILI.map((f, i) => (
+        {WIRES.map((f, i) => (
           <path
-            key={`filo-${i}`}
-            id={`${id}-filo${i}`}
-            d={filo(f)}
+            key={`wire-${i}`}
+            id={`${id}-wire${i}`}
+            d={wirePath(f)}
             fill="none"
             strokeWidth="1.6"
             strokeDasharray="4 3"
@@ -98,19 +98,19 @@ export function ScreenBack({ onRestart: onRicomincia }: { onRestart: () => void 
           />
         ))}
         <g className="sparks">
-          {FILI.map((_, i) => (
-            <circle key={`scintilla-${i}`} r="3" style={{ fill: SCINTILLE[i % 3] }}>
+          {WIRES.map((_, i) => (
+            <circle key={`spark-${i}`} r="3" style={{ fill: SPARKS[i % 3] }}>
               <animateMotion dur={`${2.4 + (i % 4) * 0.5}s`} repeatCount="indefinite" begin={`${i * 0.35}s`}>
-                <mpath href={`#${id}-filo${i}`} />
+                <mpath href={`#${id}-wire${i}`} />
               </animateMotion>
             </circle>
           ))}
         </g>
-        {Object.entries(NODI).map(([nome, [x, y]]) => (
-          <g key={nome} className="node">
-            <rect x={x - LATO / 2} y={y - LATO / 2} width={LATO} height={LATO} rx="5" />
-            <svg x={x - LATO / 2 + 3} y={y - LATO / 2 + 3} width={LATO - 6} height={LATO - 6}>
-              <Icon name={nome as NodeIcon} />
+        {Object.entries(NODES).map(([name, [x, y]]) => (
+          <g key={name} className="node">
+            <rect x={x - SIDE / 2} y={y - SIDE / 2} width={SIDE} height={SIDE} rx="5" />
+            <svg x={x - SIDE / 2 + 3} y={y - SIDE / 2 + 3} width={SIDE - 6} height={SIDE - 6}>
+              <Icon name={name as NodeIcon} />
             </svg>
           </g>
         ))}
@@ -120,13 +120,13 @@ export function ScreenBack({ onRestart: onRicomincia }: { onRestart: () => void 
       </svg>
 
       <div className="head">
-        <span className="level">{comune("etichetta", { numero: levelNumber("logiche"), nome: t("testa") })}</span>
+        <span className="level">{common("etichetta", { numero: levelNumber("logiche"), nome: t("testa") })}</span>
       </div>
 
       <div className="caption">
         <p className="mono">{t("occhiello")}</p>
         <p>{t("testo")}</p>
-        <button type="button" onClick={onRicomincia}>
+        <button type="button" onClick={onRestart}>
           {t("ricomincia")}
         </button>
       </div>

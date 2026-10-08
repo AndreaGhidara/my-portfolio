@@ -62,18 +62,18 @@ export const DRAW_SCALE = 0.95;
  * un decimillesimo di percentuale e' un millesimo di pixel, e il punto piu'
  * stretto di questo tavolo si misura in punti interi.
  */
-const CIFRE = 4;
-const quota = (n: number) => +n.toFixed(CIFRE);
+const DIGITS = 4;
+const round = (n: number) => +n.toFixed(DIGITS);
 
 /**
  * Larghezza del disegno, in percentuale della larghezza del mondo. E' l'unica
  * misura che il CSS riceve: l'altezza la porta l'aspect-ratio della sagoma.
  *
  * Arrotondata come tutte le percentuali che finiscono in uno style inline: vedi
- * la nota di CIFRE.
+ * la nota di DIGITS.
  */
 export function drawWidth(shape: DeskDrawing): number {
-  return quota((DRAW_SCALE * SHAPE_BOX[shape].w * 100) / WORLD.width);
+  return round((DRAW_SCALE * SHAPE_BOX[shape].w * 100) / WORLD.width);
 }
 
 /**
@@ -126,7 +126,7 @@ export function objectExtent(shape: DeskDrawing, rotate: number): { x: number; y
  * eccesso.
  *
  * Nessuno di questi quattro numeri e' scelto qui: sono tutti la traduzione di
- * una dichiarazione di sezioni/tavolo.css (interlinea e respiro per `height`, `top`
+ * una dichiarazione di sections/desk.css (interlinea e respiro per `height`, `top`
  * per `gap`, il corpo del carattere e la larghezza del mondo per `em`). E'
  * un contratto fra due file che non si parlano, e i test lo leggono davvero:
  * cambiare il foglio di stile senza cambiare qui fa cadere una prova. Serviva:
@@ -360,7 +360,7 @@ export function placeObject(layer: number, index: number): Placement {
   const rotate = (((layer * 7 + index * 13) % 11) - 5) * 1.4;
   // Arrotondati qui e non nel componente: la prova della geometria deve misurare
   // gli stessi numeri che il browser disegna, non quelli da cui vengono.
-  return { x: quota(50 + dx), y: quota(50 + dy), rotate: quota(rotate) };
+  return { x: round(50 + dx), y: round(50 + dy), rotate: round(rotate) };
 }
 
 /**

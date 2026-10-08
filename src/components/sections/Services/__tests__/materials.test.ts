@@ -17,8 +17,8 @@ import {
   type Theme,
 } from "../materials";
 
-const TEMI: Theme[] = ["light", "dark"];
-const NOMI = Object.keys(SURFACES) as SurfaceName[];
+const THEMES: Theme[] = ["light", "dark"];
+const NAMES = Object.keys(SURFACES) as SurfaceName[];
 
 /**
  * LA PROVA DELLA SCALA.
@@ -45,21 +45,21 @@ describe("la scala dei materiali", () => {
     expect(mixOklab(palette.ink, 78, palette.muted)).toBe("#26231e");
   });
 
-  for (const tema of TEMI) {
-    describe(`tema ${tema}`, () => {
-      const fondo = THEME_TOKENS[tema].bg;
+  for (const theme of THEMES) {
+    describe(`tema ${theme}`, () => {
+      const ground = THEME_TOKENS[theme].bg;
 
       it("ogni pieno si stacca dal fondo: una superficie che non si vede non e' una superficie", () => {
-        for (const nome of NOMI) {
-          const superficie = SURFACES[nome];
+        for (const name of NAMES) {
+          const surface = SURFACES[name];
           // Il post-it e' l'eccezione dichiarata, ed e' una scelta e non una
           // dimenticanza: un post-it giallo e' giallo di notte. Su carta fa
           // 1.08:1: a tenerlo su sono la tinta e il bordo, non la luminanza.
-          if (superficie.family === "fisso") continue;
-          const pieno = tint(tema, superficie[tema].fill);
+          if (surface.family === "fixed") continue;
+          const fill = tint(theme, surface[theme].fill);
           expect(
-            contrastRatio(pieno, fondo),
-            `${nome}: il pieno ${pieno} sparisce nel fondo ${fondo}`,
+            contrastRatio(fill, ground),
+            `${name}: il pieno ${fill} sparisce nel fondo ${ground}`,
           ).toBeGreaterThanOrEqual(THRESHOLD.ground);
         }
       });
@@ -67,42 +67,42 @@ describe("la scala dei materiali", () => {
       it("la carta e l'apparecchio restano due famiglie", () => {
         // E' il difetto che ha fatto nascere questa prova: in tema scuro
         // `card` (#302d29) e `rack` (#302d27) erano lo stesso colore, 1.00:1.
-        const carta = NOMI.filter((n) => SURFACES[n].family === "carta");
-        const apparecchi = NOMI.filter((n) => SURFACES[n].family === "apparecchio");
-        expect(carta.length).toBeGreaterThan(0);
-        expect(apparecchi.length).toBeGreaterThan(0);
-        for (const c of carta) {
-          for (const a of apparecchi) {
+        const paper = NAMES.filter((n) => SURFACES[n].family === "paper");
+        const devices = NAMES.filter((n) => SURFACES[n].family === "device");
+        expect(paper.length).toBeGreaterThan(0);
+        expect(devices.length).toBeGreaterThan(0);
+        for (const c of paper) {
+          for (const a of devices) {
             expect(
-              separation(tema, SURFACES[c][tema].fill, SURFACES[a][tema].fill),
-              `${c} e ${a} sono la stessa cosa: ${tint(tema, SURFACES[c][tema].fill)} contro ${tint(tema, SURFACES[a][tema].fill)}`,
+              separation(theme, SURFACES[c][theme].fill, SURFACES[a][theme].fill),
+              `${c} e ${a} sono la stessa cosa: ${tint(theme, SURFACES[c][theme].fill)} contro ${tint(theme, SURFACES[a][theme].fill)}`,
             ).toBeGreaterThanOrEqual(THRESHOLD.families);
           }
         }
       });
 
       it("i gradini della carta restano tre gradini", () => {
-        const carta: SurfaceName[] = ["sheet", "card", "plate"];
-        for (let i = 0; i < carta.length; i++) {
-          for (let j = i + 1; j < carta.length; j++) {
+        const paper: SurfaceName[] = ["sheet", "card", "plate"];
+        for (let i = 0; i < paper.length; i++) {
+          for (let j = i + 1; j < paper.length; j++) {
             expect(
-              separation(tema, SURFACES[carta[i]][tema].fill, SURFACES[carta[j]][tema].fill),
-              `${carta[i]} e ${carta[j]} sono lo stesso cartoncino`,
+              separation(theme, SURFACES[paper[i]][theme].fill, SURFACES[paper[j]][theme].fill),
+              `${paper[i]} e ${paper[j]} sono lo stesso cartoncino`,
             ).toBeGreaterThanOrEqual(THRESHOLD.steps);
           }
         }
       });
 
       it("ogni tratto si stacca dal suo pieno: e' il tratto a fare il disegno", () => {
-        for (const nome of NOMI) {
-          const { fill, line } = SURFACES[nome][tema];
+        for (const name of NAMES) {
+          const { fill, line } = SURFACES[name][theme];
           // Il post-it bianco non dichiara il suo tratto: eredita quello degli
           // altri post-it, ed e' quello che va misurato sul pieno nuovo.
-          const tratto = line ?? SURFACES.postit[tema].line;
-          if (!tratto) continue;
+          const stroke = line ?? SURFACES.postit[theme].line;
+          if (!stroke) continue;
           expect(
-            separation(tema, fill, tratto),
-            `${nome}: il tratto sparisce dentro il suo pieno`,
+            separation(theme, fill, stroke),
+            `${name}: il tratto sparisce dentro il suo pieno`,
           ).toBeGreaterThanOrEqual(THRESHOLD.outline);
         }
       });
@@ -112,10 +112,10 @@ describe("la scala dei materiali", () => {
         // `--ink`: l'ombra aveva la luminanza esatta del fondo su cui cadeva,
         // cioe' 1.00:1: matematicamente non c'era, e il report la dava per
         // verificata in tutti e due i temi.
-        const composta = shadowOverBg(tema);
+        const composite = shadowOverBg(theme);
         expect(
-          contrastRatio(composta, fondo),
-          `l'ombra ${composta} e' il fondo ${fondo}`,
+          contrastRatio(composite, ground),
+          `l'ombra ${composite} e' il fondo ${ground}`,
         ).toBeGreaterThanOrEqual(THRESHOLD.shadow);
       });
     });
@@ -133,17 +133,17 @@ describe("la scala dei materiali", () => {
     // che si preme, e non e' un'etichetta del tavolo. Finche' tutto era
     // contorno la differenza non si vedeva; adesso che i pieni esistono, un
     // giallo identico agli altri cinque e' un'altra cosa.
-    for (const tema of TEMI) {
-      expect(recipeCss(SURFACES.blank[tema].fill)).toBe(recipeCss(SURFACES.sheet[tema].fill));
+    for (const theme of THEMES) {
+      expect(recipeCss(SURFACES.blank[theme].fill)).toBe(recipeCss(SURFACES.sheet[theme].fill));
     }
   });
 
   it("la domanda si legge dentro il post-it bianco, in tutti e due i temi", () => {
     // `[data-desk-ask]` e' inchiostro fisso: e' il nome del comando, ed e'
     // l'unico testo del tavolo che sta DENTRO una superficie.
-    for (const tema of TEMI) {
-      const pieno = tint(tema, SURFACES.blank[tema].fill);
-      expect(contrastRatio(palette.ink, pieno), `${tema}: la domanda non si legge`).toBeGreaterThanOrEqual(4.5);
+    for (const theme of THEMES) {
+      const fill = tint(theme, SURFACES.blank[theme].fill);
+      expect(contrastRatio(palette.ink, fill), `${theme}: la domanda non si legge`).toBeGreaterThanOrEqual(4.5);
     }
   });
 });
@@ -152,7 +152,7 @@ describe("la scala dei materiali", () => {
  * IL CONTRATTO CSS-COME-TESTO.
  *
  * Il modulo qui sopra e' la specifica; il CSS (tokens.css e
- * sezioni/tavolo.css) e' l'unico che dipinge. Se i due divergono, la prova
+ * sections/desk.css) e' l'unico che dipinge. Se i due divergono, la prova
  * della scala misura un tavolo che nessuno vede, che
  * e' il modo piu' silenzioso di non provare niente. E' lo stesso pattern gia'
  * in uso per il contratto dell'etichetta e per la porta del movimento.
@@ -160,14 +160,14 @@ describe("la scala dei materiali", () => {
 /** Il selettore si cerca INTERO: `[data-desk-shape]` e' contenuto per intero
  *  dentro `[data-theme="dark"] [data-desk-shape]`. Le ancore di materials.ts
  *  finiscono con la graffa o con la virgola della lista: si tolgono. */
-function blocco(selettore: string): string | null {
-  return rules(selettore.replace(/\s*[{,]\s*$/, ""))[0]?.body ?? null;
+function ruleBody(selector: string): string | null {
+  return rules(selector.replace(/\s*[{,]\s*$/, ""))[0]?.body ?? null;
 }
 
-function pretende(selettore: string): string {
-  const testo = blocco(selettore);
-  if (testo === null) throw new Error(`il foglio di stile non ha la regola ${selettore}`);
-  return testo;
+function requireRule(selector: string): string {
+  const body = ruleBody(selector);
+  if (body === null) throw new Error(`il foglio di stile non ha la regola ${selector}`);
+  return body;
 }
 
 describe("il CSS dichiara esattamente la tavola dei materiali", () => {
@@ -175,55 +175,55 @@ describe("il CSS dichiara esattamente la tavola dei materiali", () => {
     // THEME_TOKENS e' l'assunto su cui poggia ogni numero della scala: se un
     // giorno --fg-muted scuro cambiasse mestiere nel CSS, il modulo
     // continuerebbe a calcolare il tavolo di ieri.
-    const scuro = pretende('[data-theme="dark"] {');
-    expect(scuro).toMatch(/--bg:\s*var\(--ink\)/);
-    expect(scuro).toMatch(/--fg:\s*var\(--paper\)/);
-    expect(scuro).toMatch(new RegExp(`--fg-muted:\\s*${palette.mutedDark}`, "i"));
+    const dark = requireRule('[data-theme="dark"] {');
+    expect(dark).toMatch(/--bg:\s*var\(--ink\)/);
+    expect(dark).toMatch(/--fg:\s*var\(--paper\)/);
+    expect(dark).toMatch(new RegExp(`--fg-muted:\\s*${palette.mutedDark}`, "i"));
   });
 
-  for (const nome of NOMI) {
-    const superficie = SURFACES[nome];
-    const fisso =
-      recipeCss(superficie.light.fill) === recipeCss(superficie.dark.fill) &&
-      (superficie.light.line === null) === (superficie.dark.line === null) &&
-      (superficie.light.line === null ||
-        recipeCss(superficie.light.line) === recipeCss(superficie.dark.line!));
+  for (const name of NAMES) {
+    const surface = SURFACES[name];
+    const fixed =
+      recipeCss(surface.light.fill) === recipeCss(surface.dark.fill) &&
+      (surface.light.line === null) === (surface.dark.line === null) &&
+      (surface.light.line === null ||
+        recipeCss(surface.light.line) === recipeCss(surface.dark.line!));
 
-    it(`${nome}: il tema chiaro dipinge la ricetta del modulo`, () => {
-      const testo = pretende(superficie.anchor);
-      expect(testo).toContain(`--desk-full: ${recipeCss(superficie.light.fill)}`);
-      if (superficie.light.line) {
-        expect(testo).toContain(`--desk-stroke: ${recipeCss(superficie.light.line)}`);
+    it(`${name}: il tema chiaro dipinge la ricetta del modulo`, () => {
+      const body = requireRule(surface.anchor);
+      expect(body).toContain(`--desk-full: ${recipeCss(surface.light.fill)}`);
+      if (surface.light.line) {
+        expect(body).toContain(`--desk-stroke: ${recipeCss(surface.light.line)}`);
       } else {
         // Il post-it bianco eredita il suo tratto: dichiararlo qui sarebbe una
         // seconda copia dello stesso giallo.
-        expect(testo).not.toContain("--desk-stroke");
+        expect(body).not.toContain("--desk-stroke");
       }
     });
 
     it(
-      fisso
-        ? `${nome}: e' fisso, e il tema scuro non lo ridichiara`
-        : `${nome}: il tema scuro dipinge la sua ricetta, che e' un'altra`,
+      fixed
+        ? `${name}: e' fisso, e il tema scuro non lo ridichiara`
+        : `${name}: il tema scuro dipinge la sua ricetta, che e' un'altra`,
       () => {
-        const scuro = blocco(`[data-theme="dark"] ${superficie.anchor}`);
-        if (fisso) {
-          expect(scuro, `${nome} e' dichiarato due volte per niente`).toBeNull();
+        const dark = ruleBody(`[data-theme="dark"] ${surface.anchor}`);
+        if (fixed) {
+          expect(dark, `${name} e' dichiarato due volte per niente`).toBeNull();
           return;
         }
-        expect(scuro, `${nome} non ha la sua regola in tema scuro`).not.toBeNull();
-        expect(scuro).toContain(`--desk-full: ${recipeCss(superficie.dark.fill)}`);
-        if (superficie.dark.line) {
-          expect(scuro).toContain(`--desk-stroke: ${recipeCss(superficie.dark.line)}`);
+        expect(dark, `${name} non ha la sua regola in tema scuro`).not.toBeNull();
+        expect(dark).toContain(`--desk-full: ${recipeCss(surface.dark.fill)}`);
+        if (surface.dark.line) {
+          expect(dark).toContain(`--desk-stroke: ${recipeCss(surface.dark.line)}`);
         }
       },
     );
   }
 
   it("i led sono le due tinte del modulo, e non seguono il tema", () => {
-    const led = pretende("[data-desk-leds] {");
-    expect(led).toContain(recipeCss(LEDS.on));
-    expect(led).toContain(recipeCss(LEDS.off));
+    const leds = requireRule("[data-desk-leds] {");
+    expect(leds).toContain(recipeCss(LEDS.on));
+    expect(leds).toContain(recipeCss(LEDS.off));
     expect(rules(/\[data-theme="dark"\] \[data-desk-leds\]/)).toEqual([]);
   });
 
@@ -231,8 +231,8 @@ describe("il CSS dichiara esattamente la tavola dei materiali", () => {
     // Ereditavano mask-repeat/position/size da `[data-desk-shape] > *` senza
     // mask-image: stavano dentro il rack solo perche' le percentuali capitavano
     // giuste, e nessuna regola lo diceva.
-    const led = pretende("[data-desk-leds] {");
-    expect(led).toMatch(/mask-image:\s*url\("\/brand\/desk\/rack/);
+    const leds = requireRule("[data-desk-leds] {");
+    expect(leds).toMatch(/mask-image:\s*url\("\/brand\/desk\/rack/);
   });
 });
 
@@ -247,47 +247,47 @@ describe("l'ombra sta sulle superfici e su niente altro", () => {
     // Tutte le regole del sito, anche la prima di ogni media query: l'ombra
     // delle palline di carta dell'apertura c'e', ma il tavolo e' quello che
     // conta qui, e le palline non sono una superficie del tavolo.
-    const conOmbra = rules()
+    const shadowed = rules()
       .filter((r) => /drop-shadow/.test(r.body))
       .map((r) => r.selector)
-      .filter((selettore) => /\[data-desk/.test(selettore));
-    expect(conOmbra).toEqual(["[data-desk-shape]"]);
+      .filter((selector) => /\[data-desk/.test(selector));
+    expect(shadowed).toEqual(["[data-desk-shape]"]);
   });
 
   it("l'etichetta non prende nessun filtro", () => {
-    expect(pretende("[data-desk-object] [data-desk-label] {")).not.toContain("filter");
+    expect(requireRule("[data-desk-object] [data-desk-label] {")).not.toContain("filter");
   });
 
   it("il colore lo porta --desk-shadow, dichiarata una volta per tema", () => {
-    const sagoma = pretende("[data-desk-shape] {");
-    expect(sagoma).toContain(`--desk-shadow: ${shadowCss("light")}`);
-    expect(sagoma).toMatch(/filter:\s*drop-shadow\([^)]*var\(--desk-shadow\)\)/);
-    const scuro = pretende('[data-theme="dark"] [data-desk-shape] {');
-    expect(scuro).toContain(`--desk-shadow: ${shadowCss("dark")}`);
+    const shape = requireRule("[data-desk-shape] {");
+    expect(shape).toContain(`--desk-shadow: ${shadowCss("light")}`);
+    expect(shape).toMatch(/filter:\s*drop-shadow\([^)]*var\(--desk-shadow\)\)/);
+    const dark = requireRule('[data-theme="dark"] [data-desk-shape] {');
+    expect(dark).toContain(`--desk-shadow: ${shadowCss("dark")}`);
   });
 
   it("resta corta: sborda meno dell'aria che la geometria tiene fra due oggetti", () => {
     // L'ombra non entra in objectFootprint. Il pavimento di 1,2 punti del mondo
     // vale circa 6,3px a 1440: finche' scostamento + sfocatura stanno sotto
     // meta' di quel franco, due ombre non si toccano mai.
-    const sagoma = pretende("[data-desk-shape] {");
-    const misure = sagoma.match(/drop-shadow\(0\s+([\d.]+)em\s+([\d.]+)em/);
-    expect(misure, "l'ombra non e' piu' scritta in em").not.toBeNull();
-    const [scostamento, sfocatura] = misure!.slice(1).map(Number);
-    expect((scostamento + sfocatura) * 16).toBeLessThanOrEqual(3.15);
+    const shape = requireRule("[data-desk-shape] {");
+    const sizes = shape.match(/drop-shadow\(0\s+([\d.]+)em\s+([\d.]+)em/);
+    expect(sizes, "l'ombra non e' piu' scritta in em").not.toBeNull();
+    const [offset, blur] = sizes!.slice(1).map(Number);
+    expect((offset + blur) * 16).toBeLessThanOrEqual(3.15);
   });
 });
 
 describe("nessun materiale scrive un colore a mano", () => {
   it("ogni ricetta spende solo token del tema", () => {
-    for (const tema of TEMI) {
-      for (const nome of NOMI) {
-        for (const ricetta of [SURFACES[nome][tema].fill, SURFACES[nome][tema].line]) {
-          if (!ricetta) continue;
-          expect(recipeCss(ricetta)).not.toMatch(/#[0-9a-f]{3,6}/i);
+    for (const theme of THEMES) {
+      for (const name of NAMES) {
+        for (const recipe of [SURFACES[name][theme].fill, SURFACES[name][theme].line]) {
+          if (!recipe) continue;
+          expect(recipeCss(recipe)).not.toMatch(/#[0-9a-f]{3,6}/i);
         }
       }
-      expect(shadowCss(tema)).not.toMatch(/#[0-9a-f]{3,6}/i);
+      expect(shadowCss(theme)).not.toMatch(/#[0-9a-f]{3,6}/i);
     }
   });
 });

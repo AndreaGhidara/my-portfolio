@@ -13,7 +13,7 @@ import {
 
 /**
  * Un'illustrazione del sito finto. Il markup e' una stringa fissa di
- * sitoFinto.ts, nessun dato da fuori: dangerouslySetInnerHTML qui e' sicuro.
+ * fakeSite.ts, nessun dato da fuori: dangerouslySetInnerHTML qui e' sicuro.
  */
 export function Illustration({ id }: { id: IllustrationId }) {
   return (
@@ -27,7 +27,7 @@ export function Illustration({ id }: { id: IllustrationId }) {
   );
 }
 
-type SitoProps = {
+type SiteProps = {
   layout: LayoutId;
   illustration: IllustrationId;
   pair: FakeFontPair;
@@ -42,16 +42,16 @@ type SitoProps = {
  *
  * Il titolo non e' un heading: e' il disegno di un sito dentro la pagina, e
  * chi naviga per titoli non deve trovarci il pane fra le sezioni del
- * portfolio. `data-titolo` e `data-img` sono i bersagli del lampo.
+ * portfolio. `data-title` e `data-img` sono i bersagli del lampo.
  */
-export function FakeSite({ layout: impaginazione, illustration: illustrazione, pair: coppia, scale: scala, ref }: SitoProps) {
+export function FakeSite({ layout, illustration, pair, scale, ref }: SiteProps) {
   const t = useTranslations("services.gioco.schermo.sito");
 
-  const stile = {
-    "--ft": coppia.heading,
-    "--fw": coppia.weight,
-    "--fp": coppia.body,
-    "--k": scala.k,
+  const style = {
+    "--ft": pair.heading,
+    "--fw": pair.weight,
+    "--fp": pair.body,
+    "--k": scale.k,
   } as CSSProperties;
 
   const nav = (
@@ -63,16 +63,16 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
       <i>{t("nav.prenota")}</i>
     </div>
   );
-  const immagine = (
+  const image = (
     <div className="s-img" data-img>
-      <Illustration id={illustrazione} />
+      <Illustration id={illustration} />
     </div>
   );
   const em = <em>{t("titoloEm")}</em>;
 
-  let corpo;
-  if (impaginazione === "manifesto") {
-    corpo = (
+  let body;
+  if (layout === "manifesto") {
+    body = (
       <div className="l-poster">
         {nav}
         <div className="hero">
@@ -82,7 +82,7 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
             {em}
           </p>
           <div className="seal" data-img>
-            <Illustration id={illustrazione} />
+            <Illustration id={illustration} />
           </div>
           <span className="seal-text">{t("bollo")}</span>
         </div>
@@ -94,10 +94,10 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
         </div>
       </div>
     );
-  } else if (impaginazione === "copertina") {
-    corpo = (
+  } else if (layout === "copertina") {
+    body = (
       <div className="l-cover">
-        {immagine}
+        {image}
         {nav}
         <div className="header">
           <span>{t("numero")}</span>
@@ -122,9 +122,9 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
         </div>
       </div>
     );
-  } else if (impaginazione === "bento") {
-    const giorni = [...t("giorni")];
-    corpo = (
+  } else if (layout === "bento") {
+    const days = [...t("giorni")];
+    body = (
       <div className="l-bento">
         {nav}
         <div className="grid">
@@ -140,7 +140,7 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
             </span>
           </div>
           <div className="t-img">
-            {immagine}
+            {image}
             <span className="label">✦ {t("sfornato")}</span>
           </div>
           <div className="t-num">
@@ -154,9 +154,9 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
           <div className="t-time">
             <b>6 · 13</b>
             <span className="days">
-              {giorni.map((g, i) => (
+              {days.map((g, i) => (
                 // L'ultimo giorno, la domenica, il forno e' chiuso.
-                <span key={i} className={i === giorni.length - 1 ? "no" : undefined}>
+                <span key={i} className={i === days.length - 1 ? "no" : undefined}>
                   {g}
                 </span>
               ))}
@@ -166,7 +166,7 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
       </div>
     );
   } else {
-    corpo = (
+    body = (
       <div className="l-classic">
         {nav}
         <div className="hero">
@@ -177,7 +177,7 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
             <p className="note-p">{t("nota")}</p>
             <span className="cta">{t("cta")}</span>
           </div>
-          {immagine}
+          {image}
         </div>
         <div className="cards">
           {(["pane", "torte", "dove"] as const).map((k) => (
@@ -192,8 +192,8 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
   }
 
   return (
-    <div ref={ref} className="site" style={stile}>
-      {corpo}
+    <div ref={ref} className="site" style={style}>
+      {body}
     </div>
   );
 }

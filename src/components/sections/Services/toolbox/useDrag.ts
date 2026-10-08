@@ -8,7 +8,7 @@ type Gsap = typeof import("gsap").gsap;
  * Il trascinamento: a "full" un'etichetta si prende e si sposta, e al
  * rilascio torna al suo posto con una molla di GSAP. Niente ciclo sempre
  * acceso: si lavora solo mentre qualcosa si muove, e si riscrivono solo i
- * fili del nodo preso. Sotto la soglia il gesto e' un clic, e va a onClic.
+ * fili del nodo preso. Sotto la soglia il gesto e' un clic, e va a onTap.
  *
  * Restituisce i ref da appendere a nodi e fili, i gestori del puntatore e la
  * presa in corso, che il passaggio del mouse deve rispettare.
@@ -16,40 +16,40 @@ type Gsap = typeof import("gsap").gsap;
 export function useDrag({
   svg,
   gsapRef,
-  full: pieno,
-  onTap: onClic,
+  full,
+  onTap,
 }: {
   svg: RefObject<SVGSVGElement | null>;
   gsapRef: RefObject<Gsap | null>;
   full: boolean;
   onTap: (id: string) => void;
 }) {
-  const gruppi = useRef(new Map<string, SVGGElement>());
-  const tracciati = useRef<(SVGPathElement | null)[]>([]);
-  const posizioni = useRef(
+  const groups = useRef(new Map<string, SVGGElement>());
+  const paths = useRef<(SVGPathElement | null)[]>([]);
+  const positions = useRef(
     new Map<string, MapPoint>([...restPositions].map(([id, p]) => [id, { ...p }])),
   );
-  const presa = useRef<{
+  const grab = useRef<{
     id: string;
     x0: number;
     y0: number;
     dx: number;
     dy: number;
-    mosso: boolean;
+    moved: boolean;
   } | null>(null);
 
   /** Riscrive solo i fili del nodo che si muove, non tutti e ottanta. */
-  const ridisegna = (id: string) => {
-    const pos = posizioni.current;
+  const redraw = (id: string) => {
+    const pos = positions.current;
     THREADS.forEach((f, i) => {
       if (f.a !== id && f.b !== id) return;
-      tracciati.current[i]?.setAttribute(
+      paths.current[i]?.setAttribute(
         "d",
         curve(pos.get(f.a)!, pos.get(f.b)!),
       );
     });
     const p = pos.get(id)!;
-    gruppi.current
+    groups.current
       .get(id)
       ?.setAttribute(
         "transform",
@@ -57,63 +57,63 @@ export function useDrag({
       );
   };
 
-  const versoMappa = (x: number, y: number): MapPoint => {
+  const toMap = (x: number, y: number): MapPoint => {
     const m = svg.current?.getScreenCTM();
     if (!m) return { x, y };
     return toMapPoint(m.inverse(), x, y);
   };
 
-  const giu = (id: string) => (e: React.PointerEvent<SVGGElement>) => {
+  const pointerDown = (id: string) => (e: React.PointerEvent<SVGGElement>) => {
     if (e.button !== 0) return;
-    const p = posizioni.current.get(id)!;
-    const q = versoMappa(e.clientX, e.clientY);
-    presa.current = {
+    const p = positions.current.get(id)!;
+    const q = toMap(e.clientX, e.clientY);
+    grab.current = {
       id,
       x0: e.clientX,
       y0: e.clientY,
       dx: p.x - q.x,
       dy: p.y - q.y,
-      mosso: false,
+      moved: false,
     };
     gsapRef.current?.killTweensOf(p);
     e.currentTarget.setPointerCapture(e.pointerId);
   };
 
-  const muovi = (e: React.PointerEvent<SVGGElement>) => {
-    const pr = presa.current;
-    if (!pr || !pieno || !gsapRef.current) return;
+  const pointerMove = (e: React.PointerEvent<SVGGElement>) => {
+    const pr = grab.current;
+    if (!pr || !full || !gsapRef.current) return;
     if (
-      !pr.mosso &&
+      !pr.moved &&
       !pastThreshold({ x: pr.x0, y: pr.y0 }, { x: e.clientX, y: e.clientY })
     )
       return;
-    pr.mosso = true;
-    const q = versoMappa(e.clientX, e.clientY);
-    const p = posizioni.current.get(pr.id)!;
+    pr.moved = true;
+    const q = toMap(e.clientX, e.clientY);
+    const p = positions.current.get(pr.id)!;
     p.x = q.x + pr.dx;
     p.y = q.y + pr.dy;
-    ridisegna(pr.id);
+    redraw(pr.id);
   };
 
   // Le molle nascono da un gesto, fuori dal contesto di useSectionAnimation:
   // nessuno le spegnerebbe allo smontaggio.
-  const molle = useRef(new Set<gsap.core.Tween>());
+  const springs = useRef(new Set<gsap.core.Tween>());
   useEffect(() => {
-    const vive = molle.current;
+    const live = springs.current;
     return () => {
-      for (const t of vive) t.kill();
-      vive.clear();
+      for (const t of live) t.kill();
+      live.clear();
     };
   }, []);
 
-  const molla = (id: string) => {
+  const spring = (id: string) => {
     const gsap = gsapRef.current;
-    const p = posizioni.current.get(id)!;
+    const p = positions.current.get(id)!;
     const r = restPositions.get(id)!;
     if (!gsap) {
       p.x = r.x;
       p.y = r.y;
-      ridisegna(id);
+      redraw(id);
       return;
     }
     const tween = gsap.to(p, {
@@ -121,44 +121,44 @@ export function useDrag({
       y: r.y,
       duration: 1.1,
       ease: "elastic.out(1, 0.45)",
-      onUpdate: () => ridisegna(id),
+      onUpdate: () => redraw(id),
       onComplete: () => {
-        molle.current.delete(tween);
+        springs.current.delete(tween);
       },
     });
-    molle.current.add(tween);
+    springs.current.add(tween);
   };
 
-  const su = (e: React.PointerEvent<SVGGElement>) => {
-    const pr = presa.current;
-    presa.current = null;
+  const pointerUp = (e: React.PointerEvent<SVGGElement>) => {
+    const pr = grab.current;
+    grab.current = null;
     if (!pr) return;
     if (e.currentTarget.hasPointerCapture(e.pointerId))
       e.currentTarget.releasePointerCapture(e.pointerId);
-    if (pr.mosso) {
-      molla(pr.id);
+    if (pr.moved) {
+      spring(pr.id);
       return;
     }
-    onClic(pr.id);
+    onTap(pr.id);
   };
 
-  const annulla = () => {
-    const pr = presa.current;
-    presa.current = null;
-    if (pr?.mosso) molla(pr.id);
+  const pointerCancel = () => {
+    const pr = grab.current;
+    grab.current = null;
+    if (pr?.moved) spring(pr.id);
   };
 
   // Rimesso tutto al suo posto quando il movimento si spegne a meta' presa.
   useEffect(() => {
-    if (pieno) return;
+    if (full) return;
     for (const [id, r] of restPositions) {
-      const p = posizioni.current.get(id)!;
+      const p = positions.current.get(id)!;
       if (p.x === r.x && p.y === r.y) continue;
       p.x = r.x;
       p.y = r.y;
-      ridisegna(id);
+      redraw(id);
     }
-  }, [pieno]);
+  }, [full]);
 
-  return { gruppi, tracciati, presa, giu, muovi, su, annulla };
+  return { groups, paths, grab, pointerDown, pointerMove, pointerUp, pointerCancel };
 }

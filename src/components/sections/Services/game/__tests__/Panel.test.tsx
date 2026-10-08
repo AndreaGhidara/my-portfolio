@@ -8,19 +8,19 @@ import { Panel, SEQUENCE } from "../Panel";
 
 const p = it_.services.gioco.pannello;
 
-const banco = (c: HTMLElement) => c.querySelector('[data-game-level="pannello"]') as HTMLElement;
-const console_ = (c: HTMLElement) => banco(c).querySelector(".console") as HTMLElement;
-const salute = (c: HTMLElement) => Number(banco(c).querySelector(".health b")!.textContent!.replace("%", ""));
-const coda = (c: HTMLElement) => banco(c).querySelector(".tail") as HTMLElement;
-const modulo = (nome: string) => screen.getByRole("button", { name: nome });
-const accendi = () => screen.getByRole("button", { name: new RegExp(p.spento.accendi) });
+const bench = (c: HTMLElement) => c.querySelector('[data-game-level="pannello"]') as HTMLElement;
+const console_ = (c: HTMLElement) => bench(c).querySelector(".console") as HTMLElement;
+const health = (c: HTMLElement) => Number(bench(c).querySelector(".health b")!.textContent!.replace("%", ""));
+const tail = (c: HTMLElement) => bench(c).querySelector(".tail") as HTMLElement;
+const moduleButton = (name: string) => screen.getByRole("button", { name: name });
+const switchOn = () => screen.getByRole("button", { name: new RegExp(p.spento.accendi) });
 
 /** Il clic sincrono: userEvent con i timer finti farebbe correre il battito
  *  fra un evento e l'altro, e i conti del tempo non tornerebbero piu'. */
-const tocca = (el: HTMLElement) => fireEvent.click(el);
+const tap = (el: HTMLElement) => fireEvent.click(el);
 
 /** Avanza il tempo finto dentro act, perche' i battiti aggiornano lo stato. */
-const passa = (ms: number) => act(() => vi.advanceTimersByTime(ms));
+const advance = (ms: number) => act(() => vi.advanceTimersByTime(ms));
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -29,20 +29,20 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-const monta = (props: Partial<{ onAvanti: () => void; visibile: boolean }> = {}) => {
-  const onAvanti = props.onAvanti ?? vi.fn();
+const mount = (props: Partial<{ onNext: () => void; visible: boolean }> = {}) => {
+  const onNext = props.onNext ?? vi.fn();
   const r = renderWithMessages(
     <StrictMode>
-      <Panel onNext={onAvanti} visible={props.visibile ?? true} />
+      <Panel onNext={onNext} visible={props.visible ?? true} />
     </StrictMode>,
   );
-  const visibile = (v: boolean) =>
+  const setVisible = (v: boolean) =>
     r.rerender(
       <StrictMode>
-        <Panel onNext={onAvanti} visible={v} />
+        <Panel onNext={onNext} visible={v} />
       </StrictMode>,
     );
-  return { ...r, onAvanti, visibile };
+  return { ...r, onNext, setVisible };
 };
 
 describe("il pannello, i testi", () => {
@@ -54,50 +54,50 @@ describe("il pannello, i testi", () => {
 
 describe("il pannello, acceso e spento", () => {
   it("spento non succede niente: nessun avviso, la salute resta a 100, i moduli non si toccano", () => {
-    const { container } = monta();
+    const { container } = mount();
     expect(within(console_(container)).getByText(p.spento.titolo)).toBeInTheDocument();
-    expect(within(banco(container)).getByText(p.conta.spento)).toBeInTheDocument();
-    passa(20_000);
-    expect(salute(container)).toBe(100);
-    expect(coda(container)).toHaveTextContent(p.coda.attesa);
-    expect(modulo(p.servizi.manutenzione)).toBeDisabled();
+    expect(within(bench(container)).getByText(p.conta.spento)).toBeInTheDocument();
+    advance(20_000);
+    expect(health(container)).toBe(100);
+    expect(tail(container)).toHaveTextContent(p.coda.attesa);
+    expect(moduleButton(p.servizi.manutenzione)).toBeDisabled();
   });
 
   it("acceso, il primo avviso arriva dopo 1,4 s e la salute scende solo da li'", () => {
-    const { container } = monta();
-    tocca(accendi());
+    const { container } = mount();
+    tap(switchOn());
     expect(screen.getByText(p.acceso.verde.titolo)).toBeInTheDocument();
 
-    passa(1300);
-    expect(salute(container)).toBe(100);
-    expect(coda(container)).toHaveTextContent(p.coda.attesa);
+    advance(1300);
+    expect(health(container)).toBe(100);
+    expect(tail(container)).toHaveTextContent(p.coda.attesa);
 
-    passa(200);
-    expect(coda(container)).toHaveTextContent(p.eventi[0].testo);
-    expect(within(banco(container)).getByText("avviso 1 di 6")).toBeInTheDocument();
+    advance(200);
+    expect(tail(container)).toHaveTextContent(p.eventi[0].testo);
+    expect(within(bench(container)).getByText("avviso 1 di 6")).toBeInTheDocument();
     expect(screen.getByText(p.acceso.spia.titolo)).toBeInTheDocument();
-    expect(modulo(p.servizi.manutenzione)).toHaveClass("alarm");
+    expect(moduleButton(p.servizi.manutenzione)).toHaveClass("alarm");
 
     // 1,2 punti ogni 400 ms, e con lo StrictMode un intervallo solo: 4 s
     // fanno 12 punti, non 24.
-    passa(4000);
-    expect(salute(container)).toBe(88);
+    advance(4000);
+    expect(health(container)).toBe(88);
   });
 
   it("la salute non scende sotto 40", () => {
-    const { container } = monta();
-    tocca(accendi());
-    passa(1400 + 60_000);
-    expect(salute(container)).toBe(40);
+    const { container } = mount();
+    tap(switchOn());
+    advance(1400 + 60_000);
+    expect(health(container)).toBe(40);
   });
 });
 
 describe("il pannello, i moduli", () => {
   it("il modulo sbagliato dice che li' e' tutto a posto, e non c'e' niente da fare", () => {
-    const { container } = monta();
-    tocca(accendi());
-    passa(1400);
-    tocca(modulo(p.servizi.assistenza));
+    const { container } = mount();
+    tap(switchOn());
+    advance(1400);
+    tap(moduleButton(p.servizi.assistenza));
 
     const con = within(console_(container));
     expect(con.getByText(p.modulo.aPosto)).toBeInTheDocument();
@@ -106,87 +106,87 @@ describe("il pannello, i moduli", () => {
   });
 
   it("il modulo giusto mostra il problema; intervenire lo risolve e la salute si ferma", () => {
-    const { container } = monta();
-    tocca(accendi());
-    passa(1400);
-    tocca(modulo(p.servizi.manutenzione));
+    const { container } = mount();
+    tap(switchOn());
+    advance(1400);
+    tap(moduleButton(p.servizi.manutenzione));
 
     const con = within(console_(container));
     expect(con.getByText(p.modulo.cosa)).toBeInTheDocument();
     expect(con.getByText(p.eventi[0].testo)).toBeInTheDocument();
-    tocca(con.getByRole("button", { name: new RegExp(p.eventi[0].intervento) }));
+    tap(con.getByRole("button", { name: new RegExp(p.eventi[0].intervento) }));
 
     expect(con.getByText(p.modulo.fatto)).toBeInTheDocument();
     expect(con.getByText(p.eventi[0].esito)).toBeInTheDocument();
     expect(con.getByRole("button", { name: p.modulo.aspetta })).toBeDisabled();
-    expect(coda(container)).toHaveTextContent(`${p.servizi.manutenzione} · risolto`);
-    expect(modulo(p.servizi.manutenzione)).not.toHaveClass("alarm");
+    expect(tail(container)).toHaveTextContent(`${p.servizi.manutenzione} · risolto`);
+    expect(moduleButton(p.servizi.manutenzione)).not.toHaveClass("alarm");
 
-    const ferma = salute(container);
-    passa(2000);
-    expect(salute(container)).toBe(ferma);
+    const stalled = health(container);
+    advance(2000);
+    expect(health(container)).toBe(stalled);
 
     // 2,6 s dopo l'intervento arriva il secondo avviso.
-    passa(600);
-    expect(coda(container)).toHaveTextContent(p.eventi[1].testo);
-    expect(modulo(p.servizi.assistenza)).toHaveClass("alarm");
+    advance(600);
+    expect(tail(container)).toHaveTextContent(p.eventi[1].testo);
+    expect(moduleButton(p.servizi.assistenza)).toHaveClass("alarm");
   });
 });
 
 describe("il pannello, fuori dallo schermo", () => {
   it("con visibile false i timer si fermano, e al rientro riprendono da dove erano", () => {
-    const { container, visibile } = monta();
-    tocca(accendi());
-    passa(1000);
-    visibile(false);
-    passa(10_000);
-    expect(coda(container)).toHaveTextContent(p.coda.attesa);
+    const { container, setVisible } = mount();
+    tap(switchOn());
+    advance(1000);
+    setVisible(false);
+    advance(10_000);
+    expect(tail(container)).toHaveTextContent(p.coda.attesa);
 
-    visibile(true);
-    passa(400);
-    expect(coda(container)).toHaveTextContent(p.eventi[0].testo);
-    const prima = salute(container);
+    setVisible(true);
+    advance(400);
+    expect(tail(container)).toHaveTextContent(p.eventi[0].testo);
+    const before = health(container);
 
-    visibile(false);
-    passa(10_000);
-    expect(salute(container)).toBe(prima);
+    setVisible(false);
+    advance(10_000);
+    expect(health(container)).toBe(before);
 
-    visibile(true);
-    passa(4000);
-    expect(salute(container)).toBeLessThan(prima);
+    setVisible(true);
+    advance(4000);
+    expect(health(container)).toBeLessThan(before);
   });
 
   it("smontato, non resta un timer acceso", () => {
-    const { unmount } = monta();
-    tocca(accendi());
+    const { unmount } = mount();
+    tap(switchOn());
     unmount();
     expect(vi.getTimerCount()).toBe(0);
   });
 });
 
 describe("il pannello, il resoconto", () => {
-  const risolviTutto = (container: HTMLElement) => {
-    for (const [i, servizio] of SEQUENCE.entries()) {
-      passa(i === 0 ? 1400 : 2600);
-      tocca(modulo(p.servizi[servizio]));
-      tocca(
+  const solveAll = (container: HTMLElement) => {
+    for (const [i, service] of SEQUENCE.entries()) {
+      advance(i === 0 ? 1400 : 2600);
+      tap(moduleButton(p.servizi[service]));
+      tap(
         within(console_(container)).getByRole("button", { name: new RegExp(p.eventi[i].intervento) }),
       );
     }
-    passa(2600);
+    advance(2600);
   };
 
-  it("i sei avvisi portano al resoconto per servizio; «livello 4» chiama onAvanti", () => {
-    const { container, onAvanti } = monta();
-    tocca(accendi());
-    risolviTutto(container);
+  it("i sei avvisi portano al resoconto per servizio; «livello 4» chiama onNext", () => {
+    const { container, onNext } = mount();
+    tap(switchOn());
+    solveAll(container);
 
     const con = within(console_(container));
     expect(con.getByText(p.fine.occhiello)).toBeInTheDocument();
     expect(con.getByText(p.fine.bene)).toBeInTheDocument();
-    expect(within(banco(container)).getByText(p.conta.fine)).toBeInTheDocument();
-    const righe = con.getAllByRole("listitem").map((li) => li.textContent);
-    expect(righe).toEqual([
+    expect(within(bench(container)).getByText(p.conta.fine)).toBeInTheDocument();
+    const rows = con.getAllByRole("listitem").map((li) => li.textContent);
+    expect(rows).toEqual([
       "Assistenza · 1 avviso",
       "Automazioni · 1 avviso",
       "I numeri · 1 avviso",
@@ -195,27 +195,27 @@ describe("il pannello, il resoconto", () => {
     ]);
     expect(vi.getTimerCount()).toBe(0);
 
-    tocca(con.getByRole("button", { name: new RegExp(p.fine.avanti) }));
-    expect(onAvanti).toHaveBeenCalledTimes(1);
+    tap(con.getByRole("button", { name: new RegExp(p.fine.avanti) }));
+    expect(onNext).toHaveBeenCalledTimes(1);
   });
 
   it("«ricomincia» riporta al pannello spento con la salute piena", () => {
-    const { container } = monta();
-    tocca(accendi());
-    passa(1400 + 10_000);
-    risolviTutto(container);
+    const { container } = mount();
+    tap(switchOn());
+    advance(1400 + 10_000);
+    solveAll(container);
     expect(screen.getByText(p.fine.male)).toBeInTheDocument();
 
-    tocca(screen.getByRole("button", { name: new RegExp(p.fine.ricomincia) }));
+    tap(screen.getByRole("button", { name: new RegExp(p.fine.ricomincia) }));
     expect(screen.getByText(p.spento.titolo)).toBeInTheDocument();
-    expect(salute(container)).toBe(100);
+    expect(health(container)).toBe(100);
   });
 
   it("in inglese il resoconto parla inglese", () => {
     const pe = en_.services.gioco.pannello;
       renderWithMessages(<Panel onNext={vi.fn()} visible />, { locale: "en" });
-    tocca(screen.getByRole("button", { name: new RegExp(pe.spento.accendi) }));
-    passa(1400);
+    tap(screen.getByRole("button", { name: new RegExp(pe.spento.accendi) }));
+    advance(1400);
     expect(screen.getByText(pe.acceso.spia.titolo)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: pe.servizi.manutenzione })).toHaveClass("alarm");
   });

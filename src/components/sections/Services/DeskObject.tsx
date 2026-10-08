@@ -102,9 +102,9 @@ export function DeskObject({
    *  un comando solo. */
   note?: string;
 }) {
-  const sagoma = <DeskShapeArt drawing={shape} />;
+  const shapeArt = <DeskShapeArt drawing={shape} />;
 
-  const campione = sample ? <DeskSpecimen sample={sample} /> : null;
+  const specimen = sample ? <DeskSpecimen sample={sample} /> : null;
 
   return (
     <li
@@ -125,7 +125,7 @@ export function DeskObject({
     >
       {href ? (
         <a href={href} data-desk-blank>
-          {sagoma}
+          {shapeArt}
           {/* Quello che c'e' scritto sul post-it. Decorazione come ogni altro
               campione del tavolo: il nome del comando e' la domanda qui sotto,
               e due testi dentro un <a> sono un comando che si annuncia due
@@ -144,8 +144,8 @@ export function DeskObject({
         </a>
       ) : (
         <>
-          {sagoma}
-          {campione}
+          {shapeArt}
+          {specimen}
           {/* La larghezza massima della striscia arriva da LABEL e non dal CSS:
               e' con quel numero che objectFootprint tiene le distanze, e se il
               foglio di stile ne usasse un altro la prova misurerebbe un tavolo
