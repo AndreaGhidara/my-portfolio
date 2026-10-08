@@ -11,18 +11,13 @@ import {
   type Vertex,
 } from "./geometry";
 
-/**
- * Il disegno su tela. Qui c'e' solo quello che senza un canvas non ha senso:
- * la geometria e la fisica stanno nei due moduli accanto, dove una prova le
- * vede. Se questo file cresce oltre il disegnare, e' il segno che dentro ci e'
- * finita della logica che andava di la'.
- */
+// Solo quello che senza canvas non ha senso: geometria e fisica stanno nei moduli
+// accanto, dove una prova le vede.
 
 /** Risoluzione della tela sorgente. Il foglio si ridisegna solo a gradini. */
 const SOURCE_SIZE = 256;
 
-/** Il foglio con sopra la lettera. `velo` e' quanto si vede la carta: a zero
- *  c'e' solo l'inchiostro, ed e' cosi' finche' la piega non comincia. */
+/** `veil` e' quanto si vede la carta: a zero c'e' solo l'inchiostro. */
 export function drawSource(
   letter: CanvasImageSource,
   veil: number,
@@ -104,8 +99,7 @@ function tri(
   g.restore();
 }
 
-/** Disegna il foglio a un dato grado di accartocciamento dentro `g`, che si
- *  assume gia' scalato in pixel CSS e grande `misura` x `misura`. */
+/** `g` e' gia' scalato in pixel CSS e grande `size` x `size`. */
 export function crumple(
   g: CanvasRenderingContext2D,
   tex: HTMLCanvasElement,

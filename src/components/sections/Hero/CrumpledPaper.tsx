@@ -8,30 +8,15 @@ import { RADIUS, SHADE_STEPS, buildMesh, veilFor, type Vertex } from "./paper/ge
 import { crumple, drawSource } from "./paper/drawing";
 import { atRest, fling, physicsStep, type Piece } from "./paper/physics";
 
-/**
- * Le lettere del nome sono fogli: si sgualciscono al passaggio, si prendono,
- * si lanciano, cadono in fondo allo schermo e scendono con chi scorre.
- *
- * Il vincolo che decide la forma di questo componente: le `<img>` del nome NON
- * si toccano. Sono l'elemento LCP della pagina, e `HeroMotion` le timbra
- * all'ingresso e poi le fa seguire il puntatore con un parallasse. Quindi qui
- * non si sostituisce niente: si sovrappone una tela alla singola lettera che
- * si sta toccando, posizionata sul suo rettangolo, che il parallasse lo porta
- * gia' dentro, quindi lo eredita gratis. A riposo non esiste una tela, non
- * gira un ciclo, e il nome e' esattamente quello di prima.
- *
- * Solo a "full": e' un gesto che si fa col puntatore, e fermo non vuol dire
- * niente. A "reduced", a "none" e senza JavaScript non si monta nemmeno, e
- * l'hero resta quello che e' sempre stato, che e' anche il motivo per cui in
- * jsdom (dove il livello e' sempre "none") questo componente non disegna mai:
- * una tela li' non ha un contesto 2D.
- */
+// Le <img> del nome non si toccano: sono l'elemento LCP e HeroMotion le anima. Si
+// sovrappone una tela alla sola lettera toccata, sul suo rettangolo, che la
+// parallasse porta gia' dentro. Solo a "full": in jsdom il livello e' "none", e
+// una tela li' non avrebbe un contesto 2D.
 export function CrumpledPaper() {
   const level = useMotionLevel();
   const layer = useRef<HTMLDivElement | null>(null);
 
-  /** Rimette il nome com'era. Vive fuori dall'effetto perche' lo chiamano in
-   *  tre: il ritorno in cima, lo smontaggio e il cambio di livello. */
+  // Fuori dall'effetto: la chiamano il ritorno in cima, lo smontaggio e il cambio di livello.
   const restore = useRef<() => void>(() => {});
 
   useEffect(() => {
@@ -202,11 +187,9 @@ export function CrumpledPaper() {
     const letterAt = (e: PointerEvent) =>
       letters.find((L) => !L.detached && L.img === (e.target as Node));
 
-    /* Una lettera che sta andando sotto il foglio della stampante (SottoIlFoglio
-       scrive --copertura su #hero) non si sgualcisce e non si prende: la tela
-       e la pallina stanno sopra il velo, e si accenderebbe una lettera sola
-       in mezzo alle altre scurite. Lo stile inline e non quello calcolato:
-       e' li' che il componente lo scrive, e leggerlo non costa un layout. */
+    // Sotto il foglio (UnderSheet scrive --coverage su #hero) una lettera non si
+    // prende: la tela sta sopra il velo, e si accenderebbe in mezzo alle altre
+    // scurite. Lo stile inline perche' e' li' che si scrive, e non costa un layout.
     const hero = document.getElementById("hero");
     const underSheet = () =>
       (parseFloat(hero?.style.getPropertyValue("--coverage") ?? "") || 0) > 0;
@@ -311,12 +294,8 @@ export function CrumpledPaper() {
   // solo il posto dove le tele vanno a stare. Decorativo per intero: il nome
   // che uno screen reader legge resta quello del wordmark.
   const overlayNode = <div ref={layer} data-paper aria-hidden="true" />;
-  /* A "full" lo strato va in fondo a <body>, fuori da #hero. Quando la
-     stampante passa sopra Hero (SottoIlFoglio), #hero e' sticky, e un elemento sticky
-     apre sempre un contesto di impilamento suo, z-index o no: lo z-index 40
-     dello strato varrebbe solo dentro Hero, e la pallina lanciata finirebbe
-     sotto il foglio arancione. Da <body> se la gioca con il resto della
-     pagina, com'era prima. Solo a "full" perche' e' l'unico livello in cui
-     lo strato disegna qualcosa; negli altri resta dov'e', anche sul server. */
+  // A "full" lo strato va in <body>: #hero sticky apre un contesto di impilamento
+  // suo, e la pallina lanciata finirebbe sotto il foglio arancione. Negli altri
+  // livelli non disegna niente e resta dov'e', anche sul server.
   return level === "full" ? createPortal(overlayNode, document.body) : overlayNode;
 }

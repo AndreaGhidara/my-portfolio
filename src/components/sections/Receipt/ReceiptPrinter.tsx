@@ -46,11 +46,7 @@ export type PrinterCopy = {
   signature: string;
 };
 
-/**
- * Le righe dello scontrino, una per elemento. Il titolo grande ha la sua
- * classe; la figura e' il disegno del servizio, che il CSS mostra solo sul
- * telefono.
- */
+/** La figura e' il disegno del servizio, che il CSS mostra solo sul telefono. */
 function Body({ lines, service }: { lines: ReceiptLine[]; service: PrintableService }) {
   return (
     <div data-receipt-body aria-hidden="true">
@@ -67,21 +63,10 @@ function Body({ lines, service }: { lines: ReceiptLine[]; service: PrintableServ
   );
 }
 
-/**
- * La stampante e la tavola: condividono lo stato, quindi stanno nello stesso
- * componente, che rende due figli della griglia della sezione.
- *
- * Il server e il livello "none" hanno il primo servizio gia' stampato e
- * disegnato: la sezione si legge senza JavaScript e senza movimento. Negli
- * altri livelli lo scontrino del server si toglie e la stampante aspetta di
- * essere a meta' in vista per stampare da sola il primo, una volta.
- *
- * Lo scontrino non entra mai nel flusso: e' assoluto dentro un'uscita alta
- * quanto il piu' lungo dei quattro, misurato dai quattro fantasmi invisibili
- * che ci stanno sotto (stessa lingua, stessa larghezza, dal CSS e non da uno
- * script). Stampare, strappare e cambiare servizio non cambiano mai l'altezza
- * della pagina, e le scene agganciate piu' sotto non si sfasano.
- */
+// Il server e il livello "none" hanno il primo servizio gia' stampato: la sezione
+// si legge senza JavaScript. Lo scontrino non entra mai nel flusso: e' assoluto in
+// un'uscita alta quanto il piu' lungo dei quattro fantasmi invisibili, cosi' la
+// pagina non cambia altezza e le scene agganciate piu' sotto non si sfasano.
 export function ReceiptPrinter({
   services,
   copy,
@@ -143,11 +128,9 @@ export function ReceiptPrinter({
     if (stopped) dispatch({ type: "complete" });
   }, [stopped]);
 
-  /* Acceso, decide la prima osservazione della stampante. Gia' a meta' in
-     vista (una ricarica con lo scroll ripristinato, un link a #scontrino) lo
-     scontrino del server resta: toglierlo e ristamparlo sotto gli occhi di chi
-     guarda sarebbe un salto. Ancora sotto lo schermo, si toglie e la stampante
-     aspetta chi arriva da sopra: l'autostampa e' per lui. */
+  // Gia' a meta' in vista alla prima osservazione (scroll ripristinato, link a
+  // #scontrino) lo scontrino del server resta: ristamparlo sotto gli occhi sarebbe
+  // un salto. Ancora sotto lo schermo, si toglie e aspetta l'autostampa.
   useEffect(() => {
     const el = machine.current;
     if (stopped || !el || typeof IntersectionObserver === "undefined") return;
@@ -226,13 +209,10 @@ export function ReceiptPrinter({
     return () => window.clearTimeout(dropTimer);
   }, [state.phase, state.gen]);
 
-  /* La carta esce dalla fessura quanto e' stato stampato, prima del paint: la
-     riga nuova non deve comparire per un fotogramma sotto il bordo. Parte da
-     zero, come nel prototipo: con l'altezza del foglio vuoto (i margini)
-     usciva di colpo una striscia bianca prima della prima lettera. A stampa
-     finita escono anche i bottoni, e la carta li accompagna con la stessa
-     transizione; poi il tetto si toglie, perche' un carattere che arriva
-     tardi non tagli l'ultima riga. */
+  // La carta esce quanto e' stato stampato, prima del paint: la riga nuova non deve
+  // comparire per un fotogramma sotto il bordo. Parte da zero: dai margini usciva
+  // di colpo una striscia bianca. A stampa finita il tetto si toglie, perche' un
+  // carattere che arriva tardi non tagli l'ultima riga.
   useLayoutEffect(() => {
     const el = paper.current;
     if (!el) return;
@@ -339,7 +319,7 @@ export function ReceiptPrinter({
               data-finished={finished ? "" : undefined}
               // Sopra la figura la carta esce in tutto il tempo dell'attesa, a
               // velocita' costante: e' cosi' che il disegno sembra stampato.
-              // Scritto qui e non nel CSS perche' resti uguale a FIGURA.
+              // Scritto qui e non nel CSS perche' resti uguale a FIGURE_MS.
               style={atFigure ? { transitionDuration: `${FIGURE_MS}ms` } : undefined}
             >
               <Body
@@ -347,7 +327,7 @@ export function ReceiptPrinter({
                 service={services[state.service]}
               />
               {/* Fuori portata finche' la stampa non e' finita: fino ad allora
-                  sono fuori dal flusso (sezioni/scontrino.css), e un fuoco su un bottone
+                  sono fuori dal flusso (sections/receipt.css), e un fuoco su un bottone
                   che non si vede non serve a nessuno. */}
               <div data-receipt-actions inert={state.phase !== "idle"}>
                 <a href="#contact">{copy.letsTalk}</a>

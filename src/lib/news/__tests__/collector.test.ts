@@ -12,8 +12,7 @@ import {
 } from "../collector";
 import type { Story } from "../types";
 
-/* Le risposte finte hanno la forma di quelle vere (Algolia, Hugging Face, DEV,
-   GitHub), ridotta ai campi che la raccolta legge. Nessuna rete in queste prove. */
+// Le risposte finte hanno la forma di quelle vere, ridotta ai campi letti.
 const hit = (n: number, extra: Record<string, unknown> = {}) => ({
   objectID: String(n),
   title: `Story ${n}`,
@@ -266,8 +265,6 @@ describe("componi: le tre categorie", () => {
 
 describe("gli indirizzi delle fonti", () => {
   it("Hacker News: la finestra parte dalla mezzanotte UTC, cosi' l'indirizzo cambia una volta al giorno", () => {
-    // L'indirizzo e' la chiave della cache: fermato all'ora faceva tre chiavi
-    // nuove ogni ora, per sempre, nella cache su disco.
     const u1 = sourceUrl(HN, new Date("2026-09-28T00:00:00Z"));
     const u2 = sourceUrl(HN, new Date("2026-09-28T23:59:59Z"));
     const u3 = sourceUrl(HN, new Date("2026-09-29T00:00:01Z"));
@@ -309,7 +306,6 @@ describe("gli indirizzi delle fonti", () => {
 describe("raccogli", () => {
   const now = NOW;
 
-  /** Risponde a ogni indirizzo con la risposta finta della sua fonte. */
   const sources: Fetcher = async (url) => {
     const date = url.includes("dev.to") ? "Mon, 28 Sep 2026 09:40:00 GMT" : "Mon, 28 Sep 2026 10:10:00 GMT";
     if (url.includes("algolia")) return { body: { hits: [hit(Number(url.length))] }, date };

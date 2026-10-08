@@ -15,18 +15,9 @@ export type ReceiptViewProps = {
   copy: PrinterCopy;
 };
 
-/**
- * La seconda sezione: la stampante dei servizi. A destra quattro tasti e una
- * stampante che fa uscire lo scontrino del servizio, a sinistra la tavola da
- * progetto che disegna lo stesso servizio con gli stessi pezzi.
- *
- * E' una scena a tutto schermo in flusso normale, senza aggancio: chi vuole
- * giocare si ferma con lo scroll. Passa sopra l'apertura come la sezione che
- * c'era prima (SottoIlFoglio).
- *
- * Il fondo e' arancione e di notte resta arancione: dentro solo carta e
- * inchiostro, come nel percorso. Le regole stanno in sezioni/scontrino.css.
- */
+// Scena a tutto schermo in flusso normale, senza aggancio: chi vuole giocare si
+// ferma con lo scroll. Il fondo resta arancione anche di notte, quindi dentro solo
+// carta e inchiostro (sections/receipt.css).
 export function ReceiptView({ eyebrow, title, lead, locale, services, copy }: ReceiptViewProps) {
   return (
     <section

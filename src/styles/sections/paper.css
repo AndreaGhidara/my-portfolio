@@ -1,19 +1,6 @@
-/* La carta del nome: le lettere dell'hero che si sgualciscono e cadono. */
-
-/* ──────────────────────────────────────────────────────────────────────────
-   La carta del nome. Le lettere dell'hero sono fogli: si sgualciscono al
-   passaggio, si prendono e si lanciano, e le palline cadono in fondo alla
-   finestra e ci restano mentre si scorre.
-
-   Lo strato e' fisso e copre la finestra perche' le palline devono restare
-   visibili scendendo per tutta la pagina, non solo dentro l'hero. Non riceve
-   il puntatore: quello lo prendono le <img> del nome, che stanno sotto e che
-   nessuna di queste regole tocca.
-
-   Niente qui e' condizionato al livello di movimento, e non e' una svista: il
-   componente non si monta nemmeno fuori da "full", quindi queste regole non
-   hanno su cosa applicarsi. Il fotogramma a riposo e' l'hero di sempre.
-   ────────────────────────────────────────────────────────────────────────── */
+/* Fisso sulla finestra: le palline restano visibili scendendo per tutta la
+   pagina. Non riceve il puntatore, che resta alle <img> del nome. Niente e'
+   condizionato al movimento: il componente si monta solo a "full". */
 [data-paper] {
   position: fixed;
   inset: 0;

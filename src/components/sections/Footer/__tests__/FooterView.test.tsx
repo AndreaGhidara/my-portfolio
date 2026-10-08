@@ -46,17 +46,14 @@ describe("FooterView", () => {
   });
 
   it("l'anno del copyright e' quello della visita, non quello della build", () => {
-    // La pagina e' statica: un anno calcolato sul server resterebbe quello in
-    // cui e' stata generata. Una data finta lontana dalla build lo distingue.
+    // Una data finta lontana dalla build distingue l'anno della visita.
     vi.useFakeTimers({ toFake: ["Date"], now: new Date(2031, 2, 5) });
     render(<FooterView {...props} />);
     expect(screen.getByText(/© 2031 Andrea Ghidara/)).toBeVisible();
   });
 
   it("la busta è indirizzata: nome, email e città stanno nello stesso blocco", () => {
-    // Il senso della proposta e' che la mail smetta di essere un link in fondo
-    // e diventi la riga di un indirizzo. Se i tre pezzi si separano, resta un
-    // disegno di busta con dentro un piede qualsiasi.
+    // Separati, nome, email e citta' smetterebbero di essere un indirizzo.
     render(<FooterView {...props} />);
     const address = screen.getByTestId("envelope-address");
     expect(within(address).getByText(props.replyTo)).toBeVisible();
@@ -66,15 +63,13 @@ describe("FooterView", () => {
   });
 
   it("la tagline resta nel piede: è l'unico posto del sito in cui esiste", () => {
-    // Il prototipo della busta l'aveva persa per strada. E' la sola frase che
-    // dice cosa fa e da dove, e non compare in nessun'altra sezione.
+    // E' la sola frase che dice cosa fa e da dove.
     render(<FooterView {...props} />);
     expect(screen.getByText(props.tagline)).toBeVisible();
   });
 
   it("il blocco dei profili non si chiama «mittente»: il mittente sarebbe chi scrive", () => {
-    // Su una busta indirizzata ad Andrea il mittente e' il visitatore, non lui.
-    // L'etichetta dice cosa c'e' davvero li' dentro: altri posti dove trovarlo.
+    // Su una busta indirizzata ad Andrea il mittente e' il visitatore.
     render(<FooterView {...props} />);
     const profiles = screen.getByTestId("envelope-profiles");
     expect(within(profiles).getByText(props.alsoHere)).toBeVisible();
@@ -82,27 +77,20 @@ describe("FooterView", () => {
   });
 
   it("l'affrancatura è decorativa e sta fuori dall'albero accessibile", () => {
-    // Francobollo e annullo non aggiungono niente a chi ascolta la pagina: la
-    // citta' e' gia' nella riga dell'indirizzo, e il resto e' disegno. Un nome
-    // accessibile qui sarebbe rumore letto due volte.
+    // La citta' e' gia' nell'indirizzo: qui sarebbe rumore letto due volte.
     render(<FooterView {...props} />);
     expect(screen.getByTestId("envelope-postage")).toHaveAttribute("aria-hidden", "true");
   });
 
   it("l'annullo porta la data di oggi in gg.mm.aa, non una data cablata", () => {
-    // Un timbro postale con una data ferma invecchia a vista: a distanza di
-    // mesi dice solo che la pagina non si tocca da un pezzo.
-    // E deve essere quella del giorno della visita: la pagina e' generata una
-    // volta sola, e una data presa sul server sarebbe quella della build.
+    // Un timbro con la data ferma invecchia a vista, e quella del server sarebbe della build.
     vi.useFakeTimers({ toFake: ["Date"], now: new Date(2031, 2, 5) });
     render(<FooterView {...props} />);
     expect(screen.getByTestId("envelope-postmark-date")).toHaveTextContent("05.03.31");
   });
 
   it("l'html della build si idrata alla data della visita, senza errori", async () => {
-    // Il caso vero: l'html e' scritto il giorno della build e aperto mesi dopo.
-    // Annullo e copyright devono dire il giorno della visita, e il primo render
-    // del browser deve coincidere con l'html, o React segnala un mismatch.
+    // L'html della build aperto mesi dopo: il primo render deve coincidere, o React segnala un mismatch.
     vi.useFakeTimers({ toFake: ["Date"], now: new Date(2030, 0, 1) });
     const html = renderToString(<FooterView {...props} />);
     expect(html).not.toContain("2030");
@@ -125,17 +113,14 @@ describe("FooterView", () => {
   });
 
   it("il copyright sta DENTRO la busta: fuori non c'e' piu' niente in cui stare", () => {
-    // La busta riempie tutto il piede, quindi il blocco scuro che prima
-    // ospitava questa riga non esiste piu'. Se restasse fuori, finirebbe su
-    // una striscia alta zero e sparirebbe dalla pagina.
+    // Fuori dalla busta finirebbe su una striscia alta zero.
     render(<FooterView {...props} />);
     const envelope = screen.getByTestId("envelope");
     expect(within(envelope).getByText(new RegExp(String(new Date().getFullYear())))).toBeVisible();
   });
 
   it("la busta e' l'unico figlio del piede: e' lei a occuparlo tutto", () => {
-    // Il senso della modifica: niente cornice, niente incassatura, niente
-    // contenitore intermedio che la rimpicciolisca.
+    // Niente cornice ne' contenitore intermedio che la rimpicciolisca.
     render(<FooterView {...props} />);
     const footer = screen.getByRole("contentinfo");
     expect(footer.children).toHaveLength(1);

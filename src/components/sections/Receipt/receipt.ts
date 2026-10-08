@@ -1,36 +1,21 @@
-/**
- * La stampante dei servizi senza DOM: le righe dello scontrino, la stampa a
- * colpi, la macchina a stati della stampante, le forme della tavola e dove
- * vanno i richiami. Il componente porta eventi dentro e disegna quello che
- * esce; la parte che si sbaglia (due tocchi di fila, un timer rimasto indietro)
- * si prova qui.
- *
- * Numeri e disegni sono quelli del prototipo approvato
- * (docs/prototipi/2026-09-27-scontrino-tre-proposte.html, proposta G1):
- * cambiarli qui senza ripassare da li' e' ritarare a occhio chiuso.
- */
+// La stampante senza DOM: la parte che si sbaglia (due tocchi di fila, un timer
+// rimasto indietro) si prova qui. Numeri e disegni vengono dal prototipo approvato:
+// cambiarli senza ripassare da li' e' ritarare a occhio chiuso.
 
 import { pad2 } from "@/lib/format";
 
-/** Caratteri di una riga dello scontrino: i separatori e le righe allineate ai due capi. */
 export const LINE_WIDTH = 32;
 
-/** Caratteri stampati a ogni colpo. Il titolo grande va piano, uno alla volta. */
 export const CHARS_PER_TICK = { line: 3, large: 1 } as const;
 
-/** Millisecondi fra un colpo e l'altro. */
 export const TICK_MS = 16;
 
-/** Millisecondi che lo scontrino strappato impiega a cadere prima del prossimo. */
 export const DROP_MS = 420;
 
-/**
- * Millisecondi in cui la carta esce sopra la figura stampata, sul telefono: la
- * stampa del testo aspetta, come in una stampante vera.
- */
+/** Sul telefono la stampa del testo aspetta che la carta esca sopra la figura. */
 export const FIGURE_MS = 650;
 
-/** «figura»: il disegno della tavola stampato sulla carta, solo sul telefono. */
+/** `figure`: il disegno della tavola stampato sulla carta, solo sul telefono. */
 export type ReceiptLineKind = "line" | "large" | "item" | "figure";
 export type ReceiptLine = { text: string; kind: ReceiptLineKind };
 
@@ -41,7 +26,7 @@ export type ReceiptData = {
   date: string;
   /** «N.», «No.». */
   number: string;
-  /** Il posto del servizio nell'elenco, da zero. */
+  /** Da zero. */
   index: number;
   /** Quanti sono i servizi: il «/04» viene da qui. */
   count: number;
@@ -52,13 +37,11 @@ export type ReceiptData = {
   toDiscuss: string;
 };
 
-/** Due testi ai capi della riga, con gli spazi in mezzo. */
 export function alignEnds(left: string, right: string): string {
   const gap = Math.max(1, LINE_WIDTH - left.length - right.length);
   return left + " ".repeat(gap) + right;
 }
 
-/** «TOTALE ........ DA PARLARNE»: i puntini riempiono la riga. */
 export function dotLeader(left: string, right: string): string {
   const dots = Math.max(3, LINE_WIDTH - left.length - right.length - 2);
   return `${left} ${".".repeat(dots)} ${right}`;
@@ -84,7 +67,7 @@ export function receiptLines(d: ReceiptData): ReceiptLine[] {
   ];
 }
 
-/** Quanti colpi servono a una riga. Anche una riga vuota ne prende uno. */
+/** Anche una riga vuota prende un colpo. */
 const ticksFor = (r: ReceiptLine) => Math.max(1, Math.ceil(r.text.length / CHARS_PER_TICK[r.kind === "large" ? "large" : "line"]));
 
 export function totalTicks(lines: ReceiptLine[]): number {
@@ -97,7 +80,6 @@ export function ticksToFigure(lines: ReceiptLine[]): number {
   return figureAt < 0 ? -1 : totalTicks(lines.slice(0, figureAt + 1));
 }
 
-/** Lo scontrino dopo `scatti` colpi: le righe finite e quella a meta'. */
 export function linesAtTicks(lines: ReceiptLine[], ticks: number): ReceiptLine[] {
   const out: ReceiptLine[] = [];
   let remaining = ticks;
@@ -115,20 +97,13 @@ export function linesAtTicks(lines: ReceiptLine[], ticks: number): ReceiptLine[]
   return out;
 }
 
-/* ── La stampante ───────────────────────────────────────────────────────── */
-
-/**
- * Uno stato solo. `gen` cambia a ogni cosa che rende vecchi i timer in volo
- * (una stampa che parte, uno strappo): il colpo e la caduta portano la
- * generazione in cui sono nati, e se non e' piu' quella non fanno niente. E'
- * cosi' che due tocchi di fila, l'autostampa con un tocco, o lo StrictMode che
- * monta due volte non producono mai due scontrini.
- */
+// `gen` cambia a ogni cosa che rende vecchi i timer in volo: il colpo e la caduta
+// portano la generazione in cui sono nati, e se non e' piu' quella non fanno
+// niente. Cosi' due tocchi, l'autostampa o lo StrictMode non fanno due scontrini.
 export type PrinterState = {
   phase: "idle" | "printing" | "tearing";
   /** Il servizio sullo scontrino, anche mentre cade. null: niente scontrino. */
   service: number | null;
-  /** Colpi gia' stampati. */
   ticks: number;
   /** Solo durante lo strappo: cosa stampare appena lo scontrino e' caduto. */
   next: number | null;
@@ -144,7 +119,7 @@ export type PrinterState = {
 };
 
 export type PrinterEvent =
-  /** `subito`: senza movimento, niente stampa a colpi e niente caduta. */
+  /** `immediate`: senza movimento, niente stampa a colpi e niente caduta. */
   | { type: "press"; service: number; immediate: boolean }
   | { type: "tear"; immediate: boolean }
   | { type: "autoprint" }
@@ -252,13 +227,8 @@ export function printerReducer(s: PrinterState, e: PrinterEvent, totals: readonl
   }
 }
 
-/* ── La tavola ─────────────────────────────────────────────────────────── */
-
-/**
- * I disegni dei servizi, in unita' del viewBox 600 x 460, centrati attorno a
- * (300, 215): la finestra del sito, la borsa, il pannello, la nuvoletta della
- * chat. Il primo tratto e' il contorno, gli altri sono i dettagli, piu' fiochi.
- */
+// In unita' del viewBox 600 x 460, centrati attorno a (300, 215). Il primo tratto
+// e' il contorno, gli altri sono i dettagli, piu' fiochi.
 export const FIGURE_SHAPES: Record<string, readonly string[]> = {
   sites: [
     "M190 145 H410 V285 H190 Z",
@@ -299,17 +269,13 @@ export const FIGURE_SHAPES: Record<string, readonly string[]> = {
   ],
 };
 
-/** La cornice della tavola, il cartiglio e il suo divisorio, tre tratti. */
 export const FRAME = "M20 20 H580 V440 H20 Z";
 export const TITLE_BLOCK = "M290 390 H580 M290 390 V440";
 export const DIVIDER = "M500 390 V440";
 
-/**
- * Dove vanno le annotazioni: `p` il punto sul disegno, `l` il gomito dove
- * finisce la linea di richiamo. Il testo parte da li' verso l'esterno. I gomiti
- * stanno 20 unita' piu' dentro che nel prototipo: le voci inglesi piu' lunghe
- * uscivano dalla cornice.
- */
+// `p` il punto sul disegno, `l` il gomito della linea di richiamo, da cui il testo
+// parte verso l'esterno. I gomiti stanno 20 unita' piu' dentro che nel prototipo:
+// le voci inglesi piu' lunghe uscivano dalla cornice.
 export const SLOTS: readonly { p: readonly [number, number]; l: readonly [number, number] }[] = [
   { p: [205, 150], l: [185, 80] },
   { p: [395, 150], l: [415, 80] },
@@ -319,14 +285,13 @@ export const SLOTS: readonly { p: readonly [number, number]; l: readonly [number
   { p: [380, 283], l: [415, 345] },
 ];
 
-/** Secondi di ritardo: le righe del disegno una dopo l'altra, poi i richiami. */
+/** Secondi: le righe del disegno una dopo l'altra, poi i richiami. */
 export const DELAYS = {
   line: (k: number) => 0.15 * k,
   callout: (k: number) => 1.1 + k * 0.28,
   text: 0.3,
 } as const;
 
-/** Il richiamo del pezzo `k`: la linea, dove sta il testo e quando compare. */
 export function callout(k: number) {
   const { p, l } = SLOTS[k];
   const [x, y] = l;

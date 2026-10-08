@@ -1,33 +1,16 @@
-/**
- * La geometria dell'accartocciamento. Tutto puro: niente DOM, niente canvas.
- *
- * Sta separato dal disegno per la ragione imparata sul gesto della freccia:
- * quello che finisce dentro un ciclo di disegno nessun test lo vede piu', e in
- * questo modulo c'e' esattamente il genere di codice in cui un segno sbagliato
- * non si nota guardando: la prima stesura della mappa affine ne aveva due, e
- * disegnava le lettere specchiate.
- */
+// Puro, senza canvas: dentro un ciclo di disegno nessun test lo vedrebbe, e qui un
+// segno sbagliato non si nota guardando (la prima mappa affine specchiava le lettere).
 
 export type PaperPoint = { x: number; y: number };
 
-/** Una terna di vertici. */
 export type Triple = readonly [PaperPoint, PaperPoint, PaperPoint];
 
 /** I sei numeri di `CanvasRenderingContext2D.transform`. */
 export type Affine = readonly [number, number, number, number, number, number];
 
-/**
- * La trasformazione affine che porta il triangolo `s` sul triangolo `d`.
- *
- * Derivata come DUE sistemi 3x3 (uno per la x, uno per la y) e non copiata
- * da una formula compatta. La versione compatta e' facile da sbagliare e
- * difficile da leggere: quella che avevo scritto per prima aveva due segni
- * invertiti, sull'identita' restituiva (1,0,0,-1,0,0) e disegnava tutto
- * capovolto. Con l'identita' questa restituisce (1,0,0,1,0,0), ed e' il modo
- * di accorgersene in un secondo: c'e' una prova che lo verifica.
- *
- * `null` quando il triangolo sorgente e' degenere: non c'e' niente da mappare.
- */
+// Due sistemi 3x3 e non una formula compatta, che aveva due segni invertiti:
+// sull'identita' deve restituire (1,0,0,1,0,0), e una prova lo verifica. `null` se
+// il triangolo sorgente e' degenere.
 export function affineMap(s: Triple, d: Triple): Affine | null {
   const [{ x: x0, y: y0 }, { x: x1, y: y1 }, { x: x2, y: y2 }] = s;
   const [{ x: u0, y: v0 }, { x: u1, y: v1 }, { x: u2, y: v2 }] = d;
@@ -46,12 +29,7 @@ export function affineMap(s: Triple, d: Triple): Affine | null {
 /** Celle per lato della maglia. Dodici: sotto si vedono le facce, sopra si paga. */
 export const GRID_SIDE = 12;
 
-/**
- * Il raggio della pallina, in frazione del lato del foglio. Da qui esce un
- * diametro attorno al 40% del foglio, ed e' il numero che decide se la
- * pallina si legge come pallina: a 0,46 (la prima stesura) il foglio
- * restava un quadrato rimpicciolito.
- */
+/** In frazione del lato del foglio. A 0,46 il foglio restava un quadrato rimpicciolito. */
 export const RADIUS = 0.205;
 
 /** Quanto il foglio si attorciglia mentre collassa, in radianti. */
@@ -68,11 +46,8 @@ export function smooth(t: number): number {
   return t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
 }
 
-/**
- * Un campo di rumore liscio su una griglia grossolana, interpolato.
- * La grana grossa e' voluta: e' quella che tiene insieme le facce, cosi' la
- * carta si piega a pezzi invece di sbriciolarsi.
- */
+// La grana grossa e' voluta: tiene insieme le facce, e la carta si piega a pezzi
+// invece di sbriciolarsi.
 export function noiseField(r: () => number, n: number): (u: number, w: number) => number {
   const g: number[] = [];
   for (let i = 0; i < (n + 1) * (n + 1); i++) g.push(r());
@@ -104,17 +79,9 @@ export type Vertex = {
   delay: number;
 };
 
-/**
- * La maglia di una lettera.
- *
- * Il punto e' il raggio d'arrivo: lo decide un campo di rumore INDIPENDENTE da
- * dove il vertice parte. La prima stesura mappava il quadrato su un disco, e
- * cosi' chi partiva dal bordo finiva sul bordo: l'ordine si conservava e
- * restava leggibile che fosse un foglio quadrato rimpicciolito. Scorrelando i
- * due raggi il bordo finisce DENTRO, il foglio si ripiega su se stesso, e la
- * pallina smette di essere leggibile, che e' tutto il punto. Una prova misura
- * quella scorrelazione, perche' e' la proprieta' e non un dettaglio.
- */
+// Il raggio d'arrivo lo decide un campo di rumore indipendente da dove il vertice
+// parte: il bordo finisce dentro e il foglio si ripiega su se stesso. Mappato su
+// un disco, l'ordine si conservava e si leggeva il quadrato rimpicciolito.
 export function buildMesh(seed: number): Vertex[] {
   const r = rng(seed);
   const cZ = noiseField(r, 3);
@@ -142,7 +109,6 @@ export function buildMesh(seed: number): Vertex[] {
 
 export type Placed = PaperPoint & { z: number };
 
-/** Dove sta ogni vertice a un dato grado di accartocciamento. */
 export function positions(
   mesh: readonly Vertex[],
   t: number,
@@ -163,13 +129,8 @@ export function positions(
 
 export type Cell = { i: number; j: number; z: number };
 
-/**
- * Le celle dalla piu' lontana alla piu' vicina.
- *
- * Senza questo ordine le facce si coprono nell'ordine della griglia e il
- * risultato e' un collage piatto: e' l'ordinamento in profondita' (piu'
- * dell'ombra) a far leggere una pallina invece di un'immagine schiacciata.
- */
+// Dalla piu' lontana alla piu' vicina: e' l'ordine in profondita', piu' dell'ombra,
+// a far leggere una pallina invece di un collage piatto.
 export function cellsByDepth(points: readonly Placed[]): Cell[] {
   const cells: Cell[] = [];
   const a = (i: number, j: number) => points[j * (GRID_SIDE + 1) + i].z;
@@ -184,14 +145,8 @@ export function cellsByDepth(points: readonly Placed[]): Cell[] {
 /** Quanti gradini di opacita' del foglio si tengono in cache. */
 export const SHADE_STEPS = 5;
 
-/**
- * Quanto si vede il foglio a un dato grado di piega, come indice di gradino.
- *
- * Zero fin quasi a un terzo: passando col cursore si increspa SOLO
- * l'inchiostro, e la carta compare mentre si appallottola, perche' e'
- * piegandosi che prende luce. Disegnata subito era un quadrato del colore
- * della pagina, e se ne vedeva solo il bordo piegarsi: era il difetto.
- */
+// Zero fin quasi a un terzo: passando col cursore si increspa solo l'inchiostro.
+// Disegnata subito, la carta era un quadrato del colore della pagina col bordo che si piegava.
 export function veilFor(t: number): number {
   return Math.round(smooth(Math.max(0, (t - 0.3) / 0.35)) * (SHADE_STEPS - 1));
 }

@@ -4,14 +4,9 @@ import type { NewsCopy } from "./types";
 /** La `t` di next-intl sul namespace `notizie`: serve anche `raw`, per i modelli. */
 type Translate = { (key: string): string; raw(key: string): unknown };
 
-/**
- * I testi della sezione dal namespace `notizie`. Sta fuori dal componente
- * server perche' le prove li costruiscono dagli stessi file di lingua, con lo
- * stesso codice: una chiave che manca si vede nei test.
- *
- * I modelli con le graffe passano crudi: li riempie la macchina, con valori
- * che il server non conosce (quante palline restano, a che ora sono arrivate).
- */
+// Fuori dal componente server perche' i test costruiscano i testi dagli stessi
+// file di lingua: una chiave che manca si vede nei test. I modelli con le graffe
+// passano crudi: li riempie il client, con valori che il server non conosce.
 export function newsCopy(t: Translate): NewsCopy {
   const template = (key: string) => String(t.raw(key));
   return {

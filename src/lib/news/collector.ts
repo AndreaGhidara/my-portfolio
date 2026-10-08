@@ -1,11 +1,7 @@
 import { CATEGORIES, type CategoryId, type NewsCollection, type Story, type StoryFigure, type StorySource, type StoryStamp } from "./types";
 
-/**
- * La raccolta delle notizie, senza rete: chi chiama le fonti e' la route
- * (/api/notizie), qui si decide cosa chiedere, come leggere quello che torna e
- * cosa tenere. Tutto quello che entra e' di terzi, quindi si legge come se
- * potesse avere qualunque forma, e una forma inattesa da' una lista vuota.
- */
+// Tutto quello che entra e' di terzi: si legge come se potesse avere qualunque
+// forma, e una forma inattesa da' una lista vuota.
 
 export type SourceSpec =
   | { kind: "hn"; words: string[]; weeks: number; points: number }
@@ -15,7 +11,7 @@ export type SourceSpec =
      una avrebbero aperto Codice con quattro release di fila, anche vecchie. */
   | { kind: "releases"; repos: { repo: string; name: string }[]; days: number; limit: number };
 
-/** Le fonti del prototipo (docs/prototipi/2026-09-28-bancone-tre-pulsanti.html), pubbliche e senza chiave. */
+/** Fonti pubbliche e senza chiave. */
 export const SOURCES: Record<CategoryId, SourceSpec[]> = {
   ia: [
     { kind: "hn", words: ["LLM", "OpenAI", "Anthropic", "Claude", "Gemini", "agents"], weeks: 1, points: 60 },
@@ -58,16 +54,10 @@ const OFF_TOPIC =
   /\b(pentagon|missile|war|military|iran|israel|gaza|ukraine|russia|trump|biden|election|police|killed|death|lawsuit|feds|congress|senate|weapon)\b/i;
 const EXPLICIT = /uncensored|nsfw|abliterat|erotic|porn|lewd|nude/i;
 
-/**
- * L'indirizzo di una fonte. La finestra di Hacker News parte dalla mezzanotte
- * UTC e non dal secondo: l'indirizzo e' la chiave della cache, e con i secondi
- * dentro ogni richiesta sarebbe una chiave nuova; con l'ora, tre chiavi nuove
- * ogni ora nella cache su disco. La freschezza la da' il revalidate di un'ora.
- *
- * Algolia non conosce OR: «LLM OR Claude» cerca anche la parola «or» e
- * trovava cinque storie in una settimana. Le parole date anche come
- * `optionalWords` bastano una alla volta, che e' l'OR voluto.
- */
+// La finestra di Hacker News parte dalla mezzanotte UTC: l'indirizzo e' la chiave
+// della cache, e con l'ora dentro farebbe tre chiavi nuove ogni ora su disco.
+// Algolia non conosce OR («LLM OR Claude» cerca anche «or»): le parole date anche
+// come `optionalWords` bastano una alla volta.
 export function sourceUrl(f: Exclude<SourceSpec, { kind: "releases" }>, now: Date): string {
   switch (f.kind) {
     case "hn": {
@@ -83,13 +73,11 @@ export function sourceUrl(f: Exclude<SourceSpec, { kind: "releases" }>, now: Dat
   }
 }
 
-/** Gli indirizzi di una fonte: uno, o uno per progetto per le release. */
 export function sourceUrls(f: SourceSpec, now: Date): string[] {
   if (f.kind === "releases") return f.repos.map((r) => `https://api.github.com/repos/${r.repo}/releases/latest`);
   return [sourceUrl(f, now)];
 }
 
-/** Spazi normalizzati, e tagliato sull'ultima parola intera che ci sta. */
 export function truncate(s: string, n: number): string {
   const t = s.replace(/\s+/g, " ").trim();
   if (t.length <= n) return t;
@@ -120,7 +108,6 @@ type Draft = {
   figures: StoryFigure[];
 };
 
-/** Da una bozza a una notizia, o a niente se non passa i filtri. */
 function toStory(b: Draft, source: StorySource, stamp: StoryStamp): Story | null {
   const title = truncate(b.title, 200);
   const url = parseUrl(b.url);
@@ -143,7 +130,7 @@ function toStory(b: Draft, source: StorySource, stamp: StoryStamp): Story | null
 
 const present = (l: (Story | null)[]): Story[] => l.filter((n): n is Story => n !== null);
 
-/** Le note di rilascio sono markdown: restano le parole. */
+/** Le note di rilascio sono markdown: restano solo le parole. */
 function releaseNotes(md: string): string {
   return md
     .replace(/<!--[\s\S]*?-->/g, " ")
@@ -152,11 +139,8 @@ function releaseNotes(md: string): string {
     .replace(/[#*`>[\]()_~|]/g, " ");
 }
 
-/**
- * Legge la risposta di una fonte. Per le release `corpo` e' la lista delle
- * risposte, una per progetto nell'ordine di `repos` (null per chi non ha
- * risposto), e `adesso` serve a lasciare fuori quelle vecchie.
- */
+// Per le release `body` e' la lista delle risposte nell'ordine di `repos` (null
+// per chi non ha risposto), e `now` lascia fuori quelle vecchie.
 export function parseSource(f: SourceSpec, body: unknown, now: Date = new Date()): Story[] {
   switch (f.kind) {
     case "hn": {
@@ -269,11 +253,8 @@ function interleave(lists: Story[][]): Story[] {
 
 const titleKey = (t: string) => t.toLowerCase().replace(/\s+/g, " ").trim();
 
-/**
- * Le tre categorie dalle liste delle loro fonti. DEV rimanda lo stesso
- * articolo sotto tag diversi: una notizia sta in una categoria sola, la prima
- * che l'ha trovata, nell'ordine ia, design, codice.
- */
+// DEV rimanda lo stesso articolo sotto tag diversi: una notizia sta solo nella
+// prima categoria che l'ha trovata, nell'ordine ia, design, codice.
 export function composeCategories(perCategory: Record<CategoryId, Story[][]>): Record<CategoryId, Story[]> {
   const url = new Set<string>();
   const titles = new Set<string>();
@@ -292,15 +273,12 @@ export function composeCategories(perCategory: Record<CategoryId, Story[][]>): R
   return out;
 }
 
-/** Chi va in rete: restituisce il corpo JSON e l'intestazione Date della risposta. */
+/** `date` e' l'intestazione Date della risposta. */
 export type Fetcher = (url: string) => Promise<{ body: unknown; date: string | null }>;
 
-/**
- * Chiede tutte le fonti insieme. Una fonte che cade (429 di DEV, 403 di GitHub,
- * tempo scaduto) resta fuori e non ferma le altre. `raccolteAlle` e' la Date
- * piu' vecchia fra le risposte arrivate: con la cache di un'ora per fonte e'
- * quella che dice da quanto le notizie sono ferme.
- */
+// Una fonte che cade (429 di DEV, 403 di GitHub, tempo scaduto) resta fuori.
+// `collectedAt` e' la Date piu' vecchia fra le risposte: con la cache di un'ora
+// per fonte dice da quanto le notizie sono ferme.
 export async function collectNews(fetcher: Fetcher, now: Date): Promise<NewsCollection> {
   const dates: number[] = [];
   const perCategory = {} as Record<CategoryId, Story[][]>;

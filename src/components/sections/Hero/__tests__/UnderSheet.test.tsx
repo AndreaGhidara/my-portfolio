@@ -21,11 +21,7 @@ const props = {
   scrollHint: "Scorri",
 };
 
-/**
- * Il movimento vive solo nel browser: in jsdom il livello e' sempre "none", e
- * a "none" la pagina deve essere quella di prima. E' quello che si prova qui,
- * insieme ai confini che il browser non perdona (chi sta dentro cosa).
- */
+// In jsdom il livello e' sempre "none", e a "none" la pagina deve essere quella di prima.
 describe("la seconda sezione che passa sopra la prima", () => {
   it("parte spenta: l'effetto lo accende il componente, non il markup", () => {
     const { container } = render(
@@ -52,15 +48,13 @@ describe("la seconda sezione che passa sopra la prima", () => {
   });
 
   it("nella pagina Hero e la stampante stanno nello stesso contenitore, e solo loro", () => {
-    // Lo sticky di Hero vale fino alla fine del suo contenitore: dentro <main>
-    // resterebbe incollato dietro tutte le sezioni fino in fondo alla pagina.
+    // Dentro <main> lo sticky di Hero resterebbe incollato fino in fondo alla pagina.
     const page = read("src/app/[locale]/page.tsx");
     expect(page).toMatch(/<UnderSheet>\s*<Hero \/>\s*<Receipt \/>\s*<\/UnderSheet>/);
   });
 
   it("il gioco delle lettere sta fuori da quello che si rimpicciolisce", () => {
-    // Una trasformazione sul contenitore diventa il riferimento dello strato
-    // fisso della carta, che smetterebbe di coprire lo schermo.
+    // Una trasformazione sul contenitore farebbe da riferimento allo strato fisso della carta.
     const { container } = render(<HeroView {...props} />);
     const layer = container.querySelector("[data-hero-layer]");
     expect(layer, "il contenuto di Hero non ha piu' il suo strato").not.toBeNull();
@@ -78,9 +72,7 @@ describe("le regole dell'effetto in sections/under-sheet.css", () => {
   });
 
   it("non danno a #hero ne' z-index ne' isolation", () => {
-    // Sticky, Hero apre gia' un contesto suo, e lo strato fisso della carta a
-    // "full" sta per questo in <body> (CartaStropicciata). Un livello dato a
-    // mano alla sezione non serve a niente e confonderebbe chi legge.
+    // Sticky, Hero apre gia' un contesto suo: lo strato della carta sta in <body> (CrumpledPaper).
     const section = matching(/#hero$/);
     expect(section.length, "nessuna regola su #hero: lo sticky dov'e'?").toBeGreaterThan(0);
     for (const { body } of section) {

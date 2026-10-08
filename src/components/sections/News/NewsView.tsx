@@ -10,13 +10,6 @@ export type NewsViewProps = {
   copy: NewsCopy;
 };
 
-/**
- * Le notizie della settimana, prima dei Contatti: un distributore di palline
- * con tre pulsanti, I.A., Design e Codice, e accanto la prima pagina di un
- * giornale. I prototipi sono docs/prototipi/2026-09-28-bancone-tre-pulsanti.html,
- * variante A (la macchina), e docs/prototipi/2026-09-29-notizie-impaginate.html,
- * variante B (il foglio).
- */
 export function NewsView({ eyebrow, title, intro, locale, copy }: NewsViewProps) {
   return (
     <section

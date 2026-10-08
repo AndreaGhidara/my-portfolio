@@ -5,12 +5,7 @@ import { ReceiptView, type ReceiptViewProps } from "../ReceiptView";
 import { services } from "@/content/services";
 import { rules, type Rule } from "@/test/css";
 
-/**
- * In jsdom il livello di movimento e' sempre "none" (vitest.setup.ts): e' il
- * livello del server e di chi chiede meno movimento, quello in cui la sezione
- * deve leggersi da sola. La stampa a colpi, l'autostampa e la caduta si provano
- * nel modulo puro (scontrino.test.ts) e si guardano in un browser.
- */
+// In jsdom il livello e' sempre "none" (vitest.setup.ts): la stampa a colpi si prova in receipt.test.ts.
 const props: ReceiptViewProps = {
   eyebrow: "Servizi",
   title: "Scegli, e te lo stampo",
@@ -81,10 +76,7 @@ describe("la stampante dei servizi", () => {
   });
 
   it("la data non e' nel markup del server: la riga c'e', vuota a sinistra", () => {
-    // La pagina e' statica: una data scritta dal server sarebbe quella della
-    // build, e diversa da quella del browser (errore di idratazione). Qui il
-    // markup del server vero, senza effetti: la riga e' lunga come le altre,
-    // con gli spazi al posto della data e il numero in fondo a destra.
+    // Pagina statica: una data scritta dal server sarebbe quella della build (errore di idratazione).
     const box = document.createElement("div");
     box.innerHTML = renderToStaticMarkup(<ReceiptView {...props} />);
     const lines = [...realPaper(box)!.querySelectorAll("[data-line]")];
@@ -177,16 +169,11 @@ describe("la stampante dei servizi", () => {
   });
 });
 
-/** Le regole del foglio di stile che riguardano la stampante, corpo compreso. */
 const printerRules = rules(/\[data-(receipt|brand|indicator|slot|line)/);
 
 describe("i colori della stampante", () => {
   it("non chiedono niente ai token che cambiano col tema", () => {
-    // Stessa guardia del percorso, e in piu' --accento-testo: la sezione e'
-    // arancione e di notte resta arancione, mentre --fg, --line, --bg e
-    // --fg-muted si ribaltano, e --accento-testo diventa l'arancio pieno.
-    // Tasti e scontrino diventerebbero carta su carta, il numero arancio su
-    // arancio. Nel DOM non si vede.
+    // La sezione resta arancione di notte, mentre --fg, --line, --bg e --accent-text si ribaltano.
     expect(printerRules.length).toBeGreaterThan(10);
     const offenders = printerRules.filter((r) =>
       /var\(\s*--(fg|line|bg|accent-text)\b/.test(r.body),
@@ -233,10 +220,7 @@ describe("i colori della stampante", () => {
   });
 
   it("lo scontrino non sta sotto zero: li' uscita e banco gli rubano i clic", () => {
-    // Nel prototipo stava a -1 per uscire da sotto la stampante, e in pagina
-    // «Parliamone» e «strappa» non si potevano premere: il browser da' il clic
-    // all'uscita trasparente che gli sta sopra. Sotto la stampante ci va
-    // perche' e' la stampante a salire.
+    // A -1 l'uscita trasparente sopra rubava i clic a «Parliamone» e «strappa».
     const rule = rules("[data-receipt-paper]:not([data-ghost])")[0]?.body;
     expect(rule).not.toMatch(/z-index:\s*-/);
     expect(rules("[data-receipt-machine]").some((r) => /z-index:\s*1/.test(r.body))).toBe(true);

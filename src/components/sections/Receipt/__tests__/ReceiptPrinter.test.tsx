@@ -4,10 +4,7 @@ import { ReceiptPrinter } from "../ReceiptPrinter";
 import { DROP_MS, FIGURE_MS } from "../receipt";
 import { services } from "@/content/services";
 
-/**
- * Qui il movimento e' acceso: la stampa a colpi gira con i timer finti. Negli
- * altri test il livello e' "none" (vitest.setup.ts) e lo scontrino esce intero.
- */
+// Qui il movimento e' acceso; negli altri test il livello e' "none" (vitest.setup.ts).
 vi.mock("@/animations/motionPolicy", async (original) => ({
   ...(await original<typeof import("@/animations/motionPolicy")>()),
   useMotionLevel: () => "full",
@@ -57,8 +54,7 @@ describe("la figura sulla carta, con il movimento acceso", () => {
   });
 
   it("la stampa si ferma sulla figura anche se i colpi arrivano prima del render", () => {
-    // Un telefono lento: molti colpi del timer prima che React ridisegni e
-    // rilanci gli effetti. Il colpo dopo la figura non deve passare.
+    // Un telefono lento: molti colpi del timer prima che React ridisegni.
     const { container } = render(<ReceiptPrinter services={printable} copy={copy} locale="it" />);
     fireEvent.click(screen.getByRole("button", { name: /Titolo 1/ }));
     act(() => vi.advanceTimersByTime(DROP_MS));

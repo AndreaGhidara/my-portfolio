@@ -5,7 +5,6 @@ const WALLS: Walls = { width: 1200, height: 800 };
 const piece = (p: Partial<Piece> = {}): Piece => ({
   x: 600, y: 100, vx: 0, vy: 0, rot: 0, vrot: 0, radius: 30, held: false, ...p,
 });
-/** Manda avanti la simulazione, di default senza scorrimento. */
 const advance = (p: Piece, frames: number, scrollDelta = 0) => {
   for (let i = 0; i < frames; i++) physicsStep(p, 1 / 60, WALLS, scrollDelta);
   return p;
@@ -13,8 +12,7 @@ const advance = (p: Piece, frames: number, scrollDelta = 0) => {
 
 describe("la caduta", () => {
   it("cade, e accelera", () => {
-    // Dopo un fotogramma la velocita' e' la gravita' meno un po' d'aria: il
-    // confronto e' con GRAVITA/60 a meno di quella, non con GRAVITA/60 esatta.
+    // Dopo un fotogramma: GRAVITY/60 meno un po' d'aria, non esatta.
     const afterOne = physicsStep(piece(), 1 / 60, WALLS, 0).vy;
     expect(afterOne).toBeGreaterThan(0);
     expect(afterOne).toBeLessThanOrEqual(GRAVITY / 60);
@@ -40,9 +38,7 @@ describe("la caduta", () => {
   });
 
   it("rimbalza molto meno di come arriva: e' carta, non gomma", () => {
-    // Il paragone giusto e' fra la velocita' d'IMPATTO e quella di rimbalzo.
-    // Confrontarla con la velocita' iniziale non direbbe niente: cadendo
-    // accelera, e il rimbalzo puo' superare la partenza restando ben smorzato.
+    // Il confronto giusto e' con la velocita' d'impatto: cadendo accelera.
     const p = piece({ y: 400, vy: 300 });
     let impact = 0;
     let bounce = 0;
@@ -67,8 +63,7 @@ describe("la caduta", () => {
   });
 
   it("ferma a terra smette anche di girare", () => {
-    // Senza questo la pallina posata continuava a ruotare per conto suo, che
-    // e' il dettaglio che rovina tutto il resto.
+    // La pallina posata continuava a ruotare per conto suo.
     const p = advance(piece({ vx: 300, vrot: 900 }), 600);
     expect(Math.abs(p.vrot)).toBeLessThan(20);
   });
@@ -76,9 +71,7 @@ describe("la caduta", () => {
 
 describe("lo scorrimento se la porta dietro", () => {
   it("scorrendo la pagina la pallina resta indietro e poi si rimette in fondo", () => {
-    // E' il gesto che l'utente ha chiesto: «mentre scorriamo vedremo i pezzi di
-    // carta che scendono giu' con noi». Il bordo basso della finestra scappa,
-    // la pallina resta indietro, la gravita' la richiama.
+    // Il bordo basso scappa, la pallina resta indietro e la gravita' la richiama.
     const p = advance(piece(), 600);
     const rested = p.y;
     physicsStep(p, 1 / 60, WALLS, 400);

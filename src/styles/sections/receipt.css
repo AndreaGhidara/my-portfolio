@@ -1,36 +1,7 @@
-/* La stampante dei servizi: i tasti, lo scontrino e la tavola. */
-
-/* ══════════════════════════════════════════════════════════════════════════
-   LA STAMPANTE DEI SERVIZI: la seconda sezione, su fondo arancio
-
-   A destra quattro tasti e una stampante: lo scontrino esce stampando riga per
-   riga. A sinistra la tavola da progetto che disegna lo stesso servizio, con
-   gli stessi pezzi annotati attorno. A tutto schermo in flusso normale, senza
-   aggancio. Sotto gli 860px tutto in colonna, e la sezione cresce quanto serve.
-
-   LO SCONTRINO NON ENTRA MAI NEL FLUSSO. E' assoluto dentro l'uscita, che e'
-   alta quanto il piu' lungo dei quattro: li tiene in piedi i quattro fantasmi,
-   interi e invisibili, impilati nella stessa cella della griglia. Stampare o
-   strappare non cambia l'altezza della pagina, e le scene agganciate piu'
-   sotto (tavolo, archivio, percorso) non si sfasano.
-
-   I LIVELLI. Lo scontrino esce da SOTTO la stampante: la stampante sta a 1 e
-   lo scontrino a 0. Non a -1 come nel prototipo: li' finiva sotto l'uscita e
-   il banco, che per il browser gli stanno sopra anche se trasparenti, e
-   «Parliamone» e «strappa» non si potevano premere. La sezione ha il suo
-   contesto di impilamento (isolation), che convive con lo z-index 2 che le
-   da' l'effetto sopra l'apertura.
-
-   LA REGOLA DEI COLORI e' quella del percorso: la sezione e' arancione e di
-   notte resta arancione, quindi qui dentro niente --fg, --bg, --line,
-   --fg-muted, e nemmeno --accento-testo, che nel tema scuro diventa l'arancio
-   pieno. Solo carta, inchiostro e le loro miscele: la stampante e' inchiostro,
-   tasti e scontrino carta, la tavola inchiostro con i richiami in carta
-   (l'arancio su arancio non si vede). Una prova lo verifica.
-
-   I numeri e i tempi sono quelli del prototipo
-   (docs/prototipi/2026-09-27-scontrino-tre-proposte.html, proposta G1).
-   ═══════════════════════════════════════════════════════════════════════ */
+/* Lo scontrino non entra mai nel flusso: e' assoluto in un'uscita alta quanto il
+   piu' lungo dei quattro fantasmi, e la pagina non cambia altezza. Esce da sotto
+   la stampante (0 contro 1, non -1: l'uscita trasparente gli rubava i clic).
+   Arancione anche di notte: dentro niente --fg, --bg, --line, --accent-text. */
 [data-receipt] {
   min-height: 100vh;
   min-height: 100svh;
@@ -51,7 +22,7 @@
     repeating-linear-gradient(90deg, color-mix(in oklab, var(--ink) 7%, transparent) 0 1px, transparent 1px 32px);
   /* L'arancio pieno su carta fa 3,27:1 e il numero del tasto e' 0,6rem: non
      basta. Scurito con l'inchiostro fa 5,42:1 e resta arancio. Locale, e non
-     --accento-testo, per la ragione scritta sopra. */
+     --accent-text, per la ragione scritta sopra. */
   --accent-on-paper: color-mix(in oklab, var(--accent) 72%, var(--ink));
   --faint-stroke: color-mix(in oklab, var(--ink) 50%, transparent);
   --machine-high: color-mix(in oklab, var(--paper) 14%, var(--ink));
@@ -83,7 +54,6 @@
   outline-offset: -4px;
 }
 
-/* ── I tasti e la stampante ── */
 [data-receipt-bench] {
   grid-column: 2;
   grid-row: 1 / span 2;
@@ -188,7 +158,6 @@
 @keyframes receipt-buzz { 50% { transform: translateY(0.5px); } }
 @keyframes receipt-blink { 50% { opacity: 0.3; } }
 
-/* ── Lo scontrino ── */
 [data-receipt-outlet] {
   position: relative;
   width: 78%;
@@ -272,7 +241,6 @@
   text-transform: uppercase;
 }
 
-/* ── La tavola ── */
 [data-receipt-object] {
   grid-column: 1;
   grid-row: 2;

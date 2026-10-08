@@ -6,22 +6,10 @@ import { DELAYS, DIVIDER, FIGURE_SHAPES, FRAME, TITLE_BLOCK, callout } from "./r
 /** Il ritardo scritto come lo scrivono server e client: due decimali, sempre uguali. */
 const delay = (seconds: number) => ({ transitionDelay: `${seconds.toFixed(2)}s` });
 
-/**
- * La tavola da progetto: il disegno del servizio al centro, i pezzi annotati
- * attorno con le linee di richiamo, la cornice e il cartiglio. Si traccia riga
- * per riga, poi partono i richiami e compaiono le scritte: tutto con
- * transizioni CSS che scattano su `data-traccia`.
- *
- * `anima` falso (il server, e il livello "none") vuol dire gia' tracciata dal
- * primo fotogramma. Vero: la tavola nasce vuota e si accende due fotogrammi
- * dopo, perche' il browser dipinga prima lo stato di partenza e la
- * transizione abbia da dove partire. Ogni stampa nuova la rimonta (la chiave
- * sta nel genitore), e quindi la ritraccia. `aspetta`: bianca e ferma, finche'
- * la stampa non la rimonta.
- *
- * Per chi non vede e' un'immagine sola con il suo nome: dentro, le scritte
- * ripeterebbero lo scontrino un pezzo alla volta.
- */
+// Si traccia con transizioni CSS che scattano su `data-trace`. Con `animate` nasce
+// vuota e si accende due fotogrammi dopo, perche' il browser dipinga prima lo stato
+// di partenza; ogni stampa la rimonta (la chiave sta nel genitore). Per chi non
+// vede e' un'immagine sola: dentro, le scritte ripeterebbero lo scontrino.
 export function ReceiptSchema({
   shape,
   title,
@@ -34,7 +22,7 @@ export function ReceiptSchema({
   scale,
   signature,
 }: {
-  /** L'id del servizio: sceglie il disegno in FORME. */
+  /** L'id del servizio: sceglie il disegno in FIGURE_SHAPES. */
   shape: string;
   title: string;
   pieces: string[];
@@ -43,6 +31,7 @@ export function ReceiptSchema({
   /** «01», gia' composto. */
   number: string;
   animate: boolean;
+  /** Bianca e ferma finche' la stampa non la rimonta. */
   wait?: boolean;
   plate: string;
   scale: string;
@@ -115,15 +104,9 @@ export function ReceiptSchema({
   );
 }
 
-/**
- * La stessa tavola stampata sullo scontrino, sul telefono: il disegno e i
- * richiami con i soli numeri, a inchiostro sulla carta. Niente cornice ne'
- * cartiglio (il titolo e' gia' stampato sopra), e il viewBox taglia via il
- * bianco attorno, perche' la carta e' stretta.
- *
- * Non si traccia: esce intera, e la scopre la carta che esce dalla fessura.
- * Sta nel corpo dello scontrino, che non si legge: il contenuto e' la lista.
- */
+// Sullo scontrino, sul telefono: richiami coi soli numeri, niente cornice, e il
+// viewBox taglia il bianco attorno perche' la carta e' stretta. Non si traccia: la
+// scopre la carta che esce dalla fessura.
 export function ReceiptFigure({ shape, count }: { shape: string; count: number }) {
   return (
     <svg viewBox="124 60 352 304" aria-hidden="true" focusable="false">

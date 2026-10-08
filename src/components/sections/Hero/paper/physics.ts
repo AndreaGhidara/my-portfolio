@@ -1,9 +1,4 @@
-/**
- * La fisica delle palline. Pura: prende uno stato e lo riporta avanti di un
- * fotogramma. Nessun DOM: cosi' il rimbalzo, l'attrito e il fermarsi si
- * possono provare senza un browser, che e' l'unico posto in cui il resto di
- * questo gesto vive.
- */
+// Pura, senza DOM: rimbalzo, attrito e il fermarsi si provano senza un browser.
 
 export type Piece = {
   /** In coordinate della FINESTRA: le palline si posano sul suo bordo basso. */
@@ -34,12 +29,8 @@ const FRICTION = 0.8;
 /** Sotto questa velocita' verticale non rimbalza piu': si posa. */
 const SETTLE_SPEED = 70;
 
-/**
- * Un fotogramma. `scorrimento` e' di quanto si e' mosso lo scorrimento della
- * pagina: il bordo basso della finestra scappa in giu' e le palline restano
- * indietro, poi la gravita' le richiama. E' quello che fa leggere «la carta
- * scende con te» invece di «la carta e' incollata allo schermo».
- */
+// `scrollDelta`: il bordo basso della finestra scappa in giu', le palline restano
+// indietro e la gravita' le richiama. Cosi' la carta scende con chi scorre.
 export function physicsStep(p: Piece, dt: number, walls: Walls, scrollDelta: number): Piece {
   if (p.held) return p;
 

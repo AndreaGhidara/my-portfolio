@@ -7,15 +7,9 @@ export const STALE_MS = 3 * 3_600_000;
 
 type FetchFn = (url: string, init: RequestInit) => Promise<Response>;
 
-/**
- * Chi va in rete per la route. Ogni fonte ha la sua cache di un'ora e nessuna
- * attesa oltre i 4s; una risposta non ok e' una fonte giu', e non entra in cache.
- *
- * Con poche visite la cache di Next serve la copia scaduta e si rinnova dietro:
- * chi passa dopo giorni vedrebbe notizie di giorni prima. Se la Date della
- * risposta ha piu' di tre ore, si richiede senza cache e si usa quella; se la
- * richiesta fresca non va, resta la vecchia.
- */
+// Con poche visite la cache di Next serve la copia scaduta e si rinnova dietro,
+// e chi passa dopo giorni vedrebbe notizie vecchie: se la Date della risposta ha
+// piu' di tre ore si richiede senza cache. Una risposta non ok non entra in cache.
 export function createFetcher(
   fetchFn: FetchFn,
   headersFor: (url: string) => Record<string, string>,

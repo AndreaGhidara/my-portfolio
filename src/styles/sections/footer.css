@@ -1,18 +1,6 @@
-/* Il piede: la busta di risposta. */
-
-/* ──────────────────────────────────────────────────────────────────────────
-   IL PIEDE: LA BUSTA DI RISPOSTA
-
-   La busta NON e' un foglio appoggiato su un blocco scuro: e' il piede, e lo
-   occupa tutto. Il piede quindi non mette padding proprio, o quel padding
-   diventerebbe una cornice del colore del blocco tutto intorno alla busta.
-
-   Il colore e' quello che il sito usa gia' per dire «questo e' un foglio»
-   (vedi [data-contact-foglio]): --bg schiarito del 3% verso --fg. Serve perche'
-   una busta esattamente del colore della pagina, a filo con la sezione sopra,
-   non si distinguerebbe da niente. Restano due token, quindi il tema scuro si
-   ribalta da solo.
-   ────────────────────────────────────────────────────────────────────────── */
+/* La busta e' il piede e lo occupa tutto: un padding proprio diventerebbe una
+   cornice. Il colore e' quello dei fogli del sito (--bg schiarito verso --fg), e
+   restando due token il tema scuro si ribalta da solo. */
 
 [data-footer] { background-color: var(--fg); }
 
@@ -31,12 +19,8 @@
   grid-template-rows: auto 1fr auto;
 }
 
-/* La busta si fa da parte per la barra delle sezioni, che sotto i 768px sta
-   fissa in fondo allo schermo: senza questo spazio starebbe sopra l'ultima
-   riga della busta per sempre. Lo spazio va DENTRO la busta e non sotto il
-   piede, dove sarebbe una cornice del colore del blocco tutto intorno.
-   E va DOPO la regola qui sopra: quella dichiara `padding` per intero, e una
-   scorciatoia che arriva dopo azzererebbe questo lato. */
+/* Sotto i 768px la barra delle sezioni sta fissa in fondo: lo spazio va DENTRO
+   la busta, e DOPO la regola sopra, che dichiara `padding` per intero. */
 @media (max-width: 767px) {
   [data-envelope] { padding-block-end: calc(2rem + 3.25rem + env(safe-area-inset-bottom, 0px)); }
 }
@@ -57,10 +41,7 @@
       no-repeat 100% 0 / 50% 46%;
 }
 
-/* Il taglio: la pagina finisce qui, e sotto non c'e' un'altra pagina. Finche'
-   il piede era un blocco d'inchiostro la fine la faceva il colore; adesso che
-   e' color carta serve dirla, o il sito resta aperto. E' lo stesso rimedio
-   scritto per la proposta A nel prototipo del 14 settembre. */
+/* Il taglio: color carta, il piede non dice piu' da solo che la pagina finisce. */
 [data-envelope]::after {
   content: "";
   position: absolute;
@@ -102,8 +83,6 @@
   border-block-end: 1px solid var(--line);
 }
 [data-envelope-profiles] > a:hover { border-color: var(--accent); }
-
-/* ── L'affrancatura ─────────────────────────────────────────────────────── */
 
 [data-envelope-postage] { display: flex; gap: 0.65rem; align-items: flex-start; flex: none; }
 
@@ -162,8 +141,6 @@
   font-family: var(--font-mono), ui-monospace, monospace;
 }
 
-/* ── L'indirizzo ────────────────────────────────────────────────────────── */
-
 /* Su una busta l'indirizzo non e' a sinistra: sta staccato verso il centro,
    perche' li' lo legge la macchina che smista. Con tutta la larghezza a
    disposizione quel margine si puo' finalmente dare. */
@@ -198,8 +175,6 @@
   font-size: 0.8rem;
   color: var(--fg-muted);
 }
-
-/* ── Il fondo della busta ───────────────────────────────────────────────── */
 
 [data-envelope-bottom] {
   display: flex;

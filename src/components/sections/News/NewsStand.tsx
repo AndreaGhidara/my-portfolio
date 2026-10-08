@@ -7,7 +7,7 @@ import { collectedLabel, fillTemplate, layoutBalls, storyTitle, type Ball } from
 import { NewsClipping } from "./NewsClipping";
 import type { NewsCopy } from "./types";
 
-/** Sotto questa larghezza il giornale sta sotto la macchina: la stessa soglia e' in sezioni/notizie.css. */
+/** Sotto questa larghezza il giornale sta sotto la macchina: la stessa soglia e' in sections/news.css. */
 export const PHONE_QUERY = "(max-width: 959px)";
 
 type Status = { kind: "loading" } | { kind: "error" } | { kind: "ready"; collection: NewsCollection };
@@ -22,11 +22,8 @@ function isCollection(r: unknown): r is NewsCollection {
   return !!c && CATEGORIES.every((k) => Array.isArray(c[k]));
 }
 
-/**
- * La pallina che esce dallo sportello e vola al giornale. Vive in <body> e
- * non nella sezione: vola sopra tutto, e la sezione non ha niente da tagliare.
- * A "reduced" fa la stessa strada, piu' corta e senza girare su se stessa.
- */
+// Vive in <body> e non nella sezione: vola sopra tutto, e la sezione non ha
+// niente da tagliare. A "reduced" fa la stessa strada, piu' corta e senza girare.
 async function fly(cat: CategoryId, origin: HTMLElement, target: HTMLElement, level: MotionLevel) {
   const v = document.createElement("span");
   v.setAttribute("data-news-flying", "");
@@ -69,19 +66,10 @@ const DRAG_THRESHOLD_PX = 6;
 /** Vicino al centro l'angolo non vuol dire niente: un pixel di tremito vale decine di gradi. */
 const DEAD_ZONE_PX = 12;
 
-/**
- * Il bancone: il globo con le palline delle tre categorie, i tre pulsanti da
- * sala giochi, la manopola, e accanto il giornale dove si stampa la notizia.
- *
- * Le notizie si chiedono a /api/notizie quando la sezione si avvicina alla
- * vista, non al caricamento della pagina. Se non arrivano la macchina lo dice,
- * e il giro dopo riprova.
- *
- * La manopola si gira in tre modi: un clic, Invio o Spazio (e' un bottone), o
- * trascinandola in tondo col puntatore o col dito, in senso orario. Un giro
- * intero e' una pallina. La rotella non si intercetta: lo scroll della pagina
- * resta di chi scorre.
- */
+// Le notizie si chiedono quando la sezione si avvicina alla vista, non al
+// caricamento; se non arrivano, il giro dopo riprova. Trascinata in tondo, un giro
+// intero di manopola e' una pallina. La rotella non si intercetta: lo scroll
+// della pagina resta di chi scorre.
 export function NewsStand({ copy, locale }: { copy: NewsCopy; locale: string }) {
   const level = useMotionLevel();
   const root = useRef<HTMLDivElement>(null);
@@ -101,7 +89,7 @@ export function NewsStand({ copy, locale }: { copy: NewsCopy; locale: string }) 
   const requested = useRef(false);
   const grip = useRef<Grip | null>(null);
   const dragged = useRef(false);
-  // Copie fresche di uscite e storia: gira() le rilegge dopo l'await, quando la
+  // Copie fresche di drawn e printed: turn() le rilegge dopo l'await, quando la
   // closure del render puo' essere gia' vecchia (manopola girata senza fermarsi).
   const drawnRef = useRef(NONE);
   const printedRef = useRef<Drawn[]>([]);
@@ -356,8 +344,7 @@ export function NewsStand({ copy, locale }: { copy: NewsCopy; locale: string }) 
           {story && current ? `${copy.categories[current.cat].masthead}: ${storyTitle(story, copy)}` : ""}
         </p>
         <div data-sheet-body>
-          {/* La notizia, il pannello vuoto e quello della categoria finita
-              stanno nella stessa scatola, della stessa misura. */}
+          {/* Notizia, pannello vuoto e categoria finita: stessa scatola, stessa misura. */}
           <div data-sheet-story>
             {/* Sempre montato, vuoto quando non c'e' niente da dire: una regione
                 che nasce insieme al suo testo spesso non viene letta. */}

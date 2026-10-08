@@ -1,10 +1,7 @@
 import type { CategoryId, StoryFigure, StoryStamp } from "@/lib/news/types";
 
-/**
- * I testi della sezione, gia' tradotti dal server. Quelli con le graffe
- * ({n}, {sito}, {ora}) sono modelli: li riempie la macchina con i valori che
- * conosce solo dopo, quando le notizie sono arrivate.
- */
+// Quelli con le graffe ({n}, {sito}, {ora}) sono modelli: li riempie il client
+// con valori che conosce solo a notizie arrivate.
 export type NewsCopy = {
   categories: Record<CategoryId, { name: string; masthead: string }>;
   stamps: Record<StoryStamp, string>;

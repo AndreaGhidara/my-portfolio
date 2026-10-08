@@ -24,10 +24,7 @@ describe("la mappa affine", () => {
   const S: Triple = [p(0, 0), p(10, 0), p(0, 10)];
 
   it("sull'identita' restituisce l'identita'", () => {
-    // E' la prova che avrebbe preso il difetto vero. La prima stesura usava una
-    // formula compatta con due segni invertiti e qui dava (1,0,0,-1,0,0): le
-    // lettere si disegnavano specchiate in verticale. Guardando il codice non
-    // si vedeva; guardando questo numero si vede subito.
+    // La prima formula compatta qui dava (1,0,0,-1,0,0): lettere specchiate.
     expect(affineMap(S, S)).toEqual([1, 0, 0, 1, 0, 0]);
   });
 
@@ -56,8 +53,7 @@ describe("la mappa affine", () => {
 
 describe("il generatore e il campo", () => {
   it("e' deterministico: lo stesso seme da' la stessa carta", () => {
-    // Le pieghe devono essere identiche a ogni caricamento, come le sagome del
-    // tavolo. Con Math.random() la lettera cambierebbe forma a ogni visita.
+    // Con Math.random() la lettera cambierebbe forma a ogni visita.
     expect(buildMesh(11)).toEqual(buildMesh(11));
   });
 
@@ -66,8 +62,7 @@ describe("il generatore e il campo", () => {
   });
 
   it("il campo e' liscio: due punti vicini danno valori vicini", () => {
-    // La grana grossa e' quello che tiene insieme le facce. Se il campo fosse
-    // rumore puro la carta si sbriciolerebbe invece di piegarsi a pezzi.
+    // Rumore puro sbriciolerebbe la carta invece di piegarla a pezzi.
     const f = noiseField(rng(5), 3);
     let jump = 0;
     for (let i = 0; i < 40; i++) {
@@ -82,8 +77,7 @@ describe("la pallina", () => {
   const seeds = [11, 24, 37, 50];
 
   it("e' piccola: il diametro sta sotto la meta' del foglio", () => {
-    // A 0,46 di raggio (la prima stesura) il foglio restava un quadrato
-    // rimpicciolito e si vedeva il suo bordo accartocciarsi.
+    // A 0,46 di raggio il foglio restava un quadrato rimpicciolito.
     for (const s of seeds) {
       const r = Math.max(...buildMesh(s).map((v) => Math.hypot(v.bx, v.by)));
       expect(2 * r, `seme ${s}`).toBeLessThan(0.5);
@@ -92,10 +86,7 @@ describe("la pallina", () => {
   });
 
   it("il foglio si ripiega su se stesso invece di rimpicciolirsi", () => {
-    // LA proprieta' di questo modulo, e la ragione per cui la pallina si legge
-    // come carta appallottolata. Se il raggio d'arrivo seguisse quello di
-    // partenza (mappatura quadrato -> disco) la correlazione sarebbe circa
-    // +1 e la forma del foglio sopravviverebbe intatta.
+    // Se il raggio d'arrivo seguisse quello di partenza la correlazione sarebbe circa +1.
     for (const s of seeds) {
       const v = buildMesh(s);
       const start = v.map((q) => Math.hypot(q.u - 0.5, q.w - 0.5));
@@ -116,8 +107,7 @@ describe("la pallina", () => {
   });
 
   it("il bordo del foglio finisce dentro la pallina", () => {
-    // L'altra faccia della stessa proprieta', detta in modo che si veda: se il
-    // bordo restasse fuori, il quadrato resterebbe riconoscibile.
+    // Se il bordo restasse fuori, il quadrato resterebbe riconoscibile.
     for (const s of seeds) {
       const v = buildMesh(s);
       const maxRadius = Math.max(...v.map((q) => Math.hypot(q.bx, q.by)));
@@ -147,9 +137,7 @@ describe("il collasso", () => {
   });
 
   it("la carta non cede tutta insieme", () => {
-    // A meta' strada i vertici non sono tutti allo stesso punto del loro
-    // viaggio: e' il ritardo per vertice, ed e' quello che fa sembrare che
-    // ceda a pieghe invece di sgonfiarsi.
+    // E' il ritardo per vertice a farla cedere a pieghe invece di sgonfiarsi.
     const half = positions(mesh, 0.5, center, 200);
     const flat = positions(mesh, 0, center, 200);
     const progress = half.map((q, i) => Math.hypot(q.x - flat[i].x, q.y - flat[i].y));
@@ -159,9 +147,7 @@ describe("il collasso", () => {
 
 describe("l'ordine di disegno", () => {
   it("va dalla piu' lontana alla piu' vicina, e le conta tutte", () => {
-    // Senza quest'ordine le facce si coprono nell'ordine della griglia e il
-    // risultato e' un collage piatto: e' questo, piu' dell'ombra, a far
-    // leggere una pallina.
+    // Senza quest'ordine le facce sarebbero un collage piatto.
     const cells = cellsByDepth(positions(buildMesh(24), 1, { x: 0, y: 0 }, 100));
     expect(cells).toHaveLength(GRID_SIDE * GRID_SIDE);
     for (let i = 1; i < cells.length; i++) {
@@ -172,8 +158,7 @@ describe("l'ordine di disegno", () => {
 
 describe("quando compare il foglio", () => {
   it("passando col cursore si vede solo l'inchiostro", () => {
-    // Il difetto della prima stesura: il foglio si disegnava subito, era del
-    // colore della pagina, e se ne vedeva solo il bordo piegarsi.
+    // Il difetto della prima stesura: il foglio compariva subito, col bordo che si piegava.
     expect(veilFor(0)).toBe(0);
     expect(veilFor(0.25)).toBe(0);
   });

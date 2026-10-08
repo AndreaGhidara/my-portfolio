@@ -1,46 +1,20 @@
-/* Le notizie: il bancone, la prima pagina e le gia' uscite. */
-
-/* ══════════════════════════════════════════════════════════════════════════
-   LE NOTIZIE: IL BANCONE CON TRE PULSANTI
-
-   Prima dei Contatti. A sinistra il distributore (globo, tappo, collo, corpo
-   col colore della categoria scelta, targa, tre pulsanti da sala giochi,
-   manopola, sportello, piede), a destra il foglio di giornale a misura
-   fissa; sotto i 960px la macchina sopra e il foglio sotto (fra 860 e 960 la notizia aveva meno spazio che su un telefono). La stessa soglia sta in
-   Bancone.tsx (TELEFONO), che sul telefono porta il giornale in vista.
-
-   I colori delle tre categorie sono fissi nei due temi, ciascuno col suo
-   testo leggibile (--on-…), misurato in contrast.test.ts:
-   - I.A. e' l'arancio, con l'inchiostro sopra (la carta fa 3,27:1, e le
-     scritte dei pulsanti sono piccole);
-   - Design e' il giallo della lampadina, con l'inchiostro sopra; sulla carta
-     il giallo non si vede (1,1:1), per questo palline, pulsante e corpo hanno
-     un contorno d'inchiostro, come il pallino della testata;
-   - Codice e' il verde della tavolozza, quello di carta e fisso: --verde nel
-     tema scuro diventa il verde schiarito, e la carta sopra non si leggerebbe.
-   I grigi della macchina sono miscele di carta e inchiostro: nessun colore
-   nuovo.
-
-   Il movimento sta sotto [data-motion] (lo scrive Bancone da useMotionLevel)
-   e sotto prefers-reduced-motion: a "none" niente mescola, niente giro
-   animato, il ritaglio compare.
-
-   I numeri sono quelli del prototipo
-   (docs/prototipi/2026-09-28-bancone-tre-pulsanti.html, variante A).
-   ══════════════════════════════════════════════════════════════════════════ */
+/* Sotto i 960px la macchina sopra e il foglio sotto: la stessa soglia e' in
+   NewsStand.tsx (PHONE_QUERY). I colori delle categorie sono fissi nei due temi
+   (contrast.test.ts); il giallo di Design ha sempre un contorno d'inchiostro, e il
+   verde di Codice e' palette.green perche' --theme-green si schiarisce di notte. */
 :root {
   --news-ia: var(--orange);
   --on-news-ia: var(--ink);
   --news-design: var(--bulb);
   --on-news-design: var(--ink);
-  --news-codice: #2F6F4E; /* palette.green, fisso: --verde cambia col tema */
+  --news-codice: #2F6F4E; /* palette.green, fisso: --theme-green cambia col tema */
   --on-news-codice: var(--paper);
   --news-iron: color-mix(in oklab, var(--ink) 88%, var(--paper));
   --news-steel: color-mix(in oklab, var(--ink) 38%, var(--paper));
   --news-dark-steel: color-mix(in oklab, var(--ink) 50%, var(--paper));
 }
 
-/* `--c` e' il colore di chi porta data-cat, `--su` il testo e l'anello sopra.
+/* `--c` e' il colore di chi porta data-cat, `--on-c` il testo e l'anello sopra.
    La pallina che vola vive in <body>, fuori dalla sezione. */
 [data-news] [data-cat="ia"],
 [data-news-flying][data-cat="ia"] { --c: var(--news-ia); --on-c: var(--on-news-ia); }
@@ -66,9 +40,8 @@
   [data-news-scene] { grid-template-columns: minmax(0, 1fr); justify-items: center; }
 }
 
-/* ── La macchina ── */
-/* --tema e --su-tema sono quelli della categoria scelta, risolti qui: i
-   pulsanti dentro ridefiniscono --c e --su per se', non per il corpo. */
+/* --theme e --on-theme sono quelli della categoria scelta, risolti qui: i
+   pulsanti dentro ridefiniscono --c e --on-c per se', non per il corpo. */
 [data-news-machine] {
   --theme: var(--c);
   --on-theme: var(--on-c);
@@ -316,7 +289,6 @@
   color: var(--fg-muted);
 }
 
-/* ── Il movimento ── */
 @media (prefers-reduced-motion: no-preference) {
   [data-news-scene]:not([data-motion="none"]) [data-news-globe] > span {
     transition: opacity 0.35s, filter 0.35s, scale 0.35s;
@@ -372,16 +344,9 @@
     0 6px 10px color-mix(in oklab, var(--ink) 25%, transparent);
 }
 
-/* ── La prima pagina ──
-   Un foglio di giornale a misura fissa: sopra la testata della categoria e la
-   data, sotto due colonne, la notizia grande e le gia' uscite. Qualunque cosa
-   esca (titoli da 14 a 118 caratteri, riassunti da 0 a quasi 400) il foglio
-   non cambia altezza, e la sezione con lui: le misure le decide il foglio, il
-   testo che non ci sta si ferma coi puntini. Il prototipo e'
-   docs/prototipi/2026-09-29-notizie-impaginate.html, variante B.
-
-   Carta in tutti e due i temi, come la pratica dei Lavori: dentro non entra
-   niente di quello che si ribalta col tema. */
+/* Foglio a misura fissa: qualunque cosa esca l'altezza non cambia, e il testo
+   che non ci sta si ferma coi puntini. Carta nei due temi: dentro niente di
+   quello che si ribalta col tema. */
 [data-news-sheet] {
   --sheet-paper: var(--paper);
   --sheet-ink: var(--ink);
@@ -486,7 +451,6 @@
   border: 0;
 }
 
-/* ── La notizia grande ── */
 [data-news-clipping] {
   --sheet-paper: var(--paper);
   --sheet-ink: var(--ink);
@@ -647,7 +611,6 @@
   [data-news-clipping] a { max-width: 100%; }
 }
 
-/* ── Le gia' uscite, e l'ora della raccolta ── */
 [data-sheet-column] {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
@@ -715,9 +678,8 @@
   color: var(--sheet-muted);
 }
 
-/* ── Telefono: la macchina sopra, il foglio sotto a tutta larghezza. Le
-   misure fisse restano fisse: la notizia in una scatola, la fila in un'altra
-   che scorre, la testata sopra la data perche' non vada a capo a caso. ── */
+/* Telefono: le misure fisse restano fisse, e la testata va sopra la data perche'
+   non vada a capo a caso. */
 @media (max-width: 959px) {
   /* «Notizie raccolte alle…» va su due righe sul telefono: riservate da subito,
      o la sezione cresceva di una riga all'arrivo delle notizie. */

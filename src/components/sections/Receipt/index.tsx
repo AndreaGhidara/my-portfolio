@@ -3,10 +3,8 @@ import { services } from "@/content/services";
 import { ReceiptView } from "./ReceiptView";
 import type { PrintableService } from "./ReceiptPrinter";
 
-/**
- * I servizi sono gli stessi del tavolo piu' sotto (content/services.ts e
- * services.list): qui si stampano, li' si montano. Nessuna copia dei testi.
- */
+// I servizi sono quelli del tavolo piu' sotto (content/services.ts): qui si
+// stampano, li' si montano. Nessuna copia dei testi.
 export async function Receipt() {
   const t = await getTranslations("scontrino");
   const tServices = await getTranslations("services");

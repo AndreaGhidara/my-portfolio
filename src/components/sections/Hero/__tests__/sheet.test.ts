@@ -1,10 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { sheetCoverage, stickyTop } from "../sheet";
 
-/**
- * Un Hero da 700px e una testata da 60: i numeri non contano, contano i
- * rapporti. I rettangoli sono quelli che darebbe getBoundingClientRect.
- */
+// Un Hero da 700px e una testata da 60: contano i rapporti, non i numeri.
 const HERO = { top: 60, bottom: 760, height: 700 };
 
 describe("copertura", () => {
@@ -36,8 +33,7 @@ describe("attacco", () => {
   });
 
   it("se e' piu' alta si ferma quando il suo fondo tocca il fondo visibile", () => {
-    // Spazio 840, Hero 1000: il fondo arriva al fondo dello schermo quando la
-    // cima e' 160px sopra la testata.
+    // Spazio 840, Hero 1000: il fondo tocca il fondo dello schermo con la cima 160px sopra la testata.
     expect(stickyTop({ header: 60, stage: 900, bottomBar: 0, height: 1000 })).toBe(-100);
   });
 

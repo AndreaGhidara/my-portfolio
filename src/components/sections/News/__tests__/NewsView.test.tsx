@@ -76,7 +76,6 @@ const it0 = buildCopy("it");
 const knob = () => screen.getByRole("button", { name: it0.knob });
 const categoryButton = (name: string) => within(screen.getByRole("group", { name: it0.group })).getByRole("button", { name });
 
-/** Aspetta che le notizie siano arrivate: la targa conta le palline. */
 async function ready(container: HTMLElement) {
   await waitFor(() => expect(container.querySelectorAll("[data-news-globe] > span").length).toBeGreaterThan(0));
 }
@@ -141,8 +140,7 @@ describe("le notizie: il giro", () => {
     expect(article).toHaveTextContent("Hacker News · ieri");
     expect(article).toHaveTextContent("in prima pagina");
     expect(article).toHaveTextContent(`${new Intl.NumberFormat("it").format(1234)} punti`);
-    // L'articolo intero, riassunto e numeri compresi, non si legge da solo:
-    // si annuncia la testata col titolo, e il resto lo si va a leggere.
+    // Si annunciano solo testata e titolo: il resto lo si va a leggere.
     const live = container.querySelectorAll("[aria-live]");
     expect(live).toHaveLength(1);
     expect(live[0]).toHaveTextContent("La Gazzetta dell'I.A.: Agents are here");
@@ -172,8 +170,7 @@ describe("le notizie: il giro", () => {
   });
 
   it("un tocco al centro della manopola gira, anche se il dito trema di due pixel", async () => {
-    // Vicino al centro un pixel di tremito vale molti gradi: contati come
-    // trascinamento, il clic che segue veniva buttato.
+    // Contato come trascinamento, il tremito faceva buttare il clic che segue.
     respond();
     const { container } = render(<NewsView {...props()} />);
     await ready(container);
@@ -397,10 +394,7 @@ describe("i colori delle notizie", () => {
   });
 });
 
-/**
- * In jsdom l'impaginazione non si misura: si leggono le regole che la tengono
- * ferma. Le altezze misurate nel browser stanno nel prototipo e nel suo README.
- */
+// In jsdom l'impaginazione non si misura: si leggono le regole che la tengono ferma.
 describe("il foglio non cambia misura da una notizia all'altra", () => {
   it("sul desktop il foglio ha un'altezza fissa, e la notizia la riempie", () => {
     expect(ruleBody("[data-news-sheet]")).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);

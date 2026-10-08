@@ -1,32 +1,7 @@
-/* La seconda sezione che passa sopra la prima. */
-
-/* ══════════════════════════════════════════════════════════════════════════
-   LA SECONDA SEZIONE PASSA SOPRA LA PRIMA
-
-   Hero si ferma sotto la testata e la stampante gli sale sopra come un foglio, con
-   gli angoli alti arrotondati e un'ombra sul bordo. Intanto Hero «va sotto»:
-   un velo d'inchiostro, si stringe, sale. Tutto proporzionale a --copertura
-   (0 quando la stampante tocca il fondo di Hero, 1 quando ne raggiunge la cima),
-   che scrive SottoIlFoglio insieme a --attacco, il punto in cui Hero si ferma.
-
-   Ogni regola che muove qualcosa sta sotto [data-acceso], che il componente
-   scrive dopo aver misurato e toglie a "none": senza JavaScript e con il
-   movimento ridotto la pagina e' quella di prima.
-
-   I LIVELLI, e sono il punto delicato. Un elemento sticky apre sempre un
-   contesto di impilamento suo, z-index o no: lo strato fisso della carta
-   (z-index 40) dentro Hero finirebbe sotto il foglio, ed e' per questo che a
-   "full" CartaStropicciata lo porta in fondo a <body>. Alla sezione non si da'
-   ne' z-index ne' isolation: non servono, la stampante le passa sopra lo stesso.
-   Il contesto lo apre dichiarato lo strato del contenuto, che dentro Hero
-   separa il ritratto (z-index 10) dal velo: senza, il ritratto resterebbe
-   acceso sopra il velo. La trasformazione ne apre gia' uno, ma e' un effetto
-   collaterale, e non ci si appoggia. La stampante sta a 2: sopra Hero, sotto le
-   due barre.
-
-   I numeri sono quelli tarati nel prototipo
-   (docs/prototipi/2026-09-27-sezione-sopra.html).
-   ═══════════════════════════════════════════════════════════════════════ */
+/* Tutto sotto [data-lit] e proporzionale a --coverage, scritti da UnderSheet.
+   Sticky, Hero apre un contesto suo: lo strato della carta va in <body>
+   (CrumpledPaper), e quello dichiarato del contenuto separa il ritratto dal
+   velo. La stampante sta a 2: sopra Hero, sotto le due barre. */
 [data-under-sheet] {
   position: relative;
   /* Quanto inchiostro scende su Hero a copertura piena. */

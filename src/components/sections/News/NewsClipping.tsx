@@ -3,15 +3,8 @@ import type { CategoryId, Story, StoryFigure } from "@/lib/news/types";
 import { fillTemplate, sourceName, storyTitle, timeAgo } from "./format";
 import type { NewsCopy } from "./types";
 
-/**
- * La notizia grande della prima pagina: la fonte, il timbro, il titolo, il
- * riassunto e i numeri. La testata e la data stanno sopra, sul foglio. La
- * misura la decide il foglio, qualunque notizia esca: il titolo si ferma a tre
- * righe, il riassunto a un numero fisso di righe coi puntini, e senza riassunto
- * il suo posto resta (il dominio in grande e una riga). Dati e link sul fondo.
- * Carta in tutti e due i temi, come la pratica dei lavori. Niente immagini: la
- * pagina non apre connessioni verso terzi, e il link si apre solo se lo premi.
- */
+// La misura la decide il foglio, qualunque notizia esca: senza riassunto il suo
+// posto resta. Niente immagini: la pagina non apre connessioni verso terzi.
 export function NewsClipping({
   story,
   cat,
@@ -22,7 +15,7 @@ export function NewsClipping({
 }: {
   story: Story;
   cat: CategoryId;
-  /** Di quanto e' storto, in gradi: lo sceglie chi l'ha stampato. */
+  /** Gradi. */
   tilt: number;
   copy: NewsCopy;
   locale: string;

@@ -4,22 +4,10 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { MEDIA, useMotionLevel } from "@/animations/motionPolicy";
 import { sheetCoverage, stickyTop } from "./sheet";
 
-/**
- * La seconda sezione passa sopra la prima. Hero si ferma sotto la testata,
- * la stampante dei servizi gli sale sopra come un foglio, e intanto Hero «va
- * sotto»: si scurisce, si stringe e sale. Poi la pagina scorre come sempre,
- * perche' lo sticky di Hero vale solo dentro questo contenitore: finita la
- * stampante, Hero se ne va con lei. Nessuna corsa in piu'.
- *
- * Il movimento lo fa il CSS (sezioni/sopra.css), tutto sotto `data-acceso`, che si
- * scrive qui dopo aver misurato e si toglie nella pulizia: senza JavaScript e
- * a "none" la pagina e' quella di prima. Qui si scrivono solo due numeri:
- * dove Hero si ferma (`--attacco`) e quanto e' coperto (`--copertura`).
- *
- * La copertura la calcola un ascoltatore di scroll nativo, come
- * HeaderScrollState, e non uno ScrollTrigger: e' una proporzione fra due
- * rettangoli, e Lenis muove comunque lo scroll della finestra.
- */
+// Il movimento lo fa il CSS (sections/under-sheet.css) sotto `data-lit`, scritto
+// qui dopo aver misurato: senza JavaScript e a "none" la pagina e' quella di prima.
+// Qui si scrivono solo `--stick` e `--coverage`, con uno scroll nativo e non
+// ScrollTrigger: e' una proporzione fra due rettangoli.
 export function UnderSheet({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement | null>(null);
   const probe = useRef<HTMLDivElement | null>(null);
@@ -47,10 +35,8 @@ export function UnderSheet({ children }: { children: ReactNode }) {
       written = c;
       hero.style.setProperty("--coverage", String(c));
     };
-    // `fotogramma` si azzera solo dentro il suo callback: azzerato altrove
-    // (una chiamata diretta a muovi con un fotogramma in coda) la pulizia non
-    // saprebbe piu' cosa cancellare, e un callback orfano riscriverebbe
-    // --copertura dopo che e' stata tolta.
+    // `frame` si azzera solo dentro il suo callback: azzerato altrove la pulizia non
+    // saprebbe piu' cosa cancellare, e un callback orfano riscriverebbe --coverage.
     const onScroll = () => {
       if (frame) return;
       frame = requestAnimationFrame(() => {
@@ -71,11 +57,8 @@ export function UnderSheet({ children }: { children: ReactNode }) {
       hero.style.setProperty("--stick", `${stick}px`);
     };
 
-    /* Con il puntatore fine si rimisura a ogni resize. Su touch solo quando
-       cambia la larghezza: la barra del browser che compare e sparisce non deve
-       spostare il punto in cui Hero si ferma sotto il pollice (e' per quello
-       che il palco si legge in svh dalla sonda). La copertura invece si
-       ricalcola sempre, perche' e' solo una lettura. */
+    // Su touch si rimisura solo quando cambia la larghezza: la barra del browser che
+    // compare non deve spostare il punto in cui Hero si ferma sotto il pollice.
     const fine = window.matchMedia(MEDIA.finePointer);
     let width = window.innerWidth;
     const onResize = () => {
@@ -85,38 +68,25 @@ export function UnderSheet({ children }: { children: ReactNode }) {
       update();
     };
 
-    /* Hero cresce anche da solo (un carattere che arriva tardi, il claim che va
-       a capo): l'attacco lo deve sapere. */
+    // Hero cresce anche da solo (un carattere che arriva tardi, il claim che va a
+    // capo): `--stick` lo deve sapere.
     const resizeObserver = new ResizeObserver(() => {
       measure();
       update();
     });
 
-    /* Mentre un dossier e' aperto la barra in basso e' nascosta
-       (html[data-dialog-open]) e misura zero: un resize in quel momento, una
-       rotazione del telefono, lascerebbe un attacco senza la barra. Si
-       rimisura quando il dossier si chiude, come fa SmoothScroll con Lenis.
-       Scelto al posto di leggere l'altezza «teorica» della barra: quella e'
-       3,25rem piu' la tacca, cioe' un conto che vive nel CSS e andrebbe
-       ripetuto qui. */
+    // Con un dossier aperto la barra in basso e' nascosta e misura zero: si rimisura
+    // alla chiusura, come fa SmoothScroll con Lenis, invece di ripetere qui il conto
+    // del CSS (3,25rem piu' la tacca).
     const dialogObserver = new MutationObserver(() => {
       if (document.documentElement.hasAttribute("data-dialog-open")) return;
       measure();
       update();
     });
 
-    /* Il fuoco svela. Da tastiera si arriva ai bottoni di Hero anche quando il
-       foglio li copre (sono la prima cosa che copre), e un bottone col fuoco
-       sotto un foglio arancione e' un fuoco che non si vede. Si torna al punto
-       in cui Hero si e' appena fermato: la copertura li' e' zero, e se Hero e'
-       piu' alto dello schermo se ne vede il fondo, dove stanno i bottoni. In
-       cima al contenitore, su un telefono basso, i bottoni sarebbero finiti
-       sotto la barra in basso. Se quello che ha preso il fuoco resta sotto la
-       testata si sale ancora, e salendo la copertura resta zero.
-       Niente `inert`: toglierebbe l'h1 agli screen reader per tutto il tempo
-       in cui Hero e' sotto. Solo da tastiera, come nel tavolo: :focus-visible
-       e' falso per un click. "instant" e non "auto": auto obbedisce a
-       scroll-behavior. */
+    // Da tastiera si arriva ai bottoni di Hero anche sotto il foglio: si torna dove
+    // Hero si e' appena fermato, e la copertura e' zero. Niente `inert`: toglierebbe
+    // l'h1 agli screen reader. "instant" perche' "auto" obbedisce a scroll-behavior.
     const onFocus = (event: FocusEvent) => {
       const focused = event.target as HTMLElement | null;
       if (!focused?.matches(":focus-visible") || coverage() <= 0) return;

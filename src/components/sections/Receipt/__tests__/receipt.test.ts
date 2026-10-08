@@ -57,9 +57,7 @@ describe("le righe dello scontrino", () => {
   });
 
   it("la figura sta subito prima della lista che spiega, e non ha testo", () => {
-    // Sul telefono e' il disegno della tavola stampato sulla carta; sul
-    // desktop non si vede. Senza testo costa un colpo solo: il desktop non
-    // se ne accorge.
+    // Sul desktop non si vede: senza testo costa un colpo solo.
     const lines = receiptLines(receiptData(0));
     const figure = lines.findIndex((r) => r.kind === "figure");
     expect(lines.filter((r) => r.kind === "figure")).toHaveLength(1);
@@ -72,9 +70,7 @@ describe("le righe dello scontrino", () => {
   });
 
   it("la data non cambia la lunghezza della riga: il server la scrive vuota", () => {
-    // La data esiste solo nel browser (sul server sarebbe quella della build):
-    // se allungasse la riga, lo scontrino fantasma e i tempi di stampa
-    // cambierebbero dopo il montaggio.
+    // Se allungasse la riga, fantasma e tempi di stampa cambierebbero dopo il montaggio.
     const without = receiptLines(receiptData(0, ""))[2].text;
     const withDate = receiptLines(receiptData(0, "27/09/2026"))[2].text;
     expect(without).toHaveLength(LINE_WIDTH);
@@ -133,8 +129,7 @@ describe("la tavola", () => {
   });
 
   it("i richiami a sinistra scrivono verso sinistra, quelli a destra verso destra", () => {
-    // Il testo parte dal gomito verso l'esterno: al contrario finirebbe sopra
-    // il disegno.
+    // Al contrario il testo finirebbe sopra il disegno.
     for (let k = 0; k < SLOTS.length; k++) {
       const r = callout(k);
       const toLeft = SLOTS[k].l[0] < 300;
@@ -152,11 +147,7 @@ describe("la tavola", () => {
   });
 });
 
-/**
- * La stampante e' uno stato solo, e ogni callback ritardato (il colpo di
- * stampa, lo scontrino che finisce di cadere) porta la generazione in cui e'
- * nato: se nel frattempo e' successo altro, arriva e non fa niente.
- */
+// Ogni callback ritardato porta la generazione in cui e' nato: se nel frattempo e' successo altro, non fa niente.
 describe("la stampante", () => {
   const TOTALS = [40, 30, 20, 10];
   const run = (s: PrinterState, ...events: PrinterEvent[]) =>
@@ -204,8 +195,7 @@ describe("la stampante", () => {
     expect(s).toMatchObject({ phase: "tearing", next: 2, gen: firstDropGen });
     s = run(s, { type: "dropped", gen: firstDropGen });
     expect(s).toMatchObject({ phase: "printing", service: 2 });
-    // Un secondo «caduto» con la stessa generazione (lo StrictMode, un timer
-    // rimasto) non ricomincia niente.
+    // Un secondo «dropped» con la stessa generazione (StrictMode, un timer rimasto) non ricomincia niente.
     expect(run(s, { type: "dropped", gen: firstDropGen })).toBe(s);
   });
 
@@ -217,9 +207,7 @@ describe("la stampante", () => {
   });
 
   it("svuota toglie anche il disegno, e la tavola resta bianca fino alla stampa", () => {
-    // Tracciata dal server e poi cancellata e ridisegnata sotto gli occhi
-    // all'autostampa, era un salto. Sul telefono la tavola non c'e' piu': il
-    // disegno si stampa sulla carta.
+    // Tracciata dal server e poi ridisegnata all'autostampa era un salto.
     const initial = initialPrinter(TOTALS);
     expect(initial.emptyPlate).toBe(false);
     const s = run(initial, { type: "clear" });
@@ -233,9 +221,7 @@ describe("la stampante", () => {
   });
 
   it("svuota non toglie mai uno scontrino chiesto da qualcuno", () => {
-    // Lo svuotamento arriva alla prima osservazione della stampante, un
-    // fotogramma dopo il montaggio: se nel frattempo c'e' stato un tocco, lo
-    // scontrino e' suo.
+    // Lo svuotamento arriva un fotogramma dopo il montaggio: se c'e' stato un tocco, lo scontrino e' suo.
     const touched = run(initialPrinter(TOTALS), { type: "press", service: 2, immediate: false });
     expect(run(touched, { type: "clear" })).toBe(touched);
   });
