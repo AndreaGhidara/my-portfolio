@@ -12,14 +12,9 @@ import { isDossierOpen } from "./useDossier";
 /** Ms: quanto dura lo scroll che porta davanti la cartella prima che cada. */
 const QUICK_MS = 350;
 
-/**
- * Porta la pagina a `y`. "subito" salta; "svelto" scorre in SVELTO ms, prima
- * che la cartella cada; "morbido" e' il ritorno della linguetta. Con Lenis
- * acceso lo chiede a lui (vedi vaiA). La promessa si risolve a scroll finito:
- * con Lenis da onComplete, senza da scrollend, e comunque entro una scadenza,
- * perche' scrollend non arriva se la pagina e' gia' li' e onComplete non
- * arriva se lo scroll viene interrotto.
- */
+/** Si risolve a scroll finito, e comunque entro una scadenza: scrollend non
+ *  arriva se la pagina e' gia' li', onComplete di Lenis non arriva se lo
+ *  scroll viene interrotto. */
 function scrollPageTo(y: number, mode: "instant" | "quick" | "smooth"): Promise<void> {
   const lenis = activeLenis();
   if (mode === "instant") {
@@ -51,12 +46,9 @@ function scrollPageTo(y: number, mode: "instant" | "quick" | "smooth"): Promise<
   });
 }
 
-/**
- * In colonna: la cartella puo' essere cliccata dal fondo della faccia, col
- * foglio sopra lo schermo. Il foglio e' da dove parte la pratica, e deve
- * vedersi sotto la testata del sito: si scorre quel tanto, svelti. Null se
- * c'e' gia' (o se non c'e' layout da misurare).
- */
+/** In colonna la cartella si clicca anche dal fondo della faccia, col foglio
+ *  sopra lo schermo: la pratica parte dal foglio, che deve vedersi sotto la
+ *  testata. Null se si vede gia' o se non c'e' layout. */
 function bringIntoView(folder: Folder): Promise<void> | null {
   const sheet = folder.sheet.getBoundingClientRect();
   if (sheet.height === 0) return null;
@@ -67,29 +59,16 @@ function bringIntoView(folder: Folder): Promise<void> | null {
   return scrollPageTo(Math.max(0, window.scrollY + sheet.top - margin), "quick");
 }
 
-/** Quello che sa fare l'archivio solo da acceso: vive dentro la sua build. */
+/** Vive dentro la build di useSectionAnimation: esiste solo ad archivio acceso. */
 type LitArchive = {
-  /** Riporta davanti la cartella `i`. */
   bringToFront: (i: number) => void;
-  /** La cartella `i` davanti del tutto, prima che cada. Una promessa se deve
-   *  scorrere, null se e' gia' pronta. */
+  /** Una promessa se deve scorrere, null se la cartella e' gia' davanti. */
   prepareFall: (i: number) => Promise<void> | null;
 };
 
-/**
- * Lo scaffale che si muove con lo scroll. In colonna ogni cartella entra
- * quando tocca a lei; ad archivio acceso (`ciStanno`) la successiva sale sopra
- * la precedente, e quelle sotto si scuriscono e si stringono in proporzione a
- * `--profondita`, che si scrive da qui.
- *
- * L'archivio lo accende questo hook, non il livello: il CSS sta tutto sotto
- * `data-archivio-acceso`, che si scrive dentro la build di useSectionAnimation
- * e si toglie nella pulizia.
- *
- * Restituisce le due cose che altri chiedono allo scaffale, nella colonna come
- * nell'archivio: `riporta`, il clic sulla linguetta, e `prepara`, la cartella
- * in vista prima che cada.
- */
+/** L'archivio lo accende questo hook e non il livello: il CSS sta tutto sotto
+ *  `data-archive-lit`, scritto dentro la build e tolto nella pulizia, cosi'
+ *  senza JavaScript resta la colonna. */
 export function useDepth(shelf: RefObject<HTMLOListElement | null>, allFit: boolean) {
   const lit = useRef<LitArchive | null>(null);
 
@@ -101,9 +80,8 @@ export function useDepth(shelf: RefObject<HTMLOListElement | null>, allFit: bool
       if (folders.length === 0) return;
 
       if (!allFit) {
-        /* La colonna: ogni cartella scatta quando tocca a lei. Un innesco
-           solo per tutte farebbe partire la quarta quando e' ancora fuori
-           dallo schermo, e la sua entrata non la vedrebbe nessuno. */
+        // Un innesco per cartella: uno solo per tutte farebbe partire la
+        // quarta quando e' ancora fuori dallo schermo.
         const { fromBehind } = presets;
         for (const folder of folders) {
           fromBehind(folder, { level, trigger: folder, clearProps: true });
@@ -111,8 +89,8 @@ export function useDepth(shelf: RefObject<HTMLOListElement | null>, allFit: bool
         return;
       }
 
-      // Le misure: rifatte all'accensione e al resize. Mai per fotogramma: a
-      // ogni fotogramma si leggono solo i quattro rettangoli.
+      // Misure rifatte solo all'accensione e al resize: a ogni fotogramma si
+      // leggono solo i quattro rettangoli.
       let screen = 0;
       let stops: number[] = [];
       let start = 0;
@@ -143,27 +121,25 @@ export function useDepth(shelf: RefObject<HTMLOListElement | null>, allFit: bool
         );
 
       const update = () => {
-        // A pratica aperta la cartella e' caduta, e Lenis e' fermo: niente da
-        // riscrivere. Si rifa' alla chiusura (vedi `dossier` sotto).
+        // A pratica aperta la cartella e' caduta: si rifa' alla chiusura.
         if (isDossierOpen()) return;
-        // Tre decimali bastano all'occhio, e risparmiano le scritture (e il
-        // ricalcolo degli stili della cartella) quando lo scroll non cambia
-        // niente.
+        // Tre decimali bastano all'occhio, e risparmiano scritture e ricalcolo
+        // degli stili quando lo scroll non cambia niente.
         for (const [i, p] of currentDepths().entries()) {
           const v = Math.round(p * 1000) / 1000;
           if (v === written[i]) continue;
           written[i] = v;
           folders[i].style.setProperty("--depth", String(v));
-          // Il tono del testo della linguetta: un attributo e non un conto in
-          // CSS, perche' e' una soglia, e il CSS le soglie non le sa fare.
+          // Un attributo e non un conto in CSS: e' una soglia, e il CSS le
+          // soglie non le sa fare.
           const tone = tabTone(v);
           if (tone === tones[i]) continue;
           tones[i] = tone;
           folders[i].setAttribute("data-tab-tone", String(tone));
         }
       };
-      // `fotogramma` si azzera solo dentro il suo callback, come in
-      // SottoIlFoglio: la pulizia deve sapere cosa cancellare.
+      // `frame` si azzera solo dentro il suo callback: la pulizia deve sapere
+      // cosa cancellare.
       const onScroll = () => {
         if (frame) return;
         frame = requestAnimationFrame(() => {
@@ -176,32 +152,26 @@ export function useDepth(shelf: RefObject<HTMLOListElement | null>, allFit: bool
         measure();
         update();
       };
-      // Come in SottoIlFoglio: chiusa la pratica, si rimisura quello che un
-      // resize nel frattempo ha cambiato.
+      // Chiusa la pratica, si rimisura quello che un resize nel frattempo ha
+      // cambiato.
       const dialogWatcher = new MutationObserver(() => {
         if (!isDossierOpen()) onResize();
       });
 
-      /* Il ritorno: la pagina risale fin dove la cartella si e' appena fermata.
-         Morbido per la linguetta a "full", istantaneo altrove e per il fuoco.
-         Con Lenis acceso lo chiede a lui: uno scroll nativo mentre Lenis e'
-         in corsa (un click subito dopo un giro di rotellina) lo riscrive il
-         fotogramma dopo. Senza, "instant" e non "auto", che obbedisce a
-         scroll-behavior. Le misure si rifanno qui: costano poco, e un
-         carattere arrivato tardi puo' averle spostate. */
+      // Con Lenis acceso lo scroll lo chiede a lui: uno nativo mentre Lenis e'
+      // in corsa lo riscrive il fotogramma dopo. Senza, "instant" e non
+      // "auto", che obbedisce a scroll-behavior. Le misure si rifanno perche'
+      // un carattere arrivato tardi puo' averle spostate.
       const goTo = (i: number, mode: "instant" | "quick" | "smooth") => {
         measure();
         const y = Math.max(0, returnTop({ start, step, stops, i, screen }));
         return scrollPageTo(y, mode === "smooth" && !activeLenis() && level !== "full" ? "instant" : mode);
       };
-      /** Il ritorno morbido della linguetta in corsa, se ce n'e' uno. */
       let returnInFlight: object | null = null;
 
-      /* Il fuoco svela, come in SottoIlFoglio e nel tavolo. Le cartelle
-         coperte restano raggiungibili da tastiera, e un fuoco su una cartella
-         che un'altra copre e' un fuoco che non si vede: si riporta davanti.
-         Solo da tastiera: :focus-visible e' falso per un click, e un click
-         sulla linguetta fa gia' la stessa cosa, ma morbida. */
+      // Un fuoco da tastiera su una cartella coperta non si vede: la si
+      // riporta davanti. Solo :focus-visible, perche' il click sulla linguetta
+      // fa gia' la stessa cosa, ma morbida.
       const onFocus = (event: FocusEvent) => {
         const target = event.target as HTMLElement | null;
         if (!target?.matches(":focus-visible")) return;
@@ -215,7 +185,7 @@ export function useDepth(shelf: RefObject<HTMLOListElement | null>, allFit: bool
       withoutShift(section, () => {
         list.setAttribute("data-archive-lit", "");
         // La sezione e' appena cresciuta di qualche schermo: tutto quello che
-        // sta sotto (le entrate, il percorso) va rimisurato.
+        // sta sotto va rimisurato.
         ScrollTrigger.refresh();
       });
       // Dopo l'accensione: i `top` sticky e i rettangoli valgono solo da qui.
@@ -229,12 +199,10 @@ export function useDepth(shelf: RefObject<HTMLOListElement | null>, allFit: bool
             if (returnInFlight === token) returnInFlight = null;
           });
         },
-        /* La cartella che si apre e' sempre davanti, o la pratica ferma Lenis
-           a meta' e la cartella cade mezza coperta. Riportata con la linguetta
-           e cliccata a ritorno in corsa: il ritorno si completa subito, e' gia'
-           quasi finito. Solo in parte coperta: si torna indietro svelti e
-           morbidi, e cade quando e' ferma. La profondita' si riscrive prima
-           che data-dialog-open fermi muovi(). */
+        // La cartella che si apre dev'essere davanti, o la pratica ferma Lenis
+        // a meta' e la cartella cade mezza coperta. A ritorno in corsa si
+        // completa subito. La profondita' si riscrive prima che
+        // data-dialog-open fermi update().
         prepareFall: (i) => {
           if (returnInFlight) {
             returnInFlight = null;
@@ -275,7 +243,6 @@ export function useDepth(shelf: RefObject<HTMLOListElement | null>, allFit: bool
     [allFit],
   );
 
-  /** In colonna la linguetta porta la sua cartella in cima, sotto la testata. */
   const putBack = useCallback(
     (i: number) => {
       if (lit.current) {

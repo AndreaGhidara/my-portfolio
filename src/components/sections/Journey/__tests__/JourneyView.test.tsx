@@ -12,8 +12,7 @@ const props: JourneyViewProps = {
   lessonLabel: "Cosa mi ha insegnato",
   note: "Da freelance il tesserino non te lo dà nessuno.",
   hint: "continua a scorrere",
-  // Come le prepara index.tsx: «a oggi» sulla piu' recente, calcolato sul dato
-  // (che e' dal piu' recente), poi la lista girata per raccontarla dal 2023.
+  // Come le prepara index.tsx: «a oggi» calcolato sul dato, poi la lista girata.
   entries: journey
     .map((e, index) => ({
       id: e.id,
@@ -43,9 +42,7 @@ describe("JourneyView", () => {
   });
   it("presenta il percorso come lista ordinata dal 2023 a oggi", () => {
     render(<JourneyView {...props} />);
-    // L'onda e' un <li> aria-hidden e non conta: la prima voce che si legge
-    // e' la prima tappa. La prova dell'ordine sta sull'anno, perche' la prima
-    // e l'ultima sono tutte e due da freelance.
+    // L'onda e' un <li> aria-hidden; l'ordine si prova sull'anno, prima e ultima sono da freelance.
     const items = screen.getAllByRole("listitem");
     expect(items[0]).toHaveTextContent("2023");
     expect(items[journey.length - 1]).toHaveTextContent("2026");
@@ -66,9 +63,7 @@ describe("JourneyView", () => {
   });
 
   it("il tesserino che non esiste è dichiarato, e sono i due periodi da freelance", () => {
-    // Da freelance il tesserino non te lo dà nessuno: al posto del nome
-    // dell'azienda c'è quella riga, e il cartellino si disegna tratteggiato.
-    // Il gancio sta sul <li> perché è di lì che pende la regola dello stile.
+    // Il gancio sta sul <li> perche' e' di li' che pende la regola dello stile.
     const { container } = render(<JourneyView {...props} />);
     const withoutBadge = container.querySelectorAll('[data-journey-item][data-badge="no"]');
     expect(withoutBadge).toHaveLength(journey.filter((e) => !e.badge).length);
@@ -77,7 +72,6 @@ describe("JourneyView", () => {
   });
 
   it("ogni tappa dice cosa quel posto ha insegnato", () => {
-    // È la cosa nuova della sezione: senza, tornano voci di curriculum.
     const { container } = render(<JourneyView {...props} />);
     expect(container.querySelectorAll("[data-journey-lesson]")).toHaveLength(journey.length);
   });
@@ -117,23 +111,16 @@ describe("JourneyView", () => {
   });
 
   it("parte in colonna: la scena orizzontale la accende il componente, non il markup", () => {
-    // Il server e il primo render non sanno se c'e' GSAP ne' quanto e' alto lo
-    // schermo: la colonna si legge sempre, l'orizzontale va guadagnata.
     const { container } = render(<JourneyView {...props} />);
     expect(container.querySelector("[data-scene]")).toBeNull();
   });
 });
 
-/** Le regole del foglio di stile che riguardano il percorso, corpo compreso. */
 const journeyRules = rules(/\[data-journey-/);
 
 describe("i colori del percorso", () => {
   it("non chiedono niente ai token che cambiano col tema", () => {
-    // Il percorso e' carta e inchiostro SEMPRE: sta dentro una sezione arancio
-    // che di notte resta arancio. Con --fg, --line, --bg o --fg-muted il tema
-    // scuro si ribalterebbe addosso ai tesserini e ai fogli, e diventerebbero
-    // carta su carta: sparirebbero. E' la stessa guardia della casella di
-    // posta, e vale per la stessa ragione. Nel DOM non si vede.
+    // La sezione resta arancio di notte: col tema scuro tesserini e fogli diventerebbero carta su carta.
     expect(journeyRules.length).toBeGreaterThan(10);
     const offenders = journeyRules.filter((r) =>
       /var\(\s*--(fg|line|bg)\b/.test(r.body),
@@ -142,11 +129,7 @@ describe("i colori del percorso", () => {
   });
 
   it("nemmeno le classi scritte nel componente li chiedono", () => {
-    // La prova qui sopra legge il foglio di stile e non vede le classi di
-    // utilita' col valore fra parentesi quadre: i due numeri portavano
-    // `text-[var(--fg)]` e `text-[var(--fg-muted)]` nel JSX, e sull'arancio
-    // sarebbero spariti di notte senza che nessuna regola di percorso.css lo
-    // dicesse. Qui si guarda l'altra meta' del problema.
+    // La prova sopra non vede le classi di utilita' col valore fra parentesi quadre.
     const { container } = render(<JourneyView {...props} />);
     const classes = [...container.querySelectorAll<HTMLElement>("[class]")].map(
       (el) => el.className,
@@ -156,9 +139,7 @@ describe("i colori del percorso", () => {
   });
 
   it("l'occhiello dentro il tesserino non resta quello globale", () => {
-    // `.eyebrow` porta --fg-muted, e la prova qui sopra non lo vede: quella
-    // regola non nomina il percorso. Dentro un tesserino di carta va
-    // ridichiarato, o di notte l'anno sparisce.
+    // `.eyebrow` porta --fg-muted: dentro un tesserino va ridichiarato, o di notte l'anno sparisce.
     expect(journeyRules.some((r) => /\.eyebrow/.test(r.selector))).toBe(true);
   });
 });

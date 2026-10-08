@@ -5,19 +5,10 @@ import { MEDIA } from "@/animations/motionPolicy";
 import { fits, shouldRedecide } from "./archive";
 import { isDossierOpen } from "./useDossier";
 
-/**
- * Quanto chiede e quanto ha ogni faccia, ad archivio acceso. Si misura su una
- * copia della lista con l'attributo gia' scritto, fissa e invisibile, tolta
- * subito dopo: la lista vera non cambia forma, quindi la pagina non si sposta
- * e lo scroll anchoring non ha niente da correggere.
- *
- * Una misura e non un numero scritto una volta, come ALTEZZA_MINIMA del
- * percorso: li' il foglio ha una larghezza massima e la sua altezza non cresce
- * con lo schermo, qui la riga grande cresce con la larghezza (fino a 3,1rem) e
- * la faccia con l'altezza. Un numero solo che bastasse a 1440 terrebbe in
- * colonna tutti i telefoni. Le schermate si tolgono dalla copia: nel riquadro
- * non contano (si stringono) e non devono partire a scaricarsi.
- */
+/** Si misura su una copia invisibile della lista, cosi' quella vera non cambia
+ *  forma e lo scroll anchoring non ha niente da correggere. Una misura e non un
+ *  numero fisso come MIN_HEIGHT del percorso: qui la riga cresce con la
+ *  larghezza e la faccia con l'altezza. */
 function measureFaces(list: HTMLElement) {
   const probe = list.cloneNode(true) as HTMLElement;
   for (const node of probe.querySelectorAll("img, [data-shot-blur]")) node.remove();
@@ -26,11 +17,9 @@ function measureFaces(list: HTMLElement) {
   probe.setAttribute("aria-hidden", "true");
   probe.style.width = `${list.clientWidth}px`;
   (list.parentElement ?? document.body).append(probe);
-  // Quanto chiede si legge lasciandola alta quanto vuole, e non da
-  // scrollHeight: quello non conta il contenuto che scende dentro il padding
-  // basso, e a 390x664 la faccia del riservato debordava di 18px dentro i suoi
-  // 21 di padding con scrollHeight uguale all'altezza. «Apri il caso» finiva
-  // schiacciato sul bordo e la soglia diceva che ci stava.
+  // Non da scrollHeight: non conta il contenuto che scende dentro il padding
+  // basso, e a 390x664 la faccia del riservato debordava di 18px con
+  // scrollHeight uguale all'altezza.
   const faces = [...probe.querySelectorAll<HTMLElement>("[data-face]")].map((face) => {
     const room = face.offsetHeight;
     face.style.height = "auto";
@@ -40,16 +29,9 @@ function measureFaces(list: HTMLElement) {
   return faces;
 }
 
-/**
- * Se l'archivio si accende: ogni faccia ci sta intera nel palco (vedi
- * facceNellaSonda). Falso al primo render, che e' la colonna del server.
- *
- * Si decide al montaggio, quando arrivano i caratteri (cambiano la riga), e
- * poi al resize secondo ridecidere(): una larghezza nuova subito, una sola
- * altezza mai su touch (la barra del browser: e' per quello che le facce sono
- * in svh) e col puntatore fine solo quando l'archivio non e' sullo schermo. Se
- * lo e', la decisione aspetta che esca.
- */
+/** Falso al primo render, che e' la colonna del server. Si ridecide quando
+ *  arrivano i caratteri, che cambiano la riga, e al resize secondo
+ *  shouldRedecide(). */
 export function useArchiveLight(shelf: RefObject<HTMLOListElement | null>): boolean {
   const [allFit, setAllFit] = useState(false);
 
@@ -60,19 +42,17 @@ export function useArchiveLight(shelf: RefObject<HTMLOListElement | null>): bool
     let width = window.innerWidth;
     let inView = false;
     let pending = false;
-    /** Un resize arrivato a pratica aperta: si pesa alla chiusura. */
     let pendingResize = false;
     const finePointer = window.matchMedia(MEDIA.finePointer);
-    // Solo in sviluppo e solo con ?righelli: un archivio che resta in colonna
+    // Solo in sviluppo e solo con ?rulers: un archivio che resta in colonna
     // senza dire perche' non si diagnostica.
     const logDecisions =
       process.env.NODE_ENV !== "production" &&
       new URLSearchParams(window.location.search).has("rulers");
     const decide = () => {
       if (!alive) return;
-      // A pratica aperta l'archivio sotto non si spegne: una rotazione del
-      // telefono misurerebbe una lista con la cartella caduta. Si decide alla
-      // chiusura.
+      // A pratica aperta si decide alla chiusura: una rotazione del telefono
+      // misurerebbe una lista con la cartella caduta.
       if (isDossierOpen()) {
         pending = true;
         return;
@@ -89,7 +69,7 @@ export function useArchiveLight(shelf: RefObject<HTMLOListElement | null>): bool
       setAllFit(result);
     };
     const onResize = () => {
-      // A pratica aperta si segna e basta, senza toccare `larghezza`: alla
+      // A pratica aperta si segna e basta, senza toccare `width`: alla
       // chiusura si confronta con quella di prima dell'apertura.
       if (isDossierOpen()) {
         pendingResize = true;
@@ -105,10 +85,8 @@ export function useArchiveLight(shelf: RefObject<HTMLOListElement | null>): bool
       inView = entry.isIntersecting;
       if (!inView && pending) decide();
     });
-    /* Chiusa la pratica, quello che e' rimasto sospeso passa dalle stesse
-       regole di sempre: un resize da ridecidere(), cosi' una sola altezza non
-       rimodella l'archivio sotto gli occhi; il resto solo se l'archivio non e'
-       sullo schermo, come fa l'IntersectionObserver. */
+    // Chiusa la pratica, quello che e' rimasto sospeso passa dalle regole di
+    // sempre, cosi' una sola altezza non rimodella l'archivio sotto gli occhi.
     const dialogWatcher = new MutationObserver(() => {
       if (isDossierOpen()) return;
       if (pendingResize) {

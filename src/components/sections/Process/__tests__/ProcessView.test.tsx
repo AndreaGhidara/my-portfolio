@@ -30,17 +30,12 @@ describe("ProcessView", () => {
     expect(heading).toHaveClass("section-title");
   });
   it("le consegne sono una lista ordinata: «in quest'ordine» è metà del titolo", () => {
-    // Non quattro riquadri. L'ordine e' l'informazione, e una lista ordinata e'
-    // il modo in cui arriva anche a chi la pagina non la vede.
     const { container } = render(<ProcessView {...props} />);
     expect(container.querySelectorAll("ol > li")).toHaveLength(processDeliveries.length);
   });
 
   it("l'ultima consegna è quella che non ha una data di fine", () => {
-    // Per `[data-process-item]` e non per ruolo: dentro ogni consegna c'e' una
-    // seconda lista (le tre cose che contiene) e getAllByRole("listitem")
-    // pesca anche quelle. L'ultima voce della pagina e' un trattino, non una
-    // consegna.
+    // Per attributo: getAllByRole("listitem") pesca anche la lista dentro ogni consegna.
     const { container } = render(<ProcessView {...props} />);
     const items = container.querySelectorAll("[data-process-item]");
     const last = deliveries[deliveries.length - 1];
@@ -61,17 +56,12 @@ describe("ProcessView", () => {
   });
 
   it("ogni consegna dice anche cosa NON è", () => {
-    // E' la riga che tiene la sezione lontana dal dépliant: «non e' un
-    // preventivo», «non e' la grafica finita». Se sparisce da una voce sola,
-    // quella voce diventa una promessa.
     const { container } = render(<ProcessView {...props} />);
     expect(container.querySelectorAll("[data-process-excludes]")).toHaveLength(deliveries.length);
   });
 
   it("i disegni sono le sagome del tavolo, e sono decorazione dichiarata", () => {
-    // Il gancio e' `data-desk-piece` («un pezzo disegnato») e non
-    // `data-desk-object`: quello conta i ventiquattro oggetti sul tavolo, e
-    // queste quattro consegne sul tavolo non ci stanno.
+    // `data-desk-object` conta i ventiquattro oggetti del tavolo: queste consegne non ci stanno.
     const { container } = render(<ProcessView {...props} />);
     const pieces = [...container.querySelectorAll("[data-desk-piece]")];
     expect(pieces.map((p) => p.getAttribute("data-shape"))).toEqual(

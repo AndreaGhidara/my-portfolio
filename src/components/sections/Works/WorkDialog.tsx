@@ -9,34 +9,22 @@ import type { WorkCaseData, WorkCaseLabels } from "./types";
 export type WorkDialogProps = {
   dialog: RefObject<HTMLDialogElement | null>;
   data: WorkCaseData | null;
-  /** Il posto della cartella nell'archivio, da uno. */
+  /** Da uno. */
   number: number;
   total: number;
   labels: WorkCaseLabels;
-  /** ×, Esc e clic sul velo: la chiusura la anima usePratica. */
+  /** ×, Esc e clic sul velo: la chiusura la anima useDossier. */
   onRequestClose: () => void;
   /** Il dialog si e' chiuso, orchestrato o no. */
   onClose: () => void;
 };
 
-/** Il dominio dell'indirizzo, senza protocollo e senza www: come si dice a voce. */
 const domain = (url: string) => new URL(url).hostname.replace(/^www\./, "");
 
-/**
- * La pratica: il dossier aperto, un foglio di carta sopra la pagina velata.
- *
- * E' un <dialog> nativo aperto con showModal(): trappola del fuoco, strato
- * superiore e pagina inerte li fa il browser. Aprirlo e chiuderlo no: lo fa
- * usePratica, perche' in mezzo c'e' la cartella che scivola via (scivola.ts).
- * Per questo l'Esc si ferma qui e diventa una richiesta di chiusura, come il
- * × e il clic sul velo. Il contenuto c'e' da subito: l'entrata e' solo
- * opacita' e spostamento, mai un montaggio ritardato.
- *
- * Il foglio e' carta in tutti e due i temi, come l'editor della cassetta e'
- * scuro in tutti e due: e' un oggetto, non la pagina. I suoi colori sono suoi
- * (vedi sezioni/lavori.css), e niente di quello che si ribalta col tema entra qui,
- * .eyebrow compreso.
- */
+/** Aprirlo e chiuderlo lo fa useDossier, perche' in mezzo c'e' la cartella che
+ *  scivola via: per questo l'Esc si ferma qui e diventa una richiesta di
+ *  chiusura. Il foglio e' carta nei due temi: niente di quello che si ribalta
+ *  col tema entra qui, .eyebrow compreso (vedi sections/works.css). */
 export function WorkDialog({ dialog, data, number, total, labels, onRequestClose, onClose }: WorkDialogProps) {
   const titleId = useId();
   const statusLabel = data?.status === "in-corso" ? labels.inProgress : labels.delivered;
@@ -45,9 +33,8 @@ export function WorkDialog({ dialog, data, number, total, labels, onRequestClose
     <dialog
       ref={dialog}
       data-work-dialog
-      // A dossier aperto Lenis e' fermo, e da fermo annulla ogni rotella che
-      // non trova questo attributo: il foglio, che scorre dentro di se' quando
-      // non ci sta nello schermo, restava con il fondo irraggiungibile.
+      // Lenis da fermo annulla ogni rotella che non trova questo attributo: il
+      // foglio, che scorre dentro di se', restava col fondo irraggiungibile.
       data-lenis-prevent
       aria-labelledby={titleId}
       onCancel={(event) => {
@@ -69,7 +56,6 @@ export function WorkDialog({ dialog, data, number, total, labels, onRequestClose
           </button>
 
           <article data-dossier>
-            {/* La linguetta e' il titolo: lo stesso della cartella che l'ha aperta. */}
             <p id={titleId} data-dossier-tab>
               <b>{data.name}</b> · {data.year}
             </p>
@@ -107,17 +93,12 @@ export function WorkDialog({ dialog, data, number, total, labels, onRequestClose
               </dl>
 
               <div data-dossier-body>
-                {/* La riga della faccia torna qui come la situazione trovata:
-                    e' lei ad aver fatto aprire la pratica. */}
                 <div data-dossier-subject data-enter>
                   <p>{labels.before}</p>
                   <p>{data.tagline}</p>
                 </div>
 
                 <div data-dossier-right>
-                  {/* Senza schermata il posto non resta vuoto: il tratteggio e'
-                      il modo in cui questo sito dice «questa cosa non c'e', e
-                      non per dimenticanza». */}
                   {data.screenshot ? (
                     <figure data-dossier-attachment data-enter>
                       <div data-dossier-screenshot>
@@ -133,7 +114,6 @@ export function WorkDialog({ dialog, data, number, total, labels, onRequestClose
 
                   {data.metrics.length > 0 && (
                     <section data-dossier-figures data-enter>
-                      {/* Un lavoro in corso non ha una fine da cui rilevare. */}
                       <h3>{data.status === "in-corso" ? labels.measuredSoFar : labels.measured}</h3>
                       <dl>
                         {data.metrics.map((metric) => (
@@ -151,9 +131,6 @@ export function WorkDialog({ dialog, data, number, total, labels, onRequestClose
                 </div>
               </div>
 
-              {/* Il lavoro, la scelta, la conduzione: tre pesi uguali apposta.
-                  La conduzione e' quello che un elenco di tecnologie non ha, e
-                  chi legge in diagonale non deve saltarla. */}
               <ol data-dossier-items>
                 {(
                   [
@@ -179,8 +156,6 @@ export function WorkDialog({ dialog, data, number, total, labels, onRequestClose
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
-                  {/* Senza url il link lascia la sua forma, tratteggiata e non
-                      cliccabile: l'assenza si legge come un dato. */}
                   {data.url ? (
                     <a data-dossier-link href={data.url} target="_blank" rel="noopener noreferrer">
                       {labels.visit} <span aria-hidden="true">↗</span>

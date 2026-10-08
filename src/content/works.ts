@@ -1,23 +1,13 @@
-/**
- * Consegnato o ancora in corso. Scritto a mano e non ricavato dall'anno: e'
- * il timbro della pratica, e deve essere vero.
- */
+/** Scritto a mano e non ricavato dall'anno: e' il timbro della pratica, e deve
+ *  essere vero. */
 export type WorkStatus = "consegnato" | "in-corso";
 
 export type Work = {
-  /** È anche la chiave di traduzione: works.list.<id>.riga */
+  /** E' anche la chiave di traduzione: works.list.<id>.riga */
   id: string;
-  /**
-   * Assente quando non c'e' un sito da visitare. Oggi ce l'hanno tutti e tre,
-   * quindi il ramo non si accende mai: resta perche' il quarto caso in arrivo
-   * e' coperto da un accordo di riservatezza e non avra' ne' indirizzo ne'
-   * schermata. Un "Visita il sito" che porta nel vuoto costa piu' del caso.
-   */
+  /** Assente senza un sito da visitare. Oggi ce l'hanno tutti: il ramo resta per
+   *  il prossimo caso coperto da un accordo di riservatezza. */
   url?: string;
-  /**
-   * Assente quando non c'e' niente da mostrare. Il caso riservato non ha una
-   * schermata per lo stesso motivo per cui non ha un indirizzo.
-   */
   screenshot?: string;
   year: number;
   status: WorkStatus;
@@ -28,12 +18,8 @@ export type Work = {
 
 export const works: Work[] = [
   {
-    /**
-     * Il lavoro di adesso, coperto da un accordo di riservatezza: niente nome,
-     * niente indirizzo, niente schermata. E' l'unico modo di far entrare qui
-     * dentro quello che sto facendo ORA (gli altri tre vengono tutti da
-     * D.lab, finita ad aprile) e sta in cima perche' e' il piu' recente.
-     */
+    /** Il lavoro di adesso, coperto da un accordo di riservatezza: niente nome,
+     *  indirizzo ne' schermata. In cima perche' e' il piu' recente. */
     id: "riservato",
     year: 2026,
     status: "in-corso",

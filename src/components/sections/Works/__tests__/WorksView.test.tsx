@@ -84,12 +84,9 @@ const props = {
   items,
 };
 
-/** I bottoni che aprono il dossier: uno per cartella, sulla faccia. */
 const openButtons = () => screen.getAllByRole("button", { name: /Apri il caso/ });
 
-// jsdom non ha IntersectionObserver. L'archivio lo usa solo per sapere se e'
-// sullo schermo quando un resize chiede di ridecidere: qui non osserva niente,
-// e nessuna prova di questo file dipende da quello.
+// jsdom non ha IntersectionObserver, e nessuna prova di questo file ne dipende.
 beforeEach(() => {
   vi.stubGlobal(
     "IntersectionObserver",
@@ -127,9 +124,7 @@ describe("WorksView", () => {
   });
 
   it("l'archivio e' una lista ordinata di cartelle, senza involucri in mezzo", () => {
-    // Tutto l'impaginato dell'archivio e' scritto con `[data-work-shelf] >
-    // [data-cartella]`: lo sticky, il passo, le linguette sfalsate. Un
-    // involucro in mezzo scollegherebbe le cartelle dalle regole.
+    // L'impaginato e' scritto con `[data-work-shelf] > [data-folder]`: un involucro lo scollegherebbe.
     const { container } = render(<WorksView {...props} />);
     const shelf = container.querySelector("[data-work-shelf]");
     expect(shelf?.tagName).toBe("OL");
@@ -141,8 +136,6 @@ describe("WorksView", () => {
   });
 
   it("parte in colonna: l'archivio lo accende il componente, non il markup", () => {
-    // Il server e il primo render non sanno se c'e' GSAP ne' quanto e' alto lo
-    // schermo: la colonna si legge sempre, l'archivio va guadagnato.
     const { container } = render(<WorksView {...props} />);
     expect(container.querySelector("[data-archive-lit]")).toBeNull();
   });
@@ -163,8 +156,6 @@ describe("WorksView", () => {
   });
 
   it("la linguetta e' un bottone fratello della faccia, non annidato nel bottone del caso", () => {
-    // Archiviata, di una cartella resta a vista solo la linguetta: deve
-    // prendere il click per intero, e un bottone dentro un bottone non e' HTML.
     const { container } = render(<WorksView {...props} />);
     for (const folder of Array.from(container.querySelectorAll("[data-folder]"))) {
       const tab = folder.querySelector("[data-tab]");
@@ -214,8 +205,6 @@ describe("WorksView", () => {
   });
 
   it("la schermata della faccia chiede la stessa candidata del dossier", () => {
-    // Una sola `sizes` per cartella, dossier e precarico: con due valori il
-    // browser scaricherebbe due file quasi uguali.
     const { container } = render(<WorksView {...props} />);
     const img = container.querySelector("[data-face-screenshot] img");
     expect(img).toHaveAttribute("sizes", SHOT_SIZES);
@@ -244,8 +233,7 @@ describe("WorksView", () => {
   });
 
   it("la linguetta non apre il dossier: riporta davanti la sua cartella", async () => {
-    // In colonna la linguetta porta la cartella sotto la testata: jsdom lo
-    // scroll non ce l'ha, e qui interessa solo dove finisce il click.
+    // jsdom lo scroll non ce l'ha: qui interessa solo dove finisce il click.
     const scrollSpy = vi.fn();
     vi.stubGlobal("scrollTo", scrollSpy);
     render(<WorksView {...props} />);
@@ -294,8 +282,6 @@ describe("WorksView", () => {
     const dialog = screen.getByRole("dialog");
 
     const shot = within(dialog).getByRole("img", { name: items[0].screenshotAlt });
-    // Finche' non e' arrivata, la schermata non si vede: quello che riempie il
-    // riquadro e' l'anteprima, e la dissolvenza deve avere da dove partire.
     expect(shot).not.toHaveAttribute("data-loaded");
     const preview = dialog.querySelector("[data-shot-blur]");
     expect(preview).toBeInTheDocument();
@@ -311,8 +297,7 @@ describe("WorksView", () => {
     const shot = within(screen.getByRole("dialog")).getByRole("img", {
       name: items[0].screenshotAlt,
     });
-    // next/image non passa il load cosi' com'e': ci mette in mezzo una
-    // promessa (decode), quindi lo stato cambia un microtask dopo.
+    // next/image fa passare il load da una promessa (decode): lo stato cambia un microtask dopo.
     await act(async () => {
       fireEvent.load(shot);
     });
@@ -320,9 +305,6 @@ describe("WorksView", () => {
   });
 
   it("passando il mouse sulla cartella la schermata parte a caricare prima del click", async () => {
-    // Il precarico chiede ESATTAMENTE l'indirizzo che chiedera' il dossier
-    // (stesso srcset, stesso sizes): un indirizzo diverso non sarebbe un
-    // anticipo, sarebbe la stessa immagine scaricata due volte.
     const requests: { src: string; srcset: string }[] = [];
     class FakeImage {
       srcset = "";
@@ -333,10 +315,7 @@ describe("WorksView", () => {
     }
     vi.stubGlobal("Image", FakeImage);
 
-    // Una schermata sua, mai chiesta dagli altri test di questo file: il
-    // precarico ricorda cosa ha gia' scaricato, ed e' proprio il
-    // comportamento che serve (il mouse passa sulla cartella dieci volte
-    // mentre si legge il sintomo).
+    // Una schermata mai chiesta dagli altri test: il precarico ricorda cosa ha gia' scaricato.
     const uniqueCase = {
       ...items[0],
       id: "unico",
@@ -377,7 +356,6 @@ describe("WorksView", () => {
   });
 });
 
-/** I campi della pratica come coppie etichetta → valore, nell'ordine del foglio. */
 const fields = (dialog: HTMLElement) =>
   Array.from(dialog.querySelectorAll("[data-dossier-fields] > div")).map((field) => [
     field.querySelector("dt")?.textContent,
@@ -528,8 +506,7 @@ describe("aprire e chiudere la pratica", () => {
   });
 
   it("chiusa dal browser senza passare dal cancel, la pagina torna comunque libera", async () => {
-    // Il close watcher: al secondo Esc, o col gesto indietro di Android, il
-    // dialog si chiude da solo e il cancel non si puo' fermare.
+    // Il close watcher (secondo Esc, gesto indietro di Android) chiude senza un cancel fermabile.
     const { container } = render(<WorksView {...props} />);
     await userEvent.click(openButtons()[0]);
     act(() => {
@@ -551,11 +528,7 @@ describe("aprire e chiudere la pratica", () => {
   });
 
   it("un Esc durante la caduta, prima che il dialog esista, non si perde: si chiude appena aperta", async () => {
-    // A "none" il dialog si apre subito dopo il commit e fra il clic e
-    // showModal() non c'e' un momento in cui premere Esc. Qui il livello e'
-    // "reduced" (nessuna preferenza, nessun puntatore fine) e le animazioni
-    // non finiscono finche' il test non le libera: la cartella resta a meta'
-    // caduta quanto serve.
+    // A "reduced" le animazioni restano in corsa finche' il test non le libera.
     let release = () => {};
     const pending = new Promise<void>((resolve) => {
       release = resolve;
@@ -599,13 +572,11 @@ describe("aprire e chiudere la pratica", () => {
   });
 });
 
-/** Le regole del foglio di stile che riguardano l'archivio, corpo compreso. */
 const archiveRules = rules(/\[data-(work-shelf|folder|tab|spine|sheet|face|open-button)/);
 
 describe("i colori dell'archivio", () => {
   it("vengono dalla tavolozza: miscele dei token, niente colori scritti", () => {
-    // tokens.test.ts guarda gli esadecimali; qui anche rgb() e hsl(), che quella
-    // prova non vede. Il prototipo aveva le ombre in rgba.
+    // tokens.test.ts guarda gli esadecimali; qui anche rgb() e hsl().
     expect(archiveRules.length).toBeGreaterThan(10);
     const offenders = archiveRules.filter((r) => /#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i.test(r.body));
     expect(offenders.map((r) => r.selector)).toEqual([]);
@@ -620,9 +591,7 @@ describe("i colori dell'archivio", () => {
   });
 
   it("sul chiaro la faccia e' la carta della pagina, sullo scuro un gradino sopra l'inchiostro", () => {
-    // Correzione 4 della spec: sul chiaro faccia = --superficie, dorso
-    // inchiostro al 10%, bordo al 24%, foglio carta. Sullo scuro i gradini del
-    // prototipo: una cartella col fondo della pagina li' non avrebbe corpo.
+    // Sullo scuro una cartella col fondo della pagina non avrebbe corpo.
     const light = rules("[data-work-shelf]")[0]?.body ?? "";
     expect(light).toMatch(/--folder-face:\s*var\(--surface\)/);
     expect(light).toMatch(/--folder-spine:\s*color-mix\(in oklab, var\(--ink\) 10%, var\(--paper\)\)/);
@@ -654,10 +623,7 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
   });
 
   it("la linguetta si scurisce col resto, ma col fondo e non col filtro: il testo deve restare leggibile", () => {
-    // Col filtro anche il testo si scurisce, e l'anno della linguetta piu' in
-    // fondo scendeva a 1,74:1 sul chiaro (misurato). Il fondo invece si
-    // mischia con l'inchiostro quanto il resto della cartella, e il testo
-    // cambia tono (vedi tonoLinguetta).
+    // Col filtro l'anno della linguetta in fondo scendeva a 1,74:1 sul chiaro.
     const filters = archiveRules.filter((r) => /\bfilter:/.test(r.body));
     expect(filters.length).toBeGreaterThan(0);
     for (const r of filters) {
@@ -667,8 +633,7 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
       (r) => r.selector.includes("[data-archive-lit]") && /\[data-tab\]$/.test(r.selector) && /background-color:/.test(r.body),
     );
     expect(background?.body).toMatch(/color-mix\(in srgb, var\(--folder-spine\), var\(--ink\) calc\(var\(--depth, 0\) \* var\(--darkens\) \* 100%\)\)/);
-    // Dietro @supports: un color-mix con calc che il browser rifiuta diventa
-    // trasparente, non torna al fondo di prima.
+    // Dietro @supports: un color-mix con calc rifiutato diventa trasparente.
     expect(background?.inside).toContain("@supports (background-color: color-mix(in srgb, red calc(1 * 10%), blue))");
   });
 
@@ -683,8 +648,7 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
   });
 
   it("il dorso della cartella davanti prende il click, e non lo passa a quelle coperte", () => {
-    // La fascia fra le linguette e la faccia e' dorso: trasparente al
-    // puntatore, un click li' apriva il dossier di una cartella nascosta.
+    // Trasparente al puntatore, un click li' apriva il dossier di una cartella nascosta.
     const spine = archiveRules.find(
       (r) => r.selector.includes("[data-archive-lit]") && /\[data-spine\]$/.test(r.selector),
     );
@@ -698,7 +662,6 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
     const dark = rules('[data-theme="dark"] [data-work-shelf]')[0]?.body ?? "";
     expect(dark).toMatch(/--folder-muted:\s*var\(--fg-muted\)/);
     expect(dark).toMatch(/--accent-text:\s*color-mix\(in oklab, var\(--accent\) 90%, var\(--paper\)\)/);
-    // Il tenue globale compare solo dentro la definizione del tenue suo.
     const muted = archiveRules.filter((r) =>
       /var\(--fg-muted\)/.test(r.body.replace(/--folder-muted:[^;]*;/g, "")),
     );
@@ -706,8 +669,7 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
   });
 
   it("il puntatore passa attraverso le cartelle e prende solo faccia e linguetta", () => {
-    // Le cartelle archiviate stanno una sopra l'altra: senza, la scatola di
-    // quella davanti coprirebbe le linguette di quelle dietro.
+    // Senza, la scatola della cartella davanti coprirebbe le linguette di quelle dietro.
     const pointerEvents = (sel: string) =>
       archiveRules.find((r) => r.selector === sel && /pointer-events:/.test(r.body))?.body;
     expect(pointerEvents("[data-folder]")).toMatch(/pointer-events:\s*none/);
@@ -724,19 +686,14 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
   });
 
   it("il centro della faccia non si stringe sotto il suo contenuto, o la soglia non vede niente", () => {
-    // La soglia confronta quanto deborda la faccia. Con `min-height: 0` sul
-    // centro, la riga di mezzo si stringeva e il contenuto finiva sopra il
-    // piede invece di debordare: misurato a 390x664, il riquadro del
-    // riservato scendeva 17px sotto il centro fin dentro «Apri il caso», e la
-    // soglia diceva che ci stava.
+    // Con `min-height: 0` il contenuto finiva sopra il piede invece di debordare, e la soglia non lo vedeva.
     const centre = archiveRules.filter((r) => /\[data-face-centre\]$/.test(r.selector));
     expect(centre.length).toBeGreaterThan(0);
     for (const r of centre) expect(r.body).not.toMatch(/min-height:\s*0/);
   });
 
   it("la riga grande cresce anche con l'altezza, non solo con la larghezza", () => {
-    // Su un portatile basso (1366x768) la riga del riservato a 3,6vw chiedeva
-    // cento pixel piu' della faccia. `vh` davanti per chi `svh` non lo conosce.
+    // A 1366x768 la riga a 3,6vw chiedeva cento pixel piu' della faccia; `vh` per chi non conosce `svh`.
     const line = archiveRules.filter((r) => /\[data-face-line\]$/.test(r.selector) && /font-size:/.test(r.body));
     const body = line.map((r) => r.body).join("");
     expect(body).toMatch(/font-size:\s*clamp\(1\.45rem, min\(3\.6vw, [\d.]+vh\), 3\.1rem\);\s*font-size:\s*clamp\(1\.45rem, min\(3\.6vw, [\d.]+svh\), 3\.1rem\)/);
@@ -751,14 +708,11 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
   });
 });
 
-/** Le regole della pratica: tutte sotto il dialog, anche dentro le media query. */
 const dossierRules = rules(/\[data-work-dialog\]/);
 
 describe("i colori della pratica", () => {
   it("il foglio e' carta nei due temi: dentro mai i colori che seguono il tema", () => {
-    // Come l'editor della cassetta e' scuro in tutti e due, la pratica e' un
-    // oggetto di carta: --fg, --bg e compagni si ribaltano col tema scuro, e
-    // il foglio diventerebbe inchiostro su inchiostro.
+    // --fg, --bg e compagni si ribaltano col tema: il foglio diventerebbe inchiostro su inchiostro.
     expect(dossierRules.length).toBeGreaterThan(20);
     const forbidden = /var\(--(fg|bg|fg-muted|line|accent-text|folder-[\w-]+)\)/;
     const offenders = dossierRules.filter((r) => forbidden.test(r.body));

@@ -14,8 +14,7 @@ describe("copertura di una cartella che arriva", () => {
   });
 
   it("uno schermo piu' basso del punto di sosta non da' NaN", () => {
-    // Non dovrebbe succedere (sotto la soglia l'archivio e' spento), ma un NaN
-    // finirebbe dritto in una custom property.
+    // Sotto la soglia l'archivio e' spento, ma un NaN finirebbe in una custom property.
     expect(archiveCoverage({ top: 50, stop: 100, screen: 100 })).toBe(1);
     expect(archiveCoverage({ top: 150, stop: 100, screen: 100 })).toBe(0);
   });
@@ -47,9 +46,7 @@ describe("il ritorno a una cartella", () => {
   const stops = [100, 114, 128, 142];
 
   it("e' lo scroll in cui quella cartella si e' appena fermata, quando li' e' ancora sola", () => {
-    // La cartella i sta, a pagina ferma, a inizio + i * passo: tutte alte
-    // uguali, tutte distanti uguali. Si ferma quando quel punto arriva al suo
-    // `top` sticky. Su uno schermo da 900 la successiva e' ancora sotto.
+    // Su uno schermo da 900 la successiva e' ancora sotto.
     const screen = 900;
     const step = screen - stops[3] - 20 + screen * 0.1;
     expect(returnTop({ start: 3000, step, stops, i: 2, screen })).toBe(3000 + 2 * step - 128);
@@ -61,10 +58,7 @@ describe("il ritorno a una cartella", () => {
   });
 
   it("li' la cartella dopo non la copre, nemmeno col telefono e la sua barra in basso", () => {
-    // Sul telefono la cartella si toglie la barra in basso (52px), e quando
-    // una si ferma la successiva spunta gia' dal fondo: misurato a 390x844,
-    // 29px dentro lo schermo. Il ritorno allora si ferma un poco prima,
-    // dove la successiva tocca il fondo: davanti c'e' lei sola, quasi ferma.
+    // Sul telefono, senza la barra in basso, la successiva spunta gia' dal fondo (29px a 390x844).
     for (const [screen, bar] of [
       [900, 0],
       [844, 52],
@@ -77,8 +71,6 @@ describe("il ritorno a una cartella", () => {
         const y = returnTop({ start, step, stops, i, screen });
         const nextTop = start + (i + 1) * step - y;
         expect(archiveCoverage({ top: nextTop, stop: stops[i + 1], screen })).toBe(0);
-        // E la cartella stessa e' tutta a vista: non sta piu' giu' di un
-        // passo di distanza dal punto in cui si ferma.
         const top = start + i * step - y;
         expect(top).toBeGreaterThanOrEqual(stops[i]);
         expect(top - stops[i]).toBeLessThanOrEqual(screen * 0.1);
@@ -105,8 +97,7 @@ describe("la soglia: l'archivio si accende solo se ogni faccia ci sta", () => {
   });
 
   it("una faccia senza altezza non e' una faccia che ci sta: vuol dire che non c'e' layout", () => {
-    // Zero su zero passerebbe la prova qui sopra, e accenderebbe l'archivio
-    // dove non si e' misurato niente (una scheda nascosta, un test).
+    // Zero su zero accenderebbe l'archivio dove non si e' misurato niente.
     expect(fits([{ content: 0, room: 0 }])).toBe(false);
   });
 });
@@ -123,7 +114,6 @@ describe("quando si ridecide fra archivio e colonna", () => {
   });
 
   it("col puntatore fine un cambio di sola altezza aspetta che l'archivio sia uscito dallo schermo", () => {
-    // Ridecidere li' farebbe saltare la pagina sotto gli occhi di chi legge.
     expect(shouldRedecide({ widthChanged: false, finePointer: true, inView: true })).toBe("later");
     expect(shouldRedecide({ widthChanged: false, finePointer: true, inView: false })).toBe("now");
   });
@@ -147,8 +137,7 @@ describe("il tono del testo della linguetta", () => {
   });
 
   it("le soglie stanno in ordine, e il buio minimo del tono chiaro supera quello della soglia", () => {
-    // Senza il minimo, fra la soglia e il punto in cui la carta regge da sola
-    // c'e' un tratto in cui ne' l'inchiostro ne' la carta arrivano a 4,5:1.
+    // Senza il minimo c'e' un tratto in cui ne' l'inchiostro ne' la carta arrivano a 4,5:1.
     expect(TAB.full).toBeLessThan(TAB.light);
     expect(TAB.minDark).toBeGreaterThan(TAB.light * ARCHIVE_PARAMS.darkens);
   });
@@ -156,8 +145,6 @@ describe("il tono del testo della linguetta", () => {
 
 describe("i parametri tarati nel prototipo", () => {
   it("sono quelli approvati", () => {
-    // docs/prototipi/2026-09-27-cartelle-archivio.html: cambiarli qui senza
-    // ripassare da li' e' ritarare a occhio chiuso.
     expect(ARCHIVE_PARAMS).toEqual({
       step: 14,
       distance: 10,

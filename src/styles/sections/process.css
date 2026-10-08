@@ -1,15 +1,7 @@
 /* Come lavoro: le quattro consegne e il loro disegno. */
 
-/* ══════════════════════════════════════════════════════════════════════════
-   COME LAVORO: le quattro consegne
-
-   Testo|disegno, disegno|testo, scendendo, per evitare quattro voci in
-   colonna con mezza pagina bianca accanto.
-
-   I disegni sono le sagome del tavolo (DeskShapeArt) coi campioni di questa
-   sezione (ProcessSpecimen): il materiale del sito e' uno solo, il frammento
-   che mostrano e' loro.
-   ═══════════════════════════════════════════════════════════════════════ */
+/* Testo e disegno si alternano scendendo: quattro voci dallo stesso lato
+   lasciano mezza pagina bianca. */
 
 /* Stessa ragione della lista del percorso: la spaziatura sta qui, o la
    azzererebbe il `margin` di questa stessa regola. */
@@ -22,27 +14,20 @@
   padding-block: 3rem;
   border-block-start: 1px solid var(--line);
 }
-/* La prima non ha filetto: sopra di lei c'e' gia' l'introduzione, e due righe
-   a due centimetri di distanza si leggono come un errore di impaginazione. */
+/* Sopra la prima c'e' gia' l'introduzione: due filetti cosi' vicini sembrano
+   un errore di impaginazione. */
 [data-process-item]:first-child { border-block-start: 0; padding-block-start: 1rem; }
 
 [data-process-text] { max-width: 34rem; }
 
-/* Sotto i 900px le consegne sono una colonna sola, larga quanto la pagina, ma
-   il testo si ferma a 34rem e il titolo della sezione a 30rem: appoggiati a
-   sinistra lasciavano un terzo di riga vuoto a destra, con il disegno che sotto
-   sta centrato. Misurato a 768px: 248px di vuoto sotto il titolo e 184 accanto
-   a ogni consegna, tutto spinto da una parte.
-   Si centra il BLOCCO, non le righe: dentro, il testo resta allineato a
-   sinistra. Da 900px in su non si tocca, perche' li' le due colonne si
-   dividono la riga. */
+/* Sotto i 900px testo e titolo appoggiati a sinistra lasciavano un terzo di
+   riga vuoto (248px a 768). Si centra il BLOCCO, non le righe. */
 @media (max-width: 899px) {
   [data-process-text] { margin-inline: auto; }
 }
 
-/* La testata si centra fino a 1023px e non fino a 899: fra i 900 e i 1023 le
-   consegne sono gia' a due colonne ma la testata, col suo tetto stretto,
-   resterebbe un blocco appoggiato a sinistra. */
+/* Fino a 1023px e non 899: fra 900 e 1023 le consegne sono gia' a due
+   colonne, ma la testata resterebbe appoggiata a sinistra. */
 @media (max-width: 1023px) {
   [data-process-header] h2,
   [data-process-header] p {
@@ -56,10 +41,8 @@
 }
 [data-process-lead] { margin-block-start: 0.75rem; line-height: 1.6; }
 
-/* Le tre cose che la consegna contiene. Il segno e' disegnato e non e' il
-   segnaposto della lista: quello si eredita dal tema del browser e cambia da
-   uno all'altro, e questa e' l'unica lista del sito in cui il segno conta:
-   sono voci di un contenuto, non passi di una procedura. */
+/* Il segno disegnato e non quello della lista, che cambia da un browser
+   all'altro. */
 [data-process-includes] {
   list-style: none;
   margin: 1.15rem 0 0;
@@ -81,9 +64,6 @@
   color: var(--accent-text);
 }
 
-/* Cosa NON e'. In monospaziato e staccata dal filetto: e' una nota a margine
-   del venditore, non una riga del depliant, ed e' la riga che impedisce alle
-   altre di diventare promesse. */
 [data-process-excludes] {
   margin-block-start: 1.15rem;
   font-family: var(--font-mono), ui-monospace, monospace;
@@ -95,54 +75,36 @@
 }
 [data-process-why] { margin-block-start: 1.15rem; line-height: 1.6; }
 
-/* ── Il disegno ─────────────────────────────────────────────────────────── */
-
 [data-process-art] { display: flex; justify-content: center; }
 
-/* Il pezzo e' il contenitore di posizionamento del suo campione (che e'
-   assoluto) ED e' il suo contenitore di interrogazione. La seconda cosa qui
-   non e' teorica: «Il numero» E' un campione di testo,
-   il primo disegnato fuori dal tavolo, e senza container-type i suoi cqw si
-   risolverebbero sul viewport. */
+/* Contenitore di interrogazione, non solo di posizionamento: «Il numero» e'
+   un campione di testo, e senza container-type i suoi cqw si risolverebbero
+   sul viewport. */
 [data-process-art] [data-desk-piece] {
   position: relative;
   display: block;
   width: 100%;
-  /* 18rem e non di piu': il foglio del tavolo porta tre righe stampate DENTRO
-     la sagoma (sono nella maschera, non nel campione), e piu' lo si ingrandisce
-     piu' quelle righe si vedono attraversare il frammento. A questa misura
-     tornano quello che sono (la rigatura di un foglio) invece di sembrare
-     graffi sopra al disegno. */
+  /* Non di piu': le righe stampate dentro la sagoma del foglio, ingrandite,
+     sembrerebbero graffi sopra il campione. */
   max-width: 18rem;
   container-type: inline-size;
 }
-/* Il telefono e' alto il doppio di quanto e' largo: alla larghezza degli altri
-   verrebbe una torre alta mezzo schermo. La misura non e' gusto, e' il suo
-   viewBox: 74x148 contro i 150x96 del foglio. */
+/* Il telefono e' alto il doppio: il viewBox e' 74x148 contro i 150x96 del
+   foglio. */
 [data-process-art] [data-desk-piece][data-shape="phone"] { max-width: 8.5rem; }
 [data-process-art] [data-desk-piece][data-shape="card"] { max-width: 16rem; }
 
-/* Le marche del campione sono in `em`, e senza una misura qui erediterebbero
-   il corpo del testo: righe alte uguali dentro un disegno grande il triplo di
-   un oggetto del tavolo, cioe' proporzioni sbagliate. In cqw scalano col
-   disegno, che e' quello che «un frammento della cosa» vuol dire. */
+/* Le marche sono in `em`: senza una misura qui erediterebbero il corpo del
+   testo. In cqw scalano col disegno. */
 [data-process-art] [data-desk-sample] { font-size: clamp(0.5rem, 4.6cqw, 1.05rem); }
-/* E il mono va ridichiarato: 0,78cqw e' tarato sul MONDO del tavolo, che e'
-   largo quanto la sezione. Qui il contenitore e' il pezzo, ed e' venti volte
-   piu' stretto: quella misura darebbe due pixel. */
+/* 0,78cqw e' tarato sul tavolo, venti volte piu' largo del pezzo: qui
+   darebbe due pixel. */
 [data-process-art] [data-desk-sample] [data-m="mono"] { font-size: 5.4cqw; }
 
-/* Lo schermo acceso. Le marche di un campione sono il TRATTO al 34%, e il
-   telefono e' l'unica sagoma con la scocca scura: sul tavolo e' alto 98px e
-   quel campione si legge come texture, qui e' l'unica cosa che il disegno ha
-   da dire, e su nero non si legge affatto. Ribaltate sulla carta diventano
-   quello che sono: uno schermo acceso, che e' esattamente cosa vuol dire «un
-   indirizzo che apri». L'accento (la barra e il pulsante) si legge gia' da
-   se' e resta com'e'. */
-/* `:not([data-titolo])` non e' una precauzione: senza, questa regola vince per
-   specificita' sulla riga in accento (quattro attributi contro tre) e la
-   barra dell'indirizzo, che e' tutto il motivo per cui questo campione esiste,
-   diventa carta come le altre. */
+/* Sulla scocca scura del telefono le marche al 34% non si leggono: si
+   ribaltano sulla carta. L'accento resta com'e'. */
+/* `:not([data-title])` serve: senza, questa regola vince per specificita'
+   sulla riga in accento, e la barra dell'indirizzo diventa carta. */
 [data-process-art] [data-desk-piece][data-shape="phone"] [data-m="line"]:not([data-title]),
 [data-process-art] [data-desk-piece][data-shape="phone"] [data-m="block"] {
   background-color: color-mix(in oklab, var(--paper) 58%, transparent);
@@ -154,7 +116,7 @@
     gap: 4rem;
     padding-block: 4.5rem;
   }
-  /* `lato` dice dove sta il DISEGNO: il testo va dall'altra parte. */
+  /* `data-side` dice dove sta il DISEGNO: il testo va dall'altra parte. */
   [data-process-item][data-side="left"] [data-process-text] { order: 2; }
   [data-process-item][data-side="left"] [data-process-art] { order: 1; }
 }

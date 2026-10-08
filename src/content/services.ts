@@ -1,16 +1,13 @@
 export type Service = {
-  /** È anche la chiave di traduzione: services.list.<id>.title */
+  /** E' anche la chiave di traduzione: services.list.<id>.title */
   id: string;
-  /**
-   * I pezzi del servizio, tirati fuori dal suo testo: sono le voci numerate
-   * dello scontrino e i richiami della tavola accanto, la stessa lista. Anche
-   * questi sono chiavi: services.list.<id>.pezzi.<pezzo>. Fra quattro e sei,
-   * perche' la tavola ha sei posti.
-   */
+  /** Le voci numerate dello scontrino e i richiami della tavola accanto. Sono
+   *  chiavi: services.list.<id>.pezzi.<pezzo>. Fra quattro e sei, perche' la
+   *  tavola ha sei posti. */
   pieces: string[];
 };
 
-/** L'ordine è deliberato: dal servizio d'ingresso al più impegnativo. */
+/** L'ordine e' deliberato: dal servizio d'ingresso al piu' impegnativo. */
 export const services: Service[] = [
   {
     id: "sites",

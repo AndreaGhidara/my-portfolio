@@ -5,10 +5,7 @@ import { PROCESS_SPECIMENS, ProcessSpecimen } from "../ProcessSpecimen";
 
 describe("i campioni delle consegne", () => {
   it("ogni campione dichiarato ha il suo disegno, e non ce n'è nessuno di troppo", () => {
-    // Le due direzioni sono due difetti diversi, ed e' la stessa prova che il
-    // tavolo fa sui suoi: un campione dichiarato senza disegno e' un buco in
-    // pagina, un disegno che nessuno chiama e' codice morto che il giorno dopo
-    // qualcuno "sistema" cambiandolo.
+    // Un campione senza disegno e' un buco in pagina, un disegno senza campione e' codice morto.
     const declared = new Set(processDeliveries.map((d) => d.sample));
     const drawn = new Set(Object.keys(PROCESS_SPECIMENS) as ProcessSample[]);
     for (const id of declared) {
@@ -25,10 +22,7 @@ describe("i campioni delle consegne", () => {
   });
 
   it("due campioni non sono lo stesso disegno", () => {
-    // Due consegne su quattro hanno la STESSA sagoma (sono due fogli) quindi
-    // qui non c'e' la rete di sicurezza che ha il tavolo: se «l'accordo» e «la
-    // bozza» fossero fatti delle stesse marche, il documento e lo schermo
-    // disegnato sarebbero due disegni identici uno sotto l'altro.
+    // Due consegne hanno la stessa sagoma: qui non c'e' la rete di sicurezza del tavolo.
     const drawings = (Object.keys(PROCESS_SPECIMENS) as ProcessSample[]).map(
       (id) => render(<ProcessSpecimen sample={id} />).container.innerHTML,
     );
@@ -36,8 +30,7 @@ describe("i campioni delle consegne", () => {
   });
 
   it("il campione è decorazione dichiarata: non entra nell'albero di accessibilità", () => {
-    // Il nome della consegna lo porta gia' il titolo accanto. Il campione del
-    // numero contiene del testo, ed e' l'unico che senza questo verrebbe letto.
+    // Il campione del numero contiene del testo, e senza questo verrebbe letto.
     for (const id of Object.keys(PROCESS_SPECIMENS) as ProcessSample[]) {
       const { container } = render(<ProcessSpecimen sample={id} />);
       expect(container.querySelector("[data-desk-sample]")).toHaveAttribute("aria-hidden", "true");
@@ -45,10 +38,6 @@ describe("i campioni delle consegne", () => {
   });
 
   it("il numero di telefono non è un numero: è la sua forma, con le cifre vuote", () => {
-    // Inventare un numero sarebbe la bugia che la casella ha gia' rifiutato col
-    // mittente inventato. Scriverne uno vero e' una decisione che riguarda i
-    // Contatti, non questa sezione, e il giorno in cui si prende, questo e' il
-    // primo posto in cui va.
     const { container } = render(<ProcessSpecimen sample="numero" />);
     expect(container.textContent).not.toMatch(/\d{4,}/);
   });

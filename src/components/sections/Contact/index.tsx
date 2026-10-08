@@ -2,9 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { site } from "@/content/site";
 import { ContactView } from "./ContactView";
 
-/** I tre momenti di «cosa succede dopo», nell'ordine in cui succedono. Sono
- *  una lista di chiavi e nient'altro, quindi stanno qui e non in un file di
- *  contenuto: non c'e' nessun altro dato da tenere insieme a loro. */
+// Chiavi di messaggio e nient'altro: non c'e' un dato da tenere insieme a
+// loro, quindi stanno qui e non in un file di contenuto.
 const AFTER_IDS = ["risposta", "chiamata", "preventivo"] as const;
 
 export async function Contact() {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { NO_DOSSIER, dossierReducer, type Dossier, type DossierEvent } from "../dossier";
 
-/** La cartella qui e' solo un nome: il reducer la porta e non la tocca. */
+// La cartella qui e' solo un nome: il reducer la porta e non la tocca.
 type P = Dossier<string>;
 
 const step = (s: P, ...events: DossierEvent<string>[]) => events.reduce(dossierReducer, s);
@@ -12,7 +12,6 @@ const open = (i: number, motion: "four-beats" | "fade" = "four-beats"): DossierE
   motion,
 });
 
-/** Un'apertura arrivata in fondo: cade, montata, tempi 3 e 4 finiti. */
 const opened = (i = 0) => {
   const s = step(NO_DOSSIER, open(i));
   return step(s, { type: "fall", gen: s.gen }, { type: "mounted" }, { type: "opened", gen: s.gen });

@@ -18,12 +18,9 @@ export type ContactFormCopy = {
   };
 };
 
-/**
- * Il segno dell'esito. Sta fuori dal testo e con aria-hidden: la regione viva
- * annuncia quello che LEGGE, e un'icona annunciata sarebbe rumore. Serve
- * perche' il colore da solo non basta a dire com'e' andata: c'e' chi non lo
- * distingue, e c'e' chi guarda lo schermo di sbieco al sole.
- */
+/** Fuori dal testo e con aria-hidden: la regione viva annuncia quello che
+ *  legge, un'icona annunciata sarebbe rumore. Serve perche' il colore da solo
+ *  non dice com'e' andata. */
 function OutcomeMark({ outcome }: { outcome: "success" | "error" }) {
   return (
     <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false">
@@ -50,13 +47,8 @@ function OutcomeMark({ outcome }: { outcome: "success" | "error" }) {
   );
 }
 
-/**
- * I campi non sono piu' riquadri ma righe su cui si scrive, e il vestito sta
- * in sezioni/contatti.css: un campo senza contorno ha due cose da difendere che una
- * scatola dava gratis, il fuoco della tastiera e la dimensione del bersaglio
- * sotto il pollice. Due prove le verificano nel foglio di stile, perche' nel
- * DOM non si vedono.
- */
+/** Campi senza contorno (vedi sections/contact.css): fuoco e bersaglio del
+ *  pollice li verificano due prove sul foglio di stile, nel DOM non si vedono. */
 export function ContactForm({ copy, email }: { copy: ContactFormCopy; email: string }) {
   const schema = useMemo(
     () =>
@@ -159,21 +151,9 @@ export function ContactForm({ copy, email }: { copy: ContactFormCopy; email: str
         {isSubmitting ? copy.button.sending : copy.button.default}
       </button>
 
-      {/* role=status annuncia l'esito senza rubare il focus: chi usa uno
-          screen reader sa se il messaggio e' partito.
-
-          Era una riga grigia di 13px sotto il bottone, e chi scriveva non si
-          accorgeva di aver mandato niente: premeva, non succedeva niente di
-          visibile, e restava li' a chiedersi se il modulo fosse rotto. Adesso
-          e' un riquadro con un segno e un colore.
-
-          L'elemento resta nel DOM anche da fermo, vuoto ma presente: una
-          regione viva che nasce nel momento in cui ha qualcosa da dire, certi
-          screen reader non la leggono affatto.
-
-          Quando qualcosa non parte, l'indirizzo e' li' e si puo' cliccare: un
-          errore che dice "scrivimi via email" senza dare l'email lascia la
-          persona a cercarsela, ed e' il momento in cui se ne va. */}
+      {/* La regione viva resta nel DOM anche vuota: una che nasce quando ha
+          qualcosa da dire, certi screen reader non la leggono. Sull'errore
+          l'indirizzo e' cliccabile, o chi scrive deve cercarselo. */}
       <p role="status" aria-live="polite" data-contact-outcome data-outcome={state}>
         {state !== "idle" && <OutcomeMark outcome={state} />}
         <span>

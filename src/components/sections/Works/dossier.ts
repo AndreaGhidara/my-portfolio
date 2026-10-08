@@ -1,21 +1,12 @@
 import type { FolderMotion } from "./slide";
 
-/**
- * La pratica in corso, dal clic a quando la cartella e' di nuovo ferma, come
- * stato puro: niente DOM, niente timer. Quello che si muove davvero (il
- * dialog, gli attributi sulla pagina, la cartella che cade) lo fa usePratica
- * guardando come cambia lo stato.
- *
- * `apre`: la cartella cade e la pratica si allarga; `aperta`; `chiude`: la
- * pratica si stringe; `risale`: il dialog e' chiuso e la cartella torna su.
- *
- * `C` e' la cartella: qui si porta e basta, non si tocca.
- */
+/** Stato puro della pratica, dal clic alla cartella di nuovo ferma: niente DOM
+ *  ne' timer, gli effetti li fa useDossier guardando come cambia lo stato.
+ *  `C` e' la cartella: qui si porta e basta, non si tocca. */
 export type DossierPhase = "opening" | "open" | "closing" | "rising";
 
 export type DossierRun<C> = {
   phase: DossierPhase;
-  /** Quale cartella, nell'ordine dell'archivio. */
   i: number;
   folder: C;
   motion: FolderMotion;
@@ -27,23 +18,19 @@ export type DossierRun<C> = {
   started: boolean;
   /** Esc o × durante l'apertura: si chiude appena aperta. */
   closeAfter: boolean;
-  /** Un clic durante la risalita: QUALE cartella, da aprire appena ferma. */
+  /** Un clic durante la risalita: la cartella da aprire appena ferma. */
   openAfter: { i: number; folder: C; motion: FolderMotion } | null;
 };
 
-/**
- * `gen` cambia a ogni pratica che parte e allo smontaggio: le promesse in volo
- * (lo scroll prima della caduta, l'apertura, la risalita) portano la
- * generazione in cui sono nate, e se non e' piu' quella non fanno niente.
- */
+/** `gen` cambia a ogni pratica che parte e allo smontaggio: le promesse in volo
+ *  portano la generazione in cui sono nate, e se non e' piu' quella non fanno
+ *  niente. */
 export type Dossier<C> = { gen: number; run: DossierRun<C> | null };
 
 export type DossierEvent<C> =
-  /** Il clic sulla cartella. */
   | { type: "open"; i: number; folder: C; motion: FolderMotion }
-  /** La cartella e' davanti e in vista: cade. */
+  /** La cartella e' davanti e in vista. */
   | { type: "fall"; gen: number }
-  /** Il contenuto della pratica e' nel DOM. */
   | { type: "mounted" }
   /** I tempi 3 e 4 sono finiti. */
   | { type: "opened"; gen: number }
@@ -53,15 +40,12 @@ export type DossierEvent<C> =
   | { type: "esc" }
   /** Il close del dialog, da qualunque parte arrivi. */
   | { type: "closed" }
-  /** La cartella e' risalita. */
   | { type: "settled"; gen: number }
-  /** Il componente se ne va a meta'. */
   | { type: "unmount" };
 
 export const NO_DOSSIER: Dossier<never> = { gen: 0, run: null };
 
-/* Tempi 3 e 4: partono quando ci sono tutti e due, la cartella che cade e il
-   contenuto nel DOM. */
+// I tempi 3 e 4 aspettano tutti e due: la cartella che cade e il contenuto nel DOM.
 const start = <C>(c: DossierRun<C>): DossierRun<C> => (c.fall && c.mounted && !c.started ? { ...c, started: true } : c);
 
 export function dossierReducer<C>(s: Dossier<C>, e: DossierEvent<C>): Dossier<C> {

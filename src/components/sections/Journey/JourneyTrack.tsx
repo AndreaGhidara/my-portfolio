@@ -17,12 +17,8 @@ import {
   type TrackPoint,
 } from "./track";
 
-/**
- * Le misure del binario arrivano al CSS da qui, scritte nel markup del server:
- * il numero vive in binario.ts e il foglio di stile lo legge, invece di tenerne
- * una seconda copia che il giorno della ritaratura nessuno aggiorna. Sono
- * stringhe costanti, quindi server e client le serializzano uguali.
- */
+// Le misure arrivano al CSS dal markup del server: il numero vive solo in
+// track.ts. Stringhe costanti, che server e client serializzano uguali.
 const TRACK_VARS = {
   "--wide": `min(${TRACK_PARAMS.sheet.rem}rem, ${TRACK_PARAMS.sheet.vw}vw)`,
   "--air": `${TRACK_PARAMS.air}rem`,
@@ -32,27 +28,14 @@ const TRACK_VARS = {
   "--speed-coarse": TRACK_PARAMS.speed.coarse,
 };
 
-/** L'altezza del palco, 100svh, letta da una sonda: il palco stesso in colonna
- *  e' alto quanto il suo contenuto, e una media query `min-height` sul
- *  telefono misura il viewport grande. */
+// Da una sonda alta 100svh: in colonna il palco e' alto quanto il contenuto,
+// e una media query `min-height` sul telefono misura il viewport grande.
 const stageTallEnough = (probe: HTMLElement | null) =>
   (probe?.offsetHeight ?? 0) >= MIN_HEIGHT;
 
-/**
- * Il percorso in orizzontale. Stesso schema del tavolo (DeskStage): un track
- * alto quanto la corsa, un palco sticky dentro, UN solo ScrollTrigger che
- * scrive lo stato. Niente `pin`: il pin-spacer litiga con Lenis.
- *
- * La scena orizzontale la accende questo componente, non il livello: il CSS
- * orizzontale scatta su `data-scena="orizzontale"`, che si scrive DOPO aver
- * creato il trigger e si toglie nella pulizia. Finche' non c'e' la sezione e'
- * la colonna, che e' anche il markup del server: se GSAP non arriva, si legge
- * tutto lo stesso.
- *
- * Due condizioni per accenderla: un livello di movimento diverso da "none" e un
- * palco abbastanza alto da contenere un foglio intero (ALTEZZA_MINIMA). Sotto,
- * la colonna con l'entrata di sempre.
- */
+/** Un track alto quanto la corsa e un palco sticky, con un solo ScrollTrigger e
+ *  niente `pin`: il pin-spacer litiga con Lenis. `data-scene` si scrive DOPO il
+ *  trigger e si toglie nella pulizia: se GSAP non arriva resta la colonna. */
 export function JourneyTrack({
   n,
   startYear,
@@ -60,9 +43,9 @@ export function JourneyTrack({
   hint,
   children,
 }: {
-  /** Quante tappe, arrivo escluso: entra nella formula dell'altezza del track. */
+  /** Arrivo escluso: entra nella formula dell'altezza del track. */
   n: number;
-  /** L'anno della prima tappa, quello che l'anno grande dice all'aggancio. */
+  /** Quello che l'anno grande dice all'aggancio. */
   startYear: number;
   header: ReactNode;
   hint: string;
@@ -77,10 +60,8 @@ export function JourneyTrack({
   const activeTrigger = useRef<ScrollTriggerInstance | null>(null);
   const [tallEnough, setTallEnough] = useState(false);
 
-  /* Si decide al montaggio e poi solo quando cambia la larghezza, o quando la
-     scena non e' in corsa. Mai a meta' corsa per un cambio di sola altezza: la
-     barra di Safari che compare e sparisce non deve far saltare la sezione da
-     una forma all'altra sotto il pollice. */
+  // Mai a meta' corsa per un cambio di sola altezza: la barra di Safari non
+  // deve far saltare la sezione da una forma all'altra sotto il pollice.
   useEffect(() => {
     let width = window.innerWidth;
     const decide = () => setTallEnough(stageTallEnough(probe.current));
@@ -105,11 +86,8 @@ export function JourneyTrack({
       const stops = [...listEl.querySelectorAll<HTMLElement>("[data-journey-item]")];
 
       if (!tallEnough) {
-        /* La colonna: l'entrata che la lista ha sempre avuto. Prima si posa il
-           foglio, poi ci si appunta sopra il tesserino, sovrapposti in coda
-           perche' si leggano come un gesto solo. Un trigger per tappa: una
-           entrata di gruppo le farebbe partire tutte quando si affaccia la
-           prima. */
+        // Un trigger per tappa: un'entrata di gruppo le farebbe partire tutte quando
+        // si affaccia la prima.
         const { fromBehind, fromAbove } = presets;
         for (const stop of stops) {
           const sheet = stop.querySelector("[data-journey-sheet]");
@@ -122,8 +100,8 @@ export function JourneyTrack({
               once: true,
             },
           });
-          // clearProps: l'inclinazione della tappa la porta il CSS, e un
-          // translate lasciato in linea ci combatterebbe contro.
+          // clearProps: l'inclinazione la porta il CSS, e un translate lasciato in
+          // linea ci combatterebbe contro.
           timeline.add(fromBehind(sheet, { level: resolved, clearProps: true }) ?? gsap.timeline());
           timeline.add(
             fromAbove(badge, { level: resolved, clearProps: true }) ?? gsap.timeline(),
@@ -142,9 +120,8 @@ export function JourneyTrack({
       const hintEl = root.querySelector<HTMLElement>("[data-journey-hint]");
       if (!arrival || !svg || !faint || !full || !done || !year) return;
 
-      // Le misure: rifatte solo su onRefresh, che ScrollTrigger chiama anche a
-      // ogni cambio di larghezza. Mai per fotogramma: leggere offsetLeft a ogni
-      // update sarebbe un layout per fotogramma.
+      // Misure rifatte solo su onRefresh, che arriva anche a ogni cambio di
+      // larghezza: leggere offsetLeft a ogni update sarebbe un layout per fotogramma.
       let width = 0;
       let routePx = 0;
       let travelPx = 0;
@@ -155,9 +132,8 @@ export function JourneyTrack({
       let writtenYear = "";
 
       const measure = () => {
-        // ScrollTrigger.create chiama onRefresh subito, prima che la scena sia
-        // accesa: i fogli sono ancora in colonna, tutti allo stesso x, e l'onda
-        // misurata li' non vuol dire niente. La disegna il refresh che segue.
+        // ScrollTrigger.create chiama onRefresh prima che la scena sia accesa, coi
+        // fogli ancora in colonna: l'onda la disegna il refresh che segue.
         if (!root.hasAttribute("data-scene")) return;
         const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
         height = stageEl.offsetHeight;
@@ -174,9 +150,7 @@ export function JourneyTrack({
         arrivalEnd = arrival.offsetLeft + arrival.offsetWidth;
         centres = stops.map((t) => t.offsetLeft + t.offsetWidth / 2);
 
-        // L'onda: dal bordo sinistro a meta' altezza, poi il centro di ogni
-        // foglio spostato come il foglio (lo scostamento e' un translate, che
-        // offsetTop non vede), e fine al centro del foglio dei numeri.
+        // Lo scostamento e' un translate, che offsetTop non vede: si somma qui.
         const W = listEl.offsetWidth;
         const H = listEl.offsetHeight;
         const y0 = H / 2;
@@ -220,16 +194,14 @@ export function JourneyTrack({
         }
       };
 
-      // Sui touch e' gia' il default di GSAP; scritto perche' la corsa sta in
-      // piedi solo se la barra del browser che compare e sparisce non la
-      // rimisura: e' per quello che le altezze sono in svh.
+      // Gia' il default di GSAP sui touch, scritto perche' la corsa regge solo se
+      // la barra del browser non la rimisura.
       ScrollTrigger.config({ ignoreMobileResize: true });
 
       const trigger = ScrollTrigger.create({
         trigger: trackEl,
         start: "top top",
-        // Track meno palco, misurati come li misura viaggio(): una sola
-        // altezza, quella del palco, e mai window.innerHeight.
+        // Misurati come in travel(): mai window.innerHeight.
         end: () => `+=${Math.max(0, trackEl.offsetHeight - stageEl.offsetHeight)}`,
         onRefresh: (self) => {
           measure();
@@ -242,15 +214,12 @@ export function JourneyTrack({
       const section = root.closest("section") ?? root;
       withoutShift(section, () => {
         root.setAttribute("data-scene", "horizontal");
-        // La sezione e' appena cresciuta di migliaia di pixel: tutto quello che
-        // sta sotto (il tuo turno, le entrate) va rimisurato, questo trigger
-        // compreso, che e' nato misurando la colonna.
+        // La sezione e' appena cresciuta di migliaia di pixel: va rimisurato tutto
+        // quello che sta sotto, questo trigger compreso.
         ScrollTrigger.refresh();
       });
 
-      // Un carattere che arriva dopo cambia l'altezza dei fogli e quindi i
-      // centri dell'onda. Solo questo trigger: il resto della pagina se ne
-      // occupa per conto suo.
+      // Un carattere che arriva dopo cambia l'altezza dei fogli e i centri dell'onda.
       let alive = true;
       void document.fonts?.ready.then(() => {
         if (alive) trigger.refresh();
@@ -266,8 +235,7 @@ export function JourneyTrack({
         for (const t of stops) t.removeAttribute("data-arrived");
         year.textContent = String(startYear);
         hintEl?.removeAttribute("data-moved");
-        // E' la stessa crescita al contrario: la sezione torna colonna, chi
-        // sta sotto deve saperlo, e chi stava guardando sotto resta li'.
+        // Chi sta sotto deve sapere che la sezione torna colonna.
         withoutShift(section, () => {
           root.removeAttribute("data-scene");
           ScrollTrigger.refresh();
@@ -284,8 +252,8 @@ export function JourneyTrack({
       data-journey
       style={{ ...TRACK_VARS, "--n": n } as CSSProperties}
     >
-      {/* Alta 100svh, larga zero: dice quanto e' alto il palco anche quando
-          il palco, in colonna, e' alto quanto il suo contenuto. */}
+      {/* Alta 100svh, larga zero: dice quanto e' alto il palco anche quando il
+          palco, in colonna, e' alto quanto il suo contenuto. */}
       <div ref={probe} data-journey-probe aria-hidden="true" />
       <div ref={track} data-journey-track>
         <div ref={stage} data-journey-stage>
@@ -297,8 +265,7 @@ export function JourneyTrack({
           </div>
 
           <ol ref={list} data-journey-list>
-            {/* L'onda sta dentro la lista perche' scorre con lei: e' il primo
-                <li> e non conta per chi legge. */}
+            {/* L'onda sta nella lista perche' scorre con lei. */}
             <li data-journey-wave aria-hidden="true">
               <svg>
                 <defs>

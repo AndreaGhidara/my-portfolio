@@ -2,25 +2,12 @@ import { getImageProps } from "next/image";
 import { SHOT_SIZES } from "./WorkShot";
 import type { WorkScreenshot } from "./types";
 
-/**
- * Una schermata si scarica una volta sola per sessione. Il mouse su una
- * cartella ci passa sopra dieci volte mentre si legge il sintomo.
- */
+// Il mouse passa sopra una cartella dieci volte: si chiede una volta sola.
 const requested = new Set<string>();
 
-/**
- * Chiede la schermata mentre il mouse e' ancora sulla cartella.
- *
- * L'indirizzo lo calcola getImageProps, cioe' la stessa funzione che usa
- * <Image> per scrivere il suo srcset: il browser sceglie la stessa
- * candidata, la trova in cache e il dossier si apre con la schermata gia'
- * dentro. Costruire l'indirizzo a mano vorrebbe dire scaricare due file
- * quasi uguali e non anticipare niente.
- *
- * Da telefono non c'e' hover e il precarico parte al tocco: sono i
- * centocinquanta millisecondi fra il dito che scende e il dito che sale,
- * regalati.
- */
+/** L'indirizzo lo calcola getImageProps, la stessa funzione che usa <Image> per
+ *  il suo srcset: il browser sceglie la stessa candidata e la trova in cache.
+ *  Costruirlo a mano vorrebbe dire scaricare due file quasi uguali. */
 export function preloadShot(shot?: WorkScreenshot) {
   if (!shot || typeof window === "undefined" || requested.has(shot.src)) return;
   requested.add(shot.src);

@@ -1,40 +1,16 @@
 /* I lavori: l'archivio di cartelle, la pratica aperta, e le regole di pagina che la pratica si porta dietro (scorrimento sotto il dialogo, ritaglio di #services e #process). */
 
-/* ══════════════════════════════════════════════════════════════════════════
-   I LAVORI: l'archivio di cartelle
-
-   Ogni cartella e' a tutta pagina: la linguetta col nome, il dorso con un
-   foglio che spunta, la faccia davanti. Due forme della stessa lista:
-   - la COLONNA, qui sotto per prima: e' il markup del server, quella che si
-     legge senza JavaScript, con il movimento ridotto e su un palco in cui la
-     faccia piu' lunga non ci sta;
-   - l'ARCHIVIO, piu' in basso: ogni cartella e' sticky, arriva in cima e si
-     ferma, e la successiva le sale sopra un passo piu' in basso. Le linguette
-     sono sfalsate, quindi quelle dietro restano a vista: a fine corsa c'e' il
-     cassetto con quattro linguette e l'ultima cartella intera, e l'archivio se
-     ne va con la pagina. Lo accende `data-archivio-acceso`, che scrive
-     useProfondita; nessuna media query lo accende da sola.
-
-   Passo, distanza, scurisce, stringe e larghezza delle linguette arrivano in
-   linea sulla lista da archivio.ts: qui si usano, non si scrivono.
-
-   I colori sono miscele di carta e inchiostro e seguono il tema. Sul chiaro la
-   faccia e' la carta della pagina: la staccano il dorso piu' scuro, il bordo e
-   l'ombra. Sullo scuro i gradini del prototipo, perche' li' una cartella col
-   fondo della pagina non avrebbe corpo.
-
-   I numeri sono quelli tarati nel prototipo
-   (docs/prototipi/2026-09-27-cartelle-archivio.html).
-   ═══════════════════════════════════════════════════════════════════════ */
+/* L'archivio lo accende solo `data-archive-lit`, scritto da useDepth: senza
+   resta la colonna, che e' il markup del server. Passo, distanza e le altre
+   misure arrivano in linea da archive.ts: qui si usano, non si scrivono. */
 [data-work-shelf] {
   --folder-face: var(--surface);
   --folder-spine: color-mix(in oklab, var(--ink) 10%, var(--paper));
   --folder-border: color-mix(in oklab, var(--ink) 24%, var(--paper));
   --folder-sheet: var(--paper);
   --folder-shadow: color-mix(in oklab, var(--ink) 35%, transparent);
-  /* Il tenue dei testi piccoli dell'archivio. Quello globale sul dorso, che e'
-     piu' scuro della carta, fa 3,90:1: sotto l'AA. Spinto verso l'inchiostro
-     fa 5,23:1 sul dorso (misure in contrast.test.ts). */
+  /* Il tenue globale sul dorso fa 3,90:1, sotto l'AA; spinto verso
+     l'inchiostro 5,23:1 (misure in contrast.test.ts). */
   --folder-muted: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
   /* La barra alta del sito, 60px misurati come nel percorso. */
   --header: 3.75rem;
@@ -61,14 +37,13 @@
   /* Sullo scuro il tenue globale basta: 6,34:1 sul dorso, 4,60:1 nel
      riquadro del riservato. */
   --folder-muted: var(--fg-muted);
-  /* L'arancio pieno sulla faccia, un gradino sopra l'inchiostro, fa 4,21:1:
-     «Apri il caso» e' testo piccolo. Schiarito di un decimo fa 4,82:1. */
+  /* L'arancio pieno sulla faccia fa 4,21:1, e «Apri il caso» e' testo
+     piccolo. Schiarito di un decimo fa 4,82:1. */
   --accent-text: color-mix(in oklab, var(--accent) 90%, var(--paper));
 }
 
 /* Le cartelle archiviate stanno una sopra l'altra: la scatola di quella
-   davanti coprirebbe le linguette di quelle dietro. Il puntatore passa
-   attraverso la cartella e prende solo la faccia e la propria linguetta. */
+   davanti coprirebbe le linguette di quelle dietro. */
 [data-folder] {
   position: relative;
   padding-top: var(--tab-h);
@@ -113,7 +88,6 @@
   pointer-events: none;
 }
 
-/* Il foglio che spunta dalla cartella: dice «qui dentro c'e' il caso». */
 [data-sheet] {
   position: absolute;
   left: 6%;
@@ -161,7 +135,8 @@
   color: var(--folder-muted);
 }
 
-/* Il cliente si legge anche qui, non solo sulla linguetta. */
+/* E' l'h3 della cartella: l'interlinea torna quella del testo, non quella
+   stretta dei titoli. */
 /* E' l'h3 della cartella: l'interlinea torna quella del testo, non quella
    stretta dei titoli. Famiglia e spaziatura le riscrive gia' questa regola. */
 [data-face-who] {
@@ -174,11 +149,9 @@
   color: var(--folder-muted);
 }
 
-/* La meta' destra della faccia: la schermata del sito, come un foglio
-   infilato nella cartella, appena storta. Niente `min-height: 0` qui: il
-   centro non deve stringersi sotto il suo contenuto, o il contenuto finisce
-   sopra il piede invece di far debordare la faccia, e la soglia (che guarda
-   quanto deborda) non se ne accorge. A stringersi e' il riquadro. */
+/* Niente `min-height: 0`: il centro stretto sotto il contenuto lo fa finire
+   sopra il piede invece di far debordare la faccia, e la soglia non se ne
+   accorge. A stringersi e' il riquadro. */
 [data-face-centre] {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
@@ -195,8 +168,7 @@
   color: var(--fg);
 }
 
-/* In colonna il riquadro del riservato ha un'altezza sua: senza schermata
-   resterebbe alto quanto la sua scritta. */
+/* Senza schermata il riquadro resterebbe alto quanto la sua scritta. */
 [data-face-screenshot] {
   align-self: stretch;
   min-height: 8rem;
@@ -209,8 +181,6 @@
   rotate: 0.6deg;
 }
 
-/* Lo stesso vocabolario del dossier: il tratteggio dice «questa cosa non
-   c'e', e non per dimenticanza». */
 [data-face-confidential] {
   margin: 1rem;
   padding: 0.8rem 1rem;
@@ -264,19 +234,15 @@
   [data-face-centre] { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* Sul telefono quattro linguette con l'anno non stanno in fila: resta il
-   nome, e le linguette si prendono un quarto di cartella l'una, senza il
-   rientro, strette finche' RISERVATO e VISUALBOOST ci stanno interi a 360px
-   (misurato: 72px di linguetta, i nomi a 23% si tagliavano con i puntini).
-   La faccia perde le tecnologie, che restano nel dossier: e' il posto che
-   serve alla riga. */
+/* Sul telefono quattro linguette con l'anno non stanno: resta il nome, un
+   quarto di cartella l'una, finche' RISERVATO e VISUALBOOST ci stanno interi
+   a 360px. Le tecnologie restano nel dossier. */
 @media (max-width: 599px) {
   [data-folder] { --tab-width: 25%; }
   [data-tab] {
     left: calc(var(--i) * var(--tab-width));
     min-width: 0;
-    /* 0,35rem lasciava a VISUALBOOST 66,80px per 66,84 di testo: i puntini
-       per quattro centesimi di pixel. */
+    /* 0,35rem lasciava a VISUALBOOST 66,80px per 66,84 di testo. */
     padding-inline: 0.3rem;
     font-size: 0.56rem;
     letter-spacing: 0.01em;
@@ -290,8 +256,6 @@
   [data-face] { transition: none; }
 }
 
-/* ── L'archivio acceso ── */
-
 [data-work-shelf][data-archive-lit] { gap: 0; }
 
 [data-work-shelf][data-archive-lit] > [data-folder] {
@@ -302,12 +266,9 @@
 
 [data-work-shelf][data-archive-lit] > [data-folder]:first-child { margin-top: 0; }
 
-/* L'ultima non finisce mai sotto: niente filtro, niente scala, niente strato
-   in piu' per lei. La scala e' sulla cartella intera, linguetta compresa,
-   cosi' le linguette sfalsate restano attaccate al loro dorso. Il filtro
-   invece salta la linguetta: scurirebbe anche il suo testo, e l'anno di
-   quella piu' in fondo scendeva a 1,74:1 sul chiaro. La linguetta si scurisce
-   col fondo, piu' sotto, e la cartella resta un pezzo solo. */
+/* L'ultima non finisce mai sotto. La scala e' sulla cartella intera, cosi' le
+   linguette restano attaccate al dorso; il filtro salta la linguetta, perche'
+   scurirebbe anche il testo (l'anno in fondo scendeva a 1,74:1). */
 [data-work-shelf][data-archive-lit] > [data-folder]:not(:last-child) {
   transform-origin: 50% 0;
   scale: calc(1 - var(--depth, 0) * var(--narrows));
@@ -319,14 +280,9 @@
   will-change: filter;
 }
 
-/* La linguetta si scurisce con la sua cartella ma col fondo, non col filtro:
-   il fondo e il bordo si mischiano con l'inchiostro quanto il filtro scurisce
-   il resto (in srgb un velo d'inchiostro e' la stessa cosa), e il testo
-   cambia tono a soglie di profondita' che scrive useProfondita in
-   `data-tono-linguetta` (vedi LINGUETTA in archivio.ts). Nel tono chiaro il
-   fondo non scende sotto --buio-minimo, o nel passaggio da due a tre ne'
-   l'inchiostro ne' la carta arriverebbero a 4,5:1.
-   Dietro @supports: un color-mix con calc che il browser non sa fare diventa
+/* La linguetta si scurisce col fondo, in srgb come il velo del filtro, e il
+   testo cambia tono con `data-tab-tone` (vedi TAB in archive.ts). Dietro
+   @supports: un color-mix con calc che il browser non sa fare diventa
    trasparente, non torna al fondo di prima. */
 @supports (background-color: color-mix(in srgb, red calc(1 * 10%), blue)) {
   [data-work-shelf][data-archive-lit] > [data-folder]:not(:last-child) > [data-tab] {
@@ -345,34 +301,27 @@
 [data-work-shelf][data-archive-lit] > [data-tab-tone="2"] > [data-tab],
 [data-work-shelf][data-archive-lit] > [data-tab-tone="2"] > [data-tab] b { color: var(--paper); }
 
-/* Sullo scuro il testo della linguetta e' gia' chiaro, e scurendosi il fondo
-   il contrasto cresce: i toni non cambiano niente. Dopo le regole dei toni,
-   a parita' di peso. */
+/* Sullo scuro il fondo che si scurisce aiuta il testo: i toni non cambiano
+   niente. Dopo le regole dei toni, a parita' di peso. */
 [data-theme="dark"] [data-work-shelf] > [data-tab-tone] > [data-tab] { color: var(--folder-muted); }
 
 [data-theme="dark"] [data-work-shelf] > [data-tab-tone] > [data-tab] b { color: var(--fg); }
 
-/* La riga grande cresce anche con l'altezza: su un portatile basso (1366x768)
-   a 3,6vw la riga del riservato chiedeva cento pixel piu' della faccia. A
-   900px d'altezza il tetto di 3,1rem arriva prima dell'altezza, quindi li'
-   non cambia niente. `vh` davanti, per chi `svh` non lo conosce. */
+/* Cresce anche con l'altezza: a 1366x768 la riga del riservato a 3,6vw
+   chiedeva cento pixel piu' della faccia. `vh` davanti, per chi `svh` non lo
+   conosce. */
 [data-work-shelf][data-archive-lit] [data-face-line] {
   font-size: clamp(1.45rem, min(3.6vw, 5.5vh), 3.1rem);
   font-size: clamp(1.45rem, min(3.6vw, 5.5svh), 3.1rem);
 }
 
-/* La fascia fra le linguette e la faccia e' dorso, e davanti e' opaco: deve
-   anche fermare il puntatore, o un click li' arriva alla faccia di una
-   cartella coperta e ne apre il dossier. Il dorso non ha gestori: il click
-   si ferma e basta. */
+/* Il dorso davanti e' opaco e deve fermare il puntatore, o un click li'
+   arriva alla faccia di una cartella coperta e ne apre il dossier. */
 [data-work-shelf][data-archive-lit] [data-spine] { pointer-events: auto; }
 
-/* Alta fino in fondo allo schermo: tolti la testata, il respiro in cima, i
-   passi delle cartelle gia' archiviate (lo spazio che occupera' l'ultima), la
-   linguetta, lo scarto della faccia, un respiro sotto e, sul telefono, la
-   barra in basso. Tutte uguali, cosi' l'archivio finale ha i bordi bassi
-   allineati. `svh`: la barra del browser che compare e sparisce non deve
-   cambiare la cartella. `vh` davanti, per chi `svh` non lo conosce. */
+/* Tutte alte uguali, cosi' l'archivio finale ha i bordi bassi allineati.
+   `svh`: la barra del browser non deve cambiare la cartella; `vh` davanti per
+   chi `svh` non lo conosce. */
 [data-work-shelf][data-archive-lit] [data-face] {
   height: calc(100vh - var(--header) - var(--margin-top) - (var(--n) - 1) * var(--step) - var(--tab-h) - var(--face-offset) - var(--margin-bottom) - var(--bottom-bar));
   height: calc(100svh - var(--header) - var(--margin-top) - (var(--n) - 1) * var(--step) - var(--tab-h) - var(--face-offset) - var(--margin-bottom) - var(--bottom-bar));
@@ -381,20 +330,17 @@
 /* Qui il riquadro prende quello che resta e si stringe per primo. */
 [data-work-shelf][data-archive-lit] [data-face-screenshot] { min-height: 0; }
 
-/* Sotto la riga, sul telefono: almeno quel tanto che la faccia si riconosca
-   come il sito che e'. Se non ci sta, l'archivio resta spento. */
+/* Il minimo perche' la faccia si riconosca come il sito che e'. Se non ci
+   sta, l'archivio resta spento. */
 @media (max-width: 760px) {
   [data-work-shelf][data-archive-lit] [data-face-centre] {
     grid-template-rows: auto minmax(6rem, 1fr);
   }
 }
 
-/* Sotto i 768px c'e' la barra in basso (52px piu' la tacca): la faccia se la
-   toglie, o «Apri il caso» ci finisce sotto. E sul telefono la faccia si
-   stringe dentro: respiri e margini piu' corti, perche' la faccia del
-   riservato stia anche su un iPhone da 390x664 (misurato: chiedeva 18px in
-   piu') e su un telefono da 375x640. Il margine sotto resta: e' lo stacco fra «Apri il caso» e la barra,
-   e il riquadro della schermata tiene i suoi 6rem. */
+/* Sotto i 768px la faccia si toglie la barra in basso, o «Apri il caso» ci
+   finisce sotto, e stringe i respiri: il riservato deve stare anche a
+   390x664 (chiedeva 18px in piu') e a 375x640. */
 @media (max-width: 767px) {
   [data-work-shelf][data-archive-lit] {
     --bottom-bar: calc(3.25rem + env(safe-area-inset-bottom, 0px));
@@ -410,8 +356,7 @@
   [data-work-shelf][data-archive-lit] [data-face-centre] { gap: 0.75rem; }
 }
 
-/* La copia con cui useArchivioAcceso misura se le facce ci stanno: fissa, invisibile,
-   tolta nello stesso istante in cui e' stata messa. */
+/* La copia con cui useArchiveLight misura se le facce ci stanno. */
 [data-archive-probe] {
   position: fixed;
   top: 0;
@@ -421,30 +366,16 @@
   pointer-events: none;
 }
 
-/* ── La pratica ─────────────────────────────────────────────────────────
-   Il dossier aperto: un <dialog> trasparente sopra la pagina velata, e dentro
-   un foglio di carta. La carta e' la stessa in tutti e due i temi, come
-   l'editor della cassetta e' scuro in tutti e due: e' un oggetto, non la
-   pagina. Per questo il foglio ha i colori suoi, e dentro non entra niente di
-   quello che si ribalta col tema (--fg, --bg, --line, --cartella-*,
-   .eyebrow): WorksView.test.tsx lo verifica sulle regole qui sotto.
-
-   Sul telefono, e sotto i 700px di altezza, il foglio e' in verticale e si
-   scorre il dialog. Sul computer il foglio e' grande quanto lo schermo e si
-   mette in orizzontale (vedi il blocco in fondo). Come arriva e come se ne va
-   lo scrive scivola.ts; i numeri sono quelli del prototipo
-   (docs/prototipi/2026-09-28-foglio-a-schermo.html, proposta A).
-
-   Tutto sta sotto [open], e non e' un dettaglio: dichiarando display su
-   [data-work-dialog] senza qualificarlo si sovrascrive il `display: none` che
-   il browser da' a un dialog chiuso, e il dossier chiuso restava disegnato. */
+/* La pratica e' carta nei due temi: dentro non entra niente di quello che si
+   ribalta col tema (--fg, --bg, --line, --folder-*, .eyebrow), e
+   WorksView.test.tsx lo verifica. Tutto sotto [open]: un display non
+   qualificato sovrascrive il `display: none` del dialog chiuso. */
 [data-work-dialog] {
   --sheet-paper: var(--paper);
   --sheet-ink: var(--ink);
   /* Il tenue della carta, non quello del tema: 5,03:1 sulla carta. */
   --sheet-muted: var(--muted);
-  /* L'arancio pieno su carta fa 3,27:1. Scurito con l'inchiostro fa 5,42:1
-     e resta arancio: e' quello dei fogli chiari della sezione Servizi. */
+  /* L'arancio pieno su carta fa 3,27:1; scurito con l'inchiostro 5,42:1. */
   --accent-on-paper: color-mix(in oklab, var(--accent) 72%, var(--ink));
   --sheet-orange: var(--accent-on-paper);
   --sheet-border: color-mix(in oklab, var(--sheet-ink) 24%, var(--sheet-paper));
@@ -471,8 +402,8 @@
   overscroll-behavior: contain;
 }
 
-/* Il velo non compare di colpo: arriva mentre il foglio si allarga, e se ne
-   va mentre si stringe. `data-velo` lo scrive scivola.ts. */
+/* Il velo arriva mentre il foglio si allarga e se ne va mentre si stringe:
+   `data-veil` lo scrive slide.ts. */
 [data-work-dialog]::backdrop {
   background-color: transparent;
   transition: background-color 420ms ease;
@@ -486,7 +417,6 @@
   [data-work-dialog]::backdrop { transition-duration: 160ms; }
 }
 
-/* Il × e' tondo, fermo in alto a destra, sopra il foglio. */
 [data-work-dialog] [data-dossier-close] {
   position: fixed;
   top: 1rem;
@@ -521,9 +451,8 @@
   box-shadow: 0 40px 90px -35px var(--sheet-shadow);
 }
 
-/* La linguetta della pratica ha la forma di quelle delle cartelle. Il fondo
-   lo eredita: mentre il foglio si allarga passa dal tono del foglio della
-   cartella alla carta, e lei con lui. */
+/* Il fondo lo eredita: mentre il foglio si allarga passa dal tono del foglio
+   della cartella alla carta, e la linguetta con lui. */
 [data-work-dialog] [data-dossier-tab] {
   position: absolute;
   top: -2.3rem;
@@ -547,7 +476,6 @@
   padding: 2.6rem clamp(1.25rem, 5vw, 3.5rem) 2.5rem;
 }
 
-/* Le scritte da modulo: maiuscolo, spaziato, a macchina. */
 [data-work-dialog] [data-dossier-head] p,
 [data-work-dialog] [data-dossier-fields],
 [data-work-dialog] [data-dossier-subject] p:first-child,
@@ -631,8 +559,6 @@
   letter-spacing: -0.01em;
 }
 
-/* L'allegato: la schermata spillata al foglio, appena storta, con la
-   graffetta in grafite. */
 [data-work-dialog] [data-dossier-attachment] {
   position: relative;
   margin: 2.2rem 0 0;
@@ -666,8 +592,6 @@
   color: var(--sheet-muted);
 }
 
-/* Lo stesso vocabolario della faccia: il tratteggio dice «questa cosa non
-   c'e', e non per dimenticanza». */
 [data-work-dialog] [data-dossier-confidential] {
   margin: 2.2rem 0 0;
   min-height: 8rem;
@@ -696,7 +620,6 @@
   margin-top: 0.6rem;
 }
 
-/* I puntini di guida fra l'etichetta e il numero, come in un indice. */
 [data-work-dialog] [data-dossier-figures] dt {
   flex: 1;
   display: flex;
@@ -806,8 +729,8 @@
   color: var(--sheet-muted);
 }
 
-/* Il timbro dice solo lo stato. Niente mix-blend-mode: il suo colore deve
-   essere quello misurato in contrast.test.ts, non una miscela con la carta. */
+/* Niente mix-blend-mode: il colore del timbro deve essere quello misurato in
+   contrast.test.ts, non una miscela con la carta. */
 [data-work-dialog] [data-dossier-stamp] {
   margin: 0;
   padding: 0.5rem 0.9rem;
@@ -846,14 +769,10 @@
   [data-work-dialog] [data-dossier-fields] div:nth-child(n + 3) { border-top: 1px solid var(--sheet-border); }
 }
 
-/* Sul computer il foglio e' grande quanto lo schermo, meno un bordo di 14px,
-   e si mette in orizzontale: testata, i campi in una riga, il corpo in due
-   colonne (la situazione | l'allegato e i numeri), i tre punti in tre
-   colonne, il piede. La schermata prende lo spazio che resta, ma non scende
-   sotto i 14rem: sui portatili bassi (1280x720) il foglio si scorre di poco
-   invece di schiacciarla. Da 1440x900 in su sta tutto dentro. Si scorre il
-   foglio, mai si taglia: coi testi lunghi (aidify, riservato) la colonna di
-   sinistra traboccava. */
+/* Sul computer il foglio e' grande quanto lo schermo e in orizzontale. La
+   schermata non scende sotto i 14rem: a 1280x720 il foglio si scorre di poco
+   invece di schiacciarla. Si scorre, mai si taglia: coi testi lunghi la
+   colonna di sinistra traboccava. */
 @media (min-width: 1024px) and (min-height: 700px) {
   [data-work-dialog][open] { padding: 0.9rem; overflow: hidden; }
 
@@ -913,9 +832,8 @@
     flex-direction: column;
   }
 
-  /* contain: size, o l'altezza naturale della schermata (340px a 1440)
-     diventa il minimo della riga e il piede finisce sotto il foglio: il
-     minimo deve essere solo i 14rem. */
+  /* contain: size, o l'altezza naturale della schermata diventa il minimo
+     della riga e il piede finisce sotto il foglio. */
   [data-work-dialog] [data-dossier-screenshot] {
     flex: 1;
     min-height: 14rem;
@@ -962,30 +880,20 @@
   [data-work-dialog] [data-dossier-stamp] { rotate: -4deg; }
 }
 
-/* `clip` e non `hidden` sul body: con hidden il body diventa un contenitore
-   di scorrimento, e le cartelle sticky dell'archivio si riattaccano a lui,
-   cioe' saltano al loro posto nel flusso. Misurato: la cartella davanti
-   saltava di 284px al clic, mentre doveva ancora cadere. clip taglia e basta. */
+/* `clip` e non `hidden` sul body: con hidden le cartelle sticky si
+   riattaccano al body e saltano al loro posto nel flusso (284px al clic). */
 html[data-dialog-open] { overflow: hidden; }
 html[data-dialog-open] body { overflow: clip; }
 
-/* Dove la barra di scorrimento occupa posto (Windows, Linux), overflow
-   hidden la toglie al clic: la pagina si allargava di 17px sotto il piano
-   trasparente della pratica e si ristringeva a fine risalita. La corsia resta
-   riservata sempre; sulle barre sovrapposte di macOS e dei telefoni non
-   cambia niente. */
+/* Dove la barra di scorrimento occupa posto, overflow hidden la toglie al
+   clic e la pagina si allargava di 17px sotto la pratica: la corsia resta
+   riservata sempre. */
 html { scrollbar-gutter: stable; }
 
-/* Le due sezioni in cui un blocco entrava di lato: le voci di «E in pratica?»
-   sotto il tavolo (tolte) e le consegne di «Come lavoro» (nascosta per scelta).
-   Per mezzo secondo la voce stava fuori dal bordo destro, e senza ritaglio quel
-   mezzo secondo la pagina si poteva trascinare in orizzontale: misurato, 429px
-   di documento su una finestra da 390. La regola resta: su #services non costa
-   niente, e #process torna in pagina con una riga.
-   `clip` e non `hidden`: hidden fa di questi due un contenitore di scorrimento,
-   e un contenitore di scorrimento in mezzo rompe l'intestazione appiccicata in
-   cima alla pagina. clip taglia e basta. Dove non e' supportato (Safari sotto
-   la 16) si torna al comportamento di prima, che e' brutto ma non rotto. */
+/* Un blocco che entrava di lato rendeva la pagina trascinabile in
+   orizzontale (429px su 390). `clip` e non `hidden`, che farebbe un
+   contenitore di scorrimento e romperebbe l'intestazione appiccicata. Sotto
+   Safari 16 si torna a prima: brutto, non rotto. */
 #services,
 #process {
   overflow-x: clip;

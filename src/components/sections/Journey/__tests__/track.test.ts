@@ -15,22 +15,16 @@ import {
 
 const { timings } = TRACK_PARAMS;
 
-/**
- * Un palco da telefono e una corsa qualsiasi: i numeri non contano, contano i
- * rapporti. `viaggio` si ricava come lo ricava il componente, dall'altezza del
- * track meno il palco e la coda, cosi' il test usa la stessa strada del codice.
- */
+// Un palco da telefono: contano i rapporti, e TRAVEL si ricava come nel componente.
 const STAGE = 800;
 const TRACK = 4000;
 const TRAVEL = travel({ track: TRACK, stage: STAGE, tail: TRACK_PARAMS.tail });
 const TAIL_PX = TRACK_PARAMS.tail * STAGE;
 
-/** Lo scroll fatto quando la coda e' arrivata alla frazione `q`. */
 const inTail = (q: number) => TRAVEL + q * TAIL_PX;
 const phasesAt = (done: number) =>
   phases({ done, travel: TRAVEL, tail: TRACK_PARAMS.tail, height: STAGE });
 
-/** Le curve di un tracciato: partenza, due maniglie, arrivo. */
 type Curve = { from: TrackPoint; c1: TrackPoint; c2: TrackPoint; to: TrackPoint };
 
 function parsePath(d: string): { start: TrackPoint; curves: Curve[] } {
@@ -171,9 +165,7 @@ describe("arrivata", () => {
 });
 
 describe("wavePath", () => {
-  // Il bordo sinistro a meta' altezza, quattro tappe con lo scostamento delle
-  // pose, e l'arrivo: tratti di lunghezze diverse, perche' e' li' che senza la
-  // pendenza continua l'onda faceva lo spigolo.
+  // Tratti di lunghezze diverse: e' li' che senza la pendenza continua l'onda faceva lo spigolo.
   const points: TrackPoint[] = [
     [0, 300],
     [520, 276],
@@ -224,9 +216,7 @@ describe("wavePath", () => {
   }
 
   it("con punti coincidenti non scrive mai NaN ne' Infinity", () => {
-    // Succede davvero: alla prima misura i fogli sono ancora in colonna, tutti
-    // con lo stesso offsetLeft, e un tratto largo zero faceva dividere per zero
-    // la pendenza. Il browser rifiuta il tracciato e lo dice in console.
+    // Alla prima misura i fogli sono ancora in colonna, tutti con lo stesso offsetLeft.
     const stacked: TrackPoint[] = [
       [0, 300],
       [720, 300],

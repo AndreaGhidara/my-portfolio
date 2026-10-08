@@ -2,17 +2,15 @@ import { getTranslations } from "next-intl/server";
 import { processDeliveries } from "@/content/process";
 import { ProcessView, type ProcessDeliveryView } from "./ProcessView";
 
-/** Le tre cose che ogni consegna contiene. Numerate e non un array: con gli
- *  array next-intl chiede `t.raw`, che rinuncia al controllo sulle chiavi
- *  mancanti, e nel repo non lo usa nessuno. */
+// Numerate e non un array: con gli array next-intl chiede `t.raw`, che
+// rinuncia al controllo sulle chiavi mancanti.
 const INCLUDE_KEYS = ["uno", "due", "tre"] as const;
 
 export async function Process() {
   const t = await getTranslations("process");
 
-  // Gli id vengono dal contenuto e non da una lista qui: erano due elenchi da
-  // tenere allineati a mano, ed e' il tipo di disallineamento che non rompe
-  // niente: stampa solo una consegna in meno.
+  // Gli id vengono dal contenuto: due elenchi allineati a mano si
+  // disallineano in silenzio, stampando una consegna in meno.
   const deliveries: ProcessDeliveryView[] = processDeliveries.map(({ id }) => ({
     id,
     when: t(`list.${id}.quando`),

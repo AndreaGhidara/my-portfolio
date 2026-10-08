@@ -4,20 +4,8 @@ import { DeskShapeArt } from "../Services/DeskObject";
 import { ProcessSpecimen } from "./ProcessSpecimen";
 import type { ProcessDeliveryView } from "./ProcessView";
 
-/**
- * Una consegna. Da una parte il testo, dall'altra il disegno, e i lati si
- * alternano scendendo, per una ragione semplice: quattro voci dallo stesso
- * lato sono una colonna di testo con mezza pagina bianca accanto.
- *
- * Il testo e' in quattro tempi, ed e' l'ordine che regge la voce della sezione:
- * quando arriva, cosa contiene, cosa NON e', e perche' quella cosa li'
- * conviene. Il terzo tempo e' quello che tiene la sezione lontana dal
- * depliant («non e' un preventivo», «non e' la grafica finita») ed e' il
- * motivo per cui una prova conta che ci sia in tutte e quattro.
- *
- * Il disegno e' la sagoma del tavolo col suo campione. Livello 3: le consegne
- * sono figlie del titolo della sezione, non di un altro titolo.
- */
+/** Una prova conta che il «cosa NON e'» ci sia in tutte e quattro. Livello 3:
+ *  le consegne sono figlie del titolo della sezione. */
 export function ProcessBlock({
   delivery,
   piece,
@@ -46,11 +34,9 @@ export function ProcessBlock({
         <p data-process-why>{delivery.why}</p>
       </div>
 
-      {/* Decorazione, per intero: quello che il disegno dice lo dicono gia' il
-          titolo e il testo accanto. `data-desk-piece` («un pezzo disegnato»)
-          e non `data-desk-object`, che conta i ventiquattro oggetti sul tavolo:
-          una consegna sul tavolo non ci sta. E' da quel gancio che pendono la
-          tavola dei materiali e la scatola del campione. */}
+      {/* `data-desk-piece` e non `data-desk-object`, che conta i ventiquattro
+          oggetti sul tavolo: da questo gancio pendono la tavola dei materiali e la
+          scatola del campione. */}
       <div data-process-art aria-hidden="true">
         <span data-desk-piece data-shape={piece.shape}>
           <DeskShapeArt drawing={piece.shape} />

@@ -1,17 +1,7 @@
 /* Il tuo turno: il foglio dei contatti, i tempi e il tesserino. */
 
-/* ══════════════════════════════════════════════════════════════════════════
-   IL TUO TURNO: il foglio, i tempi, e il tesserino
-
-   Non piu' due colonne pari. Il cliente ha meta' pagina e un foglio su cui
-   scrivere; chi assume ha una riga sola e un tesserino, che e' l'oggetto di
-   «Dove ho imparato»: la pagina si chiude con la stessa cosa con cui ha
-   raccontato dove si e' lavorato.
-
-   Qui i token del tema vanno bene, a differenza del percorso: sotto non c'e'
-   nessun fondo arancione, quindi carta e inchiostro si ribaltano insieme a
-   tutto il resto ed e' giusto che lo facciano.
-   ═══════════════════════════════════════════════════════════════════════ */
+/* Qui i token del tema vanno bene, a differenza del percorso: sotto non c'e'
+   un fondo arancione, e carta e inchiostro si ribaltano col resto. */
 
 [data-contact-columns] {
   margin-block-start: 3rem;
@@ -21,8 +11,6 @@
   align-items: start;
 }
 @media (max-width: 860px) { [data-contact-columns] { grid-template-columns: 1fr; } }
-
-/* ── Il foglio ──────────────────────────────────────────────────────────── */
 
 [data-contact-sheet] {
   border: 1px solid var(--line);
@@ -46,8 +34,6 @@
 }
 [data-contact-sheet] form { margin-block-start: 1.75rem; display: grid; gap: 1.4rem; }
 
-/* ── I campi: righe, non riquadri ───────────────────────────────────────── */
-
 [data-contact-label] {
   display: block;
   font-family: var(--font-mono), ui-monospace, monospace;
@@ -66,26 +52,23 @@
   border-radius: 0;
   background-color: transparent;
   padding: 0.5rem 0;
-  /* Quello che la scatola dava gratis: un bersaglio che si tocca. Una riga e'
-     alta quanto il testo, e sotto i 44px il pollice sbaglia. Una prova la
-     verifica, perche' e' l'unico prezzo vero di questo disegno. */
+  /* Quello che la scatola dava gratis: una riga e' alta quanto il testo, e
+     sotto i 44px il pollice sbaglia. Una prova la verifica. */
   min-height: 2.75rem;
   color: var(--fg);
   font: inherit;
 }
 [data-contact-field]::placeholder { color: color-mix(in oklab, var(--fg-muted) 70%, transparent); }
 
-/* Tolto il contorno, il fuoco della tastiera resta l'unica cosa che dice dove
-   sei: senza questa regola il browser non ne disegna nessuno su un campo cosi'.
-   Una prova esige che ci sia. */
+/* Tolto il contorno, senza questa regola il browser non disegna nessun fuoco
+   su un campo cosi'. Una prova esige che ci sia. */
 [data-contact-field]:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
-/* Il messaggio, a righe come un foglio vero. Il gradiente si ripete sull'altezza
-   di riga, e `background-attachment: local` lo fa scorrere col testo invece di
-   restare incollato alla scatola: scrivendo oltre il fondo, le righe seguono. */
+/* `background-attachment: local` fa scorrere le righe col testo invece di
+   lasciarle incollate alla scatola. */
 textarea[data-contact-field] {
   border-block-end: 0;
   line-height: 2rem;
@@ -121,23 +104,10 @@ textarea[data-contact-field] {
 }
 [data-contact-send]:disabled { opacity: 0.6; }
 
-/* L'esito dell'invio.
-
-   Era una riga grigia di 13,6px sotto il bottone, e chi premeva "invia" non
-   vedeva succedere niente: il messaggio partiva davvero, ma la persona restava
-   a chiedersi se il modulo fosse rotto. Adesso e' un riquadro, e si distingue
-   in tre modi diversi (colore, segno e testo) perche' chi non distingue
-   l'arancio dall'inchiostro deve capirlo lo stesso.
-
-   Il si' e' verde e il no e' inchiostro. Il verde e' l'unico colore entrato
-   in tavolozza per questo riquadro, ed e' costato una discussione: prima il
-   si' era l'arancio del sito, che e' coerente col resto ma a colpo d'occhio
-   si legge come un allarme, provato da chi il sito ce l'ha, che davanti al
-   riquadro arancione ha creduto che l'invio fosse fallito. Il rosso invece
-   non e' entrato: il no e' l'inchiostro, e il punto esclamativo dice il resto.
-
-   Da fermo l'elemento resta e non si vede: tiene il posto (1,5rem) cosi'
-   l'arrivo del riquadro non fa saltare quello che sta sotto. */
+/* Colore, segno e testo: chi non distingue l'arancio dall'inchiostro deve
+   capirlo lo stesso. Il si' e' verde perche' il riquadro arancione si leggeva
+   come un allarme. Da fermo tiene il posto (1,5rem), cosi' l'arrivo del
+   riquadro non fa saltare quello che sta sotto. */
 [data-contact-outcome] {
   min-height: 1.5rem;
   margin: 0;
@@ -165,15 +135,13 @@ textarea[data-contact-field] {
 
 [data-contact-outcome] svg {
   flex: none;
-  /* Allineato alla prima riga di testo, non al centro del riquadro: con due
-     righe il segno finirebbe a meta' frase. */
+  /* Allineato alla prima riga: con due righe il segno finirebbe a meta' frase. */
   margin-block-start: 0.12rem;
   color: var(--outcome-mark);
 }
 
-/* L'indirizzo dentro il messaggio d'errore: e' l'unica via d'uscita che resta
-   a chi non e' riuscito a mandare, quindi si vede che e' un link e si puo'
-   toccare. */
+/* L'unica via d'uscita di chi non e' riuscito a mandare: si vede che e' un
+   link e si puo' toccare. */
 [data-contact-outcome-mail] {
   color: var(--fg);
   text-decoration: underline;
@@ -192,8 +160,6 @@ textarea[data-contact-field] {
   to { opacity: 1; transform: none; }
 }
 
-/* ── Cosa succede dopo ──────────────────────────────────────────────────── */
-
 [data-contact-after-label] {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.6rem;
@@ -203,9 +169,8 @@ textarea[data-contact-field] {
   margin-block-end: 1.2rem;
 }
 [data-contact-times] { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.5rem; }
-/* Colonna contata e non `auto`: ogni <li> e' una griglia sua, e con `auto` la
-   prima colonna sarebbe larga quanto l'etichetta DI QUELLA RIGA. Le tre hanno
-   lunghezze diverse, quindi i titoli partirebbero da tre x diverse. */
+/* Colonna contata e non `auto`: ogni <li> e' una griglia sua, e con `auto` i
+   titoli partirebbero da tre x diverse. */
 [data-contact-times] > li {
   display: grid;
   grid-template-columns: 7rem 1fr;
@@ -232,15 +197,12 @@ textarea[data-contact-field] {
   [data-contact-times] > li { grid-template-columns: 1fr; gap: 0.35rem; }
 }
 
-/* ── Il tesserino, largo tutta la riga ──────────────────────────────────── */
-
-/* 0,3 gradi e non 1 come quelli del percorso: a 56rem di larghezza un grado non
-   si legge come una cosa appoggiata, si legge come una riga storta. */
+/* 0,3 gradi e non 1 come nel percorso: a 56rem un grado si legge come una
+   riga storta. */
 [data-contact-badge] { margin-block-start: 3rem; position: relative; transform: rotate(-0.3deg); }
 
-/* La clip sta in mezzo e non in un angolo: su un cartellino stretto l'angolo
-   funziona, su uno largo il centro e' l'unico punto in cui si legge come un
-   gancio invece che come un dettaglio dimenticato. */
+/* La clip in mezzo: su un cartellino largo l'angolo si legge come un
+   dettaglio dimenticato. */
 [data-contact-clip] {
   display: block;
   width: 2.6rem;
@@ -274,8 +236,8 @@ textarea[data-contact-field] {
 [data-contact-badge] h3 { margin-block-start: 0.45rem; font-size: 1.35rem; }
 [data-contact-badge-text] {
   margin-block-start: 0.5rem;
-  /* Non --fg-muted: il cartellino ha un fondo suo, piu' scuro della carta, e
-     li' il grigio spento scendeva a 4,22:1, sotto il 4,5:1 del testo piccolo. */
+  /* Non --fg-muted: sul fondo del cartellino scendeva a 4,22:1, sotto il 4,5:1
+     del testo piccolo. */
   color: var(--fg);
   line-height: 1.6;
   font-size: 0.92rem;

@@ -1,40 +1,16 @@
 /* Dove ho imparato: il percorso, i tesserini, l'arrivo e la scena orizzontale. */
 
-/* ══════════════════════════════════════════════════════════════════════════
-   DOVE HO IMPARATO: il percorso, su fondo arancio
-
-   Ogni tappa è un tesserino appuntato sopra il foglio della lezione, e le
-   tappe vanno dal 2023 a oggi. Due forme della stessa lista:
-   - la COLONNA, qui sotto per prima: e' il markup del server, quello che si
-     legge senza JavaScript, con meno movimento e su un palco troppo basso;
-   - la SCENA ORIZZONTALE, piu' in basso: la pagina si aggancia e lo scroll
-     porta i fogli verso sinistra lungo un'onda. La accende l'attributo
-     `data-scena="orizzontale"`, che scrive JourneyBinario dopo aver creato il
-     suo ScrollTrigger. Nessuna media query la accende da sola: se GSAP non
-     arriva, resta la colonna.
-
-   Le misure del binario (larghezza dei fogli, aria, coda, velocita') arrivano
-   in linea sul contenitore da binario.ts: qui si usano, non si scrivono.
-
-   LA REGOLA DEI COLORI, e non è negoziabile. La sezione è arancione e di notte
-   resta arancione: qui dentro --fg, --bg, --line e --fg-muted si ribaltano
-   mentre il fondo no, e tesserini e fogli diventerebbero carta su carta. È lo
-   stesso difetto che la casella di posta ha già avuto, ed è la stessa
-   soluzione: carta e inchiostro sempre, e le sfumature nascono qui da --ink e
-   --paper. Una prova lo verifica, perché nel DOM non si vede.
-
-   Le tre ricette sono le stesse di `.casella` e non sono condivise di proposito:
-   è ogni blocco a dichiarare la carta su cui sta, e un blocco che le eredita da
-   lontano è un blocco che non sa di che colore è.
-   ═══════════════════════════════════════════════════════════════════════ */
+/* La sezione resta arancio di notte: qui dentro --fg, --bg, --line e
+   --fg-muted si ribalterebbero e tesserini e fogli diventerebbero carta su
+   carta. Carta e inchiostro sempre, da --ink e --paper; una prova lo verifica.
+   La scena orizzontale la accende solo `data-scene`, scritto da JourneyTrack. */
 
 [data-journey-stage] {
   padding: var(--section-y) var(--gutter);
 }
 
-/* La sonda con cui JourneyBinario decide fra colonna e scena: alta quanto il
-   palco della scena (100svh, il viewport piccolo) in qualunque forma sia la
-   sezione. Fixed e larga zero, cosi' non occupa niente e non si vede. */
+/* Alta quanto il palco della scena (100svh) in qualunque forma sia la
+   sezione; fixed e larga zero, cosi' non occupa niente. */
 [data-journey-probe] {
   position: fixed;
   top: 0;
@@ -49,15 +25,14 @@
 [data-journey-header] { max-width: 34rem; margin-inline: auto; }
 [data-journey-header] h2 { color: var(--paper); }
 
-/* L'anno in cui ci si trova, grande in un angolo: e' il contachilometri del
-   viaggio, quindi in colonna non c'e'. */
+/* L'anno in cui ci si trova: il contachilometri del viaggio, quindi in
+   colonna non c'e'. */
 [data-journey-year] { display: none; }
 
 [data-journey-list] {
   list-style: none;
-  /* 6rem e non 4 perche' il tesserino sborda di 1,25 sopra il foglio: a 4rem
-     il cartellino della prima tappa finiva sopra la coda della «p» di
-     «imparato». */
+  /* 6rem e non 4: il tesserino sborda di 1,25 sopra il foglio, e a 4rem il
+     cartellino della prima tappa finiva sopra la «p» di «imparato». */
   margin: 6rem auto 0;
   padding: 0;
   max-width: 34rem;
@@ -67,30 +42,22 @@
   color: var(--ink);
   --rule-line: color-mix(in oklab, var(--ink) 16%, var(--paper));
   --faint: color-mix(in oklab, var(--ink) 62%, var(--paper));
-  /* L'arancio pieno su carta fa 3,27:1 e l'etichetta e' 0,6rem: non basta.
-     Scurito con l'inchiostro fa 5,42:1 e resta arancio. */
+  /* L'arancio pieno su carta fa 3,27:1 e l'etichetta e' 0,6rem. Scurito con
+     l'inchiostro fa 5,42:1. */
   --accent-on-paper: color-mix(in oklab, var(--accent) 72%, var(--ink));
 }
 
-/* L'onda, il suggerimento e la barra sono della scena: in colonna non c'e'
-   niente da percorrere. */
 [data-journey-wave],
 [data-journey-hint],
 [data-journey-progress] { display: none; }
 
-/* Il <li> è il contenitore di posizionamento del tesserino, ed è largo quanto
-   il foglio: appeso a qualcosa di più largo, il cartellino finirebbe a mezza
-   colonna di distanza dalla cosa a cui dovrebbe essere appuntato.
-   L'inclinazione arriva in linea da POSE, una diversa per tappa: fogli con lo
-   stesso angolo sono un errore di stampa, fogli dritti sono una tabella. In
-   colonna solo la rotazione: lo scostamento verticale qui non sfalsa niente,
-   apre solo buchi. */
+/* Il <li> e' largo quanto il foglio perche' e' il contenitore del tesserino:
+   uno piu' largo lo appenderebbe lontano dal foglio. In colonna solo la
+   rotazione: lo scostamento verticale li' apre solo buchi. */
 [data-journey-item] {
   position: relative;
   transform: rotate(var(--r, 0deg));
 }
-
-/* ── Il tesserino ───────────────────────────────────────────────────────── */
 
 [data-journey-badge] {
   position: absolute;
@@ -100,8 +67,6 @@
   z-index: 2;
 }
 
-/* La clip: mezzo rettangolo aperto in basso, che è il modo in cui si legge un
-   gancio senza disegnarne uno. */
 [data-journey-clip] {
   display: block;
   width: 2.4rem;
@@ -115,8 +80,8 @@
   z-index: 2;
 }
 
-/* Appena più scuro del foglio su cui sta: due carte identiche sovrapposte non
-   si leggono come due cose, e il bordo da solo non basta a staccarle. */
+/* Appena piu' scuro del foglio: due carte identiche sovrapposte non si
+   leggono come due cose. */
 [data-journey-badge-body] {
   border: 1.5px solid color-mix(in oklab, var(--ink) 45%, transparent);
   border-radius: 4px;
@@ -129,9 +94,9 @@
   font-size: 0.95rem;
   line-height: 1.15;
 }
-/* `.eyebrow` porta --fg-muted, che qui dentro si ribalterebbe: l'anno è la
-   prima cosa che si legge su un tesserino, e di notte sparirebbe. La prova
-   sopra non lo vedrebbe mai, perché quella regola non nomina il percorso. */
+/* `.eyebrow` porta --fg-muted, che qui si ribalterebbe: di notte l'anno
+   sparirebbe, e la prova sopra non lo vede perche' la regola non nomina il
+   percorso. */
 [data-journey-badge-body] .eyebrow { color: var(--faint); }
 [data-journey-company] {
   margin-block-start: 0.25rem;
@@ -140,8 +105,6 @@
   color: var(--faint);
 }
 
-/* Il posto che un tesserino non te lo ha dato: tratteggiato e senza fondo. Non
-   è uno stato disabilitato, è un fatto. */
 [data-journey-item][data-badge="no"] [data-journey-badge-body] {
   background-color: transparent;
   border-style: dashed;
@@ -149,10 +112,8 @@
 }
 [data-journey-item][data-badge="no"] [data-journey-clip] { border-style: dashed; }
 
-/* ── Il foglio ──────────────────────────────────────────────────────────── */
-
-/* Il respiro in cima è il posto del tesserino, che sborda di 1,25rem e ne è
-   alto circa 5: senza, il cartellino coprirebbe l'occhiello della lezione. */
+/* Il respiro in cima e' il posto del tesserino: senza, il cartellino
+   coprirebbe l'occhiello della lezione. */
 [data-journey-sheet] {
   border: 1px solid var(--rule-line);
   border-radius: 4px;
@@ -175,12 +136,7 @@
   color: var(--faint);
 }
 
-/* ── L'arrivo: i due numeri e la nota ───────────────────────────────────── */
-
-/* Un foglio piccolo, della stessa carta delle tappe: i numeri sono l'ultima
-   fermata del percorso, non una didascalia appoggiata sull'arancio.
-   --luce va da 0 a 1 quando il filo lo raggiunge (la scrive JourneyBinario):
-   via il velo arancione, un alone di carta, il bordo d'inchiostro. Senza
+/* --light va da 0 a 1 quando il filo arriva (la scrive JourneyTrack). Senza
    nessuno che la scriva vale 1: in colonna il foglio e' acceso e fermo. */
 [data-journey-arrival] {
   position: relative;
@@ -198,7 +154,6 @@
       color-mix(in oklab, var(--paper) calc(var(--light, 1) * 85%), transparent),
     0 0 0 calc(var(--light, 1) * 2px) var(--ink);
 }
-/* Il velo: lo stesso delle tappe che aspettano, ma qui lo comanda la luce. */
 [data-journey-arrival]::after {
   content: "";
   position: absolute;
@@ -209,8 +164,7 @@
   pointer-events: none;
 }
 [data-journey-arrival] dl { display: flex; gap: 2.5rem; }
-/* flex-col-reverse: il numero sopra, con l'ordine dt -> dd che la specifica
-   chiede ancora intatto nel DOM. */
+/* flex-col-reverse: il numero sopra, con l'ordine dt -> dd intatto nel DOM. */
 [data-journey-arrival] dl > div { display: flex; flex-direction: column-reverse; }
 [data-journey-arrival] dd {
   font-family: var(--font-display), var(--font-body), sans-serif;
@@ -228,20 +182,10 @@
   color: var(--faint);
 }
 
-/* ── La scena orizzontale ───────────────────────────────────────────────────
-   Il track e' alto quanto la corsa, il palco resta sticky dentro: lo scroll
-   verticale passa sotto uno schermo fermo, e JourneyBinario ne fa uno
-   spostamento a sinistra. Niente `pin`, come il tavolo.
-
-   L'altezza del track e' CSS e non JavaScript: la strada orizzontale e'
-   (n - 0,5) * foglio + n * aria + arrivo / 2 (i due margini a mezzo schermo si
-   elidono con lo schermo; la stessa formula e' strada() in binario.ts, e un
-   test la confronta con la somma dei pezzi). Scritta da script, l'altezza
-   andrebbe ordinata a mano con i refresh di ScrollTrigger, e in SSR la
-   sezione nascerebbe sbagliata.
-
-   `svh` e non `vh`: sul telefono la barra del browser che compare e sparisce
-   non deve cambiare la corsa. `vh` davanti, per chi `svh` non lo conosce. */
+/* L'altezza del track e' CSS e non JavaScript: scritta da script andrebbe
+   ordinata a mano coi refresh di ScrollTrigger, e in SSR nascerebbe
+   sbagliata. E' la stessa formula di trackRoute() in track.ts. `svh` perche'
+   la barra del browser non cambi la corsa, `vh` davanti per chi non lo conosce. */
 
 [data-journey][data-scene="horizontal"] [data-journey-track] {
   --speed: var(--speed-fine);
@@ -257,8 +201,8 @@
   }
 }
 
-/* La testata sta sotto la barra alta del sito, che e' sticky e ci passa sopra:
-   il primo termine del padding e' la sua altezza (3,75rem: 60px misurati). */
+/* La barra alta del sito e' sticky e ci passa sopra: il primo termine del
+   padding e' la sua altezza (3,75rem: 60px misurati). */
 [data-journey][data-scene="horizontal"] [data-journey-stage] {
   --bottom-bar: 0px;
   position: sticky;
@@ -274,7 +218,7 @@
     calc(var(--bottom-bar) + clamp(3rem, 7vh, 4.5rem));
 }
 /* Sotto i 768px c'e' la barra in basso (52px piu' la tacca): il palco se la
-   toglie, e suggerimento e barra d'avanzamento le stanno sopra. */
+   toglie. */
 @media (max-width: 767px) {
   [data-journey][data-scene="horizontal"] [data-journey-stage] {
     --bottom-bar: calc(3.25rem + env(safe-area-inset-bottom, 0px));
@@ -299,9 +243,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* La fila. La prima tappa parte al centro del palco e l'arrivo ci finisce: i
-   due margini sono mezzo palco meno mezzo oggetto. In percentuale e non in vw:
-   la percentuale e' del palco, che non conta la barra di scorrimento. */
+/* I due margini sono mezzo palco meno mezzo oggetto. In percentuale e non in
+   vw: la percentuale e' del palco, che non conta la barra di scorrimento. */
 [data-journey][data-scene="horizontal"] [data-journey-list] {
   position: relative;
   align-self: center;
@@ -317,10 +260,8 @@
   will-change: transform;
 }
 
-/* L'onda: tratteggiata e fioca sotto, piena sopra, ritagliata fin dove si e'
-   gia' passati. Il tracciato lo disegna JourneyBinario, perche' dipende da
-   dove finiscono i fogli. --ink, cosi' l'onda sta dentro la regola dei
-   colori della sezione. */
+/* Il tracciato lo disegna JourneyTrack, perche' dipende da dove finiscono i
+   fogli. --ink, cosi' l'onda sta dentro la regola dei colori. */
 [data-journey][data-scene="horizontal"] [data-journey-wave] {
   display: block;
   position: absolute;
@@ -341,13 +282,11 @@
   transform: translateY(var(--dy, 0rem)) rotate(var(--r, 0deg));
   transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-/* Le tappe non ancora raggiunte aspettano un po' piu' in basso e piu'
-   storte: il foglio si posa quando la riga del tempo ci arriva. */
 [data-journey][data-scene="horizontal"] [data-journey-item]:not([data-arrived]) {
   transform: translateY(calc(var(--dy, 0rem) + 2.5rem)) rotate(calc(var(--r, 0deg) * 3));
 }
-/* Sbiadita con un velo arancione e non con l'opacita': un foglio trasparente
-   lascia vedere l'onda che gli passa dietro, attraverso il testo. */
+/* Un velo arancione e non l'opacita': un foglio trasparente lascerebbe vedere
+   l'onda che gli passa dietro, attraverso il testo. */
 [data-journey][data-scene="horizontal"] [data-journey-item]::after {
   content: "";
   position: absolute;
@@ -362,10 +301,8 @@
   opacity: 0.6;
 }
 
-/* L'arrivo sulla scena: il sussulto a meta' accensione, e lo scollo. --caduta
-   va da 0 a 1 e il foglio si stacca dal filo e scende fuori dallo schermo,
-   girandosi un poco come un foglio che perde lo spillo. Lo ritaglia la
-   sezione, non il palco. */
+/* --fall va da 0 a 1: il foglio si stacca dal filo e scende fuori dallo
+   schermo. Lo ritaglia la sezione, non il palco. */
 [data-journey][data-scene="horizontal"] [data-journey-arrival] {
   flex: 0 0 auto;
   width: var(--arrival);
@@ -376,36 +313,26 @@
   rotate: calc(var(--r, 0deg) + var(--fall, 0) * 14deg);
 }
 
-/* I telefoni bassi. Il foglio piu' lungo (il 2026) deve stare intero nel
-   palco insieme alla testata, e sotto questa altezza i respiri pensati per il
-   desktop si mangiano lo spazio del testo: si stringono i margini e il corpo,
-   non si toglie niente. 880px e' dove la versione larga smette di starci:
-   a 390 di larghezza, con i respiri pieni, il 2026 e' alto 414px e chiede
-   circa 860px di palco (stesso conto di ALTEZZA_MINIMA in binario.ts).
-   Sotto quella soglia neanche questo basta, e la sezione resta in colonna. */
+/* I telefoni bassi: il 2026 deve stare intero nel palco con la testata. 880px
+   e' dove la versione larga smette di starci (a 390 il 2026 chiede circa 860px
+   di palco, stesso conto di MIN_HEIGHT in track.ts); sotto MIN_HEIGHT neanche
+   questo basta, e resta la colonna. */
 @media (max-height: 879px) {
   [data-journey][data-scene="horizontal"] [data-journey-stage] {
     padding-top: calc(3.75rem + 0.5rem);
     padding-bottom: calc(var(--bottom-bar) + 2.75rem);
   }
-  /* In cima si lascia il respiro pieno: e' il posto del tesserino, e a 4,5rem
-     l'occhiello della lezione finiva sotto il suo bordo. */
+  /* In cima il respiro pieno: a 4,5rem l'occhiello della lezione finiva sotto
+     il bordo del tesserino. */
   [data-journey][data-scene="horizontal"] [data-journey-sheet] { padding: 5.25rem 1.1rem 1.1rem; }
   [data-journey][data-scene="horizontal"] [data-journey-lesson] { font-size: 0.84rem; line-height: 1.45; }
   [data-journey][data-scene="horizontal"] [data-journey-body] { margin-block-start: 0.6rem; font-size: 0.72rem; line-height: 1.4; }
 }
 
-/* Il telefono, solo sulla scena. Qui il foglio e' largo 82vw e quindi alto, e
-   sotto c'e' la barra bassa del sito: e' la stessa soglia dei 768px, perche'
-   lo spazio che manca e' quello e non dipende dal puntatore (un tablet col
-   dito ha il posto che serve). Le tappe in attesa restano dove sono, senza
-   scendere e senza storcersi di piu': quei 2,5rem e l'inclinazione triplicata
-   erano la voce piu' grossa dell'altezza chiesta al palco. Il velo resta, ed
-   e' lui a dire che la tappa non e' ancora arrivata.
-   Il corpo piccolo sotto la lezione si toglie alla vista ma non alla lettura:
-   sta subito dopo la lezione, nello stesso ordine in cui lo leggerebbe chi
-   vede, quindi uno screen reader non trova niente di fuori posto. In colonna e
-   sugli schermi larghi si vede come sempre. */
+/* Sul telefono le tappe in attesa non scendono ne' si storcono di piu': erano
+   la voce piu' grossa dell'altezza chiesta al palco. Il corpo piccolo si toglie
+   alla vista ma non alla lettura, e sta nell'ordine in cui lo leggerebbe chi
+   vede. */
 @media (max-width: 767px) {
   [data-journey][data-scene="horizontal"] [data-journey-item]:not([data-arrived]) {
     transform: translateY(var(--dy, 0rem)) rotate(var(--r, 0deg));
@@ -422,7 +349,6 @@
   }
 }
 
-/* Il suggerimento sparisce appena si scorre; la barra dice quanto manca. */
 [data-journey][data-scene="horizontal"] [data-journey-hint] {
   display: flex;
   align-items: center;
