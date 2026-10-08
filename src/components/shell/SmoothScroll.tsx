@@ -37,6 +37,7 @@ export function SmoothScroll() {
       const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
       active = lenis;
 
+      // Senza questo ponte i trigger leggerebbero una posizione che Lenis ha gia' cambiato.
       lenis.on("scroll", ScrollTrigger.update);
 
       const tick = (time: number) => lenis.raf(time * 1000);

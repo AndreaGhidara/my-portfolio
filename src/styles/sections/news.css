@@ -601,7 +601,7 @@
   outline: 2px solid var(--sheet-orange);
   outline-offset: -2px;
 }
-/* Quando la colonna della notizia e' stretta (il telefono, ma anche fra 860 e
+/* Quando la colonna della notizia e' stretta (il telefono, ma anche fra 960 e
    1200px, dove il foglio divide lo spazio con la macchina) numeri e link non
    stanno su una riga: vanno sempre su due, e la misura resta quella. */
 @container (max-width: 32rem) {
