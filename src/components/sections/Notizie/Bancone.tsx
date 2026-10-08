@@ -101,6 +101,10 @@ export function Bancone({ testi, locale }: { testi: TestiNotizie; locale: string
   const chiesta = useRef(false);
   const presa = useRef<Presa | null>(null);
   const trascinata = useRef(false);
+  // Copie fresche di uscite e storia: gira() le rilegge dopo l'await, quando la
+  // closure del render puo' essere gia' vecchia (manopola girata senza fermarsi).
+  const usciteOra = useRef(NESSUNA);
+  const storiaOra = useRef<Uscita[]>([]);
 
   const carica = useCallback(async () => {
     setStato({ tipo: "attesa" });
@@ -113,6 +117,7 @@ export function Bancone({ testi, locale }: { testi: TestiNotizie; locale: string
       for (const c of CATEGORIE) conte[c] = raccolta.categorie[c].length;
       if (CATEGORIE.every((c) => conte[c] === 0)) throw new Error("vuote");
       setPalline(disponi(conte));
+      usciteOra.current = NESSUNA;
       setUscite(NESSUNA);
       setStato({ tipo: "pronto", raccolta });
     } catch {
@@ -161,7 +166,7 @@ export function Bancone({ testi, locale }: { testi: TestiNotizie; locale: string
     }
     if (stato.tipo !== "pronto") return;
     const cat = scelta;
-    const i = uscite[cat];
+    const i = usciteOra.current[cat];
     setGiri((g) => g + 1);
     if (i >= stato.raccolta.categorie[cat].length) {
       setFinita(cat);
@@ -169,14 +174,16 @@ export function Bancone({ testi, locale }: { testi: TestiNotizie; locale: string
     }
     setFinita(null);
     occupato.current = true;
-    setUscite((u) => ({ ...u, [cat]: i + 1 }));
+    usciteOra.current = { ...usciteOra.current, [cat]: i + 1 };
+    setUscite(usciteOra.current);
     if (level !== "none" && sportello.current && giornale.current) {
       mescola();
       await aspetta(level === "full" ? 420 : 200);
       await vola(cat, sportello.current, giornale.current, level);
     }
-    setStoria([...storia, { cat, i, storto: Math.random() * 1.4 - 0.7 }]);
-    setMostrata(storia.length);
+    storiaOra.current = [...storiaOra.current, { cat, i, storto: Math.random() * 1.4 - 0.7 }];
+    setStoria(storiaOra.current);
+    setMostrata(storiaOra.current.length - 1);
     occupato.current = false;
     // Sul telefono il giornale sta sotto la macchina, spesso fuori dallo schermo.
     if (window.matchMedia(TELEFONO).matches) {
