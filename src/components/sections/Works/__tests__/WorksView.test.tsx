@@ -783,9 +783,9 @@ describe("i colori della pratica", () => {
     const computer = rules(/\[data-dossier-sheet\]$/, { media: "(min-width: 1024px) and (min-height: 700px)" });
     expect(computer.length, "manca il blocco del computer della pratica").toBeGreaterThan(0);
     expect(computer.map((r) => r.body).join("\n")).toMatch(/overflow-y:\s*auto/);
-    const nascosti = regoleDellaPratica.filter(
-      (r) => /\[data-dossier(-foglio)?\]$/.test(r.selector) && /overflow(-y)?:\s*hidden/.test(r.body),
-    );
+    const pratica = regoleDellaPratica.filter((r) => /\[data-dossier(-sheet)?\]$/.test(r.selector));
+    expect(pratica.filter((r) => r.selector.endsWith("[data-dossier-sheet]")).length).toBeGreaterThan(0);
+    const nascosti = pratica.filter((r) => /overflow(-y)?:\s*hidden/.test(r.body));
     expect(nascosti.map((r) => r.selector)).toEqual([]);
   });
 });
