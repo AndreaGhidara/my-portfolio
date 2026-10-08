@@ -17,7 +17,7 @@ import type { DeskShape } from "./desk";
 export type ProcessSample = "accordo" | "bozza" | "indirizzo" | "numero";
 
 /** Da che parte sta il disegno. Il testo sta dall'altra. */
-export type ProcessSide = "dx" | "sx";
+export type ProcessSide = "right" | "left";
 
 export type ProcessDelivery = {
   /** E' anche la chiave di traduzione: process.list.<id>.* */
@@ -52,8 +52,8 @@ export type ProcessDelivery = {
 };
 
 export const processDeliveries: ProcessDelivery[] = [
-  { id: "documento", side: "sx", shape: "sheet", sample: "accordo" },
-  { id: "schermo", side: "dx", shape: "sheet", sample: "bozza" },
-  { id: "link", side: "sx", shape: "phone", sample: "indirizzo" },
-  { id: "numero", side: "dx", shape: "card", sample: "numero" },
+  { id: "documento", side: "left", shape: "sheet", sample: "accordo" },
+  { id: "schermo", side: "right", shape: "sheet", sample: "bozza" },
+  { id: "link", side: "left", shape: "phone", sample: "indirizzo" },
+  { id: "numero", side: "right", shape: "card", sample: "numero" },
 ];

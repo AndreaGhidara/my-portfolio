@@ -47,7 +47,7 @@ describe("la sezione del tavolo", () => {
     const sezione = screen.getByRole("region", { name: props.stageTitle });
     const titolo = within(sezione).getByRole("heading", { level: 2, name: props.stageTitle });
     expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
-    expect(titolo).toHaveClass("titolo-sezione");
+    expect(titolo).toHaveClass("section-title");
   });
   it("è ancorabile dalla navbar", () => {
     const { container } = render(<ServicesView {...props} />);
@@ -64,7 +64,7 @@ describe("la sezione del tavolo", () => {
     const sezione = container.querySelector("section#services") as HTMLElement;
     const figli = [...sezione.children];
     expect(figli[0]).toHaveAttribute("data-desk");
-    expect(figli[1]).toHaveAttribute("data-cassetta-sezione");
+    expect(figli[1]).toHaveAttribute("data-toolbox-section");
     expect(within(figli[1] as HTMLElement).getByRole("heading", { level: 2 })).toHaveTextContent(
       props.toolbox.title,
     );
@@ -153,7 +153,7 @@ describe("il tavolo è la lista", () => {
     const { container } = render(<ServicesView {...props} />);
     expect(container.querySelectorAll("[data-desk-world]")).toHaveLength(1);
     expect(container.querySelector("[data-desk-world][aria-hidden]")).toBeNull();
-    expect(container.querySelector("section#services [data-desk-stage] [data-gioco]")).not.toBeNull();
+    expect(container.querySelector("section#services [data-desk-stage] [data-game]")).not.toBeNull();
   });
 });
 

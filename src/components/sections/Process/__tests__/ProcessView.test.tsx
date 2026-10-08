@@ -27,7 +27,7 @@ describe("ProcessView", () => {
     const sezione = screen.getByRole("region", { name: props.title });
     const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
     expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
-    expect(titolo).toHaveClass("titolo-sezione");
+    expect(titolo).toHaveClass("section-title");
   });
   it("le consegne sono una lista ordinata: «in quest'ordine» è metà del titolo", () => {
     // Non quattro riquadri. L'ordine e' l'informazione, e una lista ordinata e'
@@ -50,7 +50,7 @@ describe("ProcessView", () => {
   it("i lati si alternano: due voci di fila dallo stesso lato lasciano mezza colonna vuota", () => {
     const { container } = render(<ProcessView {...props} />);
     const lati = [...container.querySelectorAll("[data-process-item]")].map((el) =>
-      el.getAttribute("data-lato"),
+      el.getAttribute("data-side"),
     );
     expect(lati).toHaveLength(processDeliveries.length);
     for (let i = 1; i < lati.length; i++) {
@@ -65,7 +65,7 @@ describe("ProcessView", () => {
     // preventivo», «non e' la grafica finita». Se sparisce da una voce sola,
     // quella voce diventa una promessa.
     const { container } = render(<ProcessView {...props} />);
-    expect(container.querySelectorAll("[data-process-non]")).toHaveLength(deliveries.length);
+    expect(container.querySelectorAll("[data-process-excludes]")).toHaveLength(deliveries.length);
   });
 
   it("i disegni sono le sagome del tavolo, e sono decorazione dichiarata", () => {

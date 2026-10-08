@@ -38,30 +38,30 @@ export function NewsClipping({
   const titolo = storyTitle(notizia, testi);
 
   return (
-    <article data-notizie-ritaglio data-cat={cat} style={{ "--storto": `${storto}deg` } as CSSProperties}>
-      <div data-ritaglio-sotto data-ritaglio-riga>
+    <article data-news-clipping data-cat={cat} style={{ "--tilt": `${storto}deg` } as CSSProperties}>
+      <div data-clipping-under data-clipping-line>
         <span>
           {sourceName(notizia.source)} · {timeAgo(notizia.when, locale, adesso)}
         </span>
-        <span data-ritaglio-timbro>{testi.stamps[notizia.stamp]}</span>
+        <span data-clipping-stamp>{testi.stamps[notizia.stamp]}</span>
       </div>
       {/* La notizia resta nella sua lingua, che e' l'inglese. Il titolo di una
           release no: «e' uscito» lo scrive la pagina, nella sua. */}
       <h3 lang={notizia.stamp === "release" ? undefined : "en"}>{titolo}</h3>
-      <div data-ritaglio-corpo>
+      <div data-clipping-body>
         {notizia.summary ? (
-          <p data-ritaglio-riassunto lang="en">
+          <p data-clipping-summary lang="en">
             {notizia.summary}
           </p>
         ) : (
-          <div data-ritaglio-vuoto>
+          <div data-clipping-empty>
             <b>{notizia.hostname}</b>
             <span>{testi.noSummary}</span>
           </div>
         )}
       </div>
-      <div data-ritaglio-piede>
-        <p data-ritaglio-dati>
+      <div data-clipping-foot>
+        <p data-clipping-figures>
           {notizia.figures.map((d) => (
             <span key={d.code}>
               <b>{valore(d)}</b> {testi.figures[d.code]}

@@ -45,11 +45,11 @@ export function LogicScene({ node: nodo, state: stato, copy: testi, onCake: onTo
   switch (nodo) {
     case 0:
       return (
-        <div className="scena">
-          <div className={`campo${stato.ok ? " giusto" : ""}`}>
+        <div className="scene">
+          <div className={`field${stato.ok ? " correct" : ""}`}>
             <span aria-hidden="true">✉</span> {testi.email}
           </div>
-          <div className={`campo${stato.ok ? " giusto" : ""}`}>
+          <div className={`field${stato.ok ? " correct" : ""}`}>
             <span aria-hidden="true">🔒</span> ••••••••
             {stato.ok && <small>{testi.dentro} ✓</small>}
           </div>
@@ -57,26 +57,26 @@ export function LogicScene({ node: nodo, state: stato, copy: testi, onCake: onTo
       );
     case 1:
       return (
-        <div className="scena torte">
+        <div className="scene cakes">
           {testi.torte.map((torta, i) => (
             <button
               key={torta.nome}
               type="button"
-              className={`torta${stato.choice === i ? " scelta" : ""}${i === CAKE_DONE ? " finita" : ""}`}
+              className={`cake${stato.choice === i ? " choice" : ""}${i === CAKE_DONE ? " finished" : ""}`}
               aria-pressed={stato.choice === i}
               onClick={() => onTorta(i)}
             >
-              <span className="disco" aria-hidden="true" />
+              <span className="disk" aria-hidden="true" />
               {torta.nome}
               <small>{torta.prezzo}</small>
-              {i === CAKE_DONE && <em className="timbro">{testi.finita}</em>}
+              {i === CAKE_DONE && <em className="stamp">{testi.finita}</em>}
             </button>
           ))}
         </div>
       );
     case 2:
       return (
-        <div className="scena giorni">
+        <div className="scene days">
           {testi.giorni.map((g, i) => {
             const p = PIENO[i];
             return (
@@ -84,14 +84,14 @@ export function LogicScene({ node: nodo, state: stato, copy: testi, onCake: onTo
                 // Le iniziali si ripetono (M, M): la chiave e' la posizione.
                 key={i}
                 type="button"
-                className={`giorno${p === 100 ? " pieno" : ""}${stato.day === i ? " scelto" : ""}`}
+                className={`day${p === 100 ? " full" : ""}${stato.day === i ? " chosen" : ""}`}
                 aria-pressed={stato.day === i}
-                style={{ "--pieno": `${p}%` } as CSSProperties}
+                style={{ "--full": `${p}%` } as CSSProperties}
                 onClick={() => onGiorno(i)}
               >
                 {g}
                 <small>{p === 100 ? testi.pieno : `${100 - p}%`}</small>
-                <span className="barra" aria-hidden="true" />
+                <span className="bar" aria-hidden="true" />
               </button>
             );
           })}
@@ -99,15 +99,15 @@ export function LogicScene({ node: nodo, state: stato, copy: testi, onCake: onTo
       );
     case 3:
       return (
-        <div className="scena carta">
+        <div className="scene paper">
           <span className="imp">{testi.importo}</span>
           <span className="num">{testi.carta}</span>
-          {stato.ok && <span className="stato">{testi.pagato}</span>}
+          {stato.ok && <span className="state">{testi.pagato}</span>}
         </div>
       );
     case 4:
       return (
-        <div className="scena mail">
+        <div className="scene mail">
           <div className="intest">
             {testi.mailA} <b>{testi.email}</b> · {testi.mailDa}
           </div>
@@ -118,9 +118,9 @@ export function LogicScene({ node: nodo, state: stato, copy: testi, onCake: onTo
       );
     default:
       return (
-        <div className="scena registro">
+        <div className="scene register">
           {[...testi.registro, ...(stato.ok ? [testi.nuovo] : [])].map((riga, i) => (
-            <div key={riga[0]} className={i === testi.registro.length ? "nuovo" : undefined}>
+            <div key={riga[0]} className={i === testi.registro.length ? "new" : undefined}>
               {riga.map((cella, j) => (
                 <span key={j}>{cella}</span>
               ))}

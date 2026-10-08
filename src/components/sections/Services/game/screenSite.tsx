@@ -73,20 +73,20 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
   let corpo;
   if (impaginazione === "manifesto") {
     corpo = (
-      <div className="l-manifesto">
+      <div className="l-poster">
         {nav}
-        <div className="eroe">
-          <p className="s-titolo" data-titolo>
+        <div className="hero">
+          <p className="s-title" data-title>
             {t("titolo")}
             <br />
             {em}
           </p>
-          <div className="bollo" data-img>
+          <div className="seal" data-img>
             <Illustration id={illustrazione} />
           </div>
-          <span className="bollo-testo">{t("bollo")}</span>
+          <span className="seal-text">{t("bollo")}</span>
         </div>
-        <div className="fascia">
+        <div className="band">
           <span>
             {t("fascia")}
             {t("fascia")}
@@ -96,25 +96,25 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
     );
   } else if (impaginazione === "copertina") {
     corpo = (
-      <div className="l-copertina">
+      <div className="l-cover">
         {immagine}
         {nav}
-        <div className="testata">
+        <div className="header">
           <span>{t("numero")}</span>
           <i>{t("sfornato")}</i>
         </div>
-        <span className="grande">Aurora</span>
-        <span className="lato">{t("lato")}</span>
-        <div className="piede">
+        <span className="large">Aurora</span>
+        <span className="side">{t("lato")}</span>
+        <div className="foot">
           <div>
-            <p className="s-titolo" data-titolo>
+            <p className="s-title" data-title>
               {t("titolo")}
               <br />
               {em}
             </p>
             <p>{t("indirizzo")}</p>
           </div>
-          <div className="bollino">
+          <div className="sticker">
             {t("aperto")}
             <b>6·13</b>
             {t("oggi")}
@@ -127,13 +127,13 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
     corpo = (
       <div className="l-bento">
         {nav}
-        <div className="griglia">
-          <div className="t-titolo">
+        <div className="grid">
+          <div className="t-title">
             <small>{t("quartiere")}</small>
-            <p className="s-titolo" data-titolo>
+            <p className="s-title" data-title>
               {t("titolo")} {em}
             </p>
-            <span className="punti">
+            <span className="points">
               <i />
               <i />
               <i />
@@ -141,7 +141,7 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
           </div>
           <div className="t-img">
             {immagine}
-            <span className="etichetta">✦ {t("sfornato")}</span>
+            <span className="label">✦ {t("sfornato")}</span>
           </div>
           <div className="t-num">
             <b>6</b>
@@ -151,9 +151,9 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
             <span>{t("prenotaTorta")}</span>
             <i aria-hidden="true">→</i>
           </div>
-          <div className="t-ora">
+          <div className="t-time">
             <b>6 · 13</b>
-            <span className="giorni">
+            <span className="days">
               {giorni.map((g, i) => (
                 // L'ultimo giorno, la domenica, il forno e' chiuso.
                 <span key={i} className={i === giorni.length - 1 ? "no" : undefined}>
@@ -167,19 +167,19 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
     );
   } else {
     corpo = (
-      <div className="l-classica">
+      <div className="l-classic">
         {nav}
-        <div className="eroe">
+        <div className="hero">
           <div>
-            <p className="s-titolo" data-titolo>
+            <p className="s-title" data-title>
               {t("titolo")} {em}
             </p>
-            <p className="nota-p">{t("nota")}</p>
+            <p className="note-p">{t("nota")}</p>
             <span className="cta">{t("cta")}</span>
           </div>
           {immagine}
         </div>
-        <div className="schede">
+        <div className="cards">
           {(["pane", "torte", "dove"] as const).map((k) => (
             <div key={k}>
               <b>{t(`schede.${k}.titolo`)}</b>
@@ -192,7 +192,7 @@ export function FakeSite({ layout: impaginazione, illustration: illustrazione, p
   }
 
   return (
-    <div ref={ref} className="sito" style={stile}>
+    <div ref={ref} className="site" style={stile}>
       {corpo}
     </div>
   );

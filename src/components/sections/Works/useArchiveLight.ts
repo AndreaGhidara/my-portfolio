@@ -21,8 +21,8 @@ import { isDossierOpen } from "./useDossier";
 function facceNellaSonda(lista: HTMLElement) {
   const sonda = lista.cloneNode(true) as HTMLElement;
   for (const nodo of sonda.querySelectorAll("img, [data-shot-blur]")) nodo.remove();
-  sonda.setAttribute("data-archivio-acceso", "");
-  sonda.setAttribute("data-archivio-sonda", "");
+  sonda.setAttribute("data-archive-lit", "");
+  sonda.setAttribute("data-archive-probe", "");
   sonda.setAttribute("aria-hidden", "true");
   sonda.style.width = `${lista.clientWidth}px`;
   (lista.parentElement ?? document.body).append(sonda);
@@ -31,7 +31,7 @@ function facceNellaSonda(lista: HTMLElement) {
   // basso, e a 390x664 la faccia del riservato debordava di 18px dentro i suoi
   // 21 di padding con scrollHeight uguale all'altezza. «Apri il caso» finiva
   // schiacciato sul bordo e la soglia diceva che ci stava.
-  const facce = [...sonda.querySelectorAll<HTMLElement>("[data-faccia]")].map((faccia) => {
+  const facce = [...sonda.querySelectorAll<HTMLElement>("[data-face]")].map((faccia) => {
     const posto = faccia.offsetHeight;
     faccia.style.height = "auto";
     return { content: faccia.offsetHeight, room: posto };
@@ -67,7 +67,7 @@ export function useArchiveLight(schedario: RefObject<HTMLOListElement | null>): 
     // senza dire perche' non si diagnostica.
     const racconta =
       process.env.NODE_ENV !== "production" &&
-      new URLSearchParams(window.location.search).has("righelli");
+      new URLSearchParams(window.location.search).has("rulers");
     const decidi = () => {
       if (!vivo) return;
       // A pratica aperta l'archivio sotto non si spegne: una rotazione del

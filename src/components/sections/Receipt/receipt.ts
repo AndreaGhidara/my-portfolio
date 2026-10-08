@@ -16,7 +16,7 @@ import { pad2 } from "@/lib/format";
 export const LINE_WIDTH = 32;
 
 /** Caratteri stampati a ogni colpo. Il titolo grande va piano, uno alla volta. */
-export const CHARS_PER_TICK = { riga: 3, grosso: 1 } as const;
+export const CHARS_PER_TICK = { line: 3, large: 1 } as const;
 
 /** Millisecondi fra un colpo e l'altro. */
 export const TICK_MS = 16;
@@ -31,7 +31,7 @@ export const DROP_MS = 420;
 export const FIGURE_MS = 650;
 
 /** «figura»: il disegno della tavola stampato sulla carta, solo sul telefono. */
-export type ReceiptLineKind = "riga" | "grosso" | "voce" | "figura";
+export type ReceiptLineKind = "line" | "large" | "item" | "figure";
 export type ReceiptLine = { text: string; kind: ReceiptLineKind };
 
 export type ReceiptData = {
@@ -65,27 +65,27 @@ export function dotLeader(sinistra: string, destra: string): string {
 }
 
 export function receiptLines(d: ReceiptData): ReceiptLine[] {
-  const riga = (testo: string, tipo: ReceiptLineKind = "riga"): ReceiptLine => ({ text: testo, kind: tipo });
+  const riga = (testo: string, tipo: ReceiptLineKind = "line"): ReceiptLine => ({ text: testo, kind: tipo });
   const taglio = riga("-".repeat(LINE_WIDTH));
   return [
     riga(d.name),
     riga(d.trade),
     riga(alignEnds(d.date, `${d.number} ${pad2(d.index + 1)}/${pad2(d.count)}`)),
     taglio,
-    riga(d.title.toUpperCase(), "grosso"),
+    riga(d.title.toUpperCase(), "large"),
     riga(d.text),
     taglio,
     // Senza testo: costa un colpo, e sul desktop non si vede.
-    riga("", "figura"),
+    riga("", "figure"),
     // Le stesse voci dei richiami sulla tavola, nello stesso ordine.
-    ...d.pieces.map((p, k) => riga(`${k + 1} ${p}`, "voce")),
+    ...d.pieces.map((p, k) => riga(`${k + 1} ${p}`, "item")),
     taglio,
     riga(dotLeader(d.total, d.toDiscuss)),
   ];
 }
 
 /** Quanti colpi servono a una riga. Anche una riga vuota ne prende uno. */
-const colpi = (r: ReceiptLine) => Math.max(1, Math.ceil(r.text.length / CHARS_PER_TICK[r.kind === "grosso" ? "grosso" : "riga"]));
+const colpi = (r: ReceiptLine) => Math.max(1, Math.ceil(r.text.length / CHARS_PER_TICK[r.kind === "large" ? "large" : "line"]));
 
 export function totalTicks(righe: ReceiptLine[]): number {
   return righe.reduce((somma, r) => somma + colpi(r), 0);
@@ -93,7 +93,7 @@ export function totalTicks(righe: ReceiptLine[]): number {
 
 /** Il colpo con cui esce la figura: da li' la stampa aspetta la carta. -1 se non c'e'. */
 export function ticksToFigure(righe: ReceiptLine[]): number {
-  const dove = righe.findIndex((r) => r.kind === "figura");
+  const dove = righe.findIndex((r) => r.kind === "figure");
   return dove < 0 ? -1 : totalTicks(righe.slice(0, dove + 1));
 }
 
@@ -107,7 +107,7 @@ export function linesAtTicks(righe: ReceiptLine[], scatti: number): ReceiptLine[
     if (resto >= servono) {
       fuori.push(r);
     } else {
-      const passo = r.kind === "grosso" ? CHARS_PER_TICK.grosso : CHARS_PER_TICK.riga;
+      const passo = r.kind === "large" ? CHARS_PER_TICK.large : CHARS_PER_TICK.line;
       fuori.push({ text: r.text.slice(0, resto * passo), kind: r.kind });
     }
     resto -= servono;
@@ -125,7 +125,7 @@ export function linesAtTicks(righe: ReceiptLine[], scatti: number): ReceiptLine[
  * monta due volte non producono mai due scontrini.
  */
 export type PrinterState = {
-  phase: "ferma" | "stampa" | "strappo";
+  phase: "idle" | "printing" | "tearing";
   /** Il servizio sullo scontrino, anche mentre cade. null: niente scontrino. */
   service: number | null;
   /** Colpi gia' stampati. */
@@ -158,7 +158,7 @@ export type PrinterEvent =
 /** Il markup del server: il primo servizio gia' stampato e disegnato. */
 export function initialPrinter(totali: readonly number[]): PrinterState {
   return {
-    phase: "ferma",
+    phase: "idle",
     service: 0,
     ticks: totali[0] ?? 0,
     next: null,
@@ -172,7 +172,7 @@ export function initialPrinter(totali: readonly number[]): PrinterState {
 
 const inizia = (s: PrinterState, servizio: number): PrinterState => ({
   ...s,
-  phase: "stampa",
+  phase: "printing",
   service: servizio,
   ticks: 0,
   next: null,
@@ -185,7 +185,7 @@ const inizia = (s: PrinterState, servizio: number): PrinterState => ({
 
 const intero = (s: PrinterState, servizio: number | null, totali: readonly number[]): PrinterState => ({
   ...s,
-  phase: "ferma",
+  phase: "idle",
   service: servizio,
   ticks: servizio === null ? 0 : (totali[servizio] ?? 0),
   next: null,
@@ -201,30 +201,30 @@ export function printerReducer(s: PrinterState, e: PrinterEvent, totali: readonl
         return { ...intero(s, e.service, totali), traced: s.traced + 1, touched: true };
       }
       // Gia' in caduta: cambia solo cosa esce dopo, lo strappo resta uno.
-      if (s.phase === "strappo") return { ...s, next: e.service, touched: true };
+      if (s.phase === "tearing") return { ...s, next: e.service, touched: true };
       if (s.service !== null) {
-        return { ...s, phase: "strappo", next: e.service, gen: s.gen + 1, touched: true };
+        return { ...s, phase: "tearing", next: e.service, gen: s.gen + 1, touched: true };
       }
       return inizia(s, e.service);
 
     case "strappa":
-      if (s.service === null || s.phase === "strappo") return s;
+      if (s.service === null || s.phase === "tearing") return s;
       if (e.immediate) return { ...intero(s, null, totali), touched: true };
-      return { ...s, phase: "strappo", next: null, gen: s.gen + 1, touched: true };
+      return { ...s, phase: "tearing", next: null, gen: s.gen + 1, touched: true };
 
     case "autostampa":
-      if (s.touched || s.service !== null || s.phase !== "ferma") return s;
+      if (s.touched || s.service !== null || s.phase !== "idle") return s;
       return inizia(s, 0);
 
     case "scatto": {
-      if (e.gen !== s.gen || s.phase !== "stampa" || s.service === null) return s;
+      if (e.gen !== s.gen || s.phase !== "printing" || s.service === null) return s;
       const totale = totali[s.service] ?? 0;
       const scatti = s.ticks + 1;
-      return scatti >= totale ? { ...s, phase: "ferma", ticks: totale } : { ...s, ticks: scatti };
+      return scatti >= totale ? { ...s, phase: "idle", ticks: totale } : { ...s, ticks: scatti };
     }
 
     case "caduto":
-      if (e.gen !== s.gen || s.phase !== "strappo") return s;
+      if (e.gen !== s.gen || s.phase !== "tearing") return s;
       return s.next === null ? intero(s, null, totali) : inizia(s, s.next);
 
     case "svuota":
@@ -234,7 +234,7 @@ export function printerReducer(s: PrinterState, e: PrinterEvent, totali: readonl
       // salto. Sul telefono la tavola non c'e': il disegno esce sulla carta.
       return {
         ...s,
-        phase: "ferma",
+        phase: "idle",
         service: null,
         ticks: 0,
         next: null,
@@ -245,7 +245,7 @@ export function printerReducer(s: PrinterState, e: PrinterEvent, totali: readonl
       };
 
     case "completa": {
-      const dopo = s.phase === "strappo" ? s.next : s.service;
+      const dopo = s.phase === "tearing" ? s.next : s.service;
       // Prima di qualunque tocco la sezione si deve leggere: torna il primo.
       return intero(s, dopo ?? (s.touched ? null : 0), totali);
     }

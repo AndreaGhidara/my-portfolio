@@ -38,7 +38,7 @@ const testi = {
 };
 
 const vero = (container: HTMLElement) =>
-  container.querySelector<HTMLElement>("[data-scontrino-carta]:not([data-fantasma])");
+  container.querySelector<HTMLElement>("[data-receipt-paper]:not([data-ghost])");
 
 describe("la figura sulla carta, con il movimento acceso", () => {
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe("la figura sulla carta, con il movimento acceso", () => {
     Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
       configurable: true,
       get(this: HTMLElement) {
-        return this.matches('[data-riga="figura"]') ? 200 : 0;
+        return this.matches('[data-line="figure"]') ? 200 : 0;
       },
     });
   });
@@ -63,13 +63,13 @@ describe("la figura sulla carta, con il movimento acceso", () => {
     fireEvent.click(screen.getByRole("button", { name: /Titolo 1/ }));
     act(() => vi.advanceTimersByTime(DROP_MS));
     act(() => vi.advanceTimersByTime(20000));
-    expect(vero(container)?.querySelector('[data-riga="figura"]')).not.toBeNull();
-    expect(vero(container)?.querySelector('[data-riga="voce"]')).toBeNull();
+    expect(vero(container)?.querySelector('[data-line="figure"]')).not.toBeNull();
+    expect(vero(container)?.querySelector('[data-line="item"]')).toBeNull();
 
     act(() => vi.advanceTimersByTime(FIGURE_MS - 10));
-    expect(vero(container)?.querySelector('[data-riga="voce"]')).toBeNull();
+    expect(vero(container)?.querySelector('[data-line="item"]')).toBeNull();
     act(() => vi.advanceTimersByTime(20000));
-    expect(vero(container)?.querySelectorAll('[data-riga="voce"]')).toHaveLength(servizi[1].pieces.length);
-    expect(vero(container)).toHaveAttribute("data-finito");
+    expect(vero(container)?.querySelectorAll('[data-line="item"]')).toHaveLength(servizi[1].pieces.length);
+    expect(vero(container)).toHaveAttribute("data-finished");
   });
 });

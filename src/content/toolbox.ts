@@ -42,7 +42,7 @@ export const ZONES: readonly Zone[] = [
  * lo so usare, ma nessun lavoro lo prova. L'etichetta lo dice, perche' una
  * cassetta che non distingue le due cose promette piu' di quello che ha.
  */
-export type Experience = "lavoro" | "conosciuto";
+export type Experience = "work" | "known";
 
 export type Tool = {
   /** Lo slug: e' anche la chiave di traduzione, cassetta.attrezzi.<id>. */
@@ -56,45 +56,45 @@ export type Tool = {
 };
 
 export const TOOLS: readonly Tool[] = [
-  { id: "nextjs", name: "Next.js", zone: "front", x: 150, y: 250, experience: "lavoro" },
-  { id: "react", name: "React", zone: "front", x: 330, y: 250, experience: "lavoro" },
-  { id: "tailwind", name: "Tailwind CSS", zone: "stili", x: 120, y: 420, experience: "lavoro" },
+  { id: "nextjs", name: "Next.js", zone: "front", x: 150, y: 250, experience: "work" },
+  { id: "react", name: "React", zone: "front", x: 330, y: 250, experience: "work" },
+  { id: "tailwind", name: "Tailwind CSS", zone: "stili", x: 120, y: 420, experience: "work" },
   // Questo sito e' montato con shadcn/ui (components.json), e Radix sta sotto.
-  { id: "shadcn-ui", name: "shadcn/ui", zone: "stili", x: 250, y: 420, experience: "lavoro" },
-  { id: "gsap", name: "GSAP", zone: "stili", x: 365, y: 420, experience: "lavoro" },
-  { id: "framer-motion", name: "Framer Motion", zone: "stili", x: 150, y: 470, experience: "conosciuto" },
-  { id: "radix", name: "Radix", zone: "stili", x: 330, y: 470, experience: "lavoro" },
-  { id: "graphql", name: "GraphQL", zone: "mezzo", x: 600, y: 250, experience: "lavoro" },
-  { id: "rest", name: "REST", zone: "mezzo", x: 530, y: 320, experience: "lavoro" },
-  { id: "trpc", name: "tRPC", zone: "mezzo", x: 670, y: 320, experience: "conosciuto" },
-  { id: "redis", name: "Redis", zone: "mezzo", x: 600, y: 410, experience: "conosciuto" },
+  { id: "shadcn-ui", name: "shadcn/ui", zone: "stili", x: 250, y: 420, experience: "work" },
+  { id: "gsap", name: "GSAP", zone: "stili", x: 365, y: 420, experience: "work" },
+  { id: "framer-motion", name: "Framer Motion", zone: "stili", x: 150, y: 470, experience: "known" },
+  { id: "radix", name: "Radix", zone: "stili", x: 330, y: 470, experience: "work" },
+  { id: "graphql", name: "GraphQL", zone: "mezzo", x: 600, y: 250, experience: "work" },
+  { id: "rest", name: "REST", zone: "mezzo", x: 530, y: 320, experience: "work" },
+  { id: "trpc", name: "tRPC", zone: "mezzo", x: 670, y: 320, experience: "known" },
+  { id: "redis", name: "Redis", zone: "mezzo", x: 600, y: 410, experience: "known" },
   // Nella scheda del colloquio c'e' come scelta ragionata (la 83), non come
   // lavoro consegnato: la regola dice «compare», e compare.
-  { id: "websocket", name: "WebSocket", zone: "mezzo", x: 600, y: 470, experience: "lavoro" },
-  { id: "nodejs", name: "Node.js", zone: "back", x: 850, y: 250, experience: "lavoro" },
-  { id: "express", name: "Express", zone: "back", x: 960, y: 250, experience: "lavoro" },
-  { id: "nestjs", name: "NestJS", zone: "back", x: 1075, y: 250, experience: "conosciuto" },
-  { id: "clerk", name: "Clerk", zone: "auth", x: 830, y: 420, experience: "conosciuto" },
-  { id: "authjs", name: "Auth.js", zone: "auth", x: 960, y: 420, experience: "conosciuto" },
+  { id: "websocket", name: "WebSocket", zone: "mezzo", x: 600, y: 470, experience: "work" },
+  { id: "nodejs", name: "Node.js", zone: "back", x: 850, y: 250, experience: "work" },
+  { id: "express", name: "Express", zone: "back", x: 960, y: 250, experience: "work" },
+  { id: "nestjs", name: "NestJS", zone: "back", x: 1075, y: 250, experience: "known" },
+  { id: "clerk", name: "Clerk", zone: "auth", x: 830, y: 420, experience: "known" },
+  { id: "authjs", name: "Auth.js", zone: "auth", x: 960, y: 420, experience: "known" },
   // Supabase c'e' nel CV e nei lavori, i suoi accessi no: meglio dire meno.
-  { id: "supabase-auth", name: "Supabase Auth", zone: "auth", x: 1085, y: 420, experience: "conosciuto" },
-  { id: "better-auth", name: "Better Auth", zone: "auth", x: 880, y: 470, experience: "conosciuto" },
-  { id: "jwt", name: "JWT", zone: "auth", x: 1040, y: 470, experience: "lavoro" },
-  { id: "postgresql", name: "PostgreSQL", zone: "dati", x: 370, y: 625, experience: "lavoro" },
-  { id: "mysql", name: "MySQL", zone: "dati", x: 480, y: 625, experience: "conosciuto" },
-  { id: "mongodb", name: "MongoDB", zone: "dati", x: 590, y: 625, experience: "conosciuto" },
-  { id: "prisma", name: "Prisma", zone: "dati", x: 715, y: 625, experience: "conosciuto" },
-  { id: "drizzle", name: "Drizzle", zone: "dati", x: 830, y: 625, experience: "conosciuto" },
-  { id: "vercel", name: "Vercel", zone: "casa", x: 420, y: 760, experience: "lavoro" },
-  { id: "railway", name: "Railway", zone: "casa", x: 600, y: 760, experience: "lavoro" },
-  { id: "docker", name: "Docker", zone: "casa", x: 780, y: 760, experience: "conosciuto" },
-  { id: "typescript", name: "TypeScript", zone: "ovunque", x: 155, y: 630, experience: "lavoro" },
-  { id: "git", name: "Git", zone: "ovunque", x: 100, y: 690, experience: "lavoro" },
-  { id: "vitest", name: "Vitest", zone: "ovunque", x: 210, y: 690, experience: "lavoro" },
-  { id: "zod", name: "Zod", zone: "ovunque", x: 155, y: 750, experience: "lavoro" },
-  { id: "langchain", name: "LangChain", zone: "ai", x: 1045, y: 630, experience: "lavoro" },
-  { id: "vercel-ai-sdk", name: "Vercel AI SDK", zone: "ai", x: 1045, y: 690, experience: "conosciuto" },
-  { id: "pgvector", name: "pgvector", zone: "ai", x: 1045, y: 750, experience: "conosciuto" },
+  { id: "supabase-auth", name: "Supabase Auth", zone: "auth", x: 1085, y: 420, experience: "known" },
+  { id: "better-auth", name: "Better Auth", zone: "auth", x: 880, y: 470, experience: "known" },
+  { id: "jwt", name: "JWT", zone: "auth", x: 1040, y: 470, experience: "work" },
+  { id: "postgresql", name: "PostgreSQL", zone: "dati", x: 370, y: 625, experience: "work" },
+  { id: "mysql", name: "MySQL", zone: "dati", x: 480, y: 625, experience: "known" },
+  { id: "mongodb", name: "MongoDB", zone: "dati", x: 590, y: 625, experience: "known" },
+  { id: "prisma", name: "Prisma", zone: "dati", x: 715, y: 625, experience: "known" },
+  { id: "drizzle", name: "Drizzle", zone: "dati", x: 830, y: 625, experience: "known" },
+  { id: "vercel", name: "Vercel", zone: "casa", x: 420, y: 760, experience: "work" },
+  { id: "railway", name: "Railway", zone: "casa", x: 600, y: 760, experience: "work" },
+  { id: "docker", name: "Docker", zone: "casa", x: 780, y: 760, experience: "known" },
+  { id: "typescript", name: "TypeScript", zone: "ovunque", x: 155, y: 630, experience: "work" },
+  { id: "git", name: "Git", zone: "ovunque", x: 100, y: 690, experience: "work" },
+  { id: "vitest", name: "Vitest", zone: "ovunque", x: 210, y: 690, experience: "work" },
+  { id: "zod", name: "Zod", zone: "ovunque", x: 155, y: 750, experience: "work" },
+  { id: "langchain", name: "LangChain", zone: "ai", x: 1045, y: 630, experience: "work" },
+  { id: "vercel-ai-sdk", name: "Vercel AI SDK", zone: "ai", x: 1045, y: 690, experience: "known" },
+  { id: "pgvector", name: "pgvector", zone: "ai", x: 1045, y: 750, experience: "known" },
 ];
 
 /** Il cartellino in cima: il capo finito, da cui scende tutto. */

@@ -16,12 +16,12 @@ import { useDepth } from "./useDepth";
  * il percorso con binario.ts.
  */
 const MISURE = {
-  "--passo": `${ARCHIVE_PARAMS.step}px`,
-  "--distanza": `${ARCHIVE_PARAMS.distance}vh`,
-  "--scurisce": ARCHIVE_PARAMS.darkens,
-  "--stringe": ARCHIVE_PARAMS.narrows,
-  "--larghezza-linguetta": `${ARCHIVE_PARAMS.tabWidth}%`,
-  "--buio-minimo": `${TAB.minDark * 100}%`,
+  "--step": `${ARCHIVE_PARAMS.step}px`,
+  "--distance": `${ARCHIVE_PARAMS.distance}vh`,
+  "--darkens": ARCHIVE_PARAMS.darkens,
+  "--narrows": ARCHIVE_PARAMS.narrows,
+  "--tab-width": `${ARCHIVE_PARAMS.tabWidth}%`,
+  "--min-dark": `${TAB.minDark * 100}%`,
 };
 
 /**

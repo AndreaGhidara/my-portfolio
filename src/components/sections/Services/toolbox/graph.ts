@@ -17,7 +17,7 @@ import {
  * prova in un test, e i componenti restano disegno.
  */
 
-type TipoNodo = "radice" | "snodo" | "attrezzo";
+type TipoNodo = "root" | "junction" | "tool";
 
 type Nodo = {
   id: string;
@@ -28,19 +28,19 @@ type Nodo = {
 };
 
 export const NODES: readonly Nodo[] = [
-  { id: ROOT.id, x: ROOT.x, y: ROOT.y, kind: "radice", zone: null },
+  { id: ROOT.id, x: ROOT.x, y: ROOT.y, kind: "root", zone: null },
   ...JUNCTIONS.map((s) => ({
     id: s.id,
     x: s.x,
     y: s.y,
-    kind: "snodo" as const,
+    kind: "junction" as const,
     zone: s.id,
   })),
   ...TOOLS.map((a) => ({
     id: a.id,
     x: a.x,
     y: a.y,
-    kind: "attrezzo" as const,
+    kind: "tool" as const,
     zone: a.zone,
   })),
 ];
@@ -133,12 +133,12 @@ export function byZone(c: Garment): { zone: ZoneId; tools: string[] }[] {
  * la mappa gia' finita).
  */
 export function nodeWidth(tipo: TipoNodo, testo: string): number {
-  if (tipo === "radice") return 170;
-  return Math.max(70, testo.length * (tipo === "snodo" ? 7.6 : 7.3) + 24);
+  if (tipo === "root") return 170;
+  return Math.max(70, testo.length * (tipo === "junction" ? 7.6 : 7.3) + 24);
 }
 
 export function nodeHeight(tipo: TipoNodo): number {
-  return tipo === "radice" ? 46 : tipo === "snodo" ? 26 : 30;
+  return tipo === "root" ? 46 : tipo === "junction" ? 26 : 30;
 }
 
 /** Il filo fra due nodi: una cubica con i controlli a meta' altezza. */

@@ -42,7 +42,7 @@ function Mini({ mini }: { mini: MiniLayout }) {
   return (
     <span
       className="mini-lay"
-      data-in-fondo={mini.atBottom || undefined}
+      data-at-bottom={mini.atBottom || undefined}
       style={{
         gridTemplateColumns: mini.columns,
         gridTemplateRows: mini.rows,
@@ -88,7 +88,7 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
   let corpo: ReactNode = null;
   if (attivo === "colori") {
     corpo = (
-      <div className="scelte tre" role="group" aria-label={titolo}>
+      <div className="choices three" role="group" aria-label={titolo}>
         {FAKE_PALETTES.map((p, i) =>
           scelta(
             "palette",
@@ -108,7 +108,7 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
     );
   } else if (attivo === "caratteri") {
     corpo = (
-      <div className="scelte" role="group" aria-label={titolo}>
+      <div className="choices" role="group" aria-label={titolo}>
         {FAKE_FONTS.map((c, i) =>
           scelta(
             "fonts",
@@ -128,13 +128,13 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
     const s = FAKE_SCALES[scelte.scale];
     corpo = (
       <>
-        <div className="scelte tre" role="group" aria-label={titolo}>
+        <div className="choices three" role="group" aria-label={titolo}>
           {FAKE_SCALES.map((x, i) =>
             scelta(
               "scale",
               i,
               <>
-                <span className="aa-scala" aria-hidden="true" style={{ fontSize: `${0.6 + i * 0.3}rem` }}>
+                <span className="aa-scale" aria-hidden="true" style={{ fontSize: `${0.6 + i * 0.3}rem` }}>
                   Aa
                 </span>
                 {t(`scale.${x.id}`)}
@@ -145,7 +145,7 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
         </div>
         {/* Le misure del campione sono quelle del prototipo: i pixel veri divisi
             per quanto il cassetto e' piu' piccolo di una pagina. */}
-        <div className="scala-campione">
+        <div className="scale-sample">
           <div>
             <b className="h1" style={{ fontSize: `${s.h1 / 80}rem` }}>
               {t("campione.h1")}
@@ -165,7 +165,7 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
     );
   } else if (attivo === "sezioni") {
     corpo = (
-      <div className="scelte" role="group" aria-label={titolo}>
+      <div className="choices" role="group" aria-label={titolo}>
         {FAKE_LAYOUTS.map((l, i) =>
           scelta(
             "layout",
@@ -181,7 +181,7 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
     );
   } else if (attivo === "immagini") {
     corpo = (
-      <div className="scelte" role="group" aria-label={titolo}>
+      <div className="choices" role="group" aria-label={titolo}>
         {ILLUSTRATION_ORDER.map((k) =>
           scelta(
             "img",
@@ -199,21 +199,21 @@ export function Drawer({ active: attivo, choices: scelte, tried: provato, messag
     );
   } else {
     corpo = (
-      <div className="leva-vista" role="group" aria-label={titolo}>
+      <div className="view-lever" role="group" aria-label={titolo}>
         {(["pc", "cell"] as const).map((v) => scelta("view", v, t(`vista.${v}`), v))}
       </div>
     );
   }
 
   return (
-    <div className="cassetto">
+    <div className="drawer">
       <p className="mono">
         {t(`attrezzo.${attivo}.nome`)} · {t(provato ? "stato.provato" : "stato.prova")}
       </p>
       <h3>{titolo}</h3>
-      <p className="spiega">{t(`attrezzo.${attivo}.testo`)}</p>
+      <p className="explain">{t(`attrezzo.${attivo}.testo`)}</p>
       {corpo}
-      <div className="ok" data-acceso={messaggio ? true : undefined} aria-live="polite">
+      <div className="ok" data-lit={messaggio ? true : undefined} aria-live="polite">
         {messaggio && (
           <>
             <span aria-hidden="true">✦</span>

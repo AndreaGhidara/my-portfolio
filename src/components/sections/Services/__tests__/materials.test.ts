@@ -191,13 +191,13 @@ describe("il CSS dichiara esattamente la tavola dei materiali", () => {
 
     it(`${nome}: il tema chiaro dipinge la ricetta del modulo`, () => {
       const testo = pretende(superficie.anchor);
-      expect(testo).toContain(`--desk-pieno: ${recipeCss(superficie.light.fill)}`);
+      expect(testo).toContain(`--desk-full: ${recipeCss(superficie.light.fill)}`);
       if (superficie.light.line) {
-        expect(testo).toContain(`--desk-tratto: ${recipeCss(superficie.light.line)}`);
+        expect(testo).toContain(`--desk-stroke: ${recipeCss(superficie.light.line)}`);
       } else {
         // Il post-it bianco eredita il suo tratto: dichiararlo qui sarebbe una
         // seconda copia dello stesso giallo.
-        expect(testo).not.toContain("--desk-tratto");
+        expect(testo).not.toContain("--desk-stroke");
       }
     });
 
@@ -212,9 +212,9 @@ describe("il CSS dichiara esattamente la tavola dei materiali", () => {
           return;
         }
         expect(scuro, `${nome} non ha la sua regola in tema scuro`).not.toBeNull();
-        expect(scuro).toContain(`--desk-pieno: ${recipeCss(superficie.dark.fill)}`);
+        expect(scuro).toContain(`--desk-full: ${recipeCss(superficie.dark.fill)}`);
         if (superficie.dark.line) {
-          expect(scuro).toContain(`--desk-tratto: ${recipeCss(superficie.dark.line)}`);
+          expect(scuro).toContain(`--desk-stroke: ${recipeCss(superficie.dark.line)}`);
         }
       },
     );
@@ -258,12 +258,12 @@ describe("l'ombra sta sulle superfici e su niente altro", () => {
     expect(pretende("[data-desk-object] [data-desk-label] {")).not.toContain("filter");
   });
 
-  it("il colore lo porta --desk-ombra, dichiarata una volta per tema", () => {
+  it("il colore lo porta --desk-shadow, dichiarata una volta per tema", () => {
     const sagoma = pretende("[data-desk-shape] {");
-    expect(sagoma).toContain(`--desk-ombra: ${shadowCss("light")}`);
-    expect(sagoma).toMatch(/filter:\s*drop-shadow\([^)]*var\(--desk-ombra\)\)/);
+    expect(sagoma).toContain(`--desk-shadow: ${shadowCss("light")}`);
+    expect(sagoma).toMatch(/filter:\s*drop-shadow\([^)]*var\(--desk-shadow\)\)/);
     const scuro = pretende('[data-theme="dark"] [data-desk-shape] {');
-    expect(scuro).toContain(`--desk-ombra: ${shadowCss("dark")}`);
+    expect(scuro).toContain(`--desk-shadow: ${shadowCss("dark")}`);
   });
 
   it("resta corta: sborda meno dell'aria che la geometria tiene fra due oggetti", () => {

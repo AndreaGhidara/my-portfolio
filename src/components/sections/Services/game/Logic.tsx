@@ -100,15 +100,15 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
   const [px, py] = dovePacco(n);
 
   return (
-    <div className="banco" data-gioco-livello="logiche">
-      <div className="sopra reticolo">
-        <svg className="fili" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-          <g className="tratteggio">
+    <div className="bench" data-game-level="logiche">
+      <div className="above lattice">
+        <svg className="threads" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <g className="dashes">
             {POS.slice(1).map(([x2, y2], i) => (
               <line key={i} x1={POS[i][0]} y1={POS[i][1]} x2={x2} y2={y2} vectorEffect="non-scaling-stroke" />
             ))}
           </g>
-          <g className="fatti">
+          <g className="done-group">
             {POS.slice(1).map(([x2, y2], i) =>
               stati[i].ok ? (
                 <line key={i} x1={POS[i][0]} y1={POS[i][1]} x2={x2} y2={y2} vectorEffect="non-scaling-stroke" />
@@ -117,19 +117,19 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
           </g>
         </svg>
 
-        <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: levelNumber("logiche"), nome: comune("livelli.logiche") })}</span>
-          <span className="destra regole">
+        <div className="head">
+          <span className="level">{comune("etichetta", { numero: levelNumber("logiche"), nome: comune("livelli.logiche") })}</span>
+          <span className="right rules">
             {t("regole")}
             {stati.map((x, i) => (
-              <i key={i} className={x.broken ? "si" : undefined} aria-hidden="true" />
+              <i key={i} className={x.broken ? "yes" : undefined} aria-hidden="true" />
             ))}
           </span>
         </div>
 
         {nodi.map((nodo, i) => {
           const stato = stati[i];
-          const classi = ["nodo", i === n && "qui", stato.ok && "fatto", stato.broken && "rotto"].filter(Boolean);
+          const classi = ["node", i === n && "here", stato.ok && "done", stato.broken && "broken"].filter(Boolean);
           return (
             <button
               key={i}
@@ -149,14 +149,14 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
                 <Icon name={ICONE[i]} />
                 <i className="num">{i + 1}</i>
               </span>
-              <span className="nome">{nodo.nome}</span>
+              <span className="name">{nodo.nome}</span>
             </button>
           );
         })}
 
-        <span className="pacco" style={{ left: `${px}%`, top: `${py}%` }} aria-hidden="true">
+        <span className="parcel" style={{ left: `${px}%`, top: `${py}%` }} aria-hidden="true">
           🎂
-          {n >= 0 && n < FINE && <i key={n} className="onda" />}
+          {n >= 0 && n < FINE && <i key={n} className="wave" />}
         </span>
       </div>
 
@@ -164,7 +164,7 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
         <Partenza onVia={() => vai(0)} />
       ) : n === FINE ? (
         <div className="console">
-          <div className="capo">
+          <div className="garment">
             <span className="chip" aria-hidden="true">
               🧾
             </span>
@@ -173,9 +173,9 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
               <h3>{t("fine.titolo")}</h3>
             </div>
           </div>
-          <p className="spiega">{rotti < ICONE.length ? t("fine.mancano") : t("fine.tutte")}</p>
-          <div className="palco">
-            <div className="foglietto">
+          <p className="explain">{rotti < ICONE.length ? t("fine.mancano") : t("fine.tutte")}</p>
+          <div className="stage">
+            <div className="slip">
               <b>{t("fine.negozio")}</b>
               <hr />
               <span>{t("fine.ordine")}</span>
@@ -188,19 +188,19 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
               <span>{t("fine.laboratorio")}</span>
             </div>
           </div>
-          <div className="azioni due">
+          <div className="actions two">
             <button type="button" onClick={ricomincia}>
               <b aria-hidden="true">↺</b>
               {t("fine.ricomincia")}
             </button>
-            <button type="button" className="rompi" onClick={onAvanti}>
+            <button type="button" className="break" onClick={onAvanti}>
               {t("fine.livello3")} <b aria-hidden="true">→</b>
             </button>
           </div>
         </div>
       ) : (
         <div className="console">
-          <div className="capo">
+          <div className="garment">
             <span className="chip">
               <Icon name={ICONE[n]} />
             </span>
@@ -209,16 +209,16 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
               <h3>{nodi[n].titolo}</h3>
             </div>
           </div>
-          <p className="spiega">{nodi[n].spiega}</p>
-          <div className="palco">
+          <p className="explain">{nodi[n].spiega}</p>
+          <div className="stage">
             {/* L'incidente prende il posto della scena, nella stessa scatola. */}
             {s.broken && (!s.ok || appena) ? (
-              <div className="incidente" role="status">
-                <div className="errore">
+              <div className="incident" role="status">
+                <div className="error">
                   <span aria-hidden="true">⚠</span>
                   {nodi[n].errore}
                 </div>
-                <div className="regola">
+                <div className="rule">
                   <p>
                     <span>{t("incidente.se")}</span>
                     {nodi[n].regola.se}
@@ -228,7 +228,7 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
                     {nodi[n].regola.allora}
                   </p>
                 </div>
-                <p className="salvato">
+                <p className="saved">
                   <span aria-hidden="true">✓ </span>
                   {t("incidente.salvato")}
                 </p>
@@ -243,7 +243,7 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
                   onDay={(i) => (i === FULL_DAY ? rompi() : sceglie({ day: i }))}
                 />
                 {s.broken && (
-                  <span className="trovata">
+                  <span className="found">
                     <span aria-hidden="true">⚡ </span>
                     {t("trovata")}
                   </span>
@@ -251,9 +251,9 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
               </>
             )}
           </div>
-          <div className={`azioni${s.ok && s.broken ? "" : " due"}`}>
+          <div className={`actions${s.ok && s.broken ? "" : " two"}`}>
             {s.ok ? (
-              <button type="button" className={s.broken ? "solo" : "verde"} onClick={() => vai(n + 1)}>
+              <button type="button" className={s.broken ? "only" : "green"} onClick={() => vai(n + 1)}>
                 {n === FINE - 1 ? t("stampa") : t("avanti", { nome: nodi[n + 1].nome })} <b aria-hidden="true">→</b>
               </button>
             ) : (
@@ -263,7 +263,7 @@ export function Logic({ onNext: onAvanti }: LevelProps) {
               </button>
             )}
             {!(s.ok && s.broken) && (
-              <button type="button" className="rompi" disabled={s.broken} onClick={rompi}>
+              <button type="button" className="break" disabled={s.broken} onClick={rompi}>
                 <b aria-hidden="true">⚡</b>
                 {s.broken ? t("giaRotto") : nodi[n].rompi}
               </button>
@@ -280,21 +280,21 @@ function Partenza({ onVia }: { onVia: () => void }) {
   const t = useTranslations("services.gioco.logiche.partenza");
   return (
     <div className="console">
-      <div className="partenza">
+      <div className="start">
         <p className="mono">{t("occhiello")}</p>
-        <div className="telefono" style={STILE_SITO}>
-          <div className="barra" aria-hidden="true">
+        <div className="phone" style={STILE_SITO}>
+          <div className="bar" aria-hidden="true">
             <i />
             <i />
             <i />
             <span>{t("indirizzo")}</span>
           </div>
-          <div className="sito">
+          <div className="site">
             <div className="menu">
               <b>{t("nome")}</b>
               <span>{t("menu")}</span>
             </div>
-            <div className="testo">
+            <div className="text">
               <small>{t("via")}</small>
               <h4>
                 {t("titolo")}
@@ -302,14 +302,14 @@ function Partenza({ onVia }: { onVia: () => void }) {
                 <em>{t("titoloAccento")}</em>
               </h4>
               <p>{t("testo")}</p>
-              <button type="button" className="prenota" onClick={onVia}>
+              <button type="button" className="book" onClick={onVia}>
                 {t("prenota")} <span aria-hidden="true">→</span>
-                <span className="dito" aria-hidden="true">
+                <span className="finger" aria-hidden="true">
                   👆
                 </span>
               </button>
             </div>
-            <div className="foto">
+            <div className="photo">
               <svg
                 viewBox={ILLUSTRATION_VIEWBOX}
                 aria-hidden="true"
@@ -320,7 +320,7 @@ function Partenza({ onVia }: { onVia: () => void }) {
             </div>
           </div>
         </div>
-        <button type="button" className="appunto" onClick={onVia}>
+        <button type="button" className="note" onClick={onVia}>
           <span className="ic" aria-hidden="true">
             🎂
           </span>
@@ -330,7 +330,7 @@ function Partenza({ onVia }: { onVia: () => void }) {
           </span>
           <span className="mini" aria-hidden="true">
             {[true, true, false, true, false, true].map((si, i) => (
-              <i key={i} className={si ? "si" : undefined} />
+              <i key={i} className={si ? "yes" : undefined} />
             ))}
           </span>
         </button>

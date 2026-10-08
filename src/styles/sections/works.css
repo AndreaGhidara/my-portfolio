@@ -27,23 +27,23 @@
    (docs/prototipi/2026-09-27-cartelle-archivio.html).
    ═══════════════════════════════════════════════════════════════════════ */
 [data-work-shelf] {
-  --cartella-faccia: var(--superficie);
-  --cartella-dorso: color-mix(in oklab, var(--ink) 10%, var(--paper));
-  --cartella-bordo: color-mix(in oklab, var(--ink) 24%, var(--paper));
-  --cartella-foglio: var(--paper);
-  --cartella-ombra: color-mix(in oklab, var(--ink) 35%, transparent);
+  --folder-face: var(--surface);
+  --folder-spine: color-mix(in oklab, var(--ink) 10%, var(--paper));
+  --folder-border: color-mix(in oklab, var(--ink) 24%, var(--paper));
+  --folder-sheet: var(--paper);
+  --folder-shadow: color-mix(in oklab, var(--ink) 35%, transparent);
   /* Il tenue dei testi piccoli dell'archivio. Quello globale sul dorso, che e'
      piu' scuro della carta, fa 3,90:1: sotto l'AA. Spinto verso l'inchiostro
      fa 5,23:1 sul dorso (misure in contrast.test.ts). */
-  --cartella-tenue: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
+  --folder-muted: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
   /* La barra alta del sito, 60px misurati come nel percorso. */
-  --testata: 3.75rem;
-  --margine-alto: 1.5rem;
-  --margine-basso: 1.25rem;
-  --h-linguetta: 2.2rem;
+  --header: 3.75rem;
+  --margin-top: 1.5rem;
+  --margin-bottom: 1.25rem;
+  --tab-h: 2.2rem;
   /* Di quanto la faccia scende sotto la linguetta: lo spazio del foglio. */
-  --scarto-faccia: 1.35rem;
-  --barra-bassa: 0px;
+  --face-offset: 1.35rem;
+  --bottom-bar: 0px;
   list-style: none;
   margin: 2.5rem 0 0;
   padding: 0;
@@ -53,40 +53,40 @@
 }
 
 [data-theme="dark"] [data-work-shelf] {
-  --cartella-faccia: color-mix(in oklab, var(--ink) 90%, var(--paper));
-  --cartella-dorso: color-mix(in oklab, var(--ink) 94%, var(--paper));
-  --cartella-bordo: color-mix(in oklab, var(--paper) 22%, var(--ink));
-  --cartella-foglio: color-mix(in oklab, var(--paper) 92%, var(--ink));
-  --cartella-ombra: color-mix(in oklab, var(--ink) 90%, transparent);
+  --folder-face: color-mix(in oklab, var(--ink) 90%, var(--paper));
+  --folder-spine: color-mix(in oklab, var(--ink) 94%, var(--paper));
+  --folder-border: color-mix(in oklab, var(--paper) 22%, var(--ink));
+  --folder-sheet: color-mix(in oklab, var(--paper) 92%, var(--ink));
+  --folder-shadow: color-mix(in oklab, var(--ink) 90%, transparent);
   /* Sullo scuro il tenue globale basta: 6,34:1 sul dorso, 4,60:1 nel
      riquadro del riservato. */
-  --cartella-tenue: var(--fg-muted);
+  --folder-muted: var(--fg-muted);
   /* L'arancio pieno sulla faccia, un gradino sopra l'inchiostro, fa 4,21:1:
      «Apri il caso» e' testo piccolo. Schiarito di un decimo fa 4,82:1. */
-  --accento-testo: color-mix(in oklab, var(--accent) 90%, var(--paper));
+  --accent-text: color-mix(in oklab, var(--accent) 90%, var(--paper));
 }
 
 /* Le cartelle archiviate stanno una sopra l'altra: la scatola di quella
    davanti coprirebbe le linguette di quelle dietro. Il puntatore passa
    attraverso la cartella e prende solo la faccia e la propria linguetta. */
-[data-cartella] {
+[data-folder] {
   position: relative;
-  padding-top: var(--h-linguetta);
+  padding-top: var(--tab-h);
   pointer-events: none;
 }
 
 /* La linguetta scende di 12px dietro il dorso, che la copre: e' quello che
    salda le due forme in una cartella sola. */
-[data-linguetta] {
+[data-tab] {
   position: absolute;
   top: 0;
-  left: calc(var(--i) * var(--larghezza-linguetta) + 0.5rem);
-  width: var(--larghezza-linguetta);
+  left: calc(var(--i) * var(--tab-width) + 0.5rem);
+  width: var(--tab-width);
   min-width: 9.5rem;
-  height: calc(var(--h-linguetta) + 12px);
+  height: calc(var(--tab-h) + 12px);
   padding: 0.6rem 0.9rem 0;
-  background-color: var(--cartella-dorso);
-  border: 1px solid var(--cartella-bordo);
+  background-color: var(--folder-spine);
+  border: 1px solid var(--folder-border);
   border-bottom: 0;
   border-radius: 10px 10px 0 0;
   font-size: 0.66rem;
@@ -94,7 +94,7 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   text-align: left;
-  color: var(--cartella-tenue);
+  color: var(--folder-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -102,25 +102,25 @@
   pointer-events: auto;
 }
 
-[data-linguetta] b { color: var(--fg); font-weight: 700; }
+[data-tab] b { color: var(--fg); font-weight: 700; }
 
-[data-dorso] {
+[data-spine] {
   position: absolute;
-  inset: var(--h-linguetta) 0 0;
-  background-color: var(--cartella-dorso);
-  border: 1px solid var(--cartella-bordo);
+  inset: var(--tab-h) 0 0;
+  background-color: var(--folder-spine);
+  border: 1px solid var(--folder-border);
   border-radius: 0 10px 12px 12px;
   pointer-events: none;
 }
 
 /* Il foglio che spunta dalla cartella: dice «qui dentro c'e' il caso». */
-[data-foglio] {
+[data-sheet] {
   position: absolute;
   left: 6%;
   right: 9%;
-  top: calc(var(--h-linguetta) + 0.55rem);
+  top: calc(var(--tab-h) + 0.55rem);
   height: 3rem;
-  background-color: var(--cartella-foglio);
+  background-color: var(--folder-sheet);
   background-image: repeating-linear-gradient(
     0deg,
     transparent 0 11px,
@@ -132,46 +132,46 @@
   pointer-events: none;
 }
 
-[data-faccia] {
+[data-face] {
   position: relative;
-  margin-top: var(--scarto-faccia);
+  margin-top: var(--face-offset);
   padding: clamp(1.6rem, 4vw, 3.5rem) clamp(1.3rem, 4vw, 3.5rem) clamp(1.3rem, 3vw, 2.5rem);
-  background-color: var(--cartella-faccia);
-  border: 1px solid var(--cartella-bordo);
+  background-color: var(--folder-face);
+  border: 1px solid var(--folder-border);
   border-radius: 12px;
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 1rem;
-  box-shadow: 0 -14px 30px -18px var(--cartella-ombra);
+  box-shadow: 0 -14px 30px -18px var(--folder-shadow);
   cursor: pointer;
   pointer-events: auto;
   transition: border-color 200ms ease;
 }
 
 @media (hover: hover) {
-  [data-faccia]:hover {
-    border-color: color-mix(in oklab, var(--accent) 60%, var(--cartella-bordo));
+  [data-face]:hover {
+    border-color: color-mix(in oklab, var(--accent) 60%, var(--folder-border));
   }
 }
 
-[data-faccia-numero] {
+[data-face-number] {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: clamp(0.75rem, 1vw, 0.9rem);
   letter-spacing: 0.15em;
-  color: var(--cartella-tenue);
+  color: var(--folder-muted);
 }
 
 /* Il cliente si legge anche qui, non solo sulla linguetta. */
 /* E' l'h3 della cartella: l'interlinea torna quella del testo, non quella
    stretta dei titoli. Famiglia e spaziatura le riscrive gia' questa regola. */
-[data-faccia-chi] {
+[data-face-who] {
   margin-top: 0.5rem;
   line-height: inherit;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--cartella-tenue);
+  color: var(--folder-muted);
 }
 
 /* La meta' destra della faccia: la schermata del sito, come un foglio
@@ -179,14 +179,14 @@
    centro non deve stringersi sotto il suo contenuto, o il contenuto finisce
    sopra il piede invece di far debordare la faccia, e la soglia (che guarda
    quanto deborda) non se ne accorge. A stringersi e' il riquadro. */
-[data-faccia-centro] {
+[data-face-centre] {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
   gap: clamp(1.5rem, 4vw, 4rem);
   align-items: start;
 }
 
-[data-faccia-riga] {
+[data-face-line] {
   max-width: 22ch;
   font-size: clamp(1.45rem, 3.6vw, 3.1rem);
   font-weight: 600;
@@ -197,34 +197,34 @@
 
 /* In colonna il riquadro del riservato ha un'altezza sua: senza schermata
    resterebbe alto quanto la sua scritta. */
-[data-faccia-schermata] {
+[data-face-screenshot] {
   align-self: stretch;
   min-height: 8rem;
   display: grid;
   place-items: center;
   overflow: hidden;
-  border: 1px solid var(--cartella-bordo);
+  border: 1px solid var(--folder-border);
   border-radius: 8px;
-  background-color: color-mix(in oklab, var(--fg) 10%, var(--cartella-faccia));
+  background-color: color-mix(in oklab, var(--fg) 10%, var(--folder-face));
   rotate: 0.6deg;
 }
 
 /* Lo stesso vocabolario del dossier: il tratteggio dice «questa cosa non
    c'e', e non per dimenticanza». */
-[data-faccia-riservato] {
+[data-face-confidential] {
   margin: 1rem;
   padding: 0.8rem 1rem;
-  border: 1px dashed var(--cartella-bordo);
+  border: 1px dashed var(--folder-border);
   border-radius: 6px;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.7rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-align: center;
-  color: var(--cartella-tenue);
+  color: var(--folder-muted);
 }
 
-[data-faccia-piede] {
+[data-face-foot] {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -232,7 +232,7 @@
   gap: 1rem;
 }
 
-[data-faccia-tech] {
+[data-face-tech] {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
@@ -241,27 +241,27 @@
   list-style: none;
 }
 
-[data-faccia-tech] li {
+[data-face-tech] li {
   padding: 0.25rem 0.6rem;
-  border: 1px solid var(--cartella-bordo);
+  border: 1px solid var(--folder-border);
   border-radius: 999px;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.66rem;
-  color: var(--cartella-tenue);
+  color: var(--folder-muted);
 }
 
-[data-apri] {
+[data-open-button] {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.7rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   white-space: nowrap;
-  color: var(--accento-testo);
+  color: var(--accent-text);
   cursor: pointer;
 }
 
 @media (max-width: 760px) {
-  [data-faccia-centro] { grid-template-columns: minmax(0, 1fr); }
+  [data-face-centre] { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* Sul telefono quattro linguette con l'anno non stanno in fila: resta il
@@ -271,9 +271,9 @@
    La faccia perde le tecnologie, che restano nel dossier: e' il posto che
    serve alla riga. */
 @media (max-width: 599px) {
-  [data-cartella] { --larghezza-linguetta: 25%; }
-  [data-linguetta] {
-    left: calc(var(--i) * var(--larghezza-linguetta));
+  [data-folder] { --tab-width: 25%; }
+  [data-tab] {
+    left: calc(var(--i) * var(--tab-width));
     min-width: 0;
     /* 0,35rem lasciava a VISUALBOOST 66,80px per 66,84 di testo: i puntini
        per quattro centesimi di pixel. */
@@ -281,26 +281,26 @@
     font-size: 0.56rem;
     letter-spacing: 0.01em;
   }
-  [data-linguetta-anno] { display: none; }
-  [data-faccia-riga] { max-width: none; }
-  [data-faccia-tech] { display: none; }
+  [data-tab-year] { display: none; }
+  [data-face-line] { max-width: none; }
+  [data-face-tech] { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-faccia] { transition: none; }
+  [data-face] { transition: none; }
 }
 
 /* ── L'archivio acceso ── */
 
-[data-work-shelf][data-archivio-acceso] { gap: 0; }
+[data-work-shelf][data-archive-lit] { gap: 0; }
 
-[data-work-shelf][data-archivio-acceso] > [data-cartella] {
+[data-work-shelf][data-archive-lit] > [data-folder] {
   position: sticky;
-  top: calc(var(--testata) + var(--margine-alto) + var(--i) * var(--passo));
-  margin-top: var(--distanza);
+  top: calc(var(--header) + var(--margin-top) + var(--i) * var(--step));
+  margin-top: var(--distance);
 }
 
-[data-work-shelf][data-archivio-acceso] > [data-cartella]:first-child { margin-top: 0; }
+[data-work-shelf][data-archive-lit] > [data-folder]:first-child { margin-top: 0; }
 
 /* L'ultima non finisce mai sotto: niente filtro, niente scala, niente strato
    in piu' per lei. La scala e' sulla cartella intera, linguetta compresa,
@@ -308,14 +308,14 @@
    invece salta la linguetta: scurirebbe anche il suo testo, e l'anno di
    quella piu' in fondo scendeva a 1,74:1 sul chiaro. La linguetta si scurisce
    col fondo, piu' sotto, e la cartella resta un pezzo solo. */
-[data-work-shelf][data-archivio-acceso] > [data-cartella]:not(:last-child) {
+[data-work-shelf][data-archive-lit] > [data-folder]:not(:last-child) {
   transform-origin: 50% 0;
-  scale: calc(1 - var(--profondita, 0) * var(--stringe));
+  scale: calc(1 - var(--depth, 0) * var(--narrows));
   will-change: scale;
 }
 
-[data-work-shelf][data-archivio-acceso] > [data-cartella]:not(:last-child) > :not([data-linguetta]) {
-  filter: brightness(calc(1 - var(--profondita, 0) * var(--scurisce)));
+[data-work-shelf][data-archive-lit] > [data-folder]:not(:last-child) > :not([data-tab]) {
+  filter: brightness(calc(1 - var(--depth, 0) * var(--darkens)));
   will-change: filter;
 }
 
@@ -329,34 +329,34 @@
    Dietro @supports: un color-mix con calc che il browser non sa fare diventa
    trasparente, non torna al fondo di prima. */
 @supports (background-color: color-mix(in srgb, red calc(1 * 10%), blue)) {
-  [data-work-shelf][data-archivio-acceso] > [data-cartella]:not(:last-child) > [data-linguetta] {
-    background-color: color-mix(in srgb, var(--cartella-dorso), var(--ink) calc(var(--profondita, 0) * var(--scurisce) * 100%));
-    border-color: color-mix(in srgb, var(--cartella-bordo), var(--ink) calc(var(--profondita, 0) * var(--scurisce) * 100%));
+  [data-work-shelf][data-archive-lit] > [data-folder]:not(:last-child) > [data-tab] {
+    background-color: color-mix(in srgb, var(--folder-spine), var(--ink) calc(var(--depth, 0) * var(--darkens) * 100%));
+    border-color: color-mix(in srgb, var(--folder-border), var(--ink) calc(var(--depth, 0) * var(--darkens) * 100%));
   }
 
-  [data-work-shelf][data-archivio-acceso] > [data-tono-linguetta="2"]:not(:last-child) > [data-linguetta] {
-    background-color: color-mix(in srgb, var(--cartella-dorso), var(--ink) max(calc(var(--profondita, 0) * var(--scurisce) * 100%), var(--buio-minimo)));
+  [data-work-shelf][data-archive-lit] > [data-tab-tone="2"]:not(:last-child) > [data-tab] {
+    background-color: color-mix(in srgb, var(--folder-spine), var(--ink) max(calc(var(--depth, 0) * var(--darkens) * 100%), var(--min-dark)));
   }
 }
 
 /* I toni: 1 l'anno pieno come il nome, 2 tutto carta. */
-[data-work-shelf][data-archivio-acceso] > [data-tono-linguetta="1"] > [data-linguetta] { color: var(--fg); }
+[data-work-shelf][data-archive-lit] > [data-tab-tone="1"] > [data-tab] { color: var(--fg); }
 
-[data-work-shelf][data-archivio-acceso] > [data-tono-linguetta="2"] > [data-linguetta],
-[data-work-shelf][data-archivio-acceso] > [data-tono-linguetta="2"] > [data-linguetta] b { color: var(--paper); }
+[data-work-shelf][data-archive-lit] > [data-tab-tone="2"] > [data-tab],
+[data-work-shelf][data-archive-lit] > [data-tab-tone="2"] > [data-tab] b { color: var(--paper); }
 
 /* Sullo scuro il testo della linguetta e' gia' chiaro, e scurendosi il fondo
    il contrasto cresce: i toni non cambiano niente. Dopo le regole dei toni,
    a parita' di peso. */
-[data-theme="dark"] [data-work-shelf] > [data-tono-linguetta] > [data-linguetta] { color: var(--cartella-tenue); }
+[data-theme="dark"] [data-work-shelf] > [data-tab-tone] > [data-tab] { color: var(--folder-muted); }
 
-[data-theme="dark"] [data-work-shelf] > [data-tono-linguetta] > [data-linguetta] b { color: var(--fg); }
+[data-theme="dark"] [data-work-shelf] > [data-tab-tone] > [data-tab] b { color: var(--fg); }
 
 /* La riga grande cresce anche con l'altezza: su un portatile basso (1366x768)
    a 3,6vw la riga del riservato chiedeva cento pixel piu' della faccia. A
    900px d'altezza il tetto di 3,1rem arriva prima dell'altezza, quindi li'
    non cambia niente. `vh` davanti, per chi `svh` non lo conosce. */
-[data-work-shelf][data-archivio-acceso] [data-faccia-riga] {
+[data-work-shelf][data-archive-lit] [data-face-line] {
   font-size: clamp(1.45rem, min(3.6vw, 5.5vh), 3.1rem);
   font-size: clamp(1.45rem, min(3.6vw, 5.5svh), 3.1rem);
 }
@@ -365,7 +365,7 @@
    anche fermare il puntatore, o un click li' arriva alla faccia di una
    cartella coperta e ne apre il dossier. Il dorso non ha gestori: il click
    si ferma e basta. */
-[data-work-shelf][data-archivio-acceso] [data-dorso] { pointer-events: auto; }
+[data-work-shelf][data-archive-lit] [data-spine] { pointer-events: auto; }
 
 /* Alta fino in fondo allo schermo: tolti la testata, il respiro in cima, i
    passi delle cartelle gia' archiviate (lo spazio che occupera' l'ultima), la
@@ -373,18 +373,18 @@
    barra in basso. Tutte uguali, cosi' l'archivio finale ha i bordi bassi
    allineati. `svh`: la barra del browser che compare e sparisce non deve
    cambiare la cartella. `vh` davanti, per chi `svh` non lo conosce. */
-[data-work-shelf][data-archivio-acceso] [data-faccia] {
-  height: calc(100vh - var(--testata) - var(--margine-alto) - (var(--n) - 1) * var(--passo) - var(--h-linguetta) - var(--scarto-faccia) - var(--margine-basso) - var(--barra-bassa));
-  height: calc(100svh - var(--testata) - var(--margine-alto) - (var(--n) - 1) * var(--passo) - var(--h-linguetta) - var(--scarto-faccia) - var(--margine-basso) - var(--barra-bassa));
+[data-work-shelf][data-archive-lit] [data-face] {
+  height: calc(100vh - var(--header) - var(--margin-top) - (var(--n) - 1) * var(--step) - var(--tab-h) - var(--face-offset) - var(--margin-bottom) - var(--bottom-bar));
+  height: calc(100svh - var(--header) - var(--margin-top) - (var(--n) - 1) * var(--step) - var(--tab-h) - var(--face-offset) - var(--margin-bottom) - var(--bottom-bar));
 }
 
 /* Qui il riquadro prende quello che resta e si stringe per primo. */
-[data-work-shelf][data-archivio-acceso] [data-faccia-schermata] { min-height: 0; }
+[data-work-shelf][data-archive-lit] [data-face-screenshot] { min-height: 0; }
 
 /* Sotto la riga, sul telefono: almeno quel tanto che la faccia si riconosca
    come il sito che e'. Se non ci sta, l'archivio resta spento. */
 @media (max-width: 760px) {
-  [data-work-shelf][data-archivio-acceso] [data-faccia-centro] {
+  [data-work-shelf][data-archive-lit] [data-face-centre] {
     grid-template-rows: auto minmax(6rem, 1fr);
   }
 }
@@ -396,23 +396,23 @@
    piu') e su un telefono da 375x640. Il margine sotto resta: e' lo stacco fra «Apri il caso» e la barra,
    e il riquadro della schermata tiene i suoi 6rem. */
 @media (max-width: 767px) {
-  [data-work-shelf][data-archivio-acceso] {
-    --barra-bassa: calc(3.25rem + env(safe-area-inset-bottom, 0px));
-    --margine-alto: 1rem;
-    --margine-basso: 0.75rem;
-    --scarto-faccia: 0.95rem;
+  [data-work-shelf][data-archive-lit] {
+    --bottom-bar: calc(3.25rem + env(safe-area-inset-bottom, 0px));
+    --margin-top: 1rem;
+    --margin-bottom: 0.75rem;
+    --face-offset: 0.95rem;
   }
-  [data-work-shelf][data-archivio-acceso] [data-faccia] {
+  [data-work-shelf][data-archive-lit] [data-face] {
     padding: 0.95rem 1.1rem 0.9rem;
     gap: 0.5rem;
   }
-  [data-work-shelf][data-archivio-acceso] [data-faccia-chi] { margin-top: 0.25rem; }
-  [data-work-shelf][data-archivio-acceso] [data-faccia-centro] { gap: 0.75rem; }
+  [data-work-shelf][data-archive-lit] [data-face-who] { margin-top: 0.25rem; }
+  [data-work-shelf][data-archive-lit] [data-face-centre] { gap: 0.75rem; }
 }
 
 /* La copia con cui useArchivioAcceso misura se le facce ci stanno: fissa, invisibile,
    tolta nello stesso istante in cui e' stata messa. */
-[data-archivio-sonda] {
+[data-archive-probe] {
   position: fixed;
   top: 0;
   left: 0;
@@ -439,17 +439,17 @@
    [data-work-dialog] senza qualificarlo si sovrascrive il `display: none` che
    il browser da' a un dialog chiuso, e il dossier chiuso restava disegnato. */
 [data-work-dialog] {
-  --carta: var(--paper);
-  --inchiostro: var(--ink);
+  --sheet-paper: var(--paper);
+  --sheet-ink: var(--ink);
   /* Il tenue della carta, non quello del tema: 5,03:1 sulla carta. */
-  --tenue: var(--muted);
+  --sheet-muted: var(--muted);
   /* L'arancio pieno su carta fa 3,27:1. Scurito con l'inchiostro fa 5,42:1
      e resta arancio: e' quello dei fogli chiari della sezione Servizi. */
-  --accento-su-carta: color-mix(in oklab, var(--accent) 72%, var(--ink));
-  --arancio: var(--accento-su-carta);
-  --bordo: color-mix(in oklab, var(--inchiostro) 24%, var(--carta));
-  --grafite: color-mix(in oklab, var(--inchiostro) 45%, var(--carta));
-  --ombra: color-mix(in oklab, var(--ink) 55%, transparent);
+  --accent-on-paper: color-mix(in oklab, var(--accent) 72%, var(--ink));
+  --sheet-orange: var(--accent-on-paper);
+  --sheet-border: color-mix(in oklab, var(--sheet-ink) 24%, var(--sheet-paper));
+  --sheet-graphite: color-mix(in oklab, var(--sheet-ink) 45%, var(--sheet-paper));
+  --sheet-shadow: color-mix(in oklab, var(--ink) 55%, transparent);
 }
 
 [data-work-dialog]:not([open]) { display: none; }
@@ -466,7 +466,7 @@
   border: 0;
   padding: 4.25rem var(--gutter) 5rem;
   background: transparent;
-  color: var(--inchiostro);
+  color: var(--sheet-ink);
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -478,7 +478,7 @@
   transition: background-color 420ms ease;
 }
 
-[data-work-dialog][data-velo]::backdrop {
+[data-work-dialog][data-veil]::backdrop {
   background-color: color-mix(in srgb, var(--ink) 58%, transparent);
 }
 
@@ -487,7 +487,7 @@
 }
 
 /* Il × e' tondo, fermo in alto a destra, sopra il foglio. */
-[data-work-dialog] [data-pratica-chiudi] {
+[data-work-dialog] [data-dossier-close] {
   position: fixed;
   top: 1rem;
   right: 1rem;
@@ -496,35 +496,35 @@
   height: 2.75rem;
   display: grid;
   place-items: center;
-  border: 1px solid var(--bordo);
+  border: 1px solid var(--sheet-border);
   border-radius: 999px;
-  background-color: var(--carta);
-  color: var(--inchiostro);
+  background-color: var(--sheet-paper);
+  color: var(--sheet-ink);
   font-size: 1.2rem;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 8px 20px -10px var(--ombra);
+  box-shadow: 0 8px 20px -10px var(--sheet-shadow);
 }
 
-[data-work-dialog] [data-pratica-chiudi]:focus-visible,
-[data-work-dialog] [data-pratica-link]:focus-visible {
-  outline: 2px solid var(--arancio);
+[data-work-dialog] [data-dossier-close]:focus-visible,
+[data-work-dialog] [data-dossier-link]:focus-visible {
+  outline: 2px solid var(--sheet-orange);
   outline-offset: 3px;
 }
 
-[data-work-dialog] [data-pratica] {
+[data-work-dialog] [data-dossier] {
   position: relative;
   margin: 2.3rem auto 0;
   width: min(52rem, 100%);
-  background-color: var(--carta);
+  background-color: var(--sheet-paper);
   border-radius: 0 4px 4px 4px;
-  box-shadow: 0 40px 90px -35px var(--ombra);
+  box-shadow: 0 40px 90px -35px var(--sheet-shadow);
 }
 
 /* La linguetta della pratica ha la forma di quelle delle cartelle. Il fondo
    lo eredita: mentre il foglio si allarga passa dal tono del foglio della
    cartella alla carta, e lei con lui. */
-[data-work-dialog] [data-pratica-linguetta] {
+[data-work-dialog] [data-dossier-tab] {
   position: absolute;
   top: -2.3rem;
   left: 0;
@@ -538,26 +538,26 @@
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--tenue);
+  color: var(--sheet-muted);
 }
 
-[data-work-dialog] [data-pratica-linguetta] b { color: var(--inchiostro); }
+[data-work-dialog] [data-dossier-tab] b { color: var(--sheet-ink); }
 
-[data-work-dialog] [data-pratica-foglio] {
+[data-work-dialog] [data-dossier-sheet] {
   padding: 2.6rem clamp(1.25rem, 5vw, 3.5rem) 2.5rem;
 }
 
 /* Le scritte da modulo: maiuscolo, spaziato, a macchina. */
-[data-work-dialog] [data-pratica-testa] p,
-[data-work-dialog] [data-pratica-campi],
-[data-work-dialog] [data-pratica-oggetto] p:first-child,
-[data-work-dialog] [data-pratica-allegato] figcaption,
-[data-work-dialog] [data-pratica-riservato],
-[data-work-dialog] [data-pratica-numeri] h3,
-[data-work-dialog] [data-pratica-voci] h3,
-[data-work-dialog] [data-pratica-link],
-[data-work-dialog] [data-pratica-senza-link],
-[data-work-dialog] [data-pratica-firma] {
+[data-work-dialog] [data-dossier-head] p,
+[data-work-dialog] [data-dossier-fields],
+[data-work-dialog] [data-dossier-subject] p:first-child,
+[data-work-dialog] [data-dossier-attachment] figcaption,
+[data-work-dialog] [data-dossier-confidential],
+[data-work-dialog] [data-dossier-figures] h3,
+[data-work-dialog] [data-dossier-items] h3,
+[data-work-dialog] [data-dossier-link],
+[data-work-dialog] [data-dossier-no-link],
+[data-work-dialog] [data-dossier-signature] {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.68rem;
   font-weight: 500;
@@ -566,64 +566,64 @@
   text-transform: uppercase;
 }
 
-[data-work-dialog] [data-pratica-testa] {
+[data-work-dialog] [data-dossier-head] {
   display: flex;
   justify-content: space-between;
   align-items: end;
   gap: 1rem;
   padding-bottom: 0.8rem;
-  border-bottom: 2px solid var(--inchiostro);
+  border-bottom: 2px solid var(--sheet-ink);
 }
 
-[data-work-dialog] [data-pratica-testa] p { color: var(--tenue); }
+[data-work-dialog] [data-dossier-head] p { color: var(--sheet-muted); }
 
-[data-work-dialog] [data-pratica-testa] b,
-[data-work-dialog] [data-pratica-numero] strong {
+[data-work-dialog] [data-dossier-head] b,
+[data-work-dialog] [data-dossier-number] strong {
   display: block;
   font-family: var(--font-display), var(--font-body), sans-serif;
   font-weight: 400;
   text-transform: none;
-  color: var(--inchiostro);
+  color: var(--sheet-ink);
 }
 
-[data-work-dialog] [data-pratica-testa] b { font-size: 1rem; letter-spacing: -0.01em; }
+[data-work-dialog] [data-dossier-head] b { font-size: 1rem; letter-spacing: -0.01em; }
 
-[data-work-dialog] [data-pratica-numero] { text-align: right; }
+[data-work-dialog] [data-dossier-number] { text-align: right; }
 
-[data-work-dialog] [data-pratica-numero] strong {
+[data-work-dialog] [data-dossier-number] strong {
   margin-top: 0.2rem;
   font-size: 1.6rem;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
-[data-work-dialog] [data-pratica-campi] {
+[data-work-dialog] [data-dossier-fields] {
   margin: 1.6rem 0 0;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid var(--bordo);
+  border: 1px solid var(--sheet-border);
 }
 
-[data-work-dialog] [data-pratica-campi] div {
+[data-work-dialog] [data-dossier-fields] div {
   padding: 0.65rem 0.8rem;
-  border-left: 1px solid var(--bordo);
+  border-left: 1px solid var(--sheet-border);
 }
 
-[data-work-dialog] [data-pratica-campi] div:first-child { border-left: 0; }
+[data-work-dialog] [data-dossier-fields] div:first-child { border-left: 0; }
 
-[data-work-dialog] [data-pratica-campi] dt { color: var(--tenue); }
+[data-work-dialog] [data-dossier-fields] dt { color: var(--sheet-muted); }
 
-[data-work-dialog] [data-pratica-campi] dd {
+[data-work-dialog] [data-dossier-fields] dd {
   margin: 0.3rem 0 0;
   font-weight: 600;
   overflow-wrap: anywhere;
 }
 
-[data-work-dialog] [data-pratica-oggetto] { margin-top: 1.6rem; }
+[data-work-dialog] [data-dossier-subject] { margin-top: 1.6rem; }
 
-[data-work-dialog] [data-pratica-oggetto] p:first-child { color: var(--tenue); }
+[data-work-dialog] [data-dossier-subject] p:first-child { color: var(--sheet-muted); }
 
-[data-work-dialog] [data-pratica-oggetto] p + p {
+[data-work-dialog] [data-dossier-subject] p + p {
   margin-top: 0.5rem;
   font-size: clamp(1.35rem, 3vw, 2rem);
   font-weight: 600;
@@ -633,63 +633,63 @@
 
 /* L'allegato: la schermata spillata al foglio, appena storta, con la
    graffetta in grafite. */
-[data-work-dialog] [data-pratica-allegato] {
+[data-work-dialog] [data-dossier-attachment] {
   position: relative;
   margin: 2.2rem 0 0;
   padding: 0.55rem 0.55rem 0;
-  background-color: color-mix(in oklab, var(--inchiostro) 4%, var(--carta));
-  border: 1px solid var(--bordo);
+  background-color: color-mix(in oklab, var(--sheet-ink) 4%, var(--sheet-paper));
+  border: 1px solid var(--sheet-border);
   rotate: -0.8deg;
-  box-shadow: 0 10px 24px -16px var(--ombra);
+  box-shadow: 0 10px 24px -16px var(--sheet-shadow);
 }
 
-[data-work-dialog] [data-pratica-allegato]::before {
+[data-work-dialog] [data-dossier-attachment]::before {
   content: "";
   position: absolute;
   top: -1.1rem;
   left: 2.2rem;
   width: 0.9rem;
   height: 3.2rem;
-  border: 2px solid var(--grafite);
+  border: 2px solid var(--sheet-graphite);
   border-radius: 999px;
   rotate: 6deg;
 }
 
-[data-work-dialog] [data-pratica-schermata] {
+[data-work-dialog] [data-dossier-screenshot] {
   aspect-ratio: 16 / 8.5;
   overflow: hidden;
-  background-color: color-mix(in oklab, var(--inchiostro) 10%, var(--carta));
+  background-color: color-mix(in oklab, var(--sheet-ink) 10%, var(--sheet-paper));
 }
 
-[data-work-dialog] [data-pratica-allegato] figcaption {
+[data-work-dialog] [data-dossier-attachment] figcaption {
   padding: 0.55rem 0.1rem 0.6rem;
-  color: var(--tenue);
+  color: var(--sheet-muted);
 }
 
 /* Lo stesso vocabolario della faccia: il tratteggio dice «questa cosa non
    c'e', e non per dimenticanza». */
-[data-work-dialog] [data-pratica-riservato] {
+[data-work-dialog] [data-dossier-confidential] {
   margin: 2.2rem 0 0;
   min-height: 8rem;
   display: grid;
   place-items: center;
   padding: 1rem;
-  border: 1px dashed var(--bordo);
+  border: 1px dashed var(--sheet-border);
   text-align: center;
-  color: var(--tenue);
+  color: var(--sheet-muted);
 }
 
-[data-work-dialog] [data-pratica-numeri] {
+[data-work-dialog] [data-dossier-figures] {
   margin-top: 2.2rem;
   padding: 1rem 1.1rem;
-  border: 1px solid var(--bordo);
+  border: 1px solid var(--sheet-border);
 }
 
-[data-work-dialog] [data-pratica-numeri] h3 { color: var(--tenue); }
+[data-work-dialog] [data-dossier-figures] h3 { color: var(--sheet-muted); }
 
-[data-work-dialog] [data-pratica-numeri] dl { margin: 0; }
+[data-work-dialog] [data-dossier-figures] dl { margin: 0; }
 
-[data-work-dialog] [data-pratica-numeri] dl > div {
+[data-work-dialog] [data-dossier-figures] dl > div {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
@@ -697,42 +697,42 @@
 }
 
 /* I puntini di guida fra l'etichetta e il numero, come in un indice. */
-[data-work-dialog] [data-pratica-numeri] dt {
+[data-work-dialog] [data-dossier-figures] dt {
   flex: 1;
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
 }
 
-[data-work-dialog] [data-pratica-numeri] dt::after {
+[data-work-dialog] [data-dossier-figures] dt::after {
   content: "";
   flex: 1;
   min-width: 1.5rem;
-  border-bottom: 1px dotted var(--bordo);
+  border-bottom: 1px dotted var(--sheet-border);
   translate: 0 -0.3rem;
 }
 
-[data-work-dialog] [data-pratica-numeri] dd {
+[data-work-dialog] [data-dossier-figures] dd {
   margin: 0;
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
 }
 
-[data-work-dialog] [data-pratica-numeri] dd b {
+[data-work-dialog] [data-dossier-figures] dd b {
   font-family: var(--font-display), var(--font-body), sans-serif;
   font-weight: 400;
   font-size: 1.35rem;
   line-height: 1;
 }
 
-[data-work-dialog] [data-pratica-numeri] dd small {
+[data-work-dialog] [data-dossier-figures] dd small {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.65rem;
-  color: var(--tenue);
+  color: var(--sheet-muted);
 }
 
-[data-work-dialog] [data-pratica-voci] {
+[data-work-dialog] [data-dossier-items] {
   margin: 2.4rem 0 0;
   padding: 0;
   list-style: none;
@@ -740,29 +740,29 @@
   gap: 1.6rem;
 }
 
-[data-work-dialog] [data-pratica-voci] li {
+[data-work-dialog] [data-dossier-items] li {
   display: grid;
   grid-template-columns: 2.6rem minmax(0, 1fr);
   gap: 0.6rem;
   padding-top: 1.1rem;
-  border-top: 1px dashed var(--bordo);
+  border-top: 1px dashed var(--sheet-border);
 }
 
-[data-work-dialog] [data-pratica-voci] li > span {
+[data-work-dialog] [data-dossier-items] li > span {
   font-family: var(--font-display), var(--font-body), sans-serif;
   font-size: 1.5rem;
   line-height: 1;
-  color: var(--arancio);
+  color: var(--sheet-orange);
 }
 
-[data-work-dialog] [data-pratica-voci] h3 { color: var(--tenue); }
+[data-work-dialog] [data-dossier-items] h3 { color: var(--sheet-muted); }
 
-[data-work-dialog] [data-pratica-voci] p {
+[data-work-dialog] [data-dossier-items] p {
   margin-top: 0.45rem;
   line-height: 1.65;
 }
 
-[data-work-dialog] [data-pratica-piede] {
+[data-work-dialog] [data-dossier-foot] {
   margin-top: 2.4rem;
   display: flex;
   flex-wrap: wrap;
@@ -771,7 +771,7 @@
   gap: 1.5rem;
 }
 
-[data-work-dialog] [data-pratica-tech] {
+[data-work-dialog] [data-dossier-tech] {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
@@ -780,70 +780,70 @@
   list-style: none;
 }
 
-[data-work-dialog] [data-pratica-tech] li {
+[data-work-dialog] [data-dossier-tech] li {
   padding: 0.25rem 0.6rem;
-  border: 1px solid var(--bordo);
+  border: 1px solid var(--sheet-border);
   border-radius: 999px;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.66rem;
-  color: var(--tenue);
+  color: var(--sheet-muted);
 }
 
-[data-work-dialog] [data-pratica-link] {
+[data-work-dialog] [data-dossier-link] {
   display: inline-block;
   margin-top: 0.9rem;
-  color: var(--inchiostro);
+  color: var(--sheet-ink);
   text-decoration: underline;
   text-underline-offset: 0.25em;
 }
 
-[data-work-dialog] [data-pratica-senza-link] {
+[data-work-dialog] [data-dossier-no-link] {
   display: inline-block;
   margin-top: 0.9rem;
   padding: 0.3rem 0.7rem;
-  border: 1px dashed var(--bordo);
+  border: 1px dashed var(--sheet-border);
   border-radius: 999px;
-  color: var(--tenue);
+  color: var(--sheet-muted);
 }
 
 /* Il timbro dice solo lo stato. Niente mix-blend-mode: il suo colore deve
    essere quello misurato in contrast.test.ts, non una miscela con la carta. */
-[data-work-dialog] [data-pratica-timbro] {
+[data-work-dialog] [data-dossier-stamp] {
   margin: 0;
   padding: 0.5rem 0.9rem;
   rotate: -7deg;
-  border: 3px double var(--arancio);
+  border: 3px double var(--sheet-orange);
   border-radius: 6px;
   font-family: var(--font-display), var(--font-body), sans-serif;
   font-size: 0.95rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--arancio);
+  color: var(--sheet-orange);
 }
 
-[data-work-dialog] [data-pratica-firma] {
+[data-work-dialog] [data-dossier-signature] {
   margin: 0;
   min-width: 11rem;
   text-align: center;
-  color: var(--tenue);
+  color: var(--sheet-muted);
 }
 
-[data-work-dialog] [data-pratica-firma] em {
+[data-work-dialog] [data-dossier-signature] em {
   display: block;
   padding-bottom: 0.3rem;
-  border-bottom: 1px solid var(--inchiostro);
+  border-bottom: 1px solid var(--sheet-ink);
   font-family: var(--font-body), system-ui, sans-serif;
   font-size: 1.15rem;
   font-style: italic;
   letter-spacing: 0;
   text-transform: none;
-  color: var(--inchiostro);
+  color: var(--sheet-ink);
 }
 
 @media (max-width: 640px) {
-  [data-work-dialog] [data-pratica-campi] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  [data-work-dialog] [data-pratica-campi] div:nth-child(3) { border-left: 0; }
-  [data-work-dialog] [data-pratica-campi] div:nth-child(n + 3) { border-top: 1px solid var(--bordo); }
+  [data-work-dialog] [data-dossier-fields] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  [data-work-dialog] [data-dossier-fields] div:nth-child(3) { border-left: 0; }
+  [data-work-dialog] [data-dossier-fields] div:nth-child(n + 3) { border-top: 1px solid var(--sheet-border); }
 }
 
 /* Sul computer il foglio e' grande quanto lo schermo, meno un bordo di 14px,
@@ -857,15 +857,15 @@
 @media (min-width: 1024px) and (min-height: 700px) {
   [data-work-dialog][open] { padding: 0.9rem; overflow: hidden; }
 
-  [data-work-dialog] [data-pratica-chiudi] { top: 1.6rem; right: 1.6rem; }
+  [data-work-dialog] [data-dossier-close] { top: 1.6rem; right: 1.6rem; }
 
-  [data-work-dialog] [data-pratica] {
+  [data-work-dialog] [data-dossier] {
     width: 100%;
     max-width: 110rem;
     height: calc(100dvh - 1.8rem - 2.3rem);
   }
 
-  [data-work-dialog] [data-pratica-foglio] {
+  [data-work-dialog] [data-dossier-sheet] {
     height: 100%;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -875,40 +875,40 @@
     padding: 1.6rem 2.6rem 1.4rem;
   }
 
-  [data-work-dialog] [data-pratica-testa] { padding-right: 3.5rem; }
+  [data-work-dialog] [data-dossier-head] { padding-right: 3.5rem; }
 
-  [data-work-dialog] [data-pratica-numero] strong { font-size: 1.35rem; }
+  [data-work-dialog] [data-dossier-number] strong { font-size: 1.35rem; }
 
-  [data-work-dialog] [data-pratica-campi] { margin-top: 0; }
+  [data-work-dialog] [data-dossier-fields] { margin-top: 0; }
 
-  [data-work-dialog] [data-pratica-campi] div { padding: 0.5rem 0.8rem; }
+  [data-work-dialog] [data-dossier-fields] div { padding: 0.5rem 0.8rem; }
 
-  [data-work-dialog] [data-pratica-corpo] {
+  [data-work-dialog] [data-dossier-body] {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     gap: 2.6rem;
   }
 
-  [data-work-dialog] [data-pratica-oggetto] { margin-top: 0; }
+  [data-work-dialog] [data-dossier-subject] { margin-top: 0; }
 
-  [data-work-dialog] [data-pratica-oggetto] p + p {
+  [data-work-dialog] [data-dossier-subject] p + p {
     max-width: 30ch;
     font-size: clamp(1.15rem, min(1.75vw, 2.9vh), 1.75rem);
   }
 
-  [data-work-dialog] [data-pratica-destra] {
+  [data-work-dialog] [data-dossier-right] {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
 
-  [data-work-dialog] [data-pratica-allegato],
-  [data-work-dialog] [data-pratica-riservato] {
+  [data-work-dialog] [data-dossier-attachment],
+  [data-work-dialog] [data-dossier-confidential] {
     margin: 0.4rem 0 0;
     flex: 1;
   }
 
-  [data-work-dialog] [data-pratica-allegato] {
+  [data-work-dialog] [data-dossier-attachment] {
     display: flex;
     flex-direction: column;
   }
@@ -916,50 +916,50 @@
   /* contain: size, o l'altezza naturale della schermata (340px a 1440)
      diventa il minimo della riga e il piede finisce sotto il foglio: il
      minimo deve essere solo i 14rem. */
-  [data-work-dialog] [data-pratica-schermata] {
+  [data-work-dialog] [data-dossier-screenshot] {
     flex: 1;
     min-height: 14rem;
     aspect-ratio: auto;
     contain: size;
   }
 
-  [data-work-dialog] [data-pratica-numeri] {
+  [data-work-dialog] [data-dossier-figures] {
     margin-top: 0;
     padding: 0.7rem 1rem;
   }
 
-  [data-work-dialog] [data-pratica-numeri] dl > div { margin-top: 0.35rem; }
+  [data-work-dialog] [data-dossier-figures] dl > div { margin-top: 0.35rem; }
 
-  [data-work-dialog] [data-pratica-voci] {
+  [data-work-dialog] [data-dossier-items] {
     margin-top: 0;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 2rem;
   }
 
-  [data-work-dialog] [data-pratica-voci] li { grid-template-columns: 2rem minmax(0, 1fr); }
+  [data-work-dialog] [data-dossier-items] li { grid-template-columns: 2rem minmax(0, 1fr); }
 
-  [data-work-dialog] [data-pratica-voci] p {
+  [data-work-dialog] [data-dossier-items] p {
     font-size: 0.93rem;
     line-height: 1.55;
   }
 
-  [data-work-dialog] [data-pratica-piede] {
+  [data-work-dialog] [data-dossier-foot] {
     margin-top: 0;
     align-items: center;
     padding-top: 0.9rem;
-    border-top: 2px solid var(--inchiostro);
+    border-top: 2px solid var(--sheet-ink);
   }
 
-  [data-work-dialog] [data-pratica-piede-sx] {
+  [data-work-dialog] [data-dossier-foot-left] {
     display: flex;
     align-items: center;
     gap: 1.2rem;
   }
 
-  [data-work-dialog] [data-pratica-link],
-  [data-work-dialog] [data-pratica-senza-link] { margin-top: 0; }
+  [data-work-dialog] [data-dossier-link],
+  [data-work-dialog] [data-dossier-no-link] { margin-top: 0; }
 
-  [data-work-dialog] [data-pratica-timbro] { rotate: -4deg; }
+  [data-work-dialog] [data-dossier-stamp] { rotate: -4deg; }
 }
 
 /* `clip` e non `hidden` sul body: con hidden il body diventa un contenitore

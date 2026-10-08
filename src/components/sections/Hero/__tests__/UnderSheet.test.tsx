@@ -34,10 +34,10 @@ describe("la seconda sezione che passa sopra la prima", () => {
         <section id="scontrino" />
       </UnderSheet>,
     );
-    const palco = container.querySelector("[data-sotto-il-foglio]");
+    const palco = container.querySelector("[data-under-sheet]");
     expect(palco).not.toBeNull();
     expect(palco, "acceso gia' nel markup: senza JavaScript Hero resterebbe incollato").not.toHaveAttribute(
-      "data-acceso",
+      "data-lit",
     );
     expect(container.querySelector("#hero")).not.toHaveAttribute("style");
   });
@@ -48,7 +48,7 @@ describe("la seconda sezione che passa sopra la prima", () => {
         <section id="hero" />
       </UnderSheet>,
     );
-    expect(container.querySelector("[data-foglio-sonda]")).toHaveAttribute("aria-hidden", "true");
+    expect(container.querySelector("[data-sheet-probe]")).toHaveAttribute("aria-hidden", "true");
   });
 
   it("nella pagina Hero e la stampante stanno nello stesso contenitore, e solo loro", () => {
@@ -62,10 +62,10 @@ describe("la seconda sezione che passa sopra la prima", () => {
     // Una trasformazione sul contenitore diventa il riferimento dello strato
     // fisso della carta, che smetterebbe di coprire lo schermo.
     const { container } = render(<HeroView {...props} />);
-    const strato = container.querySelector("[data-hero-strato]");
+    const strato = container.querySelector("[data-hero-layer]");
     expect(strato, "il contenuto di Hero non ha piu' il suo strato").not.toBeNull();
     expect(strato?.querySelector("h1")).not.toBeNull();
-    expect(strato?.querySelector("[data-carta]")).toBeNull();
+    expect(strato?.querySelector("[data-paper]")).toBeNull();
   });
 });
 
@@ -90,13 +90,13 @@ describe("le regole dell'effetto in sections/under-sheet.css", () => {
   });
 
   it("muovono Hero e la stampante solo sotto l'attributo di accensione", () => {
-    for (const { selector: selettore } of dove(/#hero|#scontrino|\[data-hero-strato\]/)) {
-      expect(selettore, `${selettore} vale anche a effetto spento`).toContain("[data-acceso]");
+    for (const { selector: selettore } of dove(/#hero|#scontrino|\[data-hero-layer\]/)) {
+      expect(selettore, `${selettore} vale anche a effetto spento`).toContain("[data-lit]");
     }
   });
 
   it("il contenuto di Hero apre un contesto suo, o il ritratto buca il velo", () => {
-    expect(dove(/\[data-hero-strato\]$/).map((r) => r.body).join("\n")).toMatch(/isolation:\s*isolate/);
+    expect(dove(/\[data-hero-layer\]$/).map((r) => r.body).join("\n")).toMatch(/isolation:\s*isolate/);
   });
 
   it("velo e ombra sono inchiostro, non nero scritto a mano", () => {

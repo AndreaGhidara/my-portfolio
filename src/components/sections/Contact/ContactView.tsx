@@ -59,30 +59,30 @@ export function ContactView({
       <div className="mx-auto max-w-[56rem]">
         <Reveal motion="dietro" stagger={0.08}>
           <p className="eyebrow">{eyebrow}</p>
-          <h2 id="titolo-contact" className="titolo-sezione">{title}</h2>
+          <h2 id="titolo-contact" className="section-title">{title}</h2>
         </Reveal>
 
         {/* Il foglio e il cartellino entrano uno dopo l'altro, e l'attributo
             resta qui: `[data-contact-due]` e' la griglia a due colonne. */}
-        <Reveal data-contact-due motion="dietro" stagger={0.12}>
+        <Reveal data-contact-columns motion="dietro" stagger={0.12}>
           {/* Il foglio: quello che scrivi finisce su una cosa che qualcuno
               legge, non dentro un sistema. Le righe al posto dei riquadri sono
               tutto quello che serve a dirlo. */}
-          <div data-contact-foglio>
-            <p data-contact-foglio-et>{client.eyebrow}</p>
+          <div data-contact-sheet>
+            <p data-contact-sheet-label>{client.eyebrow}</p>
             <h3>{client.title}</h3>
-            <p data-contact-foglio-testo>{client.body}</p>
+            <p data-contact-sheet-text>{client.body}</p>
             <ContactForm copy={form} email={email} />
           </div>
 
           <div>
-            <p data-contact-dopo-et>{dopo.label}</p>
+            <p data-contact-after-label>{dopo.label}</p>
             {/* Ordinata: i tre momenti hanno un ordine nel tempo, e non e' una
                 scelta di impaginato. */}
-            <ol data-contact-tempi>
+            <ol data-contact-times>
               {dopo.moments.map((momento) => (
                 <li key={momento.id}>
-                  <span data-contact-quando>{momento.when}</span>
+                  <span data-contact-when>{momento.when}</span>
                   <div>
                     <b>{momento.title}</b>
                     <p>{momento.text}</p>
@@ -99,20 +99,20 @@ export function ContactView({
           <span data-contact-clip aria-hidden="true" />
           <div data-contact-badge-body>
             <div>
-              <p data-contact-badge-et>{recruiter.eyebrow}</p>
+              <p data-contact-badge-label>{recruiter.eyebrow}</p>
               <h3>{recruiter.title}</h3>
-              <p data-contact-badge-testo>{recruiter.body}</p>
+              <p data-contact-badge-text>{recruiter.body}</p>
             </div>
 
-            <div data-contact-badge-uscite>
-              <a href={cvPath} download data-contact-cta="pieno">
+            <div data-contact-badge-drawn>
+              <a href={cvPath} download data-contact-cta="solid">
                 {recruiter.cv}
               </a>
               <a
                 href={urlFor("linkedin")}
                 target="_blank"
                 rel="noopener noreferrer"
-                data-contact-cta="vuoto"
+                data-contact-cta="outline"
               >
                 {recruiter.linkedin}
               </a>
@@ -120,7 +120,7 @@ export function ContactView({
                 href={urlFor("github")}
                 target="_blank"
                 rel="noopener noreferrer"
-                data-contact-cta="vuoto"
+                data-contact-cta="outline"
               >
                 {recruiter.github}
               </a>

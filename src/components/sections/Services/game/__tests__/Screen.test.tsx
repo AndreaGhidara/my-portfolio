@@ -8,7 +8,7 @@ import { FAKE_PALETTES } from "../fakeSite";
 const t = it_.services.gioco.schermo;
 const ATTREZZI = ["colori", "caratteri", "testi", "sezioni", "immagini", "telefono"] as const;
 
-const banco = (container: HTMLElement) => container.querySelector('[data-gioco-livello="schermo"]') as HTMLElement;
+const banco = (container: HTMLElement) => container.querySelector('[data-game-level="schermo"]') as HTMLElement;
 
 const attrezzo = (k: (typeof ATTREZZI)[number]) =>
   within(screen.getByRole("group", { name: t.attrezzi })).getByRole("button", { name: new RegExp(t.attrezzo[k].nome) });
@@ -53,7 +53,7 @@ describe("livello 1, gli attrezzi", () => {
     expect(notte).toHaveAttribute("aria-pressed", "true");
     expect(bottega).toHaveAttribute("aria-pressed", "false");
     expect(banco(container).style.getPropertyValue("--sf")).toBe(FAKE_PALETTES[1].colors.background);
-    expect(attrezzo("colori")).toHaveClass("fatto");
+    expect(attrezzo("colori")).toHaveClass("done");
   });
 
   it("aprire un altro attrezzo cambia il cassetto, e l'attrezzo e' fatto solo dopo una scelta", () => {
@@ -63,10 +63,10 @@ describe("livello 1, gli attrezzi", () => {
     expect(attrezzo("sezioni")).toHaveAttribute("aria-pressed", "true");
     expect(attrezzo("colori")).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByRole("heading", { name: t.attrezzo.sezioni.titolo })).toBeInTheDocument();
-    expect(attrezzo("sezioni")).not.toHaveClass("fatto");
+    expect(attrezzo("sezioni")).not.toHaveClass("done");
 
     clicca(scelte("sezioni")[1]);
-    expect(attrezzo("sezioni")).toHaveClass("fatto");
+    expect(attrezzo("sezioni")).toHaveClass("done");
   });
 
   it("il telefono porta la vista sul telefono, e un altro attrezzo la riporta al computer", () => {
@@ -74,10 +74,10 @@ describe("livello 1, gli attrezzi", () => {
 
     clicca(attrezzo("telefono"));
     clicca(scelte("telefono")[1]);
-    expect(banco(container)).toHaveAttribute("data-vista", "cell");
+    expect(banco(container)).toHaveAttribute("data-view", "cell");
 
     clicca(attrezzo("colori"));
-    expect(banco(container)).toHaveAttribute("data-vista", "pc");
+    expect(banco(container)).toHaveAttribute("data-view", "pc");
   });
 });
 
@@ -121,11 +121,11 @@ describe("livello 1, le viti", () => {
     provaTutto();
     avanza(400);
     for (const v of viti()) clicca(v);
-    expect(banco(container)).toHaveAttribute("data-aperto");
+    expect(banco(container)).toHaveAttribute("data-open");
 
     avanza(2799);
     expect(onAvanti).not.toHaveBeenCalled();
-    expect(banco(container)).toHaveAttribute("data-dietro");
+    expect(banco(container)).toHaveAttribute("data-back");
     avanza(1);
     expect(onAvanti).toHaveBeenCalledTimes(1);
   });

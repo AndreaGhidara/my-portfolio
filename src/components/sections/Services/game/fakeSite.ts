@@ -70,9 +70,9 @@ const PARAGRAFO = "var(--font-body), system-ui, sans-serif";
 
 export const FAKE_FONTS: readonly FakeFontPair[] = [
   { id: "archivo", name: "Archivo", heading: "var(--font-display), sans-serif", weight: 400, body: PARAGRAFO },
-  { id: "fraunces", name: "Fraunces", heading: "var(--font-finto-fraunces), Georgia, serif", weight: 600, body: PARAGRAFO },
-  { id: "grotesk", name: "Grotesk", heading: "var(--font-finto-grotesk), sans-serif", weight: 700, body: PARAGRAFO },
-  { id: "playfair", name: "Playfair", heading: "var(--font-finto-playfair), Georgia, serif", weight: 800, body: PARAGRAFO },
+  { id: "fraunces", name: "Fraunces", heading: "var(--font-fake-fraunces), Georgia, serif", weight: 600, body: PARAGRAFO },
+  { id: "grotesk", name: "Grotesk", heading: "var(--font-fake-grotesk), sans-serif", weight: 700, body: PARAGRAFO },
+  { id: "playfair", name: "Playfair", heading: "var(--font-fake-playfair), Georgia, serif", weight: 800, body: PARAGRAFO },
 ];
 
 export type ScaleId = "compatta" | "equilibrata" | "generosa";

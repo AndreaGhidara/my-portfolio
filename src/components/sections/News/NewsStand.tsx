@@ -29,7 +29,7 @@ function valida(r: unknown): r is NewsCollection {
  */
 async function vola(cat: CategoryId, da: HTMLElement, a: HTMLElement, level: MotionLevel) {
   const v = document.createElement("span");
-  v.setAttribute("data-notizie-volante", "");
+  v.setAttribute("data-news-flying", "");
   v.setAttribute("aria-hidden", "true");
   v.dataset.cat = cat;
   document.body.appendChild(v);
@@ -153,9 +153,9 @@ export function NewsStand({ copy: testi, locale }: { copy: NewsCopy; locale: str
     const m = macchina.current;
     if (!m) return;
     // Tolto e rimesso dopo un reflow, perche' l'animazione riparta a ogni giro.
-    m.removeAttribute("data-gira");
+    m.removeAttribute("data-turn");
     void m.offsetWidth;
-    m.setAttribute("data-gira", "");
+    m.setAttribute("data-turn", "");
   }
 
   async function gira() {
@@ -295,25 +295,25 @@ export function NewsStand({ copy: testi, locale }: { copy: NewsCopy; locale: str
   const fila = storia.length > 1 ? storia.map((u, k) => ({ ...u, k })).reverse() : [];
 
   return (
-    <div ref={radice} data-notizie-scena data-motion={level}>
-      <div data-notizie-banco>
-        <div ref={macchina} data-notizie-macchina data-cat={scelta}>
-          <span data-notizie-tappo aria-hidden="true" />
-          <div data-notizie-globo aria-hidden="true">
+    <div ref={radice} data-news-scene data-motion={level}>
+      <div data-news-bench>
+        <div ref={macchina} data-news-machine data-cat={scelta}>
+          <span data-news-cap aria-hidden="true" />
+          <div data-news-globe aria-hidden="true">
             {palline.map((p) => (
               <span
                 key={`${p.cat}-${p.i}`}
                 data-cat={p.cat}
-                data-spenta={p.cat !== scelta ? "" : undefined}
-                data-via={p.i < uscite[p.cat] ? "" : undefined}
+                data-off={p.cat !== scelta ? "" : undefined}
+                data-gone={p.i < uscite[p.cat] ? "" : undefined}
                 style={{ left: `${p.x}%`, top: `${p.y}%` }}
               />
             ))}
           </div>
-          <span data-notizie-collo aria-hidden="true" />
-          <div data-notizie-corpo>
-            <p data-notizie-targa>{targa}</p>
-            <div data-notizie-pulsanti role="group" aria-label={testi.group}>
+          <span data-news-neck aria-hidden="true" />
+          <div data-news-body>
+            <p data-news-nameplate>{targa}</p>
+            <div data-news-buttons role="group" aria-label={testi.group}>
               {CATEGORIES.map((c) => (
                 <button key={c} type="button" data-cat={c} aria-pressed={scelta === c} onClick={() => scegli(c)}>
                   <i aria-hidden="true" />
@@ -321,13 +321,13 @@ export function NewsStand({ copy: testi, locale }: { copy: NewsCopy; locale: str
                 </button>
               ))}
             </div>
-            <div data-notizie-comandi>
+            <div data-news-controls>
               <button
                 type="button"
-                data-notizie-manopola
-                data-trascina={angolo !== 0 ? "" : undefined}
+                data-news-knob
+                data-drag={angolo !== 0 ? "" : undefined}
                 aria-label={testi.knob}
-                style={{ "--giri": giri, "--angolo": `${angolo}deg` } as CSSProperties}
+                style={{ "--turns": giri, "--angle": `${angolo}deg` } as CSSProperties}
                 onClick={clic}
                 onPointerDown={prendi}
                 onPointerMove={trascina}
@@ -335,15 +335,15 @@ export function NewsStand({ copy: testi, locale }: { copy: NewsCopy; locale: str
                 onPointerCancel={lascia}
               />
             </div>
-            <div ref={sportello} data-notizie-sportello aria-hidden="true" />
+            <div ref={sportello} data-news-hatch aria-hidden="true" />
           </div>
-          <span data-notizie-piede aria-hidden="true" />
+          <span data-news-foot aria-hidden="true" />
         </div>
-        <p data-notizie-aiuto>{testi.help}</p>
+        <p data-news-help>{testi.help}</p>
       </div>
 
-      <div ref={giornale} data-notizie-foglio>
-        <div data-foglio-testa>
+      <div ref={giornale} data-news-sheet>
+        <div data-sheet-head>
           <b>
             {testata ? <i aria-hidden="true" data-cat={testata} /> : null}
             {testata ? testi.categories[testata].masthead : testi.masthead}
@@ -352,16 +352,16 @@ export function NewsStand({ copy: testi, locale }: { copy: NewsCopy; locale: str
         </div>
         {/* Si annunciano solo testata e titolo: l'articolo intero, e la fila
             delle gia' uscite, si vanno a leggere. */}
-        <p className="sr-only" aria-live="polite" data-notizie-annuncio>
+        <p className="sr-only" aria-live="polite" data-news-announcement>
           {notizia && uscita ? `${testi.categories[uscita.cat].masthead}: ${storyTitle(notizia, testi)}` : ""}
         </p>
-        <div data-foglio-corpo>
+        <div data-sheet-body>
           {/* La notizia, il pannello vuoto e quello della categoria finita
               stanno nella stessa scatola, della stessa misura. */}
-          <div data-foglio-notizia>
+          <div data-sheet-story>
             {/* Sempre montato, vuoto quando non c'e' niente da dire: una regione
                 che nasce insieme al suo testo spesso non viene letta. */}
-            <p data-notizie-avviso role="status">
+            <p data-news-notice role="status">
               {avviso ?? ""}
             </p>
             {avviso ? null : notizia && uscita ? (
@@ -375,15 +375,15 @@ export function NewsStand({ copy: testi, locale }: { copy: NewsCopy; locale: str
                 now={adesso}
               />
             ) : messaggio ? (
-              <p data-notizie-messaggio>{messaggio}</p>
+              <p data-news-message>{messaggio}</p>
             ) : null}
           </div>
-          <div data-foglio-colonna>
-            <p data-foglio-etichetta>{testi.alreadyDrawn}</p>
+          <div data-sheet-column>
+            <p data-sheet-label>{testi.alreadyDrawn}</p>
             {/* La colonna scorre dentro di se': senza, Lenis prende la rotella
                 e scorre la pagina anche col puntatore sulla lista. */}
-            <ol data-foglio-uscite data-lenis-prevent>
-              {fila.length === 0 ? <li data-foglio-nessuna>{testi.noneDrawn}</li> : null}
+            <ol data-sheet-drawn data-lenis-prevent>
+              {fila.length === 0 ? <li data-sheet-none>{testi.noneDrawn}</li> : null}
               {fila.map((u) => {
                 const n = pronta?.categories[u.cat][u.i];
                 if (!n) return null;
@@ -407,7 +407,7 @@ export function NewsStand({ copy: testi, locale }: { copy: NewsCopy; locale: str
                 );
               })}
             </ol>
-            <p data-notizie-raccolte>{pronta ? collectedLabel(pronta.collectedAt, locale, adesso, testi) : "\u00a0"}</p>
+            <p data-news-collected>{pronta ? collectedLabel(pronta.collectedAt, locale, adesso, testi) : "\u00a0"}</p>
           </div>
         </div>
       </div>

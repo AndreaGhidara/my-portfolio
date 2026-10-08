@@ -126,8 +126,8 @@ export function Toolbox({ copy: testi }: { copy: ToolboxCopy }) {
     ) : null;
 
   return (
-    <div data-cassetta data-motion={level}>
-      <div data-cassetta-cuci role="group" aria-label={testi.sewFor}>
+    <div data-toolbox data-motion={level}>
+      <div data-toolbox-sew role="group" aria-label={testi.sewFor}>
         <span aria-hidden="true">{testi.sewFor}</span>
         {GARMENTS.map((c) => (
           <button
@@ -141,16 +141,16 @@ export function Toolbox({ copy: testi }: { copy: ToolboxCopy }) {
         ))}
         <button
           type="button"
-          data-tutta
+          data-whole
           aria-pressed={stato.garment === null}
           onClick={() => manda({ type: "capo", id: null })}
         >
           {testi.whole}
         </button>
       </div>
-      <p data-cassetta-partenza>{testi.start}</p>
+      <p data-toolbox-start>{testi.start}</p>
 
-      <div data-cassetta-scena>
+      <div data-toolbox-scene>
         <ToolboxMap
           copy={testi}
           garment={capo}
@@ -179,7 +179,7 @@ export function Toolbox({ copy: testi }: { copy: ToolboxCopy }) {
         />
       </div>
 
-      <div data-cassetta-elenco>
+      <div data-toolbox-list>
         <h3>{testi.list}</h3>
         {ZONES.map((z) => (
           // Un div e non una section: nove scomparti sarebbero nove landmark,
@@ -192,7 +192,7 @@ export function Toolbox({ copy: testi }: { copy: ToolboxCopy }) {
                 <li key={a.id}>
                   <b>{a.name}</b>: {testi.tools[a.id].what}{" "}
                   <span>
-                    ({a.experience === "lavoro" ? e.atWork : e.known})
+                    ({a.experience === "work" ? e.atWork : e.known})
                   </span>
                 </li>
               ))}

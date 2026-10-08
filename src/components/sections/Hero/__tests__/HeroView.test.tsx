@@ -79,7 +79,7 @@ describe("HeroView", () => {
 describe("la carta del nome", () => {
   it("lo strato c'e', ed e' muto", () => {
     const { container } = render(<HeroView {...props} />);
-    const strato = container.querySelector("[data-carta]");
+    const strato = container.querySelector("[data-paper]");
     expect(strato).not.toBeNull();
     expect(strato).toHaveAttribute("aria-hidden", "true");
   });
@@ -89,11 +89,11 @@ describe("la carta del nome", () => {
     // con la riduzione del movimento accesa) l'hero e' quello di sempre.
     // Nessuna tela, nessuno stile appiccicato alle immagini.
     const { container } = render(<HeroView {...props} />);
-    expect(container.querySelectorAll("[data-carta-lettera], [data-carta-pezzo]")).toHaveLength(0);
+    expect(container.querySelectorAll("[data-paper-letter], [data-paper-piece]")).toHaveLength(0);
     for (const img of container.querySelectorAll(".wordmark-letter")) {
       expect((img as HTMLElement).style.opacity).toBe("");
     }
-    expect(document.body).not.toHaveAttribute("data-carta-presa");
+    expect(document.body).not.toHaveAttribute("data-paper-grabbed");
   });
 
   it("il nome resta leggibile a chi non vede lo schermo", () => {

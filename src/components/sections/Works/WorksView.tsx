@@ -18,7 +18,7 @@ export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewPro
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="eyebrow">{eyebrow}</p>
-            <h2 id="titolo-works" className="titolo-sezione">{title}</h2>
+            <h2 id="titolo-works" className="section-title">{title}</h2>
           </div>
           <QuoteFrame variant="close" className="block w-10 shrink-0 lg:w-14" />
         </div>

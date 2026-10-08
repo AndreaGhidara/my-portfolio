@@ -69,28 +69,28 @@ export function WorkFolder({
   };
 
   return (
-    <li ref={li} data-cartella style={{ "--i": index } as CSSProperties}>
-      <button ref={linguetta} type="button" data-linguetta onClick={onRiporta}>
+    <li ref={li} data-folder style={{ "--i": index } as CSSProperties}>
+      <button ref={linguetta} type="button" data-tab onClick={onRiporta}>
         <b>{data.name}</b>
         {/* Sul telefono la linguetta porta solo il nome: quattro in fila non
             ci starebbero con l'anno, e l'anno lo dice la faccia. */}
-        <span data-linguetta-anno> · {data.year}</span>
+        <span data-tab-year> · {data.year}</span>
         <span className="sr-only">, {riportaLabel}</span>
       </button>
 
       {/* Ad archivio acceso il dorso prende il puntatore (vedi sezioni/lavori.css) e
           non fa niente: e' la fascia fra le linguette e la faccia, e un click
           li' non deve arrivare alla faccia di una cartella coperta. */}
-      <div ref={dorso} data-dorso aria-hidden="true" />
+      <div ref={dorso} data-spine aria-hidden="true" />
       {/* Il foglio che spunta: e' lui che sfila quando la cartella si apre. */}
-      <div ref={foglio} data-foglio aria-hidden="true" />
+      <div ref={foglio} data-sheet aria-hidden="true" />
 
       {/* Un click sulla faccia apre il caso come il suo bottone: sono la
           stessa cosa. Il bottone c'e' per la tastiera e per chi legge a voce,
           e la faccia gli delega il puntatore. */}
       <div
         ref={faccia}
-        data-faccia
+        data-face
         onClick={(event) => {
           if ((event.target as Element).closest("button")) return;
           apri();
@@ -103,35 +103,35 @@ export function WorkFolder({
         onPointerDown={onPreload}
       >
         <div>
-          <p data-faccia-numero>
+          <p data-face-number>
             {pad2(index + 1)} / {pad2(totale)}
           </p>
           {/* Il titolo della cartella e' chi, non la frase: e' quello che
               distingue una cartella dall'altra nell'elenco dei titoli, ed e'
               lo stesso titolo del dossier che la faccia apre. */}
-          <h3 data-faccia-chi>
+          <h3 data-face-who>
             {data.name} · {data.year}
           </h3>
         </div>
 
-        <div data-faccia-centro>
-          <p data-faccia-riga>{data.tagline}</p>
-          <div data-faccia-schermata>
+        <div data-face-centre>
+          <p data-face-line>{data.tagline}</p>
+          <div data-face-screenshot>
             {data.screenshot ? (
               <WorkShot shot={data.screenshot} alt={data.screenshotAlt} />
             ) : (
-              <p data-faccia-riservato>{riservatoLabel}</p>
+              <p data-face-confidential>{riservatoLabel}</p>
             )}
           </div>
         </div>
 
-        <div data-faccia-piede>
-          <ul data-faccia-tech>
+        <div data-face-foot>
+          <ul data-face-tech>
             {data.tech.map((voce) => (
               <li key={voce}>{voce}</li>
             ))}
           </ul>
-          <button ref={bottone} type="button" data-apri aria-haspopup="dialog" onClick={apri}>
+          <button ref={bottone} type="button" data-open-button aria-haspopup="dialog" onClick={apri}>
             {openLabel} <span aria-hidden="true">+</span>
             <span className="sr-only">: {data.name}</span>
           </button>

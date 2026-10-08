@@ -9,8 +9,8 @@ import { Logic } from "../Logic";
 const testi = it_.services.gioco.logiche;
 
 const banco = (container: HTMLElement) =>
-  container.querySelector('[data-gioco-livello="logiche"]') as HTMLElement;
-const palco = (container: HTMLElement) => banco(container).querySelector(".palco") as HTMLElement;
+  container.querySelector('[data-game-level="logiche"]') as HTMLElement;
+const palco = (container: HTMLElement) => banco(container).querySelector(".stage") as HTMLElement;
 const pulsante = (nome: string) => screen.getByRole("button", { name: new RegExp(nome) });
 
 const monta = (onAvanti = vi.fn(), locale: "it" | "en" = "it") => {

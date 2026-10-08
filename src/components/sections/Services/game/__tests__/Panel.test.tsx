@@ -8,10 +8,10 @@ import { Panel, SEQUENCE } from "../Panel";
 
 const p = it_.services.gioco.pannello;
 
-const banco = (c: HTMLElement) => c.querySelector('[data-gioco-livello="pannello"]') as HTMLElement;
+const banco = (c: HTMLElement) => c.querySelector('[data-game-level="pannello"]') as HTMLElement;
 const console_ = (c: HTMLElement) => banco(c).querySelector(".console") as HTMLElement;
-const salute = (c: HTMLElement) => Number(banco(c).querySelector(".salute b")!.textContent!.replace("%", ""));
-const coda = (c: HTMLElement) => banco(c).querySelector(".coda") as HTMLElement;
+const salute = (c: HTMLElement) => Number(banco(c).querySelector(".health b")!.textContent!.replace("%", ""));
+const coda = (c: HTMLElement) => banco(c).querySelector(".tail") as HTMLElement;
 const modulo = (nome: string) => screen.getByRole("button", { name: nome });
 const accendi = () => screen.getByRole("button", { name: new RegExp(p.spento.accendi) });
 
@@ -76,7 +76,7 @@ describe("il pannello, acceso e spento", () => {
     expect(coda(container)).toHaveTextContent(p.eventi[0].testo);
     expect(within(banco(container)).getByText("avviso 1 di 6")).toBeInTheDocument();
     expect(screen.getByText(p.acceso.spia.titolo)).toBeInTheDocument();
-    expect(modulo(p.servizi.manutenzione)).toHaveClass("allarme");
+    expect(modulo(p.servizi.manutenzione)).toHaveClass("alarm");
 
     // 1,2 punti ogni 400 ms, e con lo StrictMode un intervallo solo: 4 s
     // fanno 12 punti, non 24.
@@ -120,7 +120,7 @@ describe("il pannello, i moduli", () => {
     expect(con.getByText(p.eventi[0].esito)).toBeInTheDocument();
     expect(con.getByRole("button", { name: p.modulo.aspetta })).toBeDisabled();
     expect(coda(container)).toHaveTextContent(`${p.servizi.manutenzione} · risolto`);
-    expect(modulo(p.servizi.manutenzione)).not.toHaveClass("allarme");
+    expect(modulo(p.servizi.manutenzione)).not.toHaveClass("alarm");
 
     const ferma = salute(container);
     passa(2000);
@@ -129,7 +129,7 @@ describe("il pannello, i moduli", () => {
     // 2,6 s dopo l'intervento arriva il secondo avviso.
     passa(600);
     expect(coda(container)).toHaveTextContent(p.eventi[1].testo);
-    expect(modulo(p.servizi.assistenza)).toHaveClass("allarme");
+    expect(modulo(p.servizi.assistenza)).toHaveClass("alarm");
   });
 });
 
@@ -217,6 +217,6 @@ describe("il pannello, il resoconto", () => {
     tocca(screen.getByRole("button", { name: new RegExp(pe.spento.accendi) }));
     passa(1400);
     expect(screen.getByText(pe.acceso.spia.titolo)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: pe.servizi.manutenzione })).toHaveClass("allarme");
+    expect(screen.getByRole("button", { name: pe.servizi.manutenzione })).toHaveClass("alarm");
   });
 });

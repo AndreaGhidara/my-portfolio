@@ -63,23 +63,23 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
     >
       {data && (
         <>
-          <button type="button" data-pratica-chiudi data-entra onClick={onChiudi}>
+          <button type="button" data-dossier-close data-enter onClick={onChiudi}>
             <span aria-hidden="true">×</span>
             <span className="sr-only">{labels.close}</span>
           </button>
 
-          <article data-pratica>
+          <article data-dossier>
             {/* La linguetta e' il titolo: lo stesso della cartella che l'ha aperta. */}
-            <p id={titleId} data-pratica-linguetta>
+            <p id={titleId} data-dossier-tab>
               <b>{data.name}</b> · {data.year}
             </p>
 
-            <div data-pratica-foglio>
-              <header data-pratica-testa data-entra>
+            <div data-dossier-sheet>
+              <header data-dossier-head data-enter>
                 <p>
                   <b>{site.name}</b> <span>{labels.archive}</span>
                 </p>
-                <p data-pratica-numero>
+                <p data-dossier-number>
                   {labels.dossier}{" "}
                   <strong>
                     {pad2(numero)} / {pad2(totale)}
@@ -87,7 +87,7 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
                 </p>
               </header>
 
-              <dl data-pratica-campi data-entra>
+              <dl data-dossier-fields data-enter>
                 <div>
                   <dt>{labels.client}</dt>
                   <dd>{data.name}</dd>
@@ -106,33 +106,33 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
                 </div>
               </dl>
 
-              <div data-pratica-corpo>
+              <div data-dossier-body>
                 {/* La riga della faccia torna qui come la situazione trovata:
                     e' lei ad aver fatto aprire la pratica. */}
-                <div data-pratica-oggetto data-entra>
+                <div data-dossier-subject data-enter>
                   <p>{labels.before}</p>
                   <p>{data.tagline}</p>
                 </div>
 
-                <div data-pratica-destra>
+                <div data-dossier-right>
                   {/* Senza schermata il posto non resta vuoto: il tratteggio e'
                       il modo in cui questo sito dice «questa cosa non c'e', e
                       non per dimenticanza». */}
                   {data.screenshot ? (
-                    <figure data-pratica-allegato data-entra>
-                      <div data-pratica-schermata>
+                    <figure data-dossier-attachment data-enter>
+                      <div data-dossier-screenshot>
                         <WorkShot shot={data.screenshot} alt={data.screenshotAlt} />
                       </div>
                       <figcaption>{labels.attachment}</figcaption>
                     </figure>
                   ) : (
-                    <p data-pratica-riservato data-entra>
+                    <p data-dossier-confidential data-enter>
                       {labels.confidential}
                     </p>
                   )}
 
                   {data.metrics.length > 0 && (
-                    <section data-pratica-numeri data-entra>
+                    <section data-dossier-figures data-enter>
                       {/* Un lavoro in corso non ha una fine da cui rilevare. */}
                       <h3>{data.status === "in-corso" ? labels.measuredSoFar : labels.measured}</h3>
                       <dl>
@@ -154,7 +154,7 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
               {/* Il lavoro, la scelta, la conduzione: tre pesi uguali apposta.
                   La conduzione e' quello che un elenco di tecnologie non ha, e
                   chi legge in diagonale non deve saltarla. */}
-              <ol data-pratica-voci>
+              <ol data-dossier-items>
                 {(
                   [
                     [labels.work, data.work],
@@ -162,7 +162,7 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
                     [labels.approach, data.approach],
                   ] as const
                 ).map(([titolo, testo], n) => (
-                  <li key={titolo} data-entra>
+                  <li key={titolo} data-enter>
                     <span aria-hidden="true">{n + 1}</span>
                     <div>
                       <h3>{titolo}</h3>
@@ -172,9 +172,9 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
                 ))}
               </ol>
 
-              <footer data-pratica-piede data-entra>
-                <div data-pratica-piede-sx>
-                  <ul data-pratica-tech>
+              <footer data-dossier-foot data-enter>
+                <div data-dossier-foot-left>
+                  <ul data-dossier-tech>
                     {data.tech.map((voce) => (
                       <li key={voce}>{voce}</li>
                     ))}
@@ -182,15 +182,15 @@ export function WorkDialog({ dialog: dialogo, data, number: numero, total: total
                   {/* Senza url il link lascia la sua forma, tratteggiata e non
                       cliccabile: l'assenza si legge come un dato. */}
                   {data.url ? (
-                    <a data-pratica-link href={data.url} target="_blank" rel="noopener noreferrer">
+                    <a data-dossier-link href={data.url} target="_blank" rel="noopener noreferrer">
                       {labels.visit} <span aria-hidden="true">↗</span>
                     </a>
                   ) : (
-                    <span data-pratica-senza-link>{labels.confidential}</span>
+                    <span data-dossier-no-link>{labels.confidential}</span>
                   )}
                 </div>
-                <p data-pratica-timbro>{stato}</p>
-                <p data-pratica-firma>
+                <p data-dossier-stamp>{stato}</p>
+                <p data-dossier-signature>
                   <em>{labels.signatureName}</em>
                   {labels.signatureRole}
                 </p>

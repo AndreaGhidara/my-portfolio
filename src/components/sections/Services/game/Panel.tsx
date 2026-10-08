@@ -159,33 +159,33 @@ export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
     );
 
   return (
-    <div className="banco" data-gioco-livello="pannello">
-      <div className="sopra reticolo">
-        <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: levelNumber("pannello"), nome: comune("livelli.pannello") })}</span>
-          <span className="destra">{conta}</span>
+    <div className="bench" data-game-level="pannello">
+      <div className="above lattice">
+        <div className="head">
+          <span className="level">{comune("etichetta", { numero: levelNumber("pannello"), nome: comune("livelli.pannello") })}</span>
+          <span className="right">{conta}</span>
         </div>
 
-        <div className="salute">
-          <b className={giu ? "giu" : undefined}>{salute}%</b>
-          <div className="tubo" aria-hidden="true">
-            <i className={giu ? "giu" : undefined} style={{ "--p": `${s.salute}%` } as CSSProperties} />
+        <div className="health">
+          <b className={giu ? "down" : undefined}>{salute}%</b>
+          <div className="tube" aria-hidden="true">
+            <i className={giu ? "down" : undefined} style={{ "--p": `${s.salute}%` } as CSSProperties} />
           </div>
           <small>{t("salute")}</small>
         </div>
 
-        <div className="coda" role="status">
+        <div className="tail" role="status">
           <span aria-hidden="true">›</span>
           {coda}
         </div>
 
-        <div className="moduli">
+        <div className="modules">
           {SERVIZI.map((k) => (
             <button
               key={k}
               type="button"
-              className={[allarme === k && "allarme", s.scelto === k && "scelto"].filter(Boolean).join(" ") || undefined}
-              data-modulo
+              className={[allarme === k && "alarm", s.scelto === k && "chosen"].filter(Boolean).join(" ") || undefined}
+              data-form
               aria-pressed={s.scelto === k}
               disabled={s.fase !== "acceso"}
               onClick={() => manda({ tipo: "tocca", servizio: k })}
@@ -195,7 +195,7 @@ export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
                 <Icon name={k} />
               </span>
               {nome(k)}
-              <span className="viti" aria-hidden="true" />
+              <span className="screws" aria-hidden="true" />
             </button>
           ))}
         </div>
@@ -208,12 +208,12 @@ export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
               <p className="mono">{t("spento.occhiello")}</p>
               <h3>{t("spento.titolo")}</h3>
             </div>
-            <p className="spiega">{t("spento.spiega")}</p>
-            <div className="palco">
+            <p className="explain">{t("spento.spiega")}</p>
+            <div className="stage">
               <Calma segno="🔌" testo={t("spento.calma")} />
             </div>
-            <div className="azioni">
-              <button type="button" className="verde" onClick={() => manda({ tipo: "accendi" })}>
+            <div className="actions">
+              <button type="button" className="green" onClick={() => manda({ tipo: "accendi" })}>
                 <b aria-hidden="true">⏻</b>
                 {t("spento.accendi")}
               </button>
@@ -225,9 +225,9 @@ export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
               <p className="mono">{t("fine.occhiello")}</p>
               <h3>{s.salute >= SOGLIA_BENE ? t("fine.bene") : t("fine.male")}</h3>
             </div>
-            <p className="spiega">{t("fine.spiega", { salute })}</p>
-            <div className="palco">
-              <ul className="rapporto">
+            <p className="explain">{t("fine.spiega", { salute })}</p>
+            <div className="stage">
+              <ul className="report">
                 {SERVIZI.map((k) => (
                   <li key={k}>
                     <span className="ic">
@@ -240,12 +240,12 @@ export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
                 ))}
               </ul>
             </div>
-            <div className="azioni due">
+            <div className="actions two">
               <button type="button" onClick={() => manda({ tipo: "ricomincia" })}>
                 <b aria-hidden="true">↺</b>
                 {t("fine.ricomincia")}
               </button>
-              <button type="button" className="giallo" onClick={onAvanti}>
+              <button type="button" className="yellow" onClick={onAvanti}>
                 {t("fine.avanti")} <b aria-hidden="true">→</b>
               </button>
             </div>
@@ -256,8 +256,8 @@ export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
               <p className="mono">{t("acceso.occhiello")}</p>
               <h3>{allarme ? t("acceso.spia.titolo") : t("acceso.verde.titolo")}</h3>
             </div>
-            <p className="spiega">{allarme ? t("acceso.spia.spiega") : t("acceso.verde.spiega")}</p>
-            <div className="palco">
+            <p className="explain">{allarme ? t("acceso.spia.spiega") : t("acceso.verde.spiega")}</p>
+            <div className="stage">
               {allarme ? (
                 <Calma key="spia" segno="👆" testo={t("acceso.spia.calma")} />
               ) : (
@@ -284,7 +284,7 @@ export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
 /** Il palco tranquillo: un segno e una riga, al centro. */
 function Calma({ segno, testo }: { segno: string; testo: string }) {
   return (
-    <div className="calma">
+    <div className="calm">
       <p>
         <span aria-hidden="true">{segno}</span>
         {testo}
@@ -324,10 +324,10 @@ function Modulo({
       </div>
       {/* Nel prototipo questa riga c'e' anche col pannello tutto verde; qui
           solo quando la spia accesa e' davvero un'altra. */}
-      <p className="spiega">{risolto === null && !tocca && attivo !== null ? t("altra") : ""}</p>
-      <div className="palco">
+      <p className="explain">{risolto === null && !tocca && attivo !== null ? t("altra") : ""}</p>
+      <div className="stage">
         {risolto !== null ? (
-          <div key="risolto" className="problema risolto">
+          <div key="risolto" className="problem solved">
             <small>
               <span aria-hidden="true">✓ </span>
               {t("risolto")}
@@ -335,7 +335,7 @@ function Modulo({
             <p>{eventi[risolto].esito}</p>
           </div>
         ) : avviso ? (
-          <div key="avviso" className="problema">
+          <div key="avviso" className="problem">
             <small>
               <span aria-hidden="true">⚠ </span>
               {t("avviso")}
@@ -346,9 +346,9 @@ function Modulo({
           <Calma key="calma" segno="✓" testo={t("nessuno", { nome: nome.toLowerCase() })} />
         )}
       </div>
-      <div className="azioni">
+      <div className="actions">
         {avviso ? (
-          <button type="button" className="giallo" onClick={intervieni}>
+          <button type="button" className="yellow" onClick={intervieni}>
             <b aria-hidden="true">⚡</b>
             {avviso.intervento}
           </button>

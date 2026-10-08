@@ -111,7 +111,7 @@ describe("WorksView", () => {
     const sezione = screen.getByRole("region", { name: props.title });
     const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
     expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
-    expect(titolo).toHaveClass("titolo-sezione");
+    expect(titolo).toHaveClass("section-title");
   });
 
   it("ogni cartella ha un titolo: il nome del lavoro e l'anno, come il dossier che apre", () => {
@@ -136,7 +136,7 @@ describe("WorksView", () => {
     expect(archivio!.children).toHaveLength(items.length);
     for (const figlio of Array.from(archivio!.children)) {
       expect(figlio.tagName).toBe("LI");
-      expect(figlio.hasAttribute("data-cartella")).toBe(true);
+      expect(figlio.hasAttribute("data-folder")).toBe(true);
     }
   });
 
@@ -144,20 +144,20 @@ describe("WorksView", () => {
     // Il server e il primo render non sanno se c'e' GSAP ne' quanto e' alto lo
     // schermo: la colonna si legge sempre, l'archivio va guadagnato.
     const { container } = render(<WorksView {...props} />);
-    expect(container.querySelector("[data-archivio-acceso]")).toBeNull();
+    expect(container.querySelector("[data-archive-lit]")).toBeNull();
   });
 
   it("i numeri tarati nel prototipo arrivano al CSS dal modulo, non da una seconda copia", () => {
     const { container } = render(<WorksView {...props} />);
     const archivio = container.querySelector<HTMLElement>("[data-work-shelf]")!;
-    expect(archivio.style.getPropertyValue("--passo")).toBe(`${ARCHIVE_PARAMS.step}px`);
-    expect(archivio.style.getPropertyValue("--distanza")).toBe(`${ARCHIVE_PARAMS.distance}vh`);
-    expect(archivio.style.getPropertyValue("--scurisce")).toBe(String(ARCHIVE_PARAMS.darkens));
-    expect(archivio.style.getPropertyValue("--stringe")).toBe(String(ARCHIVE_PARAMS.narrows));
-    expect(archivio.style.getPropertyValue("--larghezza-linguetta")).toBe(
+    expect(archivio.style.getPropertyValue("--step")).toBe(`${ARCHIVE_PARAMS.step}px`);
+    expect(archivio.style.getPropertyValue("--distance")).toBe(`${ARCHIVE_PARAMS.distance}vh`);
+    expect(archivio.style.getPropertyValue("--darkens")).toBe(String(ARCHIVE_PARAMS.darkens));
+    expect(archivio.style.getPropertyValue("--narrows")).toBe(String(ARCHIVE_PARAMS.narrows));
+    expect(archivio.style.getPropertyValue("--tab-width")).toBe(
       `${ARCHIVE_PARAMS.tabWidth}%`,
     );
-    expect(archivio.style.getPropertyValue("--buio-minimo")).toBe(
+    expect(archivio.style.getPropertyValue("--min-dark")).toBe(
       `${TAB.minDark * 100}%`,
     );
   });
@@ -166,18 +166,18 @@ describe("WorksView", () => {
     // Archiviata, di una cartella resta a vista solo la linguetta: deve
     // prendere il click per intero, e un bottone dentro un bottone non e' HTML.
     const { container } = render(<WorksView {...props} />);
-    for (const cartella of Array.from(container.querySelectorAll("[data-cartella]"))) {
-      const linguetta = cartella.querySelector("[data-linguetta]");
+    for (const cartella of Array.from(container.querySelectorAll("[data-folder]"))) {
+      const linguetta = cartella.querySelector("[data-tab]");
       expect(linguetta?.tagName).toBe("BUTTON");
       expect(linguetta?.parentElement).toBe(cartella);
-      expect(linguetta?.closest("[data-faccia]")).toBeNull();
-      expect(cartella.querySelector("[data-faccia] [data-apri]")?.tagName).toBe("BUTTON");
+      expect(linguetta?.closest("[data-face]")).toBeNull();
+      expect(cartella.querySelector("[data-face] [data-open-button]")?.tagName).toBe("BUTTON");
     }
   });
 
   it("dorso e foglio sono disegno: chi legge a voce non li sente", () => {
     const { container } = render(<WorksView {...props} />);
-    for (const sel of ["[data-dorso]", "[data-foglio]"]) {
+    for (const sel of ["[data-spine]", "[data-sheet]"]) {
       for (const el of Array.from(container.querySelectorAll(sel))) {
         expect(el).toHaveAttribute("aria-hidden", "true");
       }
@@ -186,9 +186,9 @@ describe("WorksView", () => {
 
   it("la linguetta porta nome e anno, e l'anno sta a parte perche' sul telefono si toglie", () => {
     const { container } = render(<WorksView {...props} />);
-    const linguetta = container.querySelector("[data-linguetta]")!;
+    const linguetta = container.querySelector("[data-tab]")!;
     expect(linguetta).toHaveTextContent(/^BDroppy\s*·\s*2024/);
-    expect(linguetta.querySelector("[data-linguetta-anno]")).toHaveTextContent("· 2024");
+    expect(linguetta.querySelector("[data-tab-year]")).toHaveTextContent("· 2024");
   });
 
   it("la linguetta dice a chi legge a voce cosa fa: non apre il caso, riporta davanti la cartella", () => {
@@ -200,7 +200,7 @@ describe("WorksView", () => {
 
   it("la faccia dice quale cartella e' su quante, e di chi", () => {
     const { container } = render(<WorksView {...props} />);
-    const prima = container.querySelector("[data-cartella] [data-faccia]")!;
+    const prima = container.querySelector("[data-folder] [data-face]")!;
     expect(prima).toHaveTextContent("01 / 02");
     expect(prima).toHaveTextContent("BDroppy · 2024");
   });
@@ -208,7 +208,7 @@ describe("WorksView", () => {
   it("il riservato non ha schermata, e al suo posto lo dice", () => {
     const riservato = { ...items[1], id: "riservato", screenshot: undefined, url: undefined };
     const { container } = render(<WorksView {...props} items={[riservato]} />);
-    const riquadro = container.querySelector("[data-faccia-schermata]");
+    const riquadro = container.querySelector("[data-face-screenshot]");
     expect(riquadro).toHaveTextContent(labels.confidential);
     expect(riquadro!.querySelector("img")).toBeNull();
   });
@@ -217,7 +217,7 @@ describe("WorksView", () => {
     // Una sola `sizes` per cartella, dossier e precarico: con due valori il
     // browser scaricherebbe due file quasi uguali.
     const { container } = render(<WorksView {...props} />);
-    const img = container.querySelector("[data-faccia-schermata] img");
+    const img = container.querySelector("[data-face-screenshot] img");
     expect(img).toHaveAttribute("sizes", SHOT_SIZES);
   });
 
@@ -349,7 +349,7 @@ describe("WorksView", () => {
     };
 
     const { container } = render(<WorksView {...props} items={[caso]} />);
-    const faccia = container.querySelector<HTMLElement>("[data-faccia]")!;
+    const faccia = container.querySelector<HTMLElement>("[data-face]")!;
     await userEvent.hover(faccia);
     await userEvent.unhover(faccia);
     await userEvent.hover(faccia);
@@ -379,7 +379,7 @@ describe("WorksView", () => {
 
 /** I campi della pratica come coppie etichetta → valore, nell'ordine del foglio. */
 const campi = (dialog: HTMLElement) =>
-  Array.from(dialog.querySelectorAll("[data-pratica-campi] > div")).map((campo) => [
+  Array.from(dialog.querySelectorAll("[data-dossier-fields] > div")).map((campo) => [
     campo.querySelector("dt")?.textContent,
     campo.querySelector("dd")?.textContent,
   ]);
@@ -417,7 +417,7 @@ describe("la pratica", () => {
   it("dice quale pratica e' su quante, come la faccia della cartella", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[1]);
-    const testa = screen.getByRole("dialog").querySelector("[data-pratica-testa]");
+    const testa = screen.getByRole("dialog").querySelector("[data-dossier-head]");
     expect(testa).toHaveTextContent("Pratica n.");
     expect(testa).toHaveTextContent("02 / 02");
     expect(testa).toHaveTextContent(labels.archive);
@@ -427,14 +427,14 @@ describe("la pratica", () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[0]);
     const dialog = screen.getByRole("dialog");
-    expect(dialog.querySelector("[data-pratica-timbro]")).toHaveTextContent(labels.delivered);
-    expect(dialog.querySelector("[data-pratica-firma]")).toHaveTextContent(`${labels.signatureName}${labels.signatureRole}`);
+    expect(dialog.querySelector("[data-dossier-stamp]")).toHaveTextContent(labels.delivered);
+    expect(dialog.querySelector("[data-dossier-signature]")).toHaveTextContent(`${labels.signatureName}${labels.signatureRole}`);
   });
 
   it("i numeri stimati lo dicono accanto al numero, e a lavoro finito sono «a fine lavoro»", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[0]);
-    const numeri = screen.getByRole("dialog").querySelector<HTMLElement>("[data-pratica-numeri]")!;
+    const numeri = screen.getByRole("dialog").querySelector<HTMLElement>("[data-dossier-figures]")!;
     expect(within(numeri).getByRole("heading", { name: labels.measured })).toBeInTheDocument();
     const valore = within(numeri).getByText("120");
     expect(valore.parentElement).toHaveTextContent(`120${labels.estimate}`);
@@ -444,7 +444,7 @@ describe("la pratica", () => {
     const misurato = { ...items[0], metrics: [{ ...items[0].metrics[0], estimated: false }] };
     render(<WorksView {...props} items={[misurato]} />);
     await userEvent.click(apri()[0]);
-    const numeri = screen.getByRole("dialog").querySelector("[data-pratica-numeri]");
+    const numeri = screen.getByRole("dialog").querySelector("[data-dossier-figures]");
     expect(numeri).not.toHaveTextContent(labels.estimate);
   });
 
@@ -459,16 +459,16 @@ describe("la pratica", () => {
       ["Online", labels.confidential],
     ]);
     expect(dialog.querySelector("img")).toBeNull();
-    expect(dialog.querySelector("[data-pratica-riservato]")).toHaveTextContent(labels.confidential);
+    expect(dialog.querySelector("[data-dossier-confidential]")).toHaveTextContent(labels.confidential);
     expect(within(dialog).queryByRole("link")).toBeNull();
-    expect(dialog.querySelector("[data-pratica-senza-link]")).toHaveTextContent(labels.confidential);
-    expect(dialog.querySelector("[data-pratica-timbro]")).toHaveTextContent(labels.inProgress);
+    expect(dialog.querySelector("[data-dossier-no-link]")).toHaveTextContent(labels.confidential);
+    expect(dialog.querySelector("[data-dossier-stamp]")).toHaveTextContent(labels.inProgress);
   });
 
   it("su un lavoro in corso i numeri sono «rilevati finora», non a fine lavoro", async () => {
     render(<WorksView {...props} items={[riservato]} />);
     await userEvent.click(apri()[0]);
-    const numeri = screen.getByRole("dialog").querySelector<HTMLElement>("[data-pratica-numeri]")!;
+    const numeri = screen.getByRole("dialog").querySelector<HTMLElement>("[data-dossier-figures]")!;
     expect(within(numeri).getByRole("heading", { name: labels.measuredSoFar })).toBeInTheDocument();
     expect(numeri).not.toHaveTextContent(labels.measured);
   });
@@ -600,7 +600,7 @@ describe("aprire e chiudere la pratica", () => {
 });
 
 /** Le regole del foglio di stile che riguardano l'archivio, corpo compreso. */
-const regoleDellArchivio = rules(/\[data-(work-shelf|cartella|linguetta|dorso|foglio|faccia|apri)/);
+const regoleDellArchivio = rules(/\[data-(work-shelf|folder|tab|spine|sheet|face|open-button)/);
 
 describe("i colori dell'archivio", () => {
   it("vengono dalla tavolozza: miscele dei token, niente colori scritti", () => {
@@ -615,8 +615,8 @@ describe("i colori dell'archivio", () => {
     const fondo = (sel: RegExp) =>
       regoleDellArchivio.find((r) => sel.test(r.selector) && /background-color:/.test(r.body))
         ?.body.match(/background-color:\s*([^;]+);/)?.[1];
-    expect(fondo(/^\[data-linguetta\]$/)).toBe("var(--cartella-dorso)");
-    expect(fondo(/^\[data-dorso\]$/)).toBe("var(--cartella-dorso)");
+    expect(fondo(/^\[data-tab\]$/)).toBe("var(--folder-spine)");
+    expect(fondo(/^\[data-spine\]$/)).toBe("var(--folder-spine)");
   });
 
   it("sul chiaro la faccia e' la carta della pagina, sullo scuro un gradino sopra l'inchiostro", () => {
@@ -624,15 +624,15 @@ describe("i colori dell'archivio", () => {
     // inchiostro al 10%, bordo al 24%, foglio carta. Sullo scuro i gradini del
     // prototipo: una cartella col fondo della pagina li' non avrebbe corpo.
     const chiaro = rules("[data-work-shelf]")[0]?.body ?? "";
-    expect(chiaro).toMatch(/--cartella-faccia:\s*var\(--superficie\)/);
-    expect(chiaro).toMatch(/--cartella-dorso:\s*color-mix\(in oklab, var\(--ink\) 10%, var\(--paper\)\)/);
-    expect(chiaro).toMatch(/--cartella-bordo:\s*color-mix\(in oklab, var\(--ink\) 24%, var\(--paper\)\)/);
-    expect(chiaro).toMatch(/--cartella-foglio:\s*var\(--paper\)/);
+    expect(chiaro).toMatch(/--folder-face:\s*var\(--surface\)/);
+    expect(chiaro).toMatch(/--folder-spine:\s*color-mix\(in oklab, var\(--ink\) 10%, var\(--paper\)\)/);
+    expect(chiaro).toMatch(/--folder-border:\s*color-mix\(in oklab, var\(--ink\) 24%, var\(--paper\)\)/);
+    expect(chiaro).toMatch(/--folder-sheet:\s*var\(--paper\)/);
 
     const scuro = rules('[data-theme="dark"] [data-work-shelf]')[0]?.body;
     expect(scuro, "l'archivio non ha i suoi colori sul tema scuro").toBeTruthy();
-    for (const token of ["faccia", "dorso", "bordo", "foglio"]) {
-      expect(scuro).toMatch(new RegExp(`--cartella-${token}:`));
+    for (const token of ["face", "spine", "border", "sheet"]) {
+      expect(scuro).toMatch(new RegExp(`--folder-${token}:`));
     }
   });
 });
@@ -641,14 +641,14 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
   it("senza l'attributo niente e' sticky: la colonna si legge senza JavaScript", () => {
     const sticky = regoleDellArchivio.filter((r) => /position:\s*sticky/.test(r.body));
     expect(sticky.length).toBeGreaterThan(0);
-    for (const r of sticky) expect(r.selector).toContain("[data-archivio-acceso]");
+    for (const r of sticky) expect(r.selector).toContain("[data-archive-lit]");
   });
 
   it("scurire e stringere solo le cartelle che possono finire sotto: l'ultima mai", () => {
     const effetti = regoleDellArchivio.filter((r) => /\bfilter:|\bscale:|will-change:/.test(r.body));
     expect(effetti.length).toBeGreaterThan(0);
     for (const r of effetti) {
-      expect(r.selector).toContain("[data-archivio-acceso]");
+      expect(r.selector).toContain("[data-archive-lit]");
       expect(r.selector).toContain(":not(:last-child)");
     }
   });
@@ -661,12 +661,12 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
     const filtri = regoleDellArchivio.filter((r) => /\bfilter:/.test(r.body));
     expect(filtri.length).toBeGreaterThan(0);
     for (const r of filtri) {
-      expect(r.selector).toMatch(/:not\(\[data-linguetta\]\)$/);
+      expect(r.selector).toMatch(/:not\(\[data-tab\]\)$/);
     }
     const fondo = regoleDellArchivio.find(
-      (r) => r.selector.includes("[data-archivio-acceso]") && /\[data-linguetta\]$/.test(r.selector) && /background-color:/.test(r.body),
+      (r) => r.selector.includes("[data-archive-lit]") && /\[data-tab\]$/.test(r.selector) && /background-color:/.test(r.body),
     );
-    expect(fondo?.body).toMatch(/color-mix\(in srgb, var\(--cartella-dorso\), var\(--ink\) calc\(var\(--profondita, 0\) \* var\(--scurisce\) \* 100%\)\)/);
+    expect(fondo?.body).toMatch(/color-mix\(in srgb, var\(--folder-spine\), var\(--ink\) calc\(var\(--depth, 0\) \* var\(--darkens\) \* 100%\)\)/);
     // Dietro @supports: un color-mix con calc che il browser rifiuta diventa
     // trasparente, non torna al fondo di prima.
     expect(fondo?.inside).toContain("@supports (background-color: color-mix(in srgb, red calc(1 * 10%), blue))");
@@ -675,10 +675,10 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
   it("i tre toni della linguetta: sul chiaro cambiano il testo, sullo scuro no", () => {
     const colore = (selettore: RegExp, valore: RegExp) =>
       rules(selettore).some((r) => valore.test(r.body));
-    expect(colore(/\[data-tono-linguetta="1"\] > \[data-linguetta\]$/, /color:\s*var\(--fg\)/)).toBe(true);
-    expect(colore(/\[data-tono-linguetta="2"\] > \[data-linguetta\]/, /color:\s*var\(--paper\)/)).toBe(true);
+    expect(colore(/\[data-tab-tone="1"\] > \[data-tab\]$/, /color:\s*var\(--fg\)/)).toBe(true);
+    expect(colore(/\[data-tab-tone="2"\] > \[data-tab\]/, /color:\s*var\(--paper\)/)).toBe(true);
     expect(
-      colore(/\[data-theme="dark"\].*\[data-tono-linguetta\] > \[data-linguetta\]/, /color:\s*var\(--cartella-tenue\)/),
+      colore(/\[data-theme="dark"\].*\[data-tab-tone\] > \[data-tab\]/, /color:\s*var\(--folder-muted\)/),
     ).toBe(true);
   });
 
@@ -686,7 +686,7 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
     // La fascia fra le linguette e la faccia e' dorso: trasparente al
     // puntatore, un click li' apriva il dossier di una cartella nascosta.
     const dorso = regoleDellArchivio.find(
-      (r) => r.selector.includes("[data-archivio-acceso]") && /\[data-dorso\]$/.test(r.selector),
+      (r) => r.selector.includes("[data-archive-lit]") && /\[data-spine\]$/.test(r.selector),
     );
     expect(dorso?.body).toMatch(/pointer-events:\s*auto/);
   });
@@ -694,13 +694,13 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
   it("dentro l'archivio i testi piccoli hanno un tenue piu' scuro, e l'arancio scuro e' schiarito", () => {
     // I rapporti sono in contrast.test.ts, misurati sui colori risolti.
     const chiaro = rules("[data-work-shelf]")[0]?.body ?? "";
-    expect(chiaro).toMatch(/--cartella-tenue:\s*color-mix\(in oklab, var\(--fg-muted\) 80%, var\(--fg\)\)/);
+    expect(chiaro).toMatch(/--folder-muted:\s*color-mix\(in oklab, var\(--fg-muted\) 80%, var\(--fg\)\)/);
     const scuro = rules('[data-theme="dark"] [data-work-shelf]')[0]?.body ?? "";
-    expect(scuro).toMatch(/--cartella-tenue:\s*var\(--fg-muted\)/);
-    expect(scuro).toMatch(/--accento-testo:\s*color-mix\(in oklab, var\(--accent\) 90%, var\(--paper\)\)/);
+    expect(scuro).toMatch(/--folder-muted:\s*var\(--fg-muted\)/);
+    expect(scuro).toMatch(/--accent-text:\s*color-mix\(in oklab, var\(--accent\) 90%, var\(--paper\)\)/);
     // Il tenue globale compare solo dentro la definizione del tenue suo.
     const tenui = regoleDellArchivio.filter((r) =>
-      /var\(--fg-muted\)/.test(r.body.replace(/--cartella-tenue:[^;]*;/g, "")),
+      /var\(--fg-muted\)/.test(r.body.replace(/--folder-muted:[^;]*;/g, "")),
     );
     expect(tenui.map((r) => r.selector), "un testo dell'archivio usa ancora il tenue globale").toEqual([]);
   });
@@ -710,17 +710,17 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
     // quella davanti coprirebbe le linguette di quelle dietro.
     const eventi = (sel: string) =>
       regoleDellArchivio.find((r) => r.selector === sel && /pointer-events:/.test(r.body))?.body;
-    expect(eventi("[data-cartella]")).toMatch(/pointer-events:\s*none/);
-    expect(eventi("[data-linguetta]")).toMatch(/pointer-events:\s*auto/);
-    expect(eventi("[data-faccia]")).toMatch(/pointer-events:\s*auto/);
+    expect(eventi("[data-folder]")).toMatch(/pointer-events:\s*none/);
+    expect(eventi("[data-tab]")).toMatch(/pointer-events:\s*auto/);
+    expect(eventi("[data-face]")).toMatch(/pointer-events:\s*auto/);
   });
 
   it("sotto i 600px la linguetta porta solo il nome e la faccia perde le tecnologie", () => {
     const telefono = { media: "(max-width: 599px)" };
-    const anno = rules(/\[data-linguetta-anno\]$/, telefono);
+    const anno = rules(/\[data-tab-year\]$/, telefono);
     expect(anno.length, "manca il blocco del telefono dell'archivio").toBeGreaterThan(0);
     expect(anno.map((r) => r.body).join("\n")).toMatch(/display:\s*none/);
-    expect(rules(/\[data-faccia-tech\]$/, telefono).map((r) => r.body).join("\n")).toMatch(/display:\s*none/);
+    expect(rules(/\[data-face-tech\]$/, telefono).map((r) => r.body).join("\n")).toMatch(/display:\s*none/);
   });
 
   it("il centro della faccia non si stringe sotto il suo contenuto, o la soglia non vede niente", () => {
@@ -729,7 +729,7 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
     // piede invece di debordare: misurato a 390x664, il riquadro del
     // riservato scendeva 17px sotto il centro fin dentro «Apri il caso», e la
     // soglia diceva che ci stava.
-    const centro = regoleDellArchivio.filter((r) => /\[data-faccia-centro\]$/.test(r.selector));
+    const centro = regoleDellArchivio.filter((r) => /\[data-face-centre\]$/.test(r.selector));
     expect(centro.length).toBeGreaterThan(0);
     for (const r of centro) expect(r.body).not.toMatch(/min-height:\s*0/);
   });
@@ -737,16 +737,16 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
   it("la riga grande cresce anche con l'altezza, non solo con la larghezza", () => {
     // Su un portatile basso (1366x768) la riga del riservato a 3,6vw chiedeva
     // cento pixel piu' della faccia. `vh` davanti per chi `svh` non lo conosce.
-    const riga = regoleDellArchivio.filter((r) => /\[data-faccia-riga\]$/.test(r.selector) && /font-size:/.test(r.body));
+    const riga = regoleDellArchivio.filter((r) => /\[data-face-line\]$/.test(r.selector) && /font-size:/.test(r.body));
     const corpo = riga.map((r) => r.body).join("");
     expect(corpo).toMatch(/font-size:\s*clamp\(1\.45rem, min\(3\.6vw, [\d.]+vh\), 3\.1rem\);\s*font-size:\s*clamp\(1\.45rem, min\(3\.6vw, [\d.]+svh\), 3\.1rem\)/);
   });
 
   it("la faccia si toglie la barra in basso, o «Apri il caso» ci finisce sotto", () => {
     const faccia = regoleDellArchivio.find(
-      (r) => r.selector.includes("[data-archivio-acceso]") && /\[data-faccia\]$/.test(r.selector) && /height:/.test(r.body),
+      (r) => r.selector.includes("[data-archive-lit]") && /\[data-face\]$/.test(r.selector) && /height:/.test(r.body),
     );
-    expect(faccia?.body).toContain("var(--barra-bassa)");
+    expect(faccia?.body).toContain("var(--bottom-bar)");
     expect(faccia?.body).toContain("100svh");
   });
 });
@@ -760,17 +760,17 @@ describe("i colori della pratica", () => {
     // oggetto di carta: --fg, --bg e compagni si ribaltano col tema scuro, e
     // il foglio diventerebbe inchiostro su inchiostro.
     expect(regoleDellaPratica.length).toBeGreaterThan(20);
-    const vietati = /var\(--(fg|bg|fg-muted|line|accento-testo|cartella-[\w-]+)\)/;
+    const vietati = /var\(--(fg|bg|fg-muted|line|accent-text|folder-[\w-]+)\)/;
     const colpevoli = regoleDellaPratica.filter((r) => vietati.test(r.body));
     expect(colpevoli.map((r) => r.selector)).toEqual([]);
   });
 
   it("i colori del foglio sono i suoi, e vengono dalla tavolozza", () => {
     const radice = regoleDellaPratica.find((r) => r.selector === "[data-work-dialog]")?.body ?? "";
-    expect(radice).toMatch(/--carta:\s*var\(--paper\)/);
-    expect(radice).toMatch(/--inchiostro:\s*var\(--ink\)/);
-    expect(radice).toMatch(/--tenue:\s*var\(--muted\)/);
-    expect(radice).toMatch(/--arancio:\s*var\(--accento-su-carta\)/);
+    expect(radice).toMatch(/--sheet-paper:\s*var\(--paper\)/);
+    expect(radice).toMatch(/--sheet-ink:\s*var\(--ink\)/);
+    expect(radice).toMatch(/--sheet-muted:\s*var\(--muted\)/);
+    expect(radice).toMatch(/--sheet-orange:\s*var\(--accent-on-paper\)/);
     const scritti = regoleDellaPratica.filter((r) => /#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i.test(r.body));
     expect(scritti.map((r) => r.selector)).toEqual([]);
   });
@@ -780,11 +780,11 @@ describe("i colori della pratica", () => {
   });
 
   it("sul computer il foglio si scorre invece di tagliare il testo", () => {
-    const computer = rules(/\[data-pratica-foglio\]$/, { media: "(min-width: 1024px) and (min-height: 700px)" });
+    const computer = rules(/\[data-dossier-sheet\]$/, { media: "(min-width: 1024px) and (min-height: 700px)" });
     expect(computer.length, "manca il blocco del computer della pratica").toBeGreaterThan(0);
     expect(computer.map((r) => r.body).join("\n")).toMatch(/overflow-y:\s*auto/);
     const nascosti = regoleDellaPratica.filter(
-      (r) => /\[data-pratica(-foglio)?\]$/.test(r.selector) && /overflow(-y)?:\s*hidden/.test(r.body),
+      (r) => /\[data-dossier(-foglio)?\]$/.test(r.selector) && /overflow(-y)?:\s*hidden/.test(r.body),
     );
     expect(nascosti.map((r) => r.selector)).toEqual([]);
   });

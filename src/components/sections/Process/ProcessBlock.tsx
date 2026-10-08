@@ -28,7 +28,7 @@ export function ProcessBlock({
   index: number;
 }) {
   return (
-    <li data-process-item data-lato={piece.side}>
+    <li data-process-item data-side={piece.side}>
       <div data-process-text>
         <p className="eyebrow">
           {pad2(index + 1)} · {delivery.when}
@@ -36,14 +36,14 @@ export function ProcessBlock({
         <h3>{delivery.title}</h3>
         <p data-process-lead>{delivery.lead}</p>
 
-        <ul data-process-dentro>
+        <ul data-process-includes>
           {delivery.includes.map((voce) => (
             <li key={voce}>{voce}</li>
           ))}
         </ul>
 
-        <p data-process-non>{delivery.excludes}</p>
-        <p data-process-perche>{delivery.why}</p>
+        <p data-process-excludes>{delivery.excludes}</p>
+        <p data-process-why>{delivery.why}</p>
       </div>
 
       {/* Decorazione, per intero: quello che il disegno dice lo dicono gia' il

@@ -104,8 +104,8 @@ describe("i fogli di stile", () => {
     // sigla e' a 1,5rem e puo' restare carta; «ITALIA» e' a 0,5rem e deve
     // stare in --on-accent, che fa 5,08:1. Il prototipo le aveva tutte e due
     // in carta, ed e' il difetto che questa prova blocca.
-    const sigla = rules("[data-francobollo-sigla]")[0]?.body;
-    const paese = rules("[data-francobollo-paese]")[0]?.body;
+    const sigla = rules("[data-stamp-code]")[0]?.body;
+    const paese = rules("[data-stamp-country]")[0]?.body;
     expect(sigla, "la sigla del francobollo non c'e' piu'").toBeTruthy();
     expect(paese, "il paese del francobollo non c'e' piu'").toBeTruthy();
     expect(sigla).toMatch(/font-size:\s*1\.5rem/);
@@ -120,7 +120,7 @@ describe("i fogli di stile", () => {
     // cornice del colore del blocco tutto intorno alla busta: e' esattamente
     // cio' che la busta doveva smettere di avere.
     const piede = rules("[data-footer]")[0]?.body;
-    const busta = rules("[data-busta]")[0]?.body;
+    const busta = rules("[data-envelope]")[0]?.body;
     expect(piede, "le regole del piede non ci sono piu'").toBeTruthy();
     expect(busta, "le regole della busta non ci sono piu'").toBeTruthy();
     expect(piede, "il piede ha di nuovo un padding: torna la cornice").not.toMatch(/padding/);
@@ -131,7 +131,7 @@ describe("i fogli di stile", () => {
     // Il blocco d'inchiostro era cio' che chiudeva la pagina. Una busta color
     // carta a filo del fondo la lascerebbe aperta: e' il rischio scritto per
     // la proposta A nel prototipo, e il rimedio e' lo stesso, il taglio.
-    const taglio = rules("[data-busta]::after")[0]?.body;
+    const taglio = rules("[data-envelope]::after")[0]?.body;
     expect(taglio, "il taglio in fondo alla pagina non c'e' piu'").toBeTruthy();
     expect(taglio).toMatch(/background-color:\s*var\(--fg\)/);
   });
@@ -143,7 +143,7 @@ describe("la barra in basso", () => {
     // di sezioni appiccicata sopra sarebbe una seconda navigazione dentro una
     // cosa che ne ha gia' una, e coprirebbe il contenuto che sei appena andato
     // ad aprire.
-    expect(dice(rules(/html\[data-dialog-open\].*\[data-nav-basso\]/), /display:\s*none/)).toBe(true);
+    expect(dice(rules(/html\[data-dialog-open\].*\[data-nav-bottom\]/), /display:\s*none/)).toBe(true);
   });
 
   it("la busta si fa da parte, o la barra le sta sopra l'ultima riga", () => {
@@ -152,12 +152,12 @@ describe("la barra in basso", () => {
     // avere (vedi la prova qui sopra).
     const stretto = { media: "(max-width: 767px)" };
     expect(rules(undefined, stretto).length, "manca il blocco sotto i 768px").toBeGreaterThan(0);
-    const spazio = rules(/\[data-busta\]/, stretto).find((r) => /padding-block-end/.test(r.body));
+    const spazio = rules(/\[data-envelope\]/, stretto).find((r) => /padding-block-end/.test(r.body));
     expect(spazio, "la busta non lascia spazio alla barra").toBeTruthy();
     // E deve stare DOPO la dichiarazione di `padding` della busta, o la
     // scorciatoia se lo riprende.
     const tutte = rules();
-    expect(tutte.indexOf(spazio!)).toBeGreaterThan(tutte.indexOf(rules("[data-busta]")[0]));
+    expect(tutte.indexOf(spazio!)).toBeGreaterThan(tutte.indexOf(rules("[data-envelope]")[0]));
   });
 });
 
@@ -167,8 +167,8 @@ describe("la superficie del tema scuro", () => {
     // il bordo basta. Su inchiostro no: lo schedario diventa un reticolo
     // piatto e l'accostamento delle cartelle non si vede piu'. Sul chiaro il
     // token resta il fondo di pagina, quindi li' non cambia niente.
-    expect(dice(rules(":root"), /--superficie:/)).toBe(true);
-    expect(dice(rules(/\[data-theme="dark"\]$/), /--superficie:/)).toBe(true);
+    expect(dice(rules(":root"), /--surface:/)).toBe(true);
+    expect(dice(rules(/\[data-theme="dark"\]$/), /--surface:/)).toBe(true);
   });
 });
 
@@ -197,7 +197,7 @@ describe("le consegne sul tablet", () => {
   it("la testata si centra fino a 1023px, non solo dove le consegne sono una colonna", () => {
     // Fra i 900 e i 1023 le consegne sono gia' a due colonne, ma la testata
     // col suo tetto stretto resterebbe appoggiata a sinistra.
-    const testata = rules(/\[data-process-testata\]/, { media: "(max-width: 1023px)" });
+    const testata = rules(/\[data-process-header\]/, { media: "(max-width: 1023px)" });
     expect(dice(testata, /margin-inline:\s*auto/), "la testata del processo non si centra sotto i 1024px").toBe(
       true,
     );

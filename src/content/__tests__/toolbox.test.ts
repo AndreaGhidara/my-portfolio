@@ -41,7 +41,7 @@ describe("la cassetta: i dati", () => {
   });
 
   it("ogni attrezzo dichiara se e' stato usato nei lavori o solo conosciuto", () => {
-    for (const a of TOOLS) expect(["lavoro", "conosciuto"], a.id).toContain(a.experience);
+    for (const a of TOOLS) expect(["work", "known"], a.id).toContain(a.experience);
   });
 
   it("ogni attrezzo sta dentro la pezza del suo scomparto", () => {

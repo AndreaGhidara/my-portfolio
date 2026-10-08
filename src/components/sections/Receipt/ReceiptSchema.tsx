@@ -63,22 +63,22 @@ export function ReceiptSchema({
   }, [traccia, aspetta]);
 
   return (
-    <div data-scontrino-tavola role="img" aria-label={etichetta}>
+    <div data-receipt-plate role="img" aria-label={etichetta}>
       <svg
         viewBox="0 0 600 460"
         preserveAspectRatio="xMidYMid meet"
         aria-hidden="true"
         focusable="false"
-        data-traccia={traccia ? "" : undefined}
+        data-trace={traccia ? "" : undefined}
       >
-        <path data-tratto="fioco" pathLength={1} d={FRAME} />
-        <path data-tratto="fioco" pathLength={1} d={TITLE_BLOCK} />
-        <path data-tratto="fioco" data-divisorio pathLength={1} d={DIVIDER} />
+        <path data-stroke="faint" pathLength={1} d={FRAME} />
+        <path data-stroke="faint" pathLength={1} d={TITLE_BLOCK} />
+        <path data-stroke="faint" data-divider pathLength={1} d={DIVIDER} />
 
         {(FIGURE_SHAPES[forma] ?? []).map((d, k) => (
           <path
             key={k}
-            data-tratto={k === 0 ? "pieno" : "fioco"}
+            data-stroke={k === 0 ? "full" : "faint"}
             pathLength={1}
             d={d}
             style={ritardo(DELAYS.line(k))}
@@ -89,25 +89,25 @@ export function ReceiptSchema({
           const r = callout(k);
           return (
             <g key={k}>
-              <path data-richiamo pathLength={1} d={r.d} style={ritardo(r.delay)} />
-              <circle data-punto cx={r.point[0]} cy={r.point[1]} r={3} style={ritardo(r.delay)} />
-              <text data-nota x={r.x} y={r.y} textAnchor={r.anchor} style={ritardo(r.textDelay)}>
+              <path data-callout pathLength={1} d={r.d} style={ritardo(r.delay)} />
+              <circle data-point cx={r.point[0]} cy={r.point[1]} r={3} style={ritardo(r.delay)} />
+              <text data-note x={r.x} y={r.y} textAnchor={r.anchor} style={ritardo(r.textDelay)}>
                 {`${k + 1} · ${pezzo.toUpperCase()}`}
               </text>
             </g>
           );
         })}
 
-        <text data-cartiglio="piccolo" x={298} y={404}>
+        <text data-title-block="small" x={298} y={404}>
           {`${tavola} ${numero}`}
         </text>
-        <text data-cartiglio="titolo" x={298} y={428}>
+        <text data-title-block="title" x={298} y={428}>
           {titolo}
         </text>
-        <text data-cartiglio="piccolo" data-divisorio x={508} y={408}>
+        <text data-title-block="small" data-divider x={508} y={408}>
           {scala}
         </text>
-        <text data-cartiglio="piccolo" data-divisorio x={508} y={424}>
+        <text data-title-block="small" data-divider x={508} y={424}>
           {firma}
         </text>
       </svg>
@@ -128,14 +128,14 @@ export function ReceiptFigure({ shape: forma, count: quanti }: { shape: string; 
   return (
     <svg viewBox="124 60 352 304" aria-hidden="true" focusable="false">
       {(FIGURE_SHAPES[forma] ?? []).map((d, k) => (
-        <path key={k} data-tratto={k === 0 ? "pieno" : "fioco"} d={d} />
+        <path key={k} data-stroke={k === 0 ? "full" : "faint"} d={d} />
       ))}
       {Array.from({ length: quanti }, (_, k) => {
         const r = callout(k);
         return (
           <g key={k}>
-            <path data-richiamo d={r.d} />
-            <circle data-punto cx={r.point[0]} cy={r.point[1]} r={4} />
+            <path data-callout d={r.d} />
+            <circle data-point cx={r.point[0]} cy={r.point[1]} r={4} />
             <text x={r.x} y={r.y + 7} textAnchor={r.anchor}>
               {k + 1}
             </text>

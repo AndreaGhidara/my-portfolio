@@ -21,8 +21,8 @@ import type { ProcessSample } from "@/content/process";
 
 /** Una riga di testo finto, larga quanto le si dice. La larghezza e' un dato
  *  del disegno (quanto e' lunga quella riga) non una scelta di stile. */
-const Riga = ({ w, ...attr }: { w: number; "data-titolo"?: string; "data-url"?: string }) => (
-  <i data-m="riga" {...attr} style={{ "--w": `${w}%` } as CSSProperties} />
+const Riga = ({ w, ...attr }: { w: number; "data-title"?: string; "data-url"?: string }) => (
+  <i data-m="line" {...attr} style={{ "--w": `${w}%` } as CSSProperties} />
 );
 
 export const PROCESS_SPECIMENS: Record<ProcessSample, ReactNode> = {
@@ -34,7 +34,7 @@ export const PROCESS_SPECIMENS: Record<ProcessSample, ReactNode> = {
    */
   accordo: (
     <>
-      <Riga w={46} data-titolo="" />
+      <Riga w={46} data-title="" />
       <Riga w={100} />
       <Riga w={88} />
       <Riga w={96} />
@@ -51,12 +51,12 @@ export const PROCESS_SPECIMENS: Record<ProcessSample, ReactNode> = {
    */
   bozza: (
     <>
-      <i data-m="blocco" data-b="testata" />
-      <span data-m="colonne">
-        <i data-m="blocco" data-b="larga" />
-        <i data-m="blocco" data-b="stretta" />
+      <i data-m="block" data-b="header" />
+      <span data-m="columns">
+        <i data-m="block" data-b="wide" />
+        <i data-m="block" data-b="narrow" />
       </span>
-      <i data-m="cta" data-piccolo="" />
+      <i data-m="cta" data-small="" />
     </>
   ),
   /**
@@ -67,8 +67,8 @@ export const PROCESS_SPECIMENS: Record<ProcessSample, ReactNode> = {
    */
   indirizzo: (
     <>
-      <Riga w={100} data-titolo="" />
-      <i data-m="blocco" data-b="testata" />
+      <Riga w={100} data-title="" />
+      <i data-m="block" data-b="header" />
       <Riga w={100} />
       <Riga w={100} />
       <Riga w={80} />

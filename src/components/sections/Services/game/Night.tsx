@@ -74,40 +74,40 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
     minuti < 60 ? t("giuMin", { min: minuti }) : t("giuOre", { ore: minuti / 60 });
 
   return (
-    <div className="banco" data-gioco-livello="notte">
-      <div className="sopra">
-        <div className="stelle" aria-hidden="true" />
-        <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: levelNumber("notte"), nome: comune("livelli.notte") })}</span>
-          <span className="destra">{mattina ? t("cielo.apre") : t("titolo")}</span>
+    <div className="bench" data-game-level="notte">
+      <div className="above">
+        <div className="stars" aria-hidden="true" />
+        <div className="head">
+          <span className="level">{comune("etichetta", { numero: levelNumber("notte"), nome: comune("livelli.notte") })}</span>
+          <span className="right">{mattina ? t("cielo.apre") : t("titolo")}</span>
         </div>
-        <div className="orologio">
-          <b data-notte-ora>{clockTime(adesso)}</b>
+        <div className="clock">
+          <b data-night-time>{clockTime(adesso)}</b>
           <span>{t("cielo.orologio")}</span>
         </div>
         <span
-          className="luna"
+          className="moon"
           aria-hidden="true"
           style={{ left: `${50 + lungo * 40}%`, top: `${3.4 - Math.sin(lungo * Math.PI) * 1.1}rem` }}
         />
-        <div className="traccia" aria-hidden="true">
+        <div className="trace" aria-hidden="true">
           {pezzi.map((p, i) => (
-            <i key={i} className={p.down ? "giu" : "su"} style={{ inlineSize: `${(p.minutes / NIGHT_MINUTES) * 100}%` }} />
+            <i key={i} className={p.down ? "down" : "up"} style={{ inlineSize: `${(p.minutes / NIGHT_MINUTES) * 100}%` }} />
           ))}
         </div>
-        <div className="ore" aria-hidden="true">
+        <div className="hours" aria-hidden="true">
           {ORE.map((o) => (
             <span key={o}>{o}</span>
           ))}
         </div>
-        <div className="cronaca" data-notte-cronaca>
+        <div className="log" data-night-log>
           {accaduti.map((e) => {
             const ok = pronti.has(e.item);
             return (
               <p key={e.item}>
                 <b>{clockTime(e.minute)}</b>
                 <span>{eventi[e.item].fatto}</span>
-                <span className={`scudo ${ok ? "si" : "no"}`}>{ok ? t("parato") : t("giu")}</span>
+                <span className={`shield ${ok ? "yes" : "no"}`}>{ok ? t("parato") : t("giu")}</span>
               </p>
             );
           })}
@@ -121,14 +121,14 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
               <p className="mono">{t("prepara.occhiello")}</p>
               <h3>{t("prepara.titolo")}</h3>
             </div>
-            <p className="spiega">{t("prepara.spiega")}</p>
-            <div className="palco">
-              <div className="lista">
+            <p className="explain">{t("prepara.spiega")}</p>
+            <div className="stage">
+              <div className="list">
                 {NIGHT_ITEMS.map((voce) => (
                   <button
                     key={voce}
                     type="button"
-                    className="riga"
+                    className="line"
                     aria-pressed={pronti.has(voce)}
                     onClick={() => accendi(voce)}
                   >
@@ -143,8 +143,8 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
                 ))}
               </div>
             </div>
-            <div className="azioni">
-              <button type="button" className="giallo" onClick={() => setDorme(true)}>
+            <div className="actions">
+              <button type="button" className="yellow" onClick={() => setDorme(true)}>
                 <b aria-hidden="true">☾</b>
                 {t("prepara.vai")}
               </button>
@@ -156,15 +156,15 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
               <p className="mono">{mattina ? t("mattina.occhiello") : t("corsa.occhiello")}</p>
               <h3>{mattina ? (tutto ? t("mattina.tutto") : t("mattina.ore", { ore: hoursOnline(pronti) })) : t("corsa.titolo")}</h3>
             </div>
-            <p className="spiega">
+            <p className="explain">
               {mattina ? (tutto ? t("mattina.spiegaTutto") : t("mattina.spiegaParte")) : t("corsa.spiega")}
             </p>
-            <div className="palco">
-              <div className="lista" aria-live="polite">
+            <div className="stage">
+              <div className="list" aria-live="polite">
                 {accaduti.map((e) => {
                   const ok = pronti.has(e.item);
                   return (
-                    <div key={e.item} className="riga corta">
+                    <div key={e.item} className="line short">
                       <span className="ic">
                         <Icon name={e.item} />
                       </span>
@@ -172,7 +172,7 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
                         <b>{t(`voci.${e.item}`)}</b>
                         <small>{ok ? eventi[e.item].parato : danno(e.damage)}</small>
                       </span>
-                      <span className={ok ? "si" : "no"} aria-hidden="true">
+                      <span className={ok ? "yes" : "no"} aria-hidden="true">
                         {ok ? "✓" : "✗"}
                       </span>
                     </div>
@@ -181,17 +181,17 @@ export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
               </div>
             </div>
             {mattina ? (
-              <div className="azioni due">
+              <div className="actions two">
                 <button type="button" onClick={preparaDaCapo}>
                   <b aria-hidden="true">↺</b>
                   {tutto ? t("mattina.rifai") : t("mattina.meglio")}
                 </button>
-                <button type="button" className="giallo" onClick={onAvanti}>
+                <button type="button" className="yellow" onClick={onAvanti}>
                   {t("mattina.finale")} <b aria-hidden="true">→</b>
                 </button>
               </div>
             ) : (
-              <div className="azioni">
+              <div className="actions">
                 <button type="button" disabled>
                   <b aria-hidden="true">☾</b>
                   {t("corsa.zzz")}

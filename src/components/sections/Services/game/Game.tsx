@@ -109,8 +109,8 @@ export function Game() {
    */
   const guardia = (e: MouseEvent<HTMLDivElement>) => {
     const premuto = (e.target as Element).closest("button, a");
-    if (!premuto || !premuto.closest("[data-gioco-livello]")) return;
-    const azione = premuto.closest(".azioni") !== null;
+    if (!premuto || !premuto.closest("[data-game-level]")) return;
+    const azione = premuto.closest(".actions") !== null;
     const dentro = ultimoTocco.current !== null && e.timeStamp - ultimoTocco.current < DOPPIO_TOCCO;
     if (dentro && (azione || appenaCambiato.current)) {
       e.preventDefault();
@@ -134,7 +134,7 @@ export function Game() {
       primo.current = false;
       return;
     }
-    const nuovo = radice.current?.querySelector<HTMLElement>("[data-gioco-livello]");
+    const nuovo = radice.current?.querySelector<HTMLElement>("[data-game-level]");
     if (!nuovo) return;
     nuovo.tabIndex = -1;
     nuovo.focus({ preventScroll: true });
@@ -152,23 +152,23 @@ export function Game() {
   };
 
   return (
-    <div ref={radice} data-gioco style={TOKEN_FISSI} onClickCapture={guardia}>
-      <div data-gioco-barrette role="group" aria-label={t("barrette")}>
+    <div ref={radice} data-game style={TOKEN_FISSI} onClickCapture={guardia}>
+      <div data-game-bars role="group" aria-label={t("barrette")}>
         {LEVELS.map((id, i) => {
           // Nel finale nessuna barretta e' «qui»: sono tutte fatte.
-          const stato = i === qui ? "qui" : i <= raggiunto ? "fatto" : "dopo";
+          const stato = i === qui ? "current" : i <= raggiunto ? "done" : "next";
           return (
             <button
               key={id}
               type="button"
-              data-stato={stato}
-              aria-current={stato === "qui" ? "step" : undefined}
+              data-state={stato}
+              aria-current={stato === "current" ? "step" : undefined}
               // Il livello aperto non si disabilita: chi ci e' arrivato da
               // tastiera perderebbe il fuoco nel momento in cui lo apre.
-              aria-disabled={stato === "qui" || undefined}
-              disabled={stato === "dopo"}
+              aria-disabled={stato === "current" || undefined}
+              disabled={stato === "next"}
               onClick={() => {
-                if (stato === "fatto") vai(i);
+                if (stato === "done") vai(i);
               }}
             >
               <i aria-hidden="true" />
@@ -181,7 +181,7 @@ export function Game() {
       {/* La regione resta la stessa e cambia il testo dentro: una regione
           appena nata non la annuncia nessuno. Il testo ha la sua key per
           rientrare in dissolvenza. */}
-      <div data-gioco-riga aria-live="polite">
+      <div data-game-line aria-live="polite">
         <p key={`riga-${passo}`}>{t(`righe.${passo}`)}</p>
       </div>
 

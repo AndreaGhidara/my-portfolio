@@ -127,15 +127,15 @@ export function ToolboxMap({
   const scelto = passo.kind === "nodo" ? passo.id : null;
 
   return (
-    <div data-cassetta-mappa>
-      <div ref={banco} data-cassetta-banco>
+    <div data-toolbox-map>
+      <div ref={banco} data-toolbox-bench>
         <svg
           ref={svg}
           viewBox={`0 0 ${LARGO} ${ALTO}`}
           aria-hidden="true"
           focusable="false"
-          data-stato={capo ? "scelta" : luce ? "spento" : undefined}
-          data-entrata={entrata ?? undefined}
+          data-state={capo ? "chosen" : luce ? "off" : undefined}
+          data-entrance={entrata ?? undefined}
         >
           <defs>
             <pattern
@@ -145,7 +145,7 @@ export function ToolboxMap({
               patternUnits="userSpaceOnUse"
               patternTransform="rotate(45)"
             >
-              <path d="M0 0 V8" data-trama />
+              <path d="M0 0 V8" data-texture />
             </pattern>
             <pattern
               id={`${idMaschera}-punti`}
@@ -153,7 +153,7 @@ export function ToolboxMap({
               height="9"
               patternUnits="userSpaceOnUse"
             >
-              <circle cx="4.5" cy="4.5" r="0.9" data-trama-punto />
+              <circle cx="4.5" cy="4.5" r="0.9" data-texture-point />
             </pattern>
             <pattern
               id={`${idMaschera}-quadretti`}
@@ -161,7 +161,7 @@ export function ToolboxMap({
               height="12"
               patternUnits="userSpaceOnUse"
             >
-              <path d="M0 0 H12 M0 0 V12" data-trama />
+              <path d="M0 0 H12 M0 0 V12" data-texture />
             </pattern>
             <mask
               id={`${idMaschera}-cucito`}
@@ -187,11 +187,11 @@ export function ToolboxMap({
               return (
                 <g
                   key={z.id}
-                  data-pezza
-                  data-zona={z.id}
-                  data-usata={zoneUsate.has(z.id) || undefined}
+                  data-patch
+                  data-zone={z.id}
+                  data-used={zoneUsate.has(z.id) || undefined}
                 >
-                  <rect x={x} y={y} width={w} height={h} rx="10" data-stoffa />
+                  <rect x={x} y={y} width={w} height={h} rx="10" data-fabric />
                   {TRAMA[z.id] && (
                     <rect
                       x={x}
@@ -199,7 +199,7 @@ export function ToolboxMap({
                       width={w}
                       height={h}
                       rx="10"
-                      data-trama-fondo
+                      data-texture-bg
                       fill={`url(#${idMaschera}-${TRAMA[z.id]})`}
                     />
                   )}
@@ -209,13 +209,13 @@ export function ToolboxMap({
                     width={w - 12}
                     height={h - 12}
                     rx="7"
-                    data-orlo
+                    data-hem
                   />
                   <text
                     x={x + w - 14}
                     y={y + h - 13}
                     textAnchor="end"
-                    data-conta
+                    data-count
                   >
                     {testi.zones[z.id].count}
                   </text>
@@ -232,8 +232,8 @@ export function ToolboxMap({
                   tracciati.current[i] = el;
                 }}
                 d={curve(restPositions.get(f.a)!, restPositions.get(f.b)!)}
-                data-filo={f.crossing ? "incrocio" : "ramo"}
-                data-acceso={filoAcceso(f) || undefined}
+                data-thread={f.crossing ? "crossing" : "branch"}
+                data-lit={filoAcceso(f) || undefined}
               />
             ))}
           </g>
@@ -242,7 +242,7 @@ export function ToolboxMap({
             <path
               ref={cucituraRef}
               d={disegnoCucitura.d}
-              data-cucitura
+              data-seam
               mask={`url(#${idMaschera}-cucito)`}
             />
           )}
@@ -250,9 +250,9 @@ export function ToolboxMap({
           <g>
             {NODES.map((n) => {
               const testo =
-                n.kind === "radice"
+                n.kind === "root"
                   ? testi.root.name
-                  : n.kind === "snodo"
+                  : n.kind === "junction"
                     ? testi.zones[n.zone!].junction
                     : toolById(n.id)!.name;
               const w = nodeWidth(n.kind, testo);
@@ -267,11 +267,11 @@ export function ToolboxMap({
                     else gruppi.current.delete(n.id);
                   }}
                   transform={`translate(${n.x} ${n.y})`}
-                  data-nodo={n.kind}
-                  data-zona={n.zone ?? undefined}
-                  data-acceso={nodiAccesi.has(n.id) || undefined}
-                  data-scelto={(!capo && scelto === n.id) || undefined}
-                  data-cucito={
+                  data-node={n.kind}
+                  data-zone={n.zone ?? undefined}
+                  data-lit={nodiAccesi.has(n.id) || undefined}
+                  data-chosen={(!capo && scelto === n.id) || undefined}
+                  data-sewn={
                     (passo !== undefined && passo < cuciti) || undefined
                   }
                   onPointerEnter={() => {
@@ -286,7 +286,7 @@ export function ToolboxMap({
                   onPointerCancel={annulla}
                 >
                   <g
-                    data-corpo
+                    data-body
                     style={
                       {
                         "--dx": `${genitore.x - n.x}px`,
@@ -300,18 +300,18 @@ export function ToolboxMap({
                       y={-h / 2}
                       width={w}
                       height={h}
-                      rx={n.kind === "snodo" ? 13 : 3}
-                      data-fondo
+                      rx={n.kind === "junction" ? 13 : 3}
+                      data-backdrop
                     />
                     <rect
                       x={-w / 2 + 3}
                       y={-h / 2 + 3}
                       width={w - 6}
                       height={h - 6}
-                      rx={n.kind === "snodo" ? 10 : 2}
-                      data-punti
+                      rx={n.kind === "junction" ? 10 : 2}
+                      data-points
                     />
-                    <text y={n.kind === "radice" ? 5 : 4} textAnchor="middle">
+                    <text y={n.kind === "root" ? 5 : 4} textAnchor="middle">
                       {testo}
                     </text>
                   </g>
@@ -320,16 +320,16 @@ export function ToolboxMap({
             })}
           </g>
 
-          <g ref={agoRef} data-ago style={{ opacity: 0 }}>
+          <g ref={agoRef} data-needle style={{ opacity: 0 }}>
             <path d="M-2 -22 L2 -22 L1.2 14 L0 20 L-1.2 14 Z" />
             <ellipse cx="0" cy="-16" rx="0.9" ry="3" />
           </g>
         </svg>
       </div>
 
-      <div data-cassetta-colonna>
+      <div data-toolbox-column>
         <aside
-          data-cassetta-pannello
+          data-toolbox-panel
           aria-live="polite"
           aria-label={testi.label.name}
         >

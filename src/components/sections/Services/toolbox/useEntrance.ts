@@ -16,7 +16,7 @@ export const ENTRANCE = (() => {
   return new Map(ordine.map((id, i) => [id, i]));
 })();
 
-type Entrata = "attesa" | "entra" | null;
+type Entrata = "waiting" | "entering" | null;
 
 /**
  * L'entrata, una volta sola e solo se la mappa non e' gia' in vista: chi
@@ -41,11 +41,11 @@ export function useEntrance(
     if (!el || typeof IntersectionObserver === "undefined") return;
     const r = el.getBoundingClientRect();
     if (r.top < window.innerHeight && r.bottom > 0) return;
-    setEntrata("attesa");
+    setEntrata("waiting");
     const osservatore = new IntersectionObserver(
       ([voce]) => {
         if (!voce.isIntersecting) return;
-        setEntrata("entra");
+        setEntrata("entering");
         osservatore.disconnect();
       },
       { threshold: 0.2 },

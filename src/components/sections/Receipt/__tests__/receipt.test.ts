@@ -52,8 +52,8 @@ describe("le righe dello scontrino", () => {
       "-".repeat(LINE_WIDTH),
       dotLeader("TOTALE", "DA PARLARNE"),
     ]);
-    expect(righe.find((r) => r.kind === "grosso")?.text).toBe("SITI E LANDING");
-    expect(righe.filter((r) => r.kind === "voce")).toHaveLength(3);
+    expect(righe.find((r) => r.kind === "large")?.text).toBe("SITI E LANDING");
+    expect(righe.filter((r) => r.kind === "item")).toHaveLength(3);
   });
 
   it("la figura sta subito prima della lista che spiega, e non ha testo", () => {
@@ -61,9 +61,9 @@ describe("le righe dello scontrino", () => {
     // desktop non si vede. Senza testo costa un colpo solo: il desktop non
     // se ne accorge.
     const righe = receiptLines(dati(0));
-    const figura = righe.findIndex((r) => r.kind === "figura");
-    expect(righe.filter((r) => r.kind === "figura")).toHaveLength(1);
-    expect(righe[figura + 1]).toEqual({ text: "1 struttura", kind: "voce" });
+    const figura = righe.findIndex((r) => r.kind === "figure");
+    expect(righe.filter((r) => r.kind === "figure")).toHaveLength(1);
+    expect(righe[figura + 1]).toEqual({ text: "1 struttura", kind: "item" });
     expect(righe[figura].text).toBe("");
   });
 
@@ -95,10 +95,10 @@ describe("la stampa carattere per carattere", () => {
   const righe = receiptLines(dati(0));
 
   it("tre caratteri a colpo, uno solo sul titolo grande", () => {
-    expect(CHARS_PER_TICK.riga).toBe(3);
-    expect(CHARS_PER_TICK.grosso).toBe(1);
+    expect(CHARS_PER_TICK.line).toBe(3);
+    expect(CHARS_PER_TICK.large).toBe(1);
     const dopoUno = linesAtTicks(righe, 1);
-    expect(dopoUno).toEqual([{ text: "AND", kind: "riga" }]);
+    expect(dopoUno).toEqual([{ text: "AND", kind: "line" }]);
   });
 
   it("una riga finita lascia il colpo dopo alla riga seguente", () => {
@@ -109,9 +109,9 @@ describe("la stampa carattere per carattere", () => {
 
   it("sa a quale colpo esce la figura: e' l'ultima riga stampata", () => {
     const soglia = ticksToFigure(righe);
-    expect(linesAtTicks(righe, soglia).at(-1)?.kind).toBe("figura");
-    expect(linesAtTicks(righe, soglia - 1).some((r) => r.kind === "figura")).toBe(false);
-    expect(ticksToFigure(righe.filter((r) => r.kind !== "figura"))).toBe(-1);
+    expect(linesAtTicks(righe, soglia).at(-1)?.kind).toBe("figure");
+    expect(linesAtTicks(righe, soglia - 1).some((r) => r.kind === "figure")).toBe(false);
+    expect(ticksToFigure(righe.filter((r) => r.kind !== "figure"))).toBe(-1);
   });
 
   it("a colpi finiti lo scontrino e' intero", () => {
@@ -165,21 +165,21 @@ describe("la stampante", () => {
 
   it("parte con il primo servizio gia' stampato: e' il markup del server", () => {
     const s = initialPrinter(TOTALI);
-    expect(s).toMatchObject({ phase: "ferma", service: 0, ticks: 40, drawing: 0 });
+    expect(s).toMatchObject({ phase: "idle", service: 0, ticks: 40, drawing: 0 });
   });
 
   it("un tasto su una stampante vuota comincia a stampare", () => {
     const s = fai(vuota, { type: "premi", service: 2, immediate: false });
-    expect(s).toMatchObject({ phase: "stampa", service: 2, ticks: 0, drawing: 2 });
+    expect(s).toMatchObject({ phase: "printing", service: 2, ticks: 0, drawing: 2 });
     expect(s.traced).toBe(vuota.traced + 1);
   });
 
   it("stampa un colpo alla volta e si ferma a scontrino finito", () => {
     let s = fai(vuota, { type: "premi", service: 3, immediate: false });
     for (let i = 0; i < 9; i++) s = fai(s, { type: "scatto", gen: s.gen });
-    expect(s).toMatchObject({ phase: "stampa", ticks: 9 });
+    expect(s).toMatchObject({ phase: "printing", ticks: 9 });
     s = fai(s, { type: "scatto", gen: s.gen });
-    expect(s).toMatchObject({ phase: "ferma", service: 3, ticks: 10 });
+    expect(s).toMatchObject({ phase: "idle", service: 3, ticks: 10 });
   });
 
   it("un colpo di un'altra generazione non stampa niente", () => {
@@ -190,9 +190,9 @@ describe("la stampante", () => {
   it("un altro tasto strappa il vecchio e stampa il nuovo quando e' caduto", () => {
     let s = fai(vuota, { type: "premi", service: 0, immediate: false });
     s = fai(s, { type: "premi", service: 1, immediate: false });
-    expect(s).toMatchObject({ phase: "strappo", service: 0, next: 1 });
+    expect(s).toMatchObject({ phase: "tearing", service: 0, next: 1 });
     s = fai(s, { type: "caduto", gen: s.gen });
-    expect(s).toMatchObject({ phase: "stampa", service: 1, ticks: 0, next: null });
+    expect(s).toMatchObject({ phase: "printing", service: 1, ticks: 0, next: null });
   });
 
   it("due tocchi di fila non fanno mai due scontrini", () => {
@@ -201,9 +201,9 @@ describe("la stampante", () => {
     const cadutoDelPrimo = s.gen;
     s = fai(s, { type: "premi", service: 2, immediate: false });
     // Il secondo tocco cambia solo cosa si stampa dopo: lo strappo resta uno.
-    expect(s).toMatchObject({ phase: "strappo", next: 2, gen: cadutoDelPrimo });
+    expect(s).toMatchObject({ phase: "tearing", next: 2, gen: cadutoDelPrimo });
     s = fai(s, { type: "caduto", gen: cadutoDelPrimo });
-    expect(s).toMatchObject({ phase: "stampa", service: 2 });
+    expect(s).toMatchObject({ phase: "printing", service: 2 });
     // Un secondo «caduto» con la stessa generazione (lo StrictMode, un timer
     // rimasto) non ricomincia niente.
     expect(fai(s, { type: "caduto", gen: cadutoDelPrimo })).toBe(s);
@@ -226,7 +226,7 @@ describe("la stampante", () => {
     expect(s.emptyPlate).toBe(true);
     expect(s.traced).toBe(iniziale.traced + 1);
     const stampa = fai(s, { type: "autostampa" });
-    expect(stampa).toMatchObject({ phase: "stampa", emptyPlate: false });
+    expect(stampa).toMatchObject({ phase: "printing", emptyPlate: false });
     expect(stampa.traced).toBe(s.traced + 1);
     // Se il movimento si spegne prima, la tavola torna disegnata.
     expect(fai(s, { type: "completa" }).emptyPlate).toBe(false);
@@ -242,7 +242,7 @@ describe("la stampante", () => {
 
   it("l'autostampa stampa il primo servizio, una volta", () => {
     const s = fai(vuota, { type: "autostampa" });
-    expect(s).toMatchObject({ phase: "stampa", service: 0 });
+    expect(s).toMatchObject({ phase: "printing", service: 0 });
     expect(fai(s, { type: "strappa", immediate: true }, { type: "autostampa" })).toMatchObject({
       service: null,
     });
@@ -251,24 +251,24 @@ describe("la stampante", () => {
   it("strappa senza un tasto dopo: lo scontrino cade e la stampante resta vuota", () => {
     let s = fai(vuota, { type: "premi", service: 1, immediate: false });
     s = fai(s, { type: "strappa", immediate: false });
-    expect(s).toMatchObject({ phase: "strappo", service: 1, next: null });
+    expect(s).toMatchObject({ phase: "tearing", service: 1, next: null });
     s = fai(s, { type: "caduto", gen: s.gen });
-    expect(s).toMatchObject({ phase: "ferma", service: null });
+    expect(s).toMatchObject({ phase: "idle", service: null });
     // Il disegno resta quello di prima: la tavola non si cancella.
     expect(s.drawing).toBe(1);
   });
 
   it("senza movimento il tasto sostituisce subito lo scontrino, gia' stampato", () => {
     const s = fai(initialPrinter(TOTALI), { type: "premi", service: 2, immediate: true });
-    expect(s).toMatchObject({ phase: "ferma", service: 2, ticks: 20, drawing: 2 });
+    expect(s).toMatchObject({ phase: "idle", service: 2, ticks: 20, drawing: 2 });
   });
 
   it("se il movimento si spegne a meta', lo scontrino resta intero", () => {
     let s = fai(vuota, { type: "premi", service: 1, immediate: false }, { type: "completa" });
-    expect(s).toMatchObject({ phase: "ferma", service: 1, ticks: 30 });
+    expect(s).toMatchObject({ phase: "idle", service: 1, ticks: 30 });
     s = fai(vuota, { type: "premi", service: 0, immediate: false });
     s = fai(s, { type: "premi", service: 3, immediate: false }, { type: "completa" });
-    expect(s).toMatchObject({ phase: "ferma", service: 3, ticks: 10, drawing: 3 });
+    expect(s).toMatchObject({ phase: "idle", service: 3, ticks: 10, drawing: 3 });
     // Prima di qualunque tocco la sezione si deve leggere: torna il primo.
     expect(fai(vuota, { type: "completa" })).toMatchObject({ service: 0, ticks: 40 });
   });

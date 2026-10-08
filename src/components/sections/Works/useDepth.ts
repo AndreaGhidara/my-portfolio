@@ -153,13 +153,13 @@ export function useDepth(schedario: RefObject<HTMLOListElement | null>, ciStanno
           const v = Math.round(p * 1000) / 1000;
           if (v === scritte[i]) continue;
           scritte[i] = v;
-          cartelle[i].style.setProperty("--profondita", String(v));
+          cartelle[i].style.setProperty("--depth", String(v));
           // Il tono del testo della linguetta: un attributo e non un conto in
           // CSS, perche' e' una soglia, e il CSS le soglie non le sa fare.
           const tono = tabTone(v);
           if (tono === toni[i]) continue;
           toni[i] = tono;
-          cartelle[i].setAttribute("data-tono-linguetta", String(tono));
+          cartelle[i].setAttribute("data-tab-tone", String(tono));
         }
       };
       // `fotogramma` si azzera solo dentro il suo callback, come in
@@ -205,7 +205,7 @@ export function useDepth(schedario: RefObject<HTMLOListElement | null>, ciStanno
       const alFuoco = (event: FocusEvent) => {
         const preso = event.target as HTMLElement | null;
         if (!preso?.matches(":focus-visible")) return;
-        const cartella = preso.closest<HTMLElement>("[data-cartella]");
+        const cartella = preso.closest<HTMLElement>("[data-folder]");
         const i = cartella ? cartelle.indexOf(cartella) : -1;
         if (i < 0 || quanto()[i] <= 0) return;
         void vaiA(i, "subito");
@@ -213,7 +213,7 @@ export function useDepth(schedario: RefObject<HTMLOListElement | null>, ciStanno
 
       const sezione = lista.closest("section") ?? lista;
       withoutShift(sezione, () => {
-        lista.setAttribute("data-archivio-acceso", "");
+        lista.setAttribute("data-archive-lit", "");
         // La sezione e' appena cresciuta di qualche schermo: tutto quello che
         // sta sotto (le entrate, il percorso) va rimisurato.
         ScrollTrigger.refresh();
@@ -260,13 +260,13 @@ export function useDepth(schedario: RefObject<HTMLOListElement | null>, ciStanno
         dossier.disconnect();
         acceso.current = null;
         for (const c of cartelle) {
-          c.style.removeProperty("--profondita");
-          c.removeAttribute("data-tono-linguetta");
+          c.style.removeProperty("--depth");
+          c.removeAttribute("data-tab-tone");
         }
         // La stessa crescita al contrario: chi sta sotto deve saperlo, e chi
         // stava guardando sotto resta li'.
         withoutShift(sezione, () => {
-          lista.removeAttribute("data-archivio-acceso");
+          lista.removeAttribute("data-archive-lit");
           ScrollTrigger.refresh();
         });
       };

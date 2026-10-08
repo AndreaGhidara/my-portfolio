@@ -144,21 +144,21 @@ export function Editor({
   const scrivendo = visibili < righe.length;
 
   return (
-    <div data-cassetta-vista-editor>
+    <div data-toolbox-view-editor>
       <div
-        data-cassetta-editor
-        data-capo={capo ? "" : undefined}
+        data-toolbox-editor
+        data-garment={capo ? "" : undefined}
         role="group"
         aria-label={e.name}
       >
-        <div data-editor-titolo aria-hidden="true">
+        <div data-editor-title aria-hidden="true">
           <i />
           <i />
           <i />
           <span>{titolo}</span>
         </div>
 
-        <div data-editor-albero role="toolbar" aria-label={e.folders}>
+        <div data-editor-tree role="toolbar" aria-label={e.folders}>
           <button
             type="button"
             ref={tastoFile}
@@ -172,8 +172,8 @@ export function Editor({
             <button
               key={z.id}
               type="button"
-              data-zona={z.id}
-              data-serve={
+              data-zone={z.id}
+              data-needed={
                 (capo && capo.uses.some((id) => toolById(id)?.zone === z.id)) ||
                 undefined
               }
@@ -185,12 +185,12 @@ export function Editor({
           ))}
         </div>
 
-        <div ref={codice} data-editor-codice aria-busy={scrivendo || undefined}>
+        <div ref={codice} data-editor-code aria-busy={scrivendo || undefined}>
           {scritte.map((riga, i) => (
             <span
               key={`${aperto.tipo}-${i}`}
-              data-codice-riga
-              data-nuova={
+              data-code-line
+              data-new={
                 (riga.isNew && capo && aperto.tipo === "config") || undefined
               }
             >
@@ -199,14 +199,14 @@ export function Editor({
                   <button
                     key={k}
                     type="button"
-                    data-sintassi="s"
-                    data-attrezzo
+                    data-syntax="s"
+                    data-tool
                     onClick={() => onApri(p.id)}
                   >
                     {p.testo}
                   </button>
                 ) : (
-                  <span key={k} data-sintassi={p.tipo}>
+                  <span key={k} data-syntax={p.tipo}>
                     {p.testo}
                   </span>
                 ),
@@ -215,12 +215,12 @@ export function Editor({
           ))}
         </div>
 
-        <div data-editor-stato>
+        <div data-editor-state>
           <span>✓ {capo ? testi.garments[capo.id].status : e.zeroErrors}</span>
           <span data-editor-mix aria-hidden="true">
             {capo &&
               sortedWeights(capo).map(([z, pc]) => (
-                <i key={z} data-zona={z} style={{ width: `${pc}%` }} />
+                <i key={z} data-zone={z} style={{ width: `${pc}%` }} />
               ))}
           </span>
           <span aria-hidden="true">TS</span>
@@ -229,7 +229,7 @@ export function Editor({
 
       <dialog
         ref={dialogo}
-        data-cassetta-foglio
+        data-toolbox-sheet
         aria-labelledby={titoloId}
         onClose={() => {
           onChiudi();
@@ -264,7 +264,7 @@ export function Editor({
                 </button>
                 <button
                   type="button"
-                  data-etichetta-chiudi
+                  data-label-close
                   onClick={() => dialogo.current?.close()}
                 >
                   {testi.label.close}

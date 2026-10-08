@@ -11,7 +11,7 @@ const n = it_.services.gioco.notte;
 const VOCI = ["dominio", "sicurezza", "dati", "copie", "dove", "velocita"] as const;
 
 const interruttore = (k: (typeof VOCI)[number]) => screen.getByRole("button", { name: n.voci[k] });
-const orologio = (container: HTMLElement) => container.querySelector("[data-notte-ora]")?.textContent;
+const orologio = (container: HTMLElement) => container.querySelector("[data-night-time]")?.textContent;
 const vaiADormire = () => fireEvent.click(screen.getByRole("button", { name: new RegExp(n.prepara.vai) }));
 const passa = (ms: number) => act(() => vi.advanceTimersByTime(ms));
 
@@ -58,7 +58,7 @@ describe("la notte che corre", () => {
     passa(NIGHT_DURATION);
 
     expect(screen.getByRole("heading", { name: n.mattina.tutto })).toBeInTheDocument();
-    const cronaca = container.querySelector("[data-notte-cronaca]") as HTMLElement;
+    const cronaca = container.querySelector("[data-night-log]") as HTMLElement;
     expect(within(cronaca).getAllByText(n.parato)).toHaveLength(6);
     expect(within(cronaca).queryByText(n.giu)).toBeNull();
     expect(screen.getByRole("button", { name: new RegExp(n.mattina.rifai) })).toBeInTheDocument();
@@ -70,7 +70,7 @@ describe("la notte che corre", () => {
     passa(NIGHT_DURATION);
 
     expect(screen.getByRole("heading", { name: "Il sito c'è stato 0,8 ore su 8" })).toBeInTheDocument();
-    const cronaca = container.querySelector("[data-notte-cronaca]") as HTMLElement;
+    const cronaca = container.querySelector("[data-night-log]") as HTMLElement;
     expect(within(cronaca).getAllByText(n.giu)).toHaveLength(6);
     expect(screen.getByText("giù 3 ore")).toBeInTheDocument();
     expect(screen.getByText("giù 24 min")).toBeInTheDocument();
@@ -124,7 +124,7 @@ describe("la mattina", () => {
     expect(interruttore("dominio")).toHaveAttribute("aria-pressed", "true");
     expect(interruttore("dati")).toHaveAttribute("aria-pressed", "true");
     expect(interruttore("copie")).toHaveAttribute("aria-pressed", "false");
-    expect(container.querySelector("[data-notte-cronaca]")?.children).toHaveLength(0);
+    expect(container.querySelector("[data-night-log]")?.children).toHaveLength(0);
   });
 
   it("«il finale» porta avanti", () => {

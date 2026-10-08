@@ -58,7 +58,7 @@ describe("FooterView", () => {
     // e diventi la riga di un indirizzo. Se i tre pezzi si separano, resta un
     // disegno di busta con dentro un piede qualsiasi.
     render(<FooterView {...props} />);
-    const indirizzo = screen.getByTestId("busta-indirizzo");
+    const indirizzo = screen.getByTestId("envelope-address");
     expect(within(indirizzo).getByText(props.replyTo)).toBeVisible();
     expect(within(indirizzo).getByText(props.name)).toBeVisible();
     expect(within(indirizzo).getByRole("link", { name: props.email })).toBeVisible();
@@ -76,7 +76,7 @@ describe("FooterView", () => {
     // Su una busta indirizzata ad Andrea il mittente e' il visitatore, non lui.
     // L'etichetta dice cosa c'e' davvero li' dentro: altri posti dove trovarlo.
     render(<FooterView {...props} />);
-    const profili = screen.getByTestId("busta-profili");
+    const profili = screen.getByTestId("envelope-profiles");
     expect(within(profili).getByText(props.alsoHere)).toBeVisible();
     expect(screen.queryByText(/mittente/i)).not.toBeInTheDocument();
   });
@@ -86,7 +86,7 @@ describe("FooterView", () => {
     // citta' e' gia' nella riga dell'indirizzo, e il resto e' disegno. Un nome
     // accessibile qui sarebbe rumore letto due volte.
     render(<FooterView {...props} />);
-    expect(screen.getByTestId("busta-affrancatura")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByTestId("envelope-postage")).toHaveAttribute("aria-hidden", "true");
   });
 
   it("l'annullo porta la data di oggi in gg.mm.aa, non una data cablata", () => {
@@ -96,7 +96,7 @@ describe("FooterView", () => {
     // volta sola, e una data presa sul server sarebbe quella della build.
     vi.useFakeTimers({ toFake: ["Date"], now: new Date(2031, 2, 5) });
     render(<FooterView {...props} />);
-    expect(screen.getByTestId("busta-annullo-data")).toHaveTextContent("05.03.31");
+    expect(screen.getByTestId("envelope-postmark-date")).toHaveTextContent("05.03.31");
   });
 
   it("l'html della build si idrata alla data della visita, senza errori", async () => {
@@ -117,7 +117,7 @@ describe("FooterView", () => {
       hydrateRoot(contenitore, <FooterView {...props} />);
     });
 
-    expect(within(contenitore).getByTestId("busta-annullo-data")).toHaveTextContent("05.03.31");
+    expect(within(contenitore).getByTestId("envelope-postmark-date")).toHaveTextContent("05.03.31");
     expect(within(contenitore).getByText(/© 2031 Andrea Ghidara/)).toBeInTheDocument();
     expect(errori).not.toHaveBeenCalled();
     errori.mockRestore();
@@ -129,7 +129,7 @@ describe("FooterView", () => {
     // ospitava questa riga non esiste piu'. Se restasse fuori, finirebbe su
     // una striscia alta zero e sparirebbe dalla pagina.
     render(<FooterView {...props} />);
-    const busta = screen.getByTestId("busta");
+    const busta = screen.getByTestId("envelope");
     expect(within(busta).getByText(new RegExp(String(new Date().getFullYear())))).toBeVisible();
   });
 
@@ -139,6 +139,6 @@ describe("FooterView", () => {
     render(<FooterView {...props} />);
     const piede = screen.getByRole("contentinfo");
     expect(piede.children).toHaveLength(1);
-    expect(piede.firstElementChild).toBe(screen.getByTestId("busta"));
+    expect(piede.firstElementChild).toBe(screen.getByTestId("envelope"));
   });
 });

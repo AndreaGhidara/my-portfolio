@@ -53,7 +53,7 @@ type Lampo = { campo: DrawerToolId; n: number };
 
 /** Dove lampeggia la landing dopo una scelta: il punto appena cambiato. */
 function bersaglio(sito: HTMLElement, campo: DrawerToolId): Element | null {
-  if (campo === "caratteri" || campo === "testi") return sito.querySelector("[data-titolo]");
+  if (campo === "caratteri" || campo === "testi") return sito.querySelector("[data-title]");
   if (campo === "immagini") return sito.querySelector("[data-img]");
   if (campo === "telefono") return null;
   return sito;
@@ -116,9 +116,9 @@ function Banco({ onNext: onAvanti, visible: visibile, onRicomincia }: LevelProps
     for (const sito of [sitoPc.current, sitoCell.current]) {
       const el = sito && bersaglio(sito, lampo.campo);
       if (!(el instanceof HTMLElement)) continue;
-      el.classList.remove("lampo");
+      el.classList.remove("flash");
       void el.offsetWidth;
-      el.classList.add("lampo");
+      el.classList.add("flash");
     }
   }, [lampo]);
 
@@ -153,27 +153,27 @@ function Banco({ onNext: onAvanti, visible: visibile, onRicomincia }: LevelProps
 
   return (
     <div
-      className="banco"
-      data-gioco-livello="schermo"
-      data-vista={scelte.view}
-      data-pronto={pronto || undefined}
-      data-aperto={aperto || undefined}
-      data-dietro={dietro || undefined}
+      className="bench"
+      data-game-level="schermo"
+      data-view={scelte.view}
+      data-ready={pronto || undefined}
+      data-open={aperto || undefined}
+      data-back={dietro || undefined}
       style={siteVariables(FAKE_PALETTES[scelte.palette].colors) as CSSProperties}
     >
-      <div className="passo-1" inert={dietro}>
-        <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: levelNumber("schermo"), nome: comune("livelli.schermo") })}</span>
-          <span className="pallini" aria-hidden="true">
+      <div className="step-1" inert={dietro}>
+        <div className="head">
+          <span className="level">{comune("etichetta", { numero: levelNumber("schermo"), nome: comune("livelli.schermo") })}</span>
+          <span className="dots" aria-hidden="true">
             {DRAWER_TOOLS.map((a, i) => (
-              <i key={a} className={i < fatti.length ? "si" : undefined} />
+              <i key={a} className={i < fatti.length ? "yes" : undefined} />
             ))}
           </span>
         </div>
 
-        <div className="portatile" inert={sulTelefono}>
-          <div className="cornice-pc">
-            <div className="schermo">
+        <div className="laptop" inert={sulTelefono}>
+          <div className="frame-pc">
+            <div className="screen">
               <FakeSite ref={sitoPc} {...sito} />
             </div>
             {pronto &&
@@ -181,7 +181,7 @@ function Banco({ onNext: onAvanti, visible: visibile, onRicomincia }: LevelProps
                 <button
                   key={i}
                   type="button"
-                  className={svitate[i] ? "vite via" : "vite"}
+                  className={svitate[i] ? "screw gone" : "screw"}
                   style={{ left: v.x, top: v.y, "--r": v.r } as CSSProperties}
                   aria-label={t("vite", { numero: i + 1 })}
                   disabled={svitate[i]}
@@ -193,18 +193,18 @@ function Banco({ onNext: onAvanti, visible: visibile, onRicomincia }: LevelProps
         </div>
 
         <div className="cell" inert={!sulTelefono}>
-          <div className="schermo">
+          <div className="screen">
             <FakeSite ref={sitoCell} {...sito} />
           </div>
         </div>
 
-        <div className="attrezzi" role="group" aria-label={t("attrezzi")}>
+        <div className="tools" role="group" aria-label={t("attrezzi")}>
           {DRAWER_TOOLS.map((a) => (
             <button
               key={a}
               type="button"
               aria-pressed={a === attivo}
-              className={fatti.includes(a) ? "fatto" : undefined}
+              className={fatti.includes(a) ? "done" : undefined}
               onClick={() => apri(a)}
             >
               <Icon name={a} />
@@ -222,7 +222,7 @@ function Banco({ onNext: onAvanti, visible: visibile, onRicomincia }: LevelProps
         />
       </div>
 
-      <div className="passo-2" inert={!dietro}>
+      <div className="step-2" inert={!dietro}>
         {aperto && <ScreenBack onRestart={onRicomincia} />}
       </div>
     </div>

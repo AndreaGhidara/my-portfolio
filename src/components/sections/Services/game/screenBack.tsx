@@ -46,7 +46,7 @@ const filo = ([a, b]: [Punto, Punto]) => {
 };
 
 /** Le scintille che corrono sui fili: tre colori a giro. */
-const SCINTILLE = ["var(--bulb)", "var(--orange)", "var(--schermo-verde-chiaro)"];
+const SCINTILLE = ["var(--bulb)", "var(--orange)", "var(--screen-light-green)"];
 
 /** Il lato della tessera di un nodo, in unita' del disegno. */
 const LATO = 28;
@@ -60,13 +60,13 @@ export function ScreenBack({ onRestart: onRicomincia }: { onRestart: () => void 
 
   return (
     <>
-      <svg className="circuito" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+      <svg className="circuit" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
         <defs>
           <pattern id={reticolo} width="15" height="15" patternUnits="userSpaceOnUse">
-            <path d="M15 0V15M0 15H15" strokeWidth="1" style={{ stroke: "var(--gioco-reticolo)" }} />
+            <path d="M15 0V15M0 15H15" strokeWidth="1" style={{ stroke: "var(--game-grid)" }} />
           </pattern>
         </defs>
-        <rect width="300" height="400" style={{ fill: "var(--gioco-scuro)" }} />
+        <rect width="300" height="400" style={{ fill: "var(--game-dark)" }} />
         <rect width="300" height="400" fill={`url(#${reticolo})`} />
         {/* Il bordo dello schermo visto da dietro. */}
         <rect
@@ -78,12 +78,12 @@ export function ScreenBack({ onRestart: onRicomincia }: { onRestart: () => void 
           fill="none"
           strokeWidth="2"
           strokeDasharray="6 4"
-          style={{ stroke: "var(--schermo-bordo-dietro)" }}
+          style={{ stroke: "var(--screen-border-back)" }}
         />
         {/* L'ingresso: il visitatore che tocca lo schermo. */}
         <circle cx="150" cy="40" r="11" strokeWidth="1.5" style={{ fill: "var(--orange)", stroke: "var(--paper)" }} />
         <path d="M146 36 l7 4 l-7 4z" style={{ fill: "var(--paper)" }} />
-        <text x="150" y="62" textAnchor="middle" fontSize="6.5" className="scritta">
+        <text x="150" y="62" textAnchor="middle" fontSize="6.5" className="lettering">
           {t("ingresso")}
         </text>
         {FILI.map((f, i) => (
@@ -97,7 +97,7 @@ export function ScreenBack({ onRestart: onRicomincia }: { onRestart: () => void 
             style={{ stroke: "var(--muted)" }}
           />
         ))}
-        <g className="scintille">
+        <g className="sparks">
           {FILI.map((_, i) => (
             <circle key={`scintilla-${i}`} r="3" style={{ fill: SCINTILLE[i % 3] }}>
               <animateMotion dur={`${2.4 + (i % 4) * 0.5}s`} repeatCount="indefinite" begin={`${i * 0.35}s`}>
@@ -107,23 +107,23 @@ export function ScreenBack({ onRestart: onRicomincia }: { onRestart: () => void 
           ))}
         </g>
         {Object.entries(NODI).map(([nome, [x, y]]) => (
-          <g key={nome} className="nodo">
+          <g key={nome} className="node">
             <rect x={x - LATO / 2} y={y - LATO / 2} width={LATO} height={LATO} rx="5" />
             <svg x={x - LATO / 2 + 3} y={y - LATO / 2 + 3} width={LATO - 6} height={LATO - 6}>
               <Icon name={nome as NodeIcon} />
             </svg>
           </g>
         ))}
-        <text x="150" y="372" textAnchor="middle" fontSize="6.5" className="scritta">
+        <text x="150" y="372" textAnchor="middle" fontSize="6.5" className="lettering">
           {t("regola")}
         </text>
       </svg>
 
-      <div className="testa">
-        <span className="livello">{comune("etichetta", { numero: levelNumber("logiche"), nome: t("testa") })}</span>
+      <div className="head">
+        <span className="level">{comune("etichetta", { numero: levelNumber("logiche"), nome: t("testa") })}</span>
       </div>
 
-      <div className="didascalia">
+      <div className="caption">
         <p className="mono">{t("occhiello")}</p>
         <p>{t("testo")}</p>
         <button type="button" onClick={onRicomincia}>

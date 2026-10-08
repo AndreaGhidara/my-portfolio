@@ -64,7 +64,7 @@ export function JourneyView({
           // non si ribalta col tema mentre --fg-muted si'.
           <Reveal motion="dietro" stagger={0.08}>
             <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
-            <h2 id="titolo-journey" className="titolo-sezione">{title}</h2>
+            <h2 id="titolo-journey" className="section-title">{title}</h2>
           </Reveal>
         }
       >
@@ -85,7 +85,7 @@ export function JourneyView({
             all'aggancio e non all'arrivo, e il momento di questo foglio e' la
             luce. */}
         <li
-          data-journey-arrivo
+          data-journey-arrival
           style={{ "--r": `${ARRIVAL_POSE.rotation}deg` } as CSSProperties}
         >
           <dl>

@@ -18,10 +18,10 @@ export function ToolboxView({
   copy: ToolboxCopy;
 }) {
   return (
-    <div data-cassetta-sezione>
-      <Reveal data-cassetta-testa motion="dietro" stagger={0.08}>
+    <div data-toolbox-section>
+      <Reveal data-toolbox-head motion="dietro" stagger={0.08}>
         <p className="eyebrow">{eyebrow}</p>
-        <h2 className="titolo-sezione">{title}</h2>
+        <h2 className="section-title">{title}</h2>
         <p>{lead}</p>
       </Reveal>
       <Toolbox copy={testi} />

@@ -73,7 +73,7 @@ describe("ContactView", () => {
     const sezione = screen.getByRole("region", { name: props.title });
     const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
     expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
-    expect(titolo).toHaveClass("titolo-sezione");
+    expect(titolo).toHaveClass("section-title");
   });
   it("i due pubblici restano distinti, ma non sono più due colonne pari", () => {
     // Il cliente ha metà pagina e un foglio su cui scrivere; chi assume ha una
@@ -84,7 +84,7 @@ describe("ContactView", () => {
     const tesserino = container.querySelector("[data-contact-badge]");
     expect(tesserino).not.toBeNull();
     expect(tesserino).toHaveTextContent(props.recruiter.title);
-    expect(container.querySelector("[data-contact-foglio] form")).not.toBeNull();
+    expect(container.querySelector("[data-contact-sheet] form")).not.toBeNull();
   });
 
   it("«cosa succede dopo» è una sequenza, e il markup lo dice", () => {
@@ -92,7 +92,7 @@ describe("ContactView", () => {
     // poi il preventivo. Una <ol> è il modo in cui quell'ordine arriva anche a
     // chi la pagina non la vede.
     const { container } = render(<ContactView {...props} />);
-    const voci = container.querySelectorAll("ol[data-contact-tempi] > li");
+    const voci = container.querySelectorAll("ol[data-contact-times] > li");
     expect(voci).toHaveLength(props.after.moments.length);
     expect(voci[0]).toHaveTextContent(props.after.moments[0].when);
     expect(voci[voci.length - 1]).toHaveTextContent("Due pagine");
@@ -137,15 +137,15 @@ describe("ContactView", () => {
     // stesso, non ci si infila dentro, o le due colonne tornano una sotto
     // l'altra su ogni schermo.
     const { container } = render(<ContactView {...props} />);
-    const griglia = container.querySelector("[data-contact-due]");
+    const griglia = container.querySelector("[data-contact-columns]");
     expect(griglia).not.toBeNull();
-    expect(griglia!.querySelector("[data-contact-foglio]")).not.toBeNull();
-    expect(griglia!.querySelector("[data-contact-tempi]")).not.toBeNull();
+    expect(griglia!.querySelector("[data-contact-sheet]")).not.toBeNull();
+    expect(griglia!.querySelector("[data-contact-times]")).not.toBeNull();
   });
 });
 
 describe("i campi sono righe, non riquadri", () => {
-  const campi = rules(/\[data-contact-campo\]/);
+  const campi = rules(/\[data-contact-field\]/);
 
   it("un campo senza bordo ha comunque un fuoco che si vede", () => {
     // È il prezzo della riga al posto della scatola: tolto il contorno, il
@@ -160,7 +160,7 @@ describe("i campi sono righe, non riquadri", () => {
     // Una riga e' alta quanto il testo. Su un telefono si tocca con il pollice,
     // e sotto i 44px il bersaglio e' troppo piccolo: la min-height e' quello
     // che una scatola dava gratis e una riga no.
-    const base = campi.find((r) => r.selector === "[data-contact-campo]");
+    const base = campi.find((r) => r.selector === "[data-contact-field]");
     expect(base, "manca la regola base dei campi").toBeDefined();
     expect(base!.body).toMatch(/min-height:\s*2\.75rem/);
   });
@@ -174,22 +174,22 @@ describe("le etichette arancioni si leggono", () => {
   // basta (5,42:1), e sul tema scuro torna pieno perche' li' il problema non
   // c'e'.
   const etichette = [
-    "[data-contact-foglio-et]",
-    "[data-contact-quando]",
-    "[data-contact-badge-et]",
+    "[data-contact-sheet-label]",
+    "[data-contact-when]",
+    "[data-contact-badge-label]",
   ];
 
   it.each(etichette)("%s non usa l'arancio pieno come testo", (selettore) => {
     const regola = rules(selettore)[0];
     expect(regola, `manca la regola ${selettore}`).toBeDefined();
-    expect(regola!.body).toMatch(/color:\s*var\(--accento-testo\)/);
+    expect(regola!.body).toMatch(/color:\s*var\(--accent-text\)/);
   });
 
   it("il testo del cartellino non e' spento: su quel fondo il grigio faceva 4,22:1", () => {
     // Il cartellino ha un fondo suo, piu' scuro della carta di pagina
     // (color-mix con --fg al 7%): li' --fg-muted scendeva sotto il 4,5:1
     // richiesto al testo piccolo. Il paragrafo passa a --fg.
-    const regola = rules("[data-contact-badge-testo]")[0];
+    const regola = rules("[data-contact-badge-text]")[0];
     expect(regola, "manca la regola del testo del cartellino").toBeDefined();
     expect(regola!.body).toMatch(/color:\s*var\(--fg\)/);
   });
@@ -197,8 +197,8 @@ describe("le etichette arancioni si leggono", () => {
   it("l'arancio da testo esiste in tutti e due i temi", () => {
     const radice = rules(":root")[0];
     const scuro = rules('[data-theme="dark"]')[0];
-    expect(radice!.body).toMatch(/--accento-testo:/);
-    expect(scuro!.body).toMatch(/--accento-testo:/);
+    expect(radice!.body).toMatch(/--accent-text:/);
+    expect(scuro!.body).toMatch(/--accent-text:/);
   });
 });
 
@@ -212,7 +212,7 @@ describe("l'esito dell'invio", () => {
     // foglio di stile costruisce il riquadro.
     await scriviEInvia({ success: true });
     const esito = await screen.findByRole("status");
-    expect(esito).toHaveAttribute("data-esito", "success");
+    expect(esito).toHaveAttribute("data-outcome", "success");
     expect(esito).toHaveTextContent(props.form.status.success);
     // Il segno accanto al testo: chi non distingue l'arancio dall'inchiostro
     // deve capirlo lo stesso, e il colore da solo non glielo dice.
@@ -225,7 +225,7 @@ describe("l'esito dell'invio", () => {
     // persona a cercarsela: e' esattamente il momento in cui se ne va.
     await scriviEInvia({ success: false });
     const esito = await screen.findByRole("status");
-    expect(esito).toHaveAttribute("data-esito", "error");
+    expect(esito).toHaveAttribute("data-outcome", "error");
     expect(esito).toHaveTextContent(props.form.status.error);
     expect(esito.querySelector("a")).toHaveAttribute("href", `mailto:${props.email}`);
   });
@@ -235,7 +235,7 @@ describe("l'esito dell'invio", () => {
     // lettori di schermo non esiste: va gia' trovata nel documento, vuota.
     render(<ContactView {...props} />);
     const esito = screen.getByRole("status");
-    expect(esito).toHaveAttribute("data-esito", "idle");
+    expect(esito).toHaveAttribute("data-outcome", "idle");
     expect(esito).toHaveTextContent("");
   });
 });

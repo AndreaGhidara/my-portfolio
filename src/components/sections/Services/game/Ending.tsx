@@ -16,14 +16,14 @@ export function Ending({ onNext: onAvanti }: LevelProps) {
   const t = useTranslations("services.gioco.finale");
 
   return (
-    <div className="banco" data-gioco-livello="finale">
-      <div className="sopra">
-        <div className="stelle" aria-hidden="true" />
-        <div className="testa">
-          <span className="livello">{t("testa")}</span>
-          <span className="destra" aria-hidden="true">☀</span>
+    <div className="bench" data-game-level="finale">
+      <div className="above">
+        <div className="stars" aria-hidden="true" />
+        <div className="head">
+          <span className="level">{t("testa")}</span>
+          <span className="right" aria-hidden="true">☀</span>
         </div>
-        <div className="alba">
+        <div className="dawn">
           <p>
             <b>{t("alba")}</b>
             <small>{t("dopoAlba")}</small>
@@ -37,8 +37,8 @@ export function Ending({ onNext: onAvanti }: LevelProps) {
           <h3>{t("titolo")}</h3>
         </div>
         <div />
-        <div className="palco">
-          <ol className="strati">
+        <div className="stage">
+          <ol className="layers">
             {LEVELS.map((id, i) => (
               <li key={id}>
                 <span aria-hidden="true">{i + 1}</span>
@@ -47,12 +47,12 @@ export function Ending({ onNext: onAvanti }: LevelProps) {
             ))}
           </ol>
         </div>
-        <div className="azioni due">
+        <div className="actions two">
           <button type="button" onClick={onAvanti}>
             <b aria-hidden="true">↺</b>
             {t("tornaAlSito")}
           </button>
-          <a href="#contact" className="arancio">
+          <a href="#contact" className="orange">
             {t("parliamone")} <b aria-hidden="true">→</b>
           </a>
         </div>

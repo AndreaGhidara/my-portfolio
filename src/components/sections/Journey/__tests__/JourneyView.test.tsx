@@ -39,7 +39,7 @@ describe("JourneyView", () => {
     const sezione = screen.getByRole("region", { name: props.title });
     const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
     expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
-    expect(titolo).toHaveClass("titolo-sezione");
+    expect(titolo).toHaveClass("section-title");
   });
   it("presenta il percorso come lista ordinata dal 2023 a oggi", () => {
     render(<JourneyView {...props} />);
@@ -70,7 +70,7 @@ describe("JourneyView", () => {
     // dell'azienda c'è quella riga, e il cartellino si disegna tratteggiato.
     // Il gancio sta sul <li> perché è di lì che pende la regola dello stile.
     const { container } = render(<JourneyView {...props} />);
-    const senza = container.querySelectorAll('[data-journey-item][data-tesserino="no"]');
+    const senza = container.querySelectorAll('[data-journey-item][data-badge="no"]');
     expect(senza).toHaveLength(journey.filter((e) => !e.badge).length);
     expect(senza[0]).toHaveTextContent(props.noBadge);
     expect(screen.queryByText("Freelance")).toBeNull();
@@ -104,14 +104,14 @@ describe("JourneyView", () => {
     render(<JourneyView {...props} />);
     const voci = screen.getAllByRole("listitem");
     const ultima = voci[voci.length - 1];
-    expect(ultima).toHaveAttribute("data-journey-arrivo");
+    expect(ultima).toHaveAttribute("data-journey-arrival");
     expect(ultima.querySelectorAll("dl dd")).toHaveLength(2);
     expect(ultima).toHaveTextContent(props.note);
   });
 
   it("onda, anno grande e barra non si leggono: sono disegno", () => {
     const { container } = render(<JourneyView {...props} />);
-    for (const sel of ["[data-journey-onda]", "[data-journey-anno]", "[data-journey-avanzamento]"]) {
+    for (const sel of ["[data-journey-wave]", "[data-journey-year]", "[data-journey-progress]"]) {
       expect(container.querySelector(sel)).toHaveAttribute("aria-hidden", "true");
     }
   });
@@ -120,7 +120,7 @@ describe("JourneyView", () => {
     // Il server e il primo render non sanno se c'e' GSAP ne' quanto e' alto lo
     // schermo: la colonna si legge sempre, l'orizzontale va guadagnata.
     const { container } = render(<JourneyView {...props} />);
-    expect(container.querySelector("[data-scena]")).toBeNull();
+    expect(container.querySelector("[data-scene]")).toBeNull();
   });
 });
 

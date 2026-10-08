@@ -96,7 +96,7 @@ export function HeroMotion({ children }: { children: ReactNode }) {
      fisso della carta, che smetterebbe di coprire lo schermo. La carta sta
      fuori, in HeroView. */
   return (
-    <div ref={scope} data-hero-strato>
+    <div ref={scope} data-hero-layer>
       {children}
     </div>
   );

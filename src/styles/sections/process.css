@@ -44,8 +44,8 @@
    consegne sono gia' a due colonne ma la testata, col suo tetto stretto,
    resterebbe un blocco appoggiato a sinistra. */
 @media (max-width: 1023px) {
-  [data-process-testata] h2,
-  [data-process-testata] p {
+  [data-process-header] h2,
+  [data-process-header] p {
     margin-inline: auto;
   }
 }
@@ -60,31 +60,31 @@
    segnaposto della lista: quello si eredita dal tema del browser e cambia da
    uno all'altro, e questa e' l'unica lista del sito in cui il segno conta:
    sono voci di un contenuto, non passi di una procedura. */
-[data-process-dentro] {
+[data-process-includes] {
   list-style: none;
   margin: 1.15rem 0 0;
   padding: 0;
   display: grid;
   gap: 0.45rem;
 }
-[data-process-dentro] li {
+[data-process-includes] li {
   position: relative;
   padding-inline-start: 1.2rem;
   font-size: 0.95rem;
   line-height: 1.5;
   color: var(--fg-muted);
 }
-[data-process-dentro] li::before {
+[data-process-includes] li::before {
   content: "\0000B7";
   position: absolute;
   inset-inline-start: 0;
-  color: var(--accento-testo);
+  color: var(--accent-text);
 }
 
 /* Cosa NON e'. In monospaziato e staccata dal filetto: e' una nota a margine
    del venditore, non una riga del depliant, ed e' la riga che impedisce alle
    altre di diventare promesse. */
-[data-process-non] {
+[data-process-excludes] {
   margin-block-start: 1.15rem;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.78rem;
@@ -93,7 +93,7 @@
   border-inline-start: 2px solid var(--line);
   padding-inline-start: 0.9rem;
 }
-[data-process-perche] { margin-block-start: 1.15rem; line-height: 1.6; }
+[data-process-why] { margin-block-start: 1.15rem; line-height: 1.6; }
 
 /* ── Il disegno ─────────────────────────────────────────────────────────── */
 
@@ -143,8 +143,8 @@
    specificita' sulla riga in accento (quattro attributi contro tre) e la
    barra dell'indirizzo, che e' tutto il motivo per cui questo campione esiste,
    diventa carta come le altre. */
-[data-process-art] [data-desk-piece][data-shape="phone"] [data-m="riga"]:not([data-titolo]),
-[data-process-art] [data-desk-piece][data-shape="phone"] [data-m="blocco"] {
+[data-process-art] [data-desk-piece][data-shape="phone"] [data-m="line"]:not([data-title]),
+[data-process-art] [data-desk-piece][data-shape="phone"] [data-m="block"] {
   background-color: color-mix(in oklab, var(--paper) 58%, transparent);
 }
 
@@ -155,6 +155,6 @@
     padding-block: 4.5rem;
   }
   /* `lato` dice dove sta il DISEGNO: il testo va dall'altra parte. */
-  [data-process-item][data-lato="sx"] [data-process-text] { order: 2; }
-  [data-process-item][data-lato="sx"] [data-process-art] { order: 1; }
+  [data-process-item][data-side="left"] [data-process-text] { order: 2; }
+  [data-process-item][data-side="left"] [data-process-art] { order: 1; }
 }

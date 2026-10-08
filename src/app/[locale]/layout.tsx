@@ -63,21 +63,21 @@ const fintoFraunces = Fraunces({
   subsets: ["latin"],
   weight: "600",
   style: ["normal", "italic"],
-  variable: "--font-finto-fraunces",
+  variable: "--font-fake-fraunces",
   display: "swap",
   preload: false,
 });
 const fintoGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["500", "700"],
-  variable: "--font-finto-grotesk",
+  variable: "--font-fake-grotesk",
   display: "swap",
   preload: false,
 });
 const fintoPlayfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["700", "800"],
-  variable: "--font-finto-playfair",
+  variable: "--font-fake-playfair",
   display: "swap",
   preload: false,
 });

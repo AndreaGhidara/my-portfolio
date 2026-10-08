@@ -54,7 +54,7 @@ export function useDossier(
         if (!c) return;
         schedario.current?.setAttribute("inert", "");
         // La barra in basso resta finche' non arriva il velo (vedi sezioni/barra.css).
-        document.documentElement.setAttribute("data-pratica-in-corso", "");
+        document.documentElement.setAttribute("data-dossier-in-progress", "");
         setAttiva(c.i);
         const attesa = c.motion === "quattro-tempi" ? prepara(c.i, c.folder) : null;
         if (attesa) void attesa.then(() => manda({ type: "cade", gen }));
@@ -70,7 +70,7 @@ export function useDossier(
         scivolata.current = null;
         schedario.current?.removeAttribute("inert");
         document.documentElement.removeAttribute("data-dialog-open");
-        document.documentElement.removeAttribute("data-pratica-in-corso");
+        document.documentElement.removeAttribute("data-dossier-in-progress");
         p.folder.openButton.focus({ preventScroll: true });
         if (p.openAfter) manda({ type: "apri", ...p.openAfter });
         return;
@@ -144,7 +144,7 @@ export function useDossier(
       if (dialog?.open) dialog.close();
       lista?.removeAttribute("inert");
       document.documentElement.removeAttribute("data-dialog-open");
-      document.documentElement.removeAttribute("data-pratica-in-corso");
+      document.documentElement.removeAttribute("data-dossier-in-progress");
     };
   }, [schedario]);
 

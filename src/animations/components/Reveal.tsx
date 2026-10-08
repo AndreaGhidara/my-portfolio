@@ -61,7 +61,7 @@ export function Reveal({
         // Con un trigger solo entrerebbero insieme appena il blocco si
         // affaccia, e chi scorre piano le troverebbe gia' tutte a posto.
         for (const figlio of figli) {
-          const verso = figlio.getAttribute("data-lato") === "sx" ? "sx" : "dx";
+          const verso = figlio.getAttribute("data-side") === "left" ? "sx" : "dx";
           fromSide(figlio, { level, trigger: figlio, direction: verso, delay, clearProps });
         }
         return;

@@ -10,14 +10,14 @@ import { rules } from "@/test/css";
 const t = copyFor("it");
 const props = { eyebrow: "Gli attrezzi", title: "Tutto quello che so usare.", lead: "La mia cassetta.", copy: t };
 
-const pannello = (c: HTMLElement) => c.querySelector("[data-cassetta-pannello]") as HTMLElement;
-const editor = (c: HTMLElement) => c.querySelector("[data-cassetta-editor]") as HTMLElement;
+const pannello = (c: HTMLElement) => c.querySelector("[data-toolbox-panel]") as HTMLElement;
+const editor = (c: HTMLElement) => c.querySelector("[data-toolbox-editor]") as HTMLElement;
 
 describe("la cassetta: la testa", () => {
   it("ha il suo titolo e un solo paragrafo", () => {
     const { container } = render(<ToolboxView {...props} />);
     expect(screen.getByRole("heading", { level: 2, name: props.title })).toBeInTheDocument();
-    const testa = container.querySelector("[data-cassetta-testa]") as HTMLElement;
+    const testa = container.querySelector("[data-toolbox-head]") as HTMLElement;
     const paragrafi = [...testa.querySelectorAll("p:not(.eyebrow)")].map((p) => p.textContent);
     expect(paragrafi).toEqual([props.lead]);
   });
@@ -45,8 +45,8 @@ describe("la cassetta: cuci per", () => {
     expect(within(p).getByRole("heading", { level: 3 })).toHaveTextContent(t.garments.ecommerce.name);
     expect(p).toHaveTextContent(`${t.label.composition} · ${t.label.estimate}`);
     const capo = GARMENTS.find((c) => c.id === "ecommerce")!;
-    expect(p.querySelectorAll("[data-etichetta-comp] li")).toHaveLength(Object.keys(capo.weight).length);
-    expect(p.querySelectorAll("[data-etichetta-chips] button")).toHaveLength(capo.uses.length);
+    expect(p.querySelectorAll("[data-label-comp] li")).toHaveLength(Object.keys(capo.weight).length);
+    expect(p.querySelectorAll("[data-label-chips] button")).toHaveLength(capo.uses.length);
     for (const { from: da } of capo.alt) expect(p).toHaveTextContent(t.garments.ecommerce.alt[da]);
     expect(p).toHaveTextContent(t.garments.ecommerce.size);
   });
@@ -87,15 +87,15 @@ describe("la cassetta: cuci per", () => {
 describe("la cassetta: la mappa", () => {
   it("e' un disegno: nascosta agli screen reader, e fuori dal giro dei Tab", () => {
     const { container } = render(<ToolboxView {...props} />);
-    const svg = container.querySelector("[data-cassetta-banco] svg") as SVGElement;
+    const svg = container.querySelector("[data-toolbox-bench] svg") as SVGElement;
     expect(svg).toHaveAttribute("aria-hidden", "true");
     expect(svg.querySelectorAll("[tabindex], a, button")).toHaveLength(0);
   });
 
   it("ha un'etichetta cucita per ogni attrezzo, e i numeri di ogni scomparto", () => {
     const { container } = render(<ToolboxView {...props} />);
-    expect(container.querySelectorAll('[data-nodo="attrezzo"]')).toHaveLength(TOOLS.length);
-    expect(container.querySelectorAll("[data-pezza]")).toHaveLength(9);
+    expect(container.querySelectorAll('[data-node="tool"]')).toHaveLength(TOOLS.length);
+    expect(container.querySelectorAll("[data-patch]")).toHaveLength(9);
   });
 });
 
@@ -115,7 +115,7 @@ describe("la cassetta: l'editor", () => {
       const nome = TOOLS.find((a) => a.id === id)!.name;
       expect(within(ed).getByRole("button", { name: `"${nome}"` })).toBeInTheDocument();
     }
-    expect(ed.querySelector("[data-editor-stato]")).toHaveTextContent(t.garments.assistente.status);
+    expect(ed.querySelector("[data-editor-state]")).toHaveTextContent(t.garments.assistente.status);
   });
 
   it("il tipo del capo nel codice e' nella lingua della pagina", async () => {
@@ -140,7 +140,7 @@ describe("la cassetta: l'editor", () => {
     await userEvent.click(screen.getByRole("button", { name: t.garments.vetrina.name }));
     const ed = editor(container);
     await userEvent.click(within(ed).getByRole("button", { name: '"GSAP"' }));
-    const foglio = container.querySelector("[data-cassetta-foglio]") as HTMLDialogElement;
+    const foglio = container.querySelector("[data-toolbox-sheet]") as HTMLDialogElement;
     expect(foglio.open).toBe(true);
     expect(document.documentElement).toHaveAttribute("data-dialog-open");
     expect(within(foglio).getByRole("heading", { level: 3 })).toHaveTextContent("GSAP");
@@ -159,7 +159,7 @@ describe("la cassetta: l'editor", () => {
 describe("la cassetta: senza JavaScript e per chi legge", () => {
   it("l'elenco per scomparti ha ogni attrezzo, con quello che fa e se e' stato usato", () => {
     const { container } = render(<ToolboxView {...props} />);
-    const elenco = container.querySelector("[data-cassetta-elenco]") as HTMLElement;
+    const elenco = container.querySelector("[data-toolbox-list]") as HTMLElement;
     expect(within(elenco).getAllByRole("heading", { level: 4 })).toHaveLength(9);
     expect(elenco.querySelectorAll("li")).toHaveLength(TOOLS.length);
     expect(elenco).toHaveTextContent(t.tools.drizzle.what);
@@ -167,15 +167,15 @@ describe("la cassetta: senza JavaScript e per chi legge", () => {
 
   it("gli scomparti dell'elenco non sono landmark: nove regioni affollerebbero la mappa della pagina", () => {
     const { container } = render(<ToolboxView {...props} />);
-    const elenco = container.querySelector("[data-cassetta-elenco]") as HTMLElement;
+    const elenco = container.querySelector("[data-toolbox-list]") as HTMLElement;
     expect(within(elenco).queryAllByRole("region")).toHaveLength(0);
     expect(elenco.querySelector("section")).toBeNull();
   });
 
   it("il CSS mostra l'elenco quando lo scripting manca, e nasconde la scena", () => {
     const senza = { media: "(scripting: none)" };
-    expect(rules(/\[data-cassetta-scena\]/, senza).some((r) => /display:\s*none/.test(r.body))).toBe(true);
-    expect(rules(/\[data-cassetta-elenco\]/, senza).length).toBeGreaterThan(0);
+    expect(rules(/\[data-toolbox-scene\]/, senza).some((r) => /display:\s*none/.test(r.body))).toBe(true);
+    expect(rules(/\[data-toolbox-list\]/, senza).length).toBeGreaterThan(0);
   });
 
   it("mappa ed editor li sceglie il CSS con la stessa condizione del codice", () => {

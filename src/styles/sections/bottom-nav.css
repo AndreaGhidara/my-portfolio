@@ -6,7 +6,7 @@
    sito, per tornare ai Contatti, si scorreva a mano fino in fondo. Qui le tre
    voci restano ferme dove il pollice arriva senza spostare la mano.
    Sopra i 768px non esiste: li' stanno in alto, che e' dove uno le cerca. */
-[data-nav-basso] {
+[data-nav-bottom] {
   display: none;
   position: fixed;
   inset-inline: 0;
@@ -26,7 +26,7 @@
 /* 3,25rem = 52px: sopra i 24 di WCAG 2.2 e sopra i 44 consigliati per il
    pollice. La larghezza se la dividono in tre parti uguali, cosi' nessuna
    delle tre e' piu' facile da prendere delle altre. */
-[data-nav-basso] a {
+[data-nav-bottom] a {
   flex: 1 1 0;
   min-block-size: 3.25rem;
   display: grid;
@@ -41,14 +41,14 @@
 /* Il dossier sta a tutto schermo e ha gia' la sua uscita: una seconda
    navigazione appiccicata sopra coprirebbe la cosa che sei appena andato ad
    aprire. */
-html[data-dialog-open]:not([data-pratica-in-corso]) [data-nav-basso] { display: none; }
+html[data-dialog-open]:not([data-dossier-in-progress]) [data-nav-bottom] { display: none; }
 
 /* La pratica dei Lavori (data-pratica-in-corso, scritto da usePratica) tiene
    la barra finche' non arriva il velo: sparire al tocco, prima che la
    cartella si muova, sembrava un salto. Se ne va e torna col velo, in
    dissolvenza, e da nascosta non prende il puntatore. */
 
-html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] {
+html[data-dossier-in-progress]:has([data-work-dialog][data-veil]) [data-nav-bottom] {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -57,17 +57,17 @@ html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] 
 /* La dissolvenza si scrive fuori da un blocco `no-preference` e si spegne
    sotto `reduce`: il primo `no-preference` del file e' la camera del tavolo,
    e la sua guardia (layers.test.ts) lo cerca per posizione. */
-[data-nav-basso] { transition: opacity 200ms ease, visibility 0s; }
+[data-nav-bottom] { transition: opacity 200ms ease, visibility 0s; }
 
-html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] {
+html[data-dossier-in-progress]:has([data-work-dialog][data-veil]) [data-nav-bottom] {
   transition: opacity 200ms ease, visibility 0s linear 200ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-nav-basso],
-  html[data-pratica-in-corso]:has([data-work-dialog][data-velo]) [data-nav-basso] { transition: none; }
+  [data-nav-bottom],
+  html[data-dossier-in-progress]:has([data-work-dialog][data-veil]) [data-nav-bottom] { transition: none; }
 }
 
 @media (max-width: 767px) {
-  [data-nav-basso] { display: flex; }
+  [data-nav-bottom] { display: flex; }
 }

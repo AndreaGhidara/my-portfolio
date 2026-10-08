@@ -96,7 +96,7 @@ export function ContactForm({ copy, email }: { copy: ContactFormCopy; email: str
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <div>
-        <label htmlFor="name" data-contact-etichetta>
+        <label htmlFor="name" data-contact-label>
           {copy.labels.name}
         </label>
         <input
@@ -106,16 +106,16 @@ export function ContactForm({ copy, email }: { copy: ContactFormCopy; email: str
           placeholder={copy.placeholders.name}
           aria-invalid={Boolean(errors.name)}
           aria-describedby={errors.name ? "name-error" : undefined}
-          data-contact-campo
+          data-contact-field
           {...register("name")}
         />
         {errors.name && (
-          <p id="name-error" data-contact-errore>{errors.name.message}</p>
+          <p id="name-error" data-contact-error>{errors.name.message}</p>
         )}
       </div>
 
       <div>
-        <label htmlFor="email" data-contact-etichetta>
+        <label htmlFor="email" data-contact-label>
           {copy.labels.email}
         </label>
         <input
@@ -125,16 +125,16 @@ export function ContactForm({ copy, email }: { copy: ContactFormCopy; email: str
           placeholder={copy.placeholders.email}
           aria-invalid={Boolean(errors.email)}
           aria-describedby={errors.email ? "email-error" : undefined}
-          data-contact-campo
+          data-contact-field
           {...register("email")}
         />
         {errors.email && (
-          <p id="email-error" data-contact-errore>{errors.email.message}</p>
+          <p id="email-error" data-contact-error>{errors.email.message}</p>
         )}
       </div>
 
       <div>
-        <label htmlFor="message" data-contact-etichetta>
+        <label htmlFor="message" data-contact-label>
           {copy.labels.message}
         </label>
         <textarea
@@ -143,18 +143,18 @@ export function ContactForm({ copy, email }: { copy: ContactFormCopy; email: str
           placeholder={copy.placeholders.message}
           aria-invalid={Boolean(errors.message)}
           aria-describedby={errors.message ? "message-error" : undefined}
-          data-contact-campo
+          data-contact-field
           {...register("message")}
         />
         {errors.message && (
-          <p id="message-error" data-contact-errore>{errors.message.message}</p>
+          <p id="message-error" data-contact-error>{errors.message.message}</p>
         )}
       </div>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        data-contact-invia
+        data-contact-send
       >
         {isSubmitting ? copy.button.sending : copy.button.default}
       </button>
@@ -174,14 +174,14 @@ export function ContactForm({ copy, email }: { copy: ContactFormCopy; email: str
           Quando qualcosa non parte, l'indirizzo e' li' e si puo' cliccare: un
           errore che dice "scrivimi via email" senza dare l'email lascia la
           persona a cercarsela, ed e' il momento in cui se ne va. */}
-      <p role="status" aria-live="polite" data-contact-esito data-esito={state}>
+      <p role="status" aria-live="polite" data-contact-outcome data-outcome={state}>
         {state !== "idle" && <SegnoEsito esito={state} />}
         <span>
           {state === "success" ? copy.status.success : state === "error" ? copy.status.error : ""}
           {state === "error" && (
             <>
               {" "}
-              <a href={`mailto:${email}`} data-contact-esito-via>
+              <a href={`mailto:${email}`} data-contact-outcome-mail>
                 {email}
               </a>
             </>

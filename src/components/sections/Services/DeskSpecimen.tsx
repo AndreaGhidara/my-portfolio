@@ -33,17 +33,17 @@ import type { SampleId } from "@/content/desk";
 /** Una riga di testo finto, larga quanto le si dice. La larghezza e' un dato del
  *  disegno (quanto e' lunga quella riga), non una scelta di stile. */
 const Riga = ({ w }: { w: number }) => (
-  <i data-m="riga" style={{ "--w": `${w}%` } as CSSProperties} />
+  <i data-m="line" style={{ "--w": `${w}%` } as CSSProperties} />
 );
 
 /** Una barra dell'istogramma, alta quanto le si dice. Stessa ragione. */
 const Barra = ({ h }: { h: number }) => (
-  <i data-m="barra" style={{ "--h": `${h}%` } as CSSProperties} />
+  <i data-m="bar" style={{ "--h": `${h}%` } as CSSProperties} />
 );
 
 const griglia = (n: number, marca: string, preso?: number) =>
   Array.from({ length: n }, (_, i) => (
-    <i key={i} data-m={marca} data-preso={i === preso ? "" : undefined} />
+    <i key={i} data-m={marca} data-grabbed={i === preso ? "" : undefined} />
   ));
 
 /**
@@ -58,9 +58,9 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
    *  tavolo, ed e' anche quello che spiega la regola meglio di un commento. */
   colori: (
     <>
-      <i data-m="tinta" data-t="carta" />
-      <i data-m="tinta" data-t="accento" />
-      <i data-m="tinta" data-t="inchiostro" />
+      <i data-m="swatch" data-t="paper" />
+      <i data-m="swatch" data-t="accent" />
+      <i data-m="swatch" data-t="ink" />
     </>
   ),
   /** La Archivo Black, che e' il carattere dei titoli del sito. Non "una A
@@ -68,12 +68,12 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   caratteri: <b data-m="aa">Aa</b>,
   sezioni: (
     <>
-      <i data-m="blocco" data-b="testata" />
-      <span data-m="colonne">
-        <i data-m="blocco" data-b="larga" />
-        <i data-m="blocco" data-b="stretta" />
+      <i data-m="block" data-b="header" />
+      <span data-m="columns">
+        <i data-m="block" data-b="wide" />
+        <i data-m="block" data-b="narrow" />
       </span>
-      <i data-m="blocco" data-b="piede" />
+      <i data-m="block" data-b="foot" />
     </>
   ),
   /** Quattro righe di lunghezza diversa: e' come si vede un testo da lontano, ed
@@ -88,9 +88,9 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   ),
   immagini: (
     <>
-      <i data-m="cielo" />
-      <i data-m="sole" />
-      <i data-m="monte" />
+      <i data-m="sky" />
+      <i data-m="sun" />
+      <i data-m="mountain" />
     </>
   ),
   /** Un impaginato mobile dentro lo schermo del telefono: testata, tre blocchi,
@@ -98,7 +98,7 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
    *  che e' precisamente cosa vuol dire mettere un sito su un telefono. */
   telefono: (
     <>
-      <i data-m="blocco" data-b="testata" />
+      <i data-m="block" data-b="header" />
       <Riga w={100} />
       <Riga w={100} />
       <Riga w={80} />
@@ -109,8 +109,8 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   // ── Le logiche ───────────────────────────────────────────────────────────
   contatti: (
     <>
-      <i data-m="campo" />
-      <i data-m="campo" />
+      <i data-m="field" />
+      <i data-m="field" />
       <i data-m="cta" />
     </>
   ),
@@ -118,9 +118,9 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
    *  un'area riservata, ed e' per questo che sono il suo campione. */
   riservata: (
     <>
-      <i data-m="campo" />
-      <span data-m="pallini">{griglia(6, "pallino")}</span>
-      <i data-m="cta" data-piccolo="" />
+      <i data-m="field" />
+      <span data-m="dots">{griglia(6, "dot")}</span>
+      <i data-m="cta" data-small="" />
     </>
   ),
   /** Una scheda prodotto, non una griglia. Quattro tessere sono anche "Le
@@ -128,12 +128,12 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
    *  esista, e tre oggetti con la stessa forma non distinguono niente. Quello
    *  che rende un catalogo un catalogo, e non una galleria, e' il prezzo. */
   catalogo: (
-    <span data-m="scheda">
-      <i data-m="tessera" data-grande="" />
-      <span data-m="dettaglio">
+    <span data-m="card">
+      <i data-m="tile" data-large="" />
+      <span data-m="detail">
         <Riga w={100} />
         <Riga w={70} />
-        <i data-m="prezzo" />
+        <i data-m="price" />
       </span>
     </span>
   ),
@@ -152,14 +152,14 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
    * disegnate dentro una scheda.
    */
   pagamenti: (
-    <span data-m="ricevuta">
+    <span data-m="receipt">
       <Riga w={78} />
       <Riga w={62} />
       <Riga w={70} />
-      <i data-m="strappo" />
-      <span data-m="voce" data-totale="">
+      <i data-m="tear" />
+      <span data-m="item" data-total="">
         <Riga w={38} />
-        <i data-m="importo" />
+        <i data-m="amount" />
       </span>
     </span>
   ),
@@ -167,8 +167,8 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
    *  cosa che una prenotazione aggiunge a un calendario. */
   prenotazioni: (
     <>
-      <i data-m="riga" data-testa="" style={{ "--w": "100%" } as CSSProperties} />
-      <span data-m="mese">{griglia(18, "giorno", 9)}</span>
+      <i data-m="line" data-head="" style={{ "--w": "100%" } as CSSProperties} />
+      <span data-m="month">{griglia(18, "day", 9)}</span>
     </>
   ),
   /**
@@ -183,9 +183,9 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
     <>
       <b data-m="mono">ART-0412</b>
       <Riga w={64} />
-      <span data-m="qta">
+      <span data-m="qty">
         <Riga w={34} />
-        <b data-m="mono" data-piccolo="">
+        <b data-m="mono" data-small="">
           ×24
         </b>
       </span>
@@ -193,14 +193,14 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   ),
 
   // ── L'infrastruttura ─────────────────────────────────────────────────────
-  dati: <span data-m="tabella" data-fitta="">{griglia(18, "cella")}</span>,
+  dati: <span data-m="table" data-dense="">{griglia(18, "cell")}</span>,
   /** La stessa sagoma tre volte, sfalsata. Nessun simbolo: una copia e' una
    *  ripetizione, e mostrarne tre e' letteralmente mostrare delle copie. */
   copie: (
     <>
-      <i data-m="copia" data-i="3" />
-      <i data-m="copia" data-i="2" />
-      <i data-m="copia" data-i="1" />
+      <i data-m="copy" data-i="3" />
+      <i data-m="copy" data-i="2" />
+      <i data-m="copy" data-i="1" />
     </>
   ),
   /** Un dominio non si disegna, si scrive: e' testo, ed e' sempre stato testo. */
@@ -215,19 +215,19 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
   // ── I servizi ────────────────────────────────────────────────────────────
   assistente: (
     <>
-      <i data-m="bolla" data-lato="qui" />
-      <i data-m="bolla" data-lato="la" />
+      <i data-m="bubble" data-side="here" />
+      <i data-m="bubble" data-side="there" />
     </>
   ),
   automazioni: (
-    <span data-m="flusso">
-      <i data-m="nodo" />
-      <i data-m="nodo" />
-      <i data-m="nodo" />
+    <span data-m="flow">
+      <i data-m="node" />
+      <i data-m="node" />
+      <i data-m="node" />
     </span>
   ),
   numeri: (
-    <span data-m="istogramma">
+    <span data-m="histogram">
       <Barra h={38} />
       <Barra h={58} />
       <Barra h={46} />
@@ -248,9 +248,9 @@ export const SPECIMENS: Record<SampleId, ReactNode> = {
         [64, 40],
         [58, 44],
       ].map(([titolo, url], i) => (
-        <span key={i} data-m="risultato" data-primo={i === 0 ? "" : undefined}>
-          <i data-m="riga" style={{ "--w": `${titolo}%` } as CSSProperties} />
-          <i data-m="riga" data-url="" style={{ "--w": `${url}%` } as CSSProperties} />
+        <span key={i} data-m="result" data-first={i === 0 ? "" : undefined}>
+          <i data-m="line" style={{ "--w": `${titolo}%` } as CSSProperties} />
+          <i data-m="line" data-url="" style={{ "--w": `${url}%` } as CSSProperties} />
         </span>
       ))}
     </>

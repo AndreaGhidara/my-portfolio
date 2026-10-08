@@ -32,13 +32,13 @@ export function ReceiptView({ eyebrow, title, lead, locale, services: servizi, c
     <section
       id="scontrino"
       aria-labelledby="titolo-scontrino"
-      data-scontrino
+      data-receipt
       className="relative bg-[var(--accent)]"
     >
-      <Reveal motion="dietro" stagger={0.08} data-scontrino-testa>
+      <Reveal motion="dietro" stagger={0.08} data-receipt-head>
         <p className="eyebrow">{eyebrow}</p>
-        <h2 id="titolo-scontrino" className="titolo-sezione">{title}</h2>
-        <p data-scontrino-lead>{lead}</p>
+        <h2 id="titolo-scontrino" className="section-title">{title}</h2>
+        <p data-receipt-lead>{lead}</p>
       </Reveal>
 
       <ReceiptPrinter services={servizi} copy={testi} locale={locale} />

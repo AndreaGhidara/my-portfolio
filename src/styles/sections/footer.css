@@ -16,7 +16,7 @@
 
 [data-footer] { background-color: var(--fg); }
 
-[data-busta] {
+[data-envelope] {
   position: relative;
   background-color: color-mix(in oklab, var(--fg) 3%, var(--bg));
   color: var(--fg);
@@ -38,12 +38,12 @@
    E va DOPO la regola qui sopra: quella dichiara `padding` per intero, e una
    scorciatoia che arriva dopo azzererebbe questo lato. */
 @media (max-width: 767px) {
-  [data-busta] { padding-block-end: calc(2rem + 3.25rem + env(safe-area-inset-bottom, 0px)); }
+  [data-envelope] { padding-block-end: calc(2rem + 3.25rem + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* La patta vista in trasparenza: due diagonali appena accennate dagli angoli
    di sopra. Non e' una busta aperta, e' lo spessore della carta contro luce. */
-[data-busta]::before {
+[data-envelope]::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -61,7 +61,7 @@
    il piede era un blocco d'inchiostro la fine la faceva il colore; adesso che
    e' color carta serve dirla, o il sito resta aperto. E' lo stesso rimedio
    scritto per la proposta A nel prototipo del 14 settembre. */
-[data-busta]::after {
+[data-envelope]::after {
   content: "";
   position: absolute;
   inset-inline: 0;
@@ -70,14 +70,14 @@
   background-color: var(--fg);
 }
 
-[data-busta-alto] {
+[data-envelope-top] {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
 }
 
-[data-busta-et] {
+[data-envelope-label] {
   display: block;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.58rem;
@@ -86,7 +86,7 @@
   color: var(--fg-muted);
 }
 
-[data-busta-profili] {
+[data-envelope-profiles] {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.72rem;
   line-height: 1.9;
@@ -95,23 +95,23 @@
    filetto gli sta attaccato sotto, quindi il link era alto 23px, sotto i 24
    che WCAG 2.2 chiede a un bersaglio. Cresce solo verso l'alto, cosi' il
    filetto resta dov'e'. */
-[data-busta-profili] > a {
+[data-envelope-profiles] > a {
   display: block;
   padding-block-start: 0.55rem;
   text-decoration: none;
   border-block-end: 1px solid var(--line);
 }
-[data-busta-profili] > a:hover { border-color: var(--accent); }
+[data-envelope-profiles] > a:hover { border-color: var(--accent); }
 
 /* ── L'affrancatura ─────────────────────────────────────────────────────── */
 
-[data-busta-affrancatura] { display: flex; gap: 0.65rem; align-items: flex-start; flex: none; }
+[data-envelope-postage] { display: flex; gap: 0.65rem; align-items: flex-start; flex: none; }
 
 /* La dentellatura e' una mask di quattro gradienti radiali che si intersecano,
    uno per lato: un bordo tratteggiato sembrerebbe tratteggio e basta. Dove
    mask-composite non passa resta un rettangolo pieno, che e' comunque un
    francobollo: il degrado non ha bisogno di una riserva scritta a parte. */
-[data-francobollo] {
+[data-stamp] {
   inline-size: 3.5rem;
   block-size: 4.2rem;
   flex: none;
@@ -133,7 +133,7 @@
   mask-composite: intersect;
 }
 /* Testo grande: carta su arancio fa 3,27:1, ammessa sopra i 24px. */
-[data-francobollo-sigla] {
+[data-stamp-code] {
   display: block;
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: 1.5rem;
@@ -141,7 +141,7 @@
   color: var(--paper);
 }
 /* Testo piccolo: qui carta su arancio sarebbe sotto AA. --on-accent fa 5,08:1. */
-[data-francobollo-paese] {
+[data-stamp-country] {
   display: block;
   margin-block-start: 0.2rem;
   font-family: var(--font-mono), ui-monospace, monospace;
@@ -150,14 +150,14 @@
   color: var(--on-accent);
 }
 
-[data-busta-annullo] {
+[data-envelope-postmark] {
   inline-size: 4.4rem;
   block-size: 4.4rem;
   flex: none;
   color: var(--fg);
   opacity: 0.66;
 }
-[data-busta-annullo] text {
+[data-envelope-postmark] text {
   fill: currentColor;
   font-family: var(--font-mono), ui-monospace, monospace;
 }
@@ -167,19 +167,19 @@
 /* Su una busta l'indirizzo non e' a sinistra: sta staccato verso il centro,
    perche' li' lo legge la macchina che smista. Con tutta la larghezza a
    disposizione quel margine si puo' finalmente dare. */
-[data-busta-indirizzo] {
+[data-envelope-address] {
   align-self: center;
   padding-inline-start: clamp(0rem, 12vw, 11rem);
   padding-block: 1.5rem;
 }
-[data-busta-nome] {
+[data-envelope-name] {
   margin-block-start: 0.35rem;
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: clamp(1.5rem, 3.4vw, 2.5rem);
   line-height: 1.05;
   letter-spacing: -0.02em;
 }
-[data-busta-mail] {
+[data-envelope-mail] {
   display: inline-block;
   margin-block-start: 0.6rem;
   /* Stessa ragione dei profili qui sopra: una riga di testo e' alta 20px. Qui
@@ -192,7 +192,7 @@
   text-underline-offset: 4px;
   text-decoration-color: var(--accent);
 }
-[data-busta-citta] {
+[data-envelope-city] {
   margin-block-start: 0.4rem;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.8rem;
@@ -201,7 +201,7 @@
 
 /* ── Il fondo della busta ───────────────────────────────────────────────── */
 
-[data-busta-basso] {
+[data-envelope-bottom] {
   display: flex;
   gap: 1rem 2rem;
   justify-content: space-between;
@@ -209,30 +209,30 @@
   flex-wrap: wrap;
 }
 /* Dove le buste commerciali stampano la loro riga. */
-[data-busta-tagline] {
+[data-envelope-tagline] {
   max-inline-size: 24rem;
   font-size: 0.85rem;
   line-height: 1.5;
   color: var(--fg-muted);
 }
-[data-busta-basso-dx] { display: grid; justify-items: end; gap: 0.7rem; }
-[data-busta-codice] { display: flex; gap: 3px; align-items: flex-end; block-size: 1.1rem; opacity: 0.5; }
-[data-busta-codice] i { inline-size: 2px; block-size: 55%; background-color: var(--fg); }
-[data-busta-codice] i[data-alta] { block-size: 100%; }
+[data-envelope-bottom-right] { display: grid; justify-items: end; gap: 0.7rem; }
+[data-envelope-code] { display: flex; gap: 3px; align-items: flex-end; block-size: 1.1rem; opacity: 0.5; }
+[data-envelope-code] i { inline-size: 2px; block-size: 55%; background-color: var(--fg); }
+[data-envelope-code] i[data-high] { block-size: 100%; }
 
-[data-footer-diritti] {
+[data-footer-rights] {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.66rem;
   color: var(--fg-muted);
 }
 
 @media (max-width: 640px) {
-  [data-busta] { min-block-size: 0; grid-template-rows: auto auto auto; }
-  [data-busta-alto] { flex-direction: column-reverse; align-items: flex-start; }
-  [data-busta-indirizzo] { padding-inline-start: 0; }
-  [data-busta-basso] { margin-block-start: 1.5rem; }
-  [data-busta-basso-dx] { justify-items: start; }
+  [data-envelope] { min-block-size: 0; grid-template-rows: auto auto auto; }
+  [data-envelope-top] { flex-direction: column-reverse; align-items: flex-start; }
+  [data-envelope-address] { padding-inline-start: 0; }
+  [data-envelope-bottom] { margin-block-start: 1.5rem; }
+  [data-envelope-bottom-right] { justify-items: start; }
   /* Le barre sono una per carattere dell'indirizzo: su schermo stretto
      riempirebbero la riga e sembrerebbero un elemento, non una rifinitura. */
-  [data-busta-codice] { display: none; }
+  [data-envelope-code] { display: none; }
 }

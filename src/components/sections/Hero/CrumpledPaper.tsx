@@ -96,7 +96,7 @@ export function CrumpledPaper() {
       const misura = Math.max(r.width, r.height);
       if (!L.tela) {
         L.tela = document.createElement("canvas");
-        L.tela.setAttribute("data-carta-lettera", "");
+        L.tela.setAttribute("data-paper-letter", "");
         overlay.appendChild(L.tela);
       }
       const px = Math.round(misura * dpr);
@@ -126,7 +126,7 @@ export function CrumpledPaper() {
       const r = L.img.getBoundingClientRect();
       const misura = Math.max(r.width, r.height);
       const el = document.createElement("canvas");
-      el.setAttribute("data-carta-pezzo", "");
+      el.setAttribute("data-paper-piece", "");
       el.width = el.height = Math.round(misura * dpr);
       el.style.width = el.style.height = `${misura}px`;
       const g = el.getContext("2d");
@@ -209,7 +209,7 @@ export function CrumpledPaper() {
        e' li' che il componente lo scrive, e leggerlo non costa un layout. */
     const hero = document.getElementById("hero");
     const sottoIlFoglio = () =>
-      (parseFloat(hero?.style.getPropertyValue("--copertura") ?? "") || 0) > 0;
+      (parseFloat(hero?.style.getPropertyValue("--coverage") ?? "") || 0) > 0;
 
     const sopra = (e: PointerEvent) => {
       const L = dentro(e);
@@ -231,7 +231,7 @@ export function CrumpledPaper() {
       presa = p;
       // Trascinando sopra il claim partiva la selezione del testo e il gesto
       // si rompeva a meta'.
-      document.body.setAttribute("data-carta-presa", "");
+      document.body.setAttribute("data-paper-grabbed", "");
       (p as unknown as { dx: number; dy: number }).dx = p.x - e.clientX;
       (p as unknown as { dx: number; dy: number }).dy = p.y - e.clientY;
       sveglia();
@@ -255,7 +255,7 @@ export function CrumpledPaper() {
       presa.vrot = v.vx * 1.4;
       presa.held = false;
       presa = null;
-      document.body.removeAttribute("data-carta-presa");
+      document.body.removeAttribute("data-paper-grabbed");
       sveglia();
     };
     const scorri = () => {
@@ -303,14 +303,14 @@ export function CrumpledPaper() {
       // restasse appiccicato a opacity 0, il nome sparirebbe per sempre.
       rimetti.current();
       rimetti.current = () => {};
-      document.body.removeAttribute("data-carta-presa");
+      document.body.removeAttribute("data-paper-grabbed");
     };
   }, [livello]);
 
   // Lo strato c'e' sempre nel DOM ma e' vuoto e non riceve il puntatore: e'
   // solo il posto dove le tele vanno a stare. Decorativo per intero: il nome
   // che uno screen reader legge resta quello del wordmark.
-  const tela = <div ref={strato} data-carta aria-hidden="true" />;
+  const tela = <div ref={strato} data-paper aria-hidden="true" />;
   /* A "full" lo strato va in fondo a <body>, fuori da #hero. Quando la
      stampante passa sopra Hero (SottoIlFoglio), #hero e' sticky, e un elemento sticky
      apre sempre un contesto di impilamento suo, z-index o no: lo z-index 40

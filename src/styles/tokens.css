@@ -13,7 +13,7 @@
      Smorzato verso l'oliva per stare sulla carta senza sembrare un semaforo:
      5,32:1 sulla carta e 4,70:1 sul fondo tinto del riquadro, cioe' buono
      anche se un giorno porta del testo. */
-  --verde: #2F6F4E;
+  --theme-green: #2F6F4E;
 
   --bg: var(--paper);
   --fg: var(--ink);
@@ -25,7 +25,7 @@
   /* Il fondo delle cose appoggiate sulla pagina: le cartelle dello schedario.
      Sul chiaro e' il fondo di pagina e non cambia niente, perche' li' il bordo
      basta a staccarle. Vedi la variante scura sotto. */
-  --superficie: var(--bg);
+  --surface: var(--bg);
 
   /* L'arancio quando fa da TESTO sul fondo di pagina, e non da fondo lui.
      Pieno su carta fa 3,27:1, e quasi tutte le etichette che lo usano stanno
@@ -33,7 +33,7 @@
      con l'inchiostro fa 5,42:1 e resta arancio. Non e' --accento-su-carta,
      che vive dentro i fogli chiari appoggiati sull'arancio e resta carta in
      tutti e due i temi: questo invece segue il fondo della pagina. */
-  --accento-testo: color-mix(in oklab, var(--accent) 72%, var(--ink));
+  --accent-text: color-mix(in oklab, var(--accent) 72%, var(--ink));
 
   --radius: 10px;
   --section-y: 4.5rem;
@@ -52,18 +52,18 @@
   --fg: var(--paper);
   /* Su inchiostro l'arancio pieno fa gia' 5,08:1: scurirlo qui lo
      spegnerebbe e basta. */
-  --accento-testo: var(--accent);
+  --accent-text: var(--accent);
   /* Su inchiostro una cartella col fondo della pagina non ha corpo: restano
      quattro rettangoli di bordo, e l'accostamento che fa lo schedario non si
      legge piu'. Un gradino di carta dentro l'inchiostro basta a rimetterle
      sopra il piano. Non entra un colore nuovo in tavolozza: e' una miscela
      dei due che ci sono gia'. */
-  --superficie: color-mix(in oklab, var(--paper) 7%, var(--ink));
+  --surface: color-mix(in oklab, var(--paper) 7%, var(--ink));
   --fg-muted: #A79E8C; /* from palette.mutedDark */
   /* Sul fondo scuro del riquadro il verde di carta sprofonda (2,39:1, sotto
      la soglia 3:1 che WCAG chiede a un elemento non testuale): qui serve la
      versione schiarita, che li' fa 6,68:1. */
-  --verde: #7FBF95;
+  --theme-green: #7FBF95;
   --line: var(--muted); /* il vecchio lineDark era a 1.52:1 su --ink, sotto la soglia 3:1 WCAG per elementi non testuali */
 }
 
@@ -108,7 +108,7 @@ h1, h2, h3, h4, .display {
    di h2. Le regole delle sezioni scritte come `[data-x] h2` (0,1,1) battono
    questa classe (0,1,0): li' si mette il colore o l'a capo, mai font-size o
    margin-top, o la sezione torna ad avere la sua misura. */
-.titolo-sezione {
+.section-title {
   margin-top: 0.75rem;
   font-size: clamp(1.9rem, 4.2vw, 3rem);
 }

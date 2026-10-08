@@ -243,8 +243,8 @@
      aveva la luminanza esatta del fondo su cui cadeva, cioe' non c'era.
      Scostamento e sfocatura stanno sotto i 3px: l'ombra non entra nel modello
      geometrico, e il pavimento d'aria fra due oggetti vale ~6,3px a 1440. */
-  --desk-ombra: color-mix(in oklab, var(--ink) 26%, transparent);
-  filter: drop-shadow(0 0.07em 0.11em var(--desk-ombra));
+  --desk-shadow: color-mix(in oklab, var(--ink) 26%, transparent);
+  filter: drop-shadow(0 0.07em 0.11em var(--desk-shadow));
 }
 
 /* In una stanza buia sotto una scatola nera non c'e' niente di piu' scuro da
@@ -253,7 +253,7 @@
    buio. Resta sotto al pieno della scocca, cosi' stacca l'oggetto dal piano
    senza confondersi col suo bordo. */
 [data-theme="dark"] [data-desk-shape] {
-  --desk-ombra: color-mix(in oklab, var(--fg-muted) 14%, transparent);
+  --desk-shadow: color-mix(in oklab, var(--fg-muted) 14%, transparent);
 }
 
 /* I due strati (piu' i led del rack) stanno uno sull'altro. Nessuno z-index:
@@ -268,8 +268,8 @@
 
 /* Il default e' il disegno di prima: una sagoma senza materiale dichiarato
    resta il suo contorno, e non sparisce. */
-[data-desk-fill] { background-color: var(--desk-pieno, transparent); }
-[data-desk-line] { background-color: var(--desk-tratto, currentColor); }
+[data-desk-fill] { background-color: var(--desk-full, transparent); }
+[data-desk-line] { background-color: var(--desk-stroke, currentColor); }
 
 /* Le maschere pendono dalla SAGOMA e non dall'oggetto: cosi' chiunque disegni
    una DeskShapeArt se le porta dietro, tavolo o no. Le consegne di «Come
@@ -326,21 +326,21 @@
 
 /* Carta appena staccata dal fondo, bordo grafite: e' il foglio. */
 [data-desk-piece][data-shape="sheet"] {
-  --desk-pieno: color-mix(in oklab, var(--fg) 9%, var(--bg));
-  --desk-tratto: var(--fg-muted);
+  --desk-full: color-mix(in oklab, var(--fg) 9%, var(--bg));
+  --desk-stroke: var(--fg-muted);
 }
 
 /* Carta, e il bordo di inchiostro: la scheda e' stampata, il foglio no. */
 [data-desk-piece][data-shape="card"] {
-  --desk-pieno: color-mix(in oklab, var(--fg) 20%, var(--bg));
-  --desk-tratto: color-mix(in oklab, var(--fg) 80%, var(--bg));
+  --desk-full: color-mix(in oklab, var(--fg) 20%, var(--bg));
+  --desk-stroke: color-mix(in oklab, var(--fg) 80%, var(--bg));
 }
 
 /* Grafite: la piastra e' l'unica cosa di metallo sul tavolo. Il tratto e' la
    stessa grafite tirata verso il testo, per staccare il bordo dal pieno. */
 [data-desk-piece][data-shape="plate"] {
-  --desk-pieno: color-mix(in oklab, var(--fg-muted) 55%, var(--bg));
-  --desk-tratto: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
+  --desk-full: color-mix(in oklab, var(--fg-muted) 55%, var(--bg));
+  --desk-stroke: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
 }
 
 /* La scocca: rack, telefono e laptop sono la stessa cosa: scatole scure. Non
@@ -350,8 +350,8 @@
 [data-desk-piece][data-shape="rack"],
 [data-desk-piece][data-shape="phone"],
 [data-desk-centre] {
-  --desk-pieno: color-mix(in oklab, var(--ink) 78%, var(--fg-muted));
-  --desk-tratto: color-mix(in oklab, var(--ink) 42%, var(--fg-muted));
+  --desk-full: color-mix(in oklab, var(--ink) 78%, var(--fg-muted));
+  --desk-stroke: color-mix(in oklab, var(--ink) 42%, var(--fg-muted));
 }
 
 /* Il post-it e' l'unico calore che non sia arancio, e --bulb pieno: un post-it
@@ -360,8 +360,8 @@
    E' l'unica superficie che NON si dichiara due volte: se la ridichiarasse
    uguale in tema scuro, direbbe che segue il tema, e non lo segue. */
 [data-desk-piece][data-shape="postit"] {
-  --desk-pieno: var(--bulb);
-  --desk-tratto: color-mix(in oklab, var(--bulb) 55%, var(--ink));
+  --desk-full: var(--bulb);
+  --desk-stroke: color-mix(in oklab, var(--bulb) 55%, var(--ink));
 }
 
 /* Il post-it BIANCO. La spec (§3.2) lo chiama cosi': e' la ventiquattresima
@@ -376,7 +376,7 @@
    caffe'. Il grigio serve ancora, e anzi serve di piu': e' l'unico oggetto del
    tavolo che non e' un pezzo di lavoro, ed e' l'unico che si preme. */
 [data-desk-piece][data-shape="postit"] [data-desk-blank] {
-  --desk-pieno: color-mix(in oklab, var(--fg) 9%, var(--bg));
+  --desk-full: color-mix(in oklab, var(--fg) 9%, var(--bg));
 }
 
 /* ── Tema scuro ──────────────────────────────────────────────────────────── */
@@ -384,18 +384,18 @@
 /* Qui la carta e' la cosa che brilla: sale netta sopra il fondo, e i segni
    sopra restano scuri: una matita e' una matita anche di notte. */
 [data-theme="dark"] [data-desk-piece][data-shape="sheet"] {
-  --desk-pieno: color-mix(in oklab, var(--fg) 68%, var(--bg));
-  --desk-tratto: color-mix(in oklab, var(--ink) 60%, var(--fg-muted));
+  --desk-full: color-mix(in oklab, var(--fg) 68%, var(--bg));
+  --desk-stroke: color-mix(in oklab, var(--ink) 60%, var(--fg-muted));
 }
 
 [data-theme="dark"] [data-desk-piece][data-shape="card"] {
-  --desk-pieno: color-mix(in oklab, var(--fg) 58%, var(--bg));
-  --desk-tratto: color-mix(in oklab, var(--ink) 85%, var(--fg-muted));
+  --desk-full: color-mix(in oklab, var(--fg) 58%, var(--bg));
+  --desk-stroke: color-mix(in oklab, var(--ink) 85%, var(--fg-muted));
 }
 
 [data-theme="dark"] [data-desk-piece][data-shape="plate"] {
-  --desk-pieno: color-mix(in oklab, var(--fg-muted) 75%, var(--bg));
-  --desk-tratto: color-mix(in oklab, var(--ink) 62%, var(--fg-muted));
+  --desk-full: color-mix(in oklab, var(--fg-muted) 75%, var(--bg));
+  --desk-stroke: color-mix(in oklab, var(--ink) 62%, var(--fg-muted));
 }
 
 /* E l'apparecchio scende: resta basso, vicino al fondo, e a tenerlo su sono il
@@ -404,12 +404,12 @@
 [data-theme="dark"] [data-desk-piece][data-shape="rack"],
 [data-theme="dark"] [data-desk-piece][data-shape="phone"],
 [data-theme="dark"] [data-desk-centre] {
-  --desk-pieno: color-mix(in oklab, var(--ink) 82%, var(--fg-muted));
-  --desk-tratto: color-mix(in oklab, var(--ink) 30%, var(--fg-muted));
+  --desk-full: color-mix(in oklab, var(--ink) 82%, var(--fg-muted));
+  --desk-stroke: color-mix(in oklab, var(--ink) 30%, var(--fg-muted));
 }
 
 [data-theme="dark"] [data-desk-piece][data-shape="postit"] [data-desk-blank] {
-  --desk-pieno: color-mix(in oklab, var(--fg) 68%, var(--bg));
+  --desk-full: color-mix(in oklab, var(--fg) 68%, var(--bg));
 }
 
 /* I led del rack. Sono l'unica cosa del tavolo che una maschera non sa portare:
@@ -639,42 +639,42 @@
 /* ── Le marche ──────────────────────────────────────────────────────────── */
 [data-desk-sample] i { display: block; }
 
-[data-desk-sample] [data-m="riga"] {
+[data-desk-sample] [data-m="line"] {
   width: var(--w, 100%);
   height: 0.42em;
   border-radius: 1px;
-  background-color: color-mix(in oklab, var(--desk-tratto) 34%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 34%, transparent);
 }
-[data-desk-sample] [data-m="riga"][data-titolo] {
+[data-desk-sample] [data-m="line"][data-title] {
   background-color: var(--accent);
   height: 0.5em;
 }
-[data-desk-sample] [data-m="riga"][data-url],
-[data-desk-sample] [data-m="riga"][data-testa] {
-  background-color: color-mix(in oklab, var(--desk-tratto) 62%, transparent);
+[data-desk-sample] [data-m="line"][data-url],
+[data-desk-sample] [data-m="line"][data-head] {
+  background-color: color-mix(in oklab, var(--desk-stroke) 62%, transparent);
 }
 
-[data-desk-sample] [data-m="blocco"] {
+[data-desk-sample] [data-m="block"] {
   width: 100%;
   border-radius: 1px;
-  background-color: color-mix(in oklab, var(--desk-tratto) 40%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 40%, transparent);
 }
-[data-desk-sample] [data-m="blocco"][data-b="testata"] { height: 18%; min-height: 0.5em; }
-[data-desk-sample] [data-m="blocco"][data-b="piede"] { height: 12%; min-height: 0.35em; }
-[data-desk-sample] [data-m="colonne"] { display: flex; gap: 6%; flex: 1; }
-[data-desk-sample] [data-m="blocco"][data-b="larga"] { flex: 1.7; height: 100%; }
-[data-desk-sample] [data-m="blocco"][data-b="stretta"] {
+[data-desk-sample] [data-m="block"][data-b="header"] { height: 18%; min-height: 0.5em; }
+[data-desk-sample] [data-m="block"][data-b="foot"] { height: 12%; min-height: 0.35em; }
+[data-desk-sample] [data-m="columns"] { display: flex; gap: 6%; flex: 1; }
+[data-desk-sample] [data-m="block"][data-b="wide"] { flex: 1.7; height: 100%; }
+[data-desk-sample] [data-m="block"][data-b="narrow"] {
   flex: 1;
   height: 100%;
-  background-color: color-mix(in oklab, var(--desk-tratto) 22%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 22%, transparent);
 }
 
-[data-desk-sample] [data-m="campo"] {
+[data-desk-sample] [data-m="field"] {
   width: 100%;
   height: 22%;
   min-height: 0.55em;
   border-radius: 1px;
-  border: 1px solid color-mix(in oklab, var(--desk-tratto) 45%, transparent);
+  border: 1px solid color-mix(in oklab, var(--desk-stroke) 45%, transparent);
 }
 [data-desk-sample] [data-m="cta"] {
   width: 52%;
@@ -683,33 +683,33 @@
   border-radius: 1px;
   background-color: var(--accent);
 }
-[data-desk-sample] [data-m="cta"][data-piccolo] { width: 38%; height: 18%; }
+[data-desk-sample] [data-m="cta"][data-small] { width: 38%; height: 18%; }
 
-[data-desk-sample] [data-m="pallini"] { display: flex; gap: 5%; align-items: center; height: 22%; }
-[data-desk-sample] [data-m="pallino"] {
+[data-desk-sample] [data-m="dots"] { display: flex; gap: 5%; align-items: center; height: 22%; }
+[data-desk-sample] [data-m="dot"] {
   width: 0.3em;
   aspect-ratio: 1;
   border-radius: 50%;
-  background-color: color-mix(in oklab, var(--desk-tratto) 62%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 62%, transparent);
 }
 
 /* La scheda prodotto: un'immagine a sinistra, il dettaglio a destra, e il
    prezzo in accento. Il prezzo e' l'unico segno che distingue un catalogo da
    una galleria: senza, questo campione sarebbe "Le immagini" con del testo. */
-[data-desk-sample] [data-m="scheda"] { display: flex; gap: 8%; flex: 1; }
-[data-desk-sample] [data-m="tessera"] {
+[data-desk-sample] [data-m="card"] { display: flex; gap: 8%; flex: 1; }
+[data-desk-sample] [data-m="tile"] {
   border-radius: 1px;
-  background-color: color-mix(in oklab, var(--desk-tratto) 30%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 30%, transparent);
 }
-[data-desk-sample] [data-m="tessera"][data-grande] { flex: 1; height: 100%; }
-[data-desk-sample] [data-m="dettaglio"] {
+[data-desk-sample] [data-m="tile"][data-large] { flex: 1; height: 100%; }
+[data-desk-sample] [data-m="detail"] {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 14%;
   flex: 1.1;
 }
-[data-desk-sample] [data-m="prezzo"] {
+[data-desk-sample] [data-m="price"] {
   width: 44%;
   height: 0.44em;
   border-radius: 1px;
@@ -718,25 +718,25 @@
 
 /* Il gestionale: il codice sopra, la descrizione, e la quantita' in fondo a
    destra dove sta su ogni riga d'ordine che sia mai esistita. */
-[data-desk-sample] [data-m="qta"] {
+[data-desk-sample] [data-m="qty"] {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 6%;
 }
-[data-desk-sample] [data-m="mono"][data-piccolo] { font-size: 0.62cqw; }
+[data-desk-sample] [data-m="mono"][data-small] { font-size: 0.62cqw; }
 
 /* Farsi trovare: tre risultati, e il primo in accento. La riga in accento e'
    il titolo del primo, cioe' l'unica cosa che "farsi trovare" aggiunge a
    "esistere in una lista". */
-[data-desk-sample] [data-m="risultato"] {
+[data-desk-sample] [data-m="result"] {
   display: flex;
   flex-direction: column;
   gap: 22%;
   flex: 1;
   justify-content: center;
 }
-[data-desk-sample] [data-m="risultato"][data-primo] [data-m="riga"]:first-child {
+[data-desk-sample] [data-m="result"][data-first] [data-m="line"]:first-child {
   background-color: var(--accent);
   height: 0.5em;
 }
@@ -744,94 +744,94 @@
 /* La ricevuta. La linea di strappo e' un fondo tratteggiato e non un elemento:
    e' una sola riga di CSS invece di dodici <i>, e a 98px la differenza fra i
    due modi non esiste. */
-[data-desk-sample] [data-m="ricevuta"] {
+[data-desk-sample] [data-m="receipt"] {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 11%;
   flex: 1;
 }
-[data-desk-sample] [data-m="strappo"] {
+[data-desk-sample] [data-m="tear"] {
   width: 100%;
   height: 1px;
   flex: none;
   background-image: repeating-linear-gradient(
     to right,
-    color-mix(in oklab, var(--desk-tratto) 60%, transparent) 0 3px,
+    color-mix(in oklab, var(--desk-stroke) 60%, transparent) 0 3px,
     transparent 3px 6px
   );
 }
-[data-desk-sample] [data-m="voce"] {
+[data-desk-sample] [data-m="item"] {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8%;
 }
-[data-desk-sample] [data-m="importo"] {
+[data-desk-sample] [data-m="amount"] {
   width: 22%;
   height: 0.36em;
   border-radius: 1px;
   flex: none;
-  background-color: color-mix(in oklab, var(--desk-tratto) 55%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 55%, transparent);
 }
 /* Il totale e' l'unica cosa in accento: e' il numero che si guarda. */
-[data-desk-sample] [data-m="voce"][data-totale] [data-m="importo"] {
+[data-desk-sample] [data-m="item"][data-total] [data-m="amount"] {
   background-color: var(--accent);
   height: 0.44em;
 }
 
 /* Il mese: sei colonne per tre righe, e un giorno preso. Quel giorno e' l'unica
    cosa che una prenotazione aggiunge a un calendario, ed e' l'unico in accento. */
-[data-desk-sample] [data-m="mese"] {
+[data-desk-sample] [data-m="month"] {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 6%;
   flex: 1;
 }
-[data-desk-sample] [data-m="giorno"] {
+[data-desk-sample] [data-m="day"] {
   border-radius: 1px;
-  background-color: color-mix(in oklab, var(--desk-tratto) 22%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 22%, transparent);
 }
-[data-desk-sample] [data-m="giorno"][data-preso] { background-color: var(--accent); }
+[data-desk-sample] [data-m="day"][data-grabbed] { background-color: var(--accent); }
 
-[data-desk-sample] [data-m="tabella"] {
+[data-desk-sample] [data-m="table"] {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8% 6%;
   flex: 1;
 }
-[data-desk-sample] [data-m="tabella"][data-fitta] { grid-template-columns: repeat(3, 1fr); gap: 6% 5%; }
-[data-desk-sample] [data-m="cella"] {
+[data-desk-sample] [data-m="table"][data-dense] { grid-template-columns: repeat(3, 1fr); gap: 6% 5%; }
+[data-desk-sample] [data-m="cell"] {
   border-radius: 1px;
-  background-color: color-mix(in oklab, var(--desk-tratto) 26%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 26%, transparent);
 }
 
 /* Le copie: la stessa sagoma tre volte, sfalsata. Non e' un'icona di un backup,
    e' letteralmente una cosa ripetuta, che e' quello che un backup e'. */
 [data-desk-piece] [data-desk-sample="copie"] { display: block; }
-[data-desk-sample] [data-m="copia"] {
+[data-desk-sample] [data-m="copy"] {
   position: absolute;
   inset: 0 22% 22% 0;
   border-radius: 1px;
-  border: 1px solid color-mix(in oklab, var(--desk-tratto) 55%, transparent);
-  background-color: color-mix(in oklab, var(--desk-tratto) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--desk-stroke) 55%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 12%, transparent);
 }
-[data-desk-sample] [data-m="copia"][data-i="2"] { transform: translate(11%, 11%); }
-[data-desk-sample] [data-m="copia"][data-i="3"] { transform: translate(22%, 22%); }
+[data-desk-sample] [data-m="copy"][data-i="2"] { transform: translate(11%, 11%); }
+[data-desk-sample] [data-m="copy"][data-i="3"] { transform: translate(22%, 22%); }
 
-[data-desk-sample] [data-m="bolla"] {
+[data-desk-sample] [data-m="bubble"] {
   width: 68%;
   height: 30%;
   min-height: 0.7em;
   border-radius: 0.35em;
-  background-color: color-mix(in oklab, var(--desk-tratto) 30%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 30%, transparent);
 }
-[data-desk-sample] [data-m="bolla"][data-lato="la"] {
+[data-desk-sample] [data-m="bubble"][data-side="there"] {
   align-self: flex-end;
-  background-color: color-mix(in oklab, var(--desk-tratto) 62%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 62%, transparent);
 }
 
-[data-desk-sample] [data-m="flusso"] {
+[data-desk-sample] [data-m="flow"] {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -839,44 +839,44 @@
   /* Il filo fra i nodi: un fondo, non tre elementi. */
   background-image: linear-gradient(
     to right,
-    color-mix(in oklab, var(--desk-tratto) 45%, transparent) 0 100%
+    color-mix(in oklab, var(--desk-stroke) 45%, transparent) 0 100%
   );
   background-size: 100% 1px;
   background-position: center;
   background-repeat: no-repeat;
 }
-[data-desk-sample] [data-m="nodo"] {
+[data-desk-sample] [data-m="node"] {
   width: 0.55em;
   aspect-ratio: 1;
   border-radius: 50%;
-  background-color: color-mix(in oklab, var(--desk-tratto) 72%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 72%, transparent);
 }
 
-[data-desk-sample] [data-m="istogramma"] {
+[data-desk-sample] [data-m="histogram"] {
   display: flex;
   align-items: flex-end;
   gap: 8%;
   flex: 1;
 }
-[data-desk-sample] [data-m="barra"] {
+[data-desk-sample] [data-m="bar"] {
   flex: 1;
   height: var(--h, 50%);
   border-radius: 1px 1px 0 0;
-  background-color: color-mix(in oklab, var(--desk-tratto) 48%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 48%, transparent);
 }
-[data-desk-sample] [data-m="barra"]:last-child { background-color: var(--accent); }
+[data-desk-sample] [data-m="bar"]:last-child { background-color: var(--accent); }
 
 /* L'immagine: un cielo, un sole, un profilo. E' il campione meno letterale dei
    ventidue (un'immagine non ha un contenuto proprio da mostrare) e resta
    dentro la regola solo perche' e' quello che si vede in un posto dove
    un'immagine non e' ancora arrivata. */
 [data-desk-piece] [data-desk-sample="immagini"] { display: block; }
-[data-desk-sample] [data-m="cielo"] {
+[data-desk-sample] [data-m="sky"] {
   position: absolute;
   inset: 0;
-  background-color: color-mix(in oklab, var(--desk-tratto) 16%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 16%, transparent);
 }
-[data-desk-sample] [data-m="sole"] {
+[data-desk-sample] [data-m="sun"] {
   position: absolute;
   right: 18%;
   top: 16%;
@@ -885,10 +885,10 @@
   border-radius: 50%;
   background-color: var(--accent);
 }
-[data-desk-sample] [data-m="monte"] {
+[data-desk-sample] [data-m="mountain"] {
   position: absolute;
   inset: 34% 0 0;
-  background-color: color-mix(in oklab, var(--desk-tratto) 52%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 52%, transparent);
   clip-path: polygon(0 100%, 34% 12%, 62% 62%, 78% 40%, 100% 100%);
 }
 
@@ -896,16 +896,16 @@
    --fg e --bg, che si invertono col tema, ma le tinte come sono: e' il senso
    del campione. Mostrare i colori del sito girati al buio sarebbe mostrare
    altri colori. Il bordo li stacca dal materiale sotto. */
-[data-desk-sample] [data-m="tinta"] {
+[data-desk-sample] [data-m="swatch"] {
   flex: 1;
   width: 100%;
   border-radius: 1px;
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--desk-tratto) 30%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--desk-stroke) 30%, transparent);
 }
 [data-desk-piece] [data-desk-sample="colori"] { flex-direction: row; gap: 8%; }
-[data-desk-sample] [data-m="tinta"][data-t="carta"] { background-color: var(--paper); }
-[data-desk-sample] [data-m="tinta"][data-t="accento"] { background-color: var(--orange); }
-[data-desk-sample] [data-m="tinta"][data-t="inchiostro"] { background-color: var(--ink); }
+[data-desk-sample] [data-m="swatch"][data-t="paper"] { background-color: var(--paper); }
+[data-desk-sample] [data-m="swatch"][data-t="accent"] { background-color: var(--orange); }
+[data-desk-sample] [data-m="swatch"][data-t="ink"] { background-color: var(--ink); }
 
 /* Il carattere dei titoli, nel suo peso. Non una A stilizzata: proprio quella. */
 [data-desk-sample] [data-m="aa"] {
@@ -914,7 +914,7 @@
   font-size: 2.1cqw;
   line-height: 1;
   text-align: center;
-  color: color-mix(in oklab, var(--desk-tratto) 88%, transparent);
+  color: color-mix(in oklab, var(--desk-stroke) 88%, transparent);
 }
 
 /* I tre campioni che sono testo perche' la cosa che mostrano E' testo: un
@@ -936,7 +936,7 @@
      righe non e' piu' un dominio. Se un giorno una non ci sta, deve sbordare e
      farsi vedere, non accartocciarsi in silenzio. */
   white-space: nowrap;
-  color: color-mix(in oklab, var(--desk-tratto) 82%, transparent);
+  color: color-mix(in oklab, var(--desk-stroke) 82%, transparent);
 }
 [data-desk-piece] [data-desk-sample="dominio"],
 [data-desk-piece] [data-desk-sample="sicurezza"],

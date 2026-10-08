@@ -27,19 +27,19 @@
    I numeri sono quelli tarati nel prototipo
    (docs/prototipi/2026-09-27-sezione-sopra.html).
    ═══════════════════════════════════════════════════════════════════════ */
-[data-sotto-il-foglio] {
+[data-under-sheet] {
   position: relative;
   /* Quanto inchiostro scende su Hero a copertura piena. */
-  --buio: 0.55;
+  --dark: 0.55;
   /* Di quanto si stringe: 0.06 e' al 94%. */
-  --rimpicciolisce: 0.06;
+  --shrink: 0.06;
   /* Di quanto sale mentre va sotto, della sua altezza. */
-  --sale: 4%;
-  --raggio: 18px;
+  --rise: 4%;
+  --corner-radius: 18px;
 }
 
 /* Il palco visibile: 100svh, il viewport piccolo, come la sonda del percorso. */
-[data-foglio-sonda] {
+[data-sheet-probe] {
   position: fixed;
   top: 0;
   left: 0;
@@ -50,21 +50,21 @@
   pointer-events: none;
 }
 
-[data-sotto-il-foglio][data-acceso] #hero {
+[data-under-sheet][data-lit] #hero {
   position: sticky;
   /* 3,75rem e' la testata (60px misurati), per il fotogramma prima della misura. */
-  top: var(--attacco, 3.75rem);
+  top: var(--stick, 3.75rem);
 }
 
 /* Il velo sta sulla sezione intera, gutter compreso: e' Hero che va
    sotto, non solo il suo contenuto. Uno pseudo-elemento non e' una
    trasformazione, e lo strato fisso della carta non se ne accorge. */
-[data-sotto-il-foglio][data-acceso] #hero::after {
+[data-under-sheet][data-lit] #hero::after {
   content: "";
   position: absolute;
   inset: 0;
   background-color: var(--ink);
-  opacity: calc(var(--copertura, 0) * var(--buio));
+  opacity: calc(var(--coverage, 0) * var(--dark));
   pointer-events: none;
   will-change: opacity;
 }
@@ -72,18 +72,18 @@
 /* translate prima di scale, come negli scale/translate del prototipo: la
    salita non si stringe con il resto. L'origine al 30% tiene il nome quasi
    fermo: a stringersi verso l'alto e' il fondo, che il foglio sta coprendo. */
-[data-sotto-il-foglio][data-acceso] [data-hero-strato] {
+[data-under-sheet][data-lit] [data-hero-layer] {
   isolation: isolate;
   transform-origin: 50% 30%;
-  transform: translateY(calc(var(--copertura, 0) * var(--sale) * -1))
-    scale(calc(1 - var(--copertura, 0) * var(--rimpicciolisce)));
+  transform: translateY(calc(var(--coverage, 0) * var(--rise) * -1))
+    scale(calc(1 - var(--coverage, 0) * var(--shrink)));
   will-change: transform;
 }
 
 /* L'ombra sulla sezione stessa: `overflow: hidden` ritaglia il contenuto, non
    la box-shadow esterna. */
-[data-sotto-il-foglio][data-acceso] #scontrino {
+[data-under-sheet][data-lit] #scontrino {
   z-index: 2;
-  border-radius: var(--raggio) var(--raggio) 0 0;
+  border-radius: var(--corner-radius) var(--corner-radius) 0 0;
   box-shadow: 0 -18px 40px -12px color-mix(in oklab, var(--ink) 55%, transparent);
 }

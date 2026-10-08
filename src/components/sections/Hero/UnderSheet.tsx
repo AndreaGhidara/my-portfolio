@@ -45,7 +45,7 @@ export function UnderSheet({ children }: { children: ReactNode }) {
       const c = Math.round(quanto() * 1000) / 1000;
       if (c === scritta) return;
       scritta = c;
-      hero.style.setProperty("--copertura", String(c));
+      hero.style.setProperty("--coverage", String(c));
     };
     // `fotogramma` si azzera solo dentro il suo callback: azzerato altrove
     // (una chiamata diretta a muovi con un fotogramma in coda) la pulizia non
@@ -66,9 +66,9 @@ export function UnderSheet({ children }: { children: ReactNode }) {
       // la media query la dice gia' il CSS, qui non si ripete. E' zero anche
       // mentre un dossier aperto la nasconde: per questo si rimisura alla
       // chiusura (vedi il MutationObserver sotto).
-      const barraBassa = document.querySelector<HTMLElement>("[data-nav-basso]")?.offsetHeight ?? 0;
+      const barraBassa = document.querySelector<HTMLElement>("[data-nav-bottom]")?.offsetHeight ?? 0;
       fermo = stickyTop({ header: testata, stage: sondaEl.offsetHeight, bottomBar: barraBassa, height: altezza });
-      hero.style.setProperty("--attacco", `${fermo}px`);
+      hero.style.setProperty("--stick", `${fermo}px`);
     };
 
     /* Con il puntatore fine si rimisura a ogni resize. Su touch solo quando
@@ -127,7 +127,7 @@ export function UnderSheet({ children }: { children: ReactNode }) {
     };
 
     misura();
-    root.setAttribute("data-acceso", "");
+    root.setAttribute("data-lit", "");
     // Dopo l'accensione: il rettangolo di Hero e' quello sticky solo da qui.
     muovi();
 
@@ -146,17 +146,17 @@ export function UnderSheet({ children }: { children: ReactNode }) {
       osservatore.disconnect();
       dossier.disconnect();
       hero.removeEventListener("focusin", alFuoco);
-      root.removeAttribute("data-acceso");
-      hero.style.removeProperty("--copertura");
-      hero.style.removeProperty("--attacco");
+      root.removeAttribute("data-lit");
+      hero.style.removeProperty("--coverage");
+      hero.style.removeProperty("--stick");
     };
   }, [level]);
 
   return (
-    <div ref={scope} data-sotto-il-foglio>
+    <div ref={scope} data-under-sheet>
       {/* Alta 100svh, larga zero: il palco visibile che non cambia con la
           barra del browser, come la sonda del percorso. */}
-      <div ref={sonda} data-foglio-sonda aria-hidden="true" />
+      <div ref={sonda} data-sheet-probe aria-hidden="true" />
       {children}
     </div>
   );

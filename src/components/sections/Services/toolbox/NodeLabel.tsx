@@ -43,8 +43,8 @@ export function NodeLabel({
   const nomeNodo = (id: string) => {
     const n = nodeById(id);
     if (!n) return id;
-    if (n.kind === "radice") return testi.root.name;
-    if (n.kind === "snodo") return testi.zones[n.zone!].junction;
+    if (n.kind === "root") return testi.root.name;
+    if (n.kind === "junction") return testi.zones[n.zone!].junction;
     return toolById(id)!.name;
   };
 
@@ -52,8 +52,8 @@ export function NodeLabel({
     <button
       key={id}
       type="button"
-      data-cassetta-chip
-      data-zona={nodeById(id)?.zone ?? undefined}
+      data-toolbox-chip
+      data-zone={nodeById(id)?.zone ?? undefined}
       onClick={() => onNodo(id)}
     >
       {nomeNodo(id)}
@@ -64,7 +64,7 @@ export function NodeLabel({
     <button
       key={id}
       type="button"
-      data-cassetta-chip
+      data-toolbox-chip
       onClick={() => onCapo(id)}
     >
       {testi.garments[id].name}
@@ -84,12 +84,12 @@ export function NodeLabel({
     taglia = tc.size;
     corpo = (
       <>
-        <p data-etichetta-voce>
-          {e.composition} <span data-etichetta-stima>· {e.estimate}</span>
+        <p data-label-item>
+          {e.composition} <span data-label-estimate>· {e.estimate}</span>
         </p>
-        <ul data-etichetta-comp>
+        <ul data-label-comp>
           {sortedWeights(c).map(([z, pc]) => (
-            <li key={z} data-zona={z}>
+            <li key={z} data-zone={z}>
               <span aria-hidden="true" style={{ width: `${pc}%` }} />
               <em>
                 {pc}% {testi.zones[z].name}
@@ -97,11 +97,11 @@ export function NodeLabel({
             </li>
           ))}
         </ul>
-        <p data-etichetta-voce>{e.fibres}</p>
-        <div data-etichetta-chips>{c.uses.map(chipNodo)}</div>
-        <p data-etichetta-voce>{e.care}</p>
+        <p data-label-item>{e.fibres}</p>
+        <div data-label-chips>{c.uses.map(chipNodo)}</div>
+        <p data-label-item>{e.care}</p>
         {c.alt.map(({ from: da, to: a }) => (
-          <p key={da} data-etichetta-cura>
+          <p key={da} data-label-care>
             <i aria-hidden="true">↺</i> {e.careIf} <b>{toolById(a)!.name}</b>{" "}
             {e.insteadOf} <b>{toolById(da)!.name}</b>: {tc.alt[da]}.
           </p>
@@ -113,21 +113,21 @@ export function NodeLabel({
     // Lo scomparto di un attrezzo ha gia' la sua voce: qui non si ripete.
     const conChi = neighbours(n.id).filter(
       (id) =>
-        (!soloAttrezzi || nodeById(id)?.kind === "attrezzo") &&
-        !(n.kind === "attrezzo" && id === n.zone),
+        (!soloAttrezzi || nodeById(id)?.kind === "tool") &&
+        !(n.kind === "tool" && id === n.zone),
     );
     const abbina = conChi.length ? (
       <>
-        <p data-etichetta-voce>{e.pairsWith}</p>
-        <div data-etichetta-chips>{conChi.map(chipNodo)}</div>
+        <p data-label-item>{e.pairsWith}</p>
+        <div data-label-chips>{conChi.map(chipNodo)}</div>
       </>
     ) : null;
 
-    if (n.kind === "radice") {
+    if (n.kind === "root") {
       titolo = testi.root.name;
       riga = testi.root.what;
       corpo = abbina;
-    } else if (n.kind === "snodo") {
+    } else if (n.kind === "junction") {
       const z = testi.zones[n.zone!];
       const dentro = toolsIn(n.zone!).map((a) => a.id);
       // Oltre a quello che contiene, lo scomparto porta agli scomparti
@@ -138,12 +138,12 @@ export function NodeLabel({
       riga = z.what;
       corpo = (
         <>
-          <p data-etichetta-voce>{e.contains}</p>
-          <div data-etichetta-chips>{dentro.map(chipNodo)}</div>
+          <p data-label-item>{e.contains}</p>
+          <div data-label-chips>{dentro.map(chipNodo)}</div>
           {fuori.length > 0 && (
             <>
-              <p data-etichetta-voce>{e.pairsWith}</p>
-              <div data-etichetta-chips>{fuori.map(chipNodo)}</div>
+              <p data-label-item>{e.pairsWith}</p>
+              <div data-label-chips>{fuori.map(chipNodo)}</div>
             </>
           )}
         </>
@@ -155,24 +155,24 @@ export function NodeLabel({
       riga = testi.tools[a.id].what;
       corpo = (
         <>
-          <p data-etichetta-voce>{e.tried}</p>
-          <p data-etichetta-riga data-provato={a.experience}>
-            {a.experience === "lavoro" ? e.atWork : e.known}
+          <p data-label-item>{e.tried}</p>
+          <p data-label-line data-experience={a.experience}>
+            {a.experience === "work" ? e.atWork : e.known}
           </p>
-          <p data-etichetta-voce>{e.compartment}</p>
-          <div data-etichetta-chips>
+          <p data-label-item>{e.compartment}</p>
+          <div data-label-chips>
             {soloAttrezzi ? (
-              <span data-etichetta-riga>{testi.zones[a.zone].name}</span>
+              <span data-label-line>{testi.zones[a.zone].name}</span>
             ) : (
               chipNodo(a.zone)
             )}
           </div>
-          <p data-etichetta-voce>{e.fitsIn}</p>
-          <div data-etichetta-chips>
+          <p data-label-item>{e.fitsIn}</p>
+          <div data-label-chips>
             {per.length ? (
               per.map((c) => chipCapo(c.id))
             ) : (
-              <span data-etichetta-riga>{e.onRequest}</span>
+              <span data-label-line>{e.onRequest}</span>
             )}
           </div>
           {abbina}
@@ -182,13 +182,13 @@ export function NodeLabel({
   }
 
   return (
-    <div data-etichetta>
-      <div data-etichetta-orlo>{azioni}</div>
-      <p data-etichetta-marca>{e.brand}</p>
+    <div data-label>
+      <div data-label-hem>{azioni}</div>
+      <p data-label-brand>{e.brand}</p>
       <h3 id={titoloId}>{titolo}</h3>
-      <p data-etichetta-riga>{riga}</p>
+      <p data-label-line>{riga}</p>
       {corpo}
-      <p data-etichetta-taglia>{taglia}</p>
+      <p data-label-size>{taglia}</p>
     </div>
   );
 }

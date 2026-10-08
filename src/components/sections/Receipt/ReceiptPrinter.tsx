@@ -53,10 +53,10 @@ export type PrinterCopy = {
  */
 function Corpo({ righe, servizio }: { righe: ReceiptLine[]; servizio: PrintableService }) {
   return (
-    <div data-scontrino-corpo aria-hidden="true">
+    <div data-receipt-body aria-hidden="true">
       {righe.map((r, k) => (
-        <div key={k} data-riga={r.kind}>
-          {r.kind === "figura" ? (
+        <div key={k} data-line={r.kind}>
+          {r.kind === "figure" ? (
             <ReceiptFigure shape={servizio.id} count={servizio.pieces.length} />
           ) : (
             r.text
@@ -176,7 +176,7 @@ export function ReceiptPrinter({
 
   // Il colpo che ha appena stampato la figura: la carta deve uscire sopra il disegno.
   const allaFigura =
-    stato.phase === "stampa" && stato.service !== null && stato.ticks === soglie[stato.service];
+    stato.phase === "printing" && stato.service !== null && stato.ticks === soglie[stato.service];
 
   // I colpi gia' stampati, per il timer che riparte: letti al suo avvio, non
   // un motivo per rilanciarlo a ogni colpo.
@@ -188,13 +188,13 @@ export function ReceiptPrinter({
   // I due tempi della stampante. Ognuno porta la generazione in cui e' nato:
   // se nel frattempo e' cambiata, il riduttore lo ignora.
   useEffect(() => {
-    if (stato.phase !== "stampa" || stato.service === null) return;
+    if (stato.phase !== "printing" || stato.service === null) return;
     const gen = stato.gen;
     /* Sulla figura la stampa aspetta che la carta sia uscita. Solo se la
        figura si vede (il telefono): e' il CSS a deciderlo, e chiederlo al
        DOM evita di ripetere qui il suo breakpoint. Si guarda quella di un
        fantasma, che c'e' sempre: sulla carta vera arriva solo con il suo colpo. */
-    const figura = uscita.current?.querySelector<HTMLElement>('[data-fantasma] [data-riga="figura"]');
+    const figura = uscita.current?.querySelector<HTMLElement>('[data-ghost] [data-line="figure"]');
     const siVede = !!figura?.offsetHeight;
     const soglia = soglie[stato.service];
     let fatti = scattiOra.current;
@@ -220,7 +220,7 @@ export function ReceiptPrinter({
   }, [stato.phase, stato.gen, stato.service, soglie, allaFigura]);
 
   useEffect(() => {
-    if (stato.phase !== "strappo") return;
+    if (stato.phase !== "tearing") return;
     const gen = stato.gen;
     const caduta = window.setTimeout(() => manda({ type: "caduto", gen }), DROP_MS);
     return () => window.clearTimeout(caduta);
@@ -236,11 +236,11 @@ export function ReceiptPrinter({
   useLayoutEffect(() => {
     const el = carta.current;
     if (!el) return;
-    if (stato.phase === "stampa") {
+    if (stato.phase === "printing") {
       el.style.maxHeight = stato.ticks === 0 ? "0px" : `${el.scrollHeight + 4}px`;
       return;
     }
-    if (stato.phase !== "ferma") return;
+    if (stato.phase !== "idle") return;
     if (!el.style.maxHeight) return;
     el.style.maxHeight = `${el.scrollHeight + 4}px`;
     const libera = () => el.style.removeProperty("max-height");
@@ -257,18 +257,18 @@ export function ReceiptPrinter({
     if (premuto !== null) tasti.current[premuto]?.focus({ preventScroll: true });
   };
 
-  const sulTasto = stato.phase === "strappo" ? stato.next : stato.service;
+  const sulTasto = stato.phase === "tearing" ? stato.next : stato.service;
   const inCarta = stato.service === null ? null : servizi[stato.service];
   const finito = stato.service !== null && stato.ticks >= (totali[stato.service] ?? 0);
   const disegnato = servizi[stato.drawing] ?? servizi[0];
   const annuncio =
-    inCarta && stato.phase !== "strappo"
+    inCarta && stato.phase !== "tearing"
       ? `${inCarta.title}. ${inCarta.text} ${inCarta.pieces.join(", ")}.`
       : "";
 
   return (
     <>
-      <div data-scontrino-oggetto>
+      <div data-receipt-object>
         {disegnato && (
           <ReceiptSchema
             key={stato.traced}
@@ -286,8 +286,8 @@ export function ReceiptPrinter({
         )}
       </div>
 
-      <div data-scontrino-banco>
-        <div role="group" aria-label={testi.keys} data-scontrino-tasti>
+      <div data-receipt-bench>
+        <div role="group" aria-label={testi.keys} data-receipt-keys>
           {servizi.map((s, i) => (
             <button
               key={s.id}
@@ -295,7 +295,7 @@ export function ReceiptPrinter({
                 tasti.current[i] = el;
               }}
               type="button"
-              data-scontrino-tasto
+              data-receipt-key
               aria-pressed={sulTasto === i}
               onClick={() => premi(i)}
             >
@@ -307,23 +307,23 @@ export function ReceiptPrinter({
 
         <div
           ref={macchina}
-          data-scontrino-macchina
-          data-lavora={stato.phase === "stampa" ? "" : undefined}
+          data-receipt-machine
+          data-busy={stato.phase === "printing" ? "" : undefined}
           aria-hidden="true"
         >
-          <span data-marca>{testi.brand}</span>
-          <span data-spia />
-          <span data-fessura />
+          <span data-brand>{testi.brand}</span>
+          <span data-indicator />
+          <span data-slot />
         </div>
 
-        <div ref={uscita} data-scontrino-uscita>
+        <div ref={uscita} data-receipt-outlet>
           {/* I fantasmi: i quattro scontrini interi, invisibili, uno sopra
               l'altro nella stessa cella. Tengono l'uscita alta quanto il piu'
               lungo, qualunque sia la lingua e la larghezza. */}
           {righe.map((r, i) => (
-            <div key={servizi[i].id} data-scontrino-carta data-fantasma aria-hidden="true">
+            <div key={servizi[i].id} data-receipt-paper data-ghost aria-hidden="true">
               <Corpo righe={r} servizio={servizi[i]} />
-              <div data-scontrino-azioni>
+              <div data-receipt-actions>
                 <span>{testi.letsTalk}</span>
                 <span>{testi.tear}</span>
               </div>
@@ -334,9 +334,9 @@ export function ReceiptPrinter({
             <div
               key={stato.traced}
               ref={carta}
-              data-scontrino-carta
-              data-fase={stato.phase}
-              data-finito={finito ? "" : undefined}
+              data-receipt-paper
+              data-phase={stato.phase}
+              data-finished={finito ? "" : undefined}
               // Sopra la figura la carta esce in tutto il tempo dell'attesa, a
               // velocita' costante: e' cosi' che il disegno sembra stampato.
               // Scritto qui e non nel CSS perche' resti uguale a FIGURA.
@@ -349,7 +349,7 @@ export function ReceiptPrinter({
               {/* Fuori portata finche' la stampa non e' finita: fino ad allora
                   sono fuori dal flusso (sezioni/scontrino.css), e un fuoco su un bottone
                   che non si vede non serve a nessuno. */}
-              <div data-scontrino-azioni inert={stato.phase !== "ferma"}>
+              <div data-receipt-actions inert={stato.phase !== "idle"}>
                 <a href="#contact">{testi.letsTalk}</a>
                 <button type="button" onClick={strappa}>
                   {testi.tear}
@@ -358,7 +358,7 @@ export function ReceiptPrinter({
             </div>
           )}
 
-          {stato.service === null && <p data-scontrino-invito>{testi.hint}</p>}
+          {stato.service === null && <p data-receipt-invite>{testi.hint}</p>}
 
           {/* Il servizio stampato si annuncia una volta, intero: la stampa a
               colpi e' per gli occhi, e letta cosi' sarebbe un balbettio. */}

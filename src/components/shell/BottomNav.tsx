@@ -29,7 +29,7 @@ export async function BottomNav() {
   ];
 
   return (
-    <nav data-nav-basso aria-label={t("sections")}>
+    <nav data-nav-bottom aria-label={t("sections")}>
       {links.map((link) => (
         <a key={link.href} href={link.href}>
           {link.label}

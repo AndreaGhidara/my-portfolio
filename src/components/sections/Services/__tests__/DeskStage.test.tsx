@@ -105,7 +105,7 @@ describe("sotto i 1024px la sezione e' il gioco", () => {
     mockMedia(() => false);
     const { container } = renderWithMessages(<DeskStage {...props} />);
     const stage = palco(container);
-    expect(stage.querySelector("[data-gioco]")).not.toBeNull();
+    expect(stage.querySelector("[data-game]")).not.toBeNull();
     expect(stage.querySelector('[data-desk-world][data-layout="tall"]')).toBeNull();
     expect(stage.querySelectorAll("[data-desk-world]")).toHaveLength(1);
     expect(stage.querySelector('[data-desk-world][data-layout="wide"]')).not.toBeNull();
@@ -115,7 +115,7 @@ describe("sotto i 1024px la sezione e' il gioco", () => {
     mockMedia(() => false);
     const { container } = renderWithMessages(<DeskStage {...props} />);
     const figli = [...palco(container).children];
-    const gioco = figli.findIndex((el) => el.hasAttribute("data-gioco"));
+    const gioco = figli.findIndex((el) => el.hasAttribute("data-game"));
     expect(gioco).toBeGreaterThan(figli.findIndex((el) => el.hasAttribute("data-desk-title")));
     expect(gioco).toBeLessThan(figli.findIndex((el) => el.hasAttribute("data-desk-punch")));
   });

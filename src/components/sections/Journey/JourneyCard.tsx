@@ -38,9 +38,9 @@ export function JourneyCard({
   return (
     <li
       data-journey-item
-      data-tesserino={entry.badge ? undefined : "no"}
-      data-anno={entry.year}
-      data-scostamento={posa.offset}
+      data-badge={entry.badge ? undefined : "no"}
+      data-year={entry.year}
+      data-offset={posa.offset}
       style={{ "--r": `${posa.rotation}deg`, "--dy": `${posa.offset}rem` } as CSSProperties}
     >
       <div data-journey-badge>

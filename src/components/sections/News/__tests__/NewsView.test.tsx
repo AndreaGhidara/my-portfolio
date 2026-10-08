@@ -78,7 +78,7 @@ const pulsante = (nome: string) => within(screen.getByRole("group", { name: it0.
 
 /** Aspetta che le notizie siano arrivate: la targa conta le palline. */
 async function pronta(container: HTMLElement) {
-  await waitFor(() => expect(container.querySelectorAll("[data-notizie-globo] > span").length).toBeGreaterThan(0));
+  await waitFor(() => expect(container.querySelectorAll("[data-news-globe] > span").length).toBeGreaterThan(0));
 }
 
 describe("le notizie: la testa e i comandi", () => {
@@ -87,7 +87,7 @@ describe("le notizie: la testa e i comandi", () => {
     render(<NewsView {...props()} />);
     const sezione = screen.getByRole("region", { name: props().title });
     expect(sezione).toHaveAttribute("id", "notizie");
-    expect(within(sezione).getByRole("heading", { level: 2 })).toHaveClass("titolo-sezione");
+    expect(within(sezione).getByRole("heading", { level: 2 })).toHaveClass("section-title");
     expect(sezione).toHaveTextContent(it_.notizie.eyebrow);
     expect(sezione).toHaveTextContent(it_.notizie.intro);
   });
@@ -108,12 +108,12 @@ describe("le notizie: la testa e i comandi", () => {
     await userEvent.click(pulsante("Design"));
     expect(pulsante("Design")).toHaveAttribute("aria-pressed", "true");
     expect(pulsante("I.A.")).toHaveAttribute("aria-pressed", "false");
-    expect(container.querySelector("[data-notizie-macchina]")).toHaveAttribute("data-cat", "design");
+    expect(container.querySelector("[data-news-machine]")).toHaveAttribute("data-cat", "design");
   });
 
   it("nel markup del server il globo e' vuoto: le palline si dispongono a caso solo sul client", () => {
     const html = renderToString(<NewsView {...props()} />);
-    expect(html).toMatch(/<div data-notizie-globo="true" aria-hidden="true"><\/div>/);
+    expect(html).toMatch(/<div data-news-globe="true" aria-hidden="true"><\/div>/);
   });
 });
 
@@ -123,20 +123,20 @@ describe("le notizie: il giro", () => {
     const { container } = render(<NewsView {...props()} />);
     await pronta(container);
     expect(f).toHaveBeenCalledWith("/api/notizie");
-    expect(container.querySelectorAll("[data-notizie-globo] > span")).toHaveLength(4);
-    expect(container.querySelector("[data-notizie-targa]")).toHaveTextContent("I.A. · 2 palline");
+    expect(container.querySelectorAll("[data-news-globe] > span")).toHaveLength(4);
+    expect(container.querySelector("[data-news-nameplate]")).toHaveTextContent("I.A. · 2 palline");
     await userEvent.click(pulsante("Codice"));
-    expect(container.querySelector("[data-notizie-targa]")).toHaveTextContent("Codice · 1 pallina");
+    expect(container.querySelector("[data-news-nameplate]")).toHaveTextContent("Codice · 1 pallina");
   });
 
   it("un giro stampa la notizia sotto la testata della categoria, e annuncia solo testata e titolo", async () => {
     rispondi();
     const { container } = render(<NewsView {...props()} />);
     await pronta(container);
-    expect(container.querySelector("[data-foglio-testa] b")).toHaveTextContent(it0.masthead);
+    expect(container.querySelector("[data-sheet-head] b")).toHaveTextContent(it0.masthead);
     await userEvent.click(manopola());
     const articolo = await screen.findByRole("article");
-    expect(container.querySelector("[data-foglio-testa] b")).toHaveTextContent("La Gazzetta dell'I.A.");
+    expect(container.querySelector("[data-sheet-head] b")).toHaveTextContent("La Gazzetta dell'I.A.");
     expect(within(articolo).getByRole("heading", { level: 3 })).toHaveTextContent("Agents are here");
     expect(articolo).toHaveTextContent("Hacker News · ieri");
     expect(articolo).toHaveTextContent("in prima pagina");
@@ -148,8 +148,8 @@ describe("le notizie: il giro", () => {
     expect(vivi[0]).toHaveTextContent("La Gazzetta dell'I.A.: Agents are here");
     expect(vivi[0]).not.toContainElement(articolo);
     expect(articolo.closest("[aria-live]")).toBeNull();
-    expect(container.querySelector('[data-notizie-globo] > [data-cat="ia"][data-via]')).not.toBeNull();
-    expect(container.querySelector("[data-notizie-targa]")).toHaveTextContent("I.A. · 1 pallina");
+    expect(container.querySelector('[data-news-globe] > [data-cat="ia"][data-gone]')).not.toBeNull();
+    expect(container.querySelector("[data-news-nameplate]")).toHaveTextContent("I.A. · 1 pallina");
   });
 
   it("il link apre la fonte in un'altra scheda senza dire da dove si arriva; nessuna immagine", async () => {
@@ -184,7 +184,7 @@ describe("le notizie: il giro", () => {
     fireEvent.pointerUp(m, { clientX: -1, clientY: 2, pointerId: 1 });
     fireEvent.click(m);
     expect(await screen.findByRole("article")).toHaveTextContent("Agents are here");
-    expect(container.querySelector("[data-notizie-targa]")).toHaveTextContent("I.A. · 1 pallina");
+    expect(container.querySelector("[data-news-nameplate]")).toHaveTextContent("I.A. · 1 pallina");
   });
 
   it("senza riassunto il posto resta: il dominio in grande e una riga", async () => {
@@ -196,8 +196,8 @@ describe("le notizie: il giro", () => {
     await pronta(container);
     await userEvent.click(manopola());
     const articolo = await screen.findByRole("article");
-    expect(articolo.querySelector("[data-ritaglio-riassunto]")).toBeNull();
-    const vuoto = articolo.querySelector("[data-ritaglio-corpo] [data-ritaglio-vuoto]");
+    expect(articolo.querySelector("[data-clipping-summary]")).toBeNull();
+    const vuoto = articolo.querySelector("[data-clipping-body] [data-clipping-empty]");
     expect(vuoto).toHaveTextContent("example.com");
     expect(vuoto).toHaveTextContent(it0.noSummary);
   });
@@ -239,7 +239,7 @@ describe("le notizie: il giro", () => {
     await userEvent.click(pulsante("Codice"));
     await userEvent.click(manopola());
     const articolo = await screen.findByRole("article");
-    expect(container.querySelector("[data-foglio-testa] b")).toHaveTextContent("Il Corriere del Codice");
+    expect(container.querySelector("[data-sheet-head] b")).toHaveTextContent("Il Corriere del Codice");
     expect(within(articolo).getByRole("heading", { level: 3 })).toHaveTextContent("Next.js 15.5.0 è uscito");
     expect(articolo).toHaveTextContent("GitHub · vercel/next.js");
     expect(articolo).toHaveTextContent("nuova versione");
@@ -249,7 +249,7 @@ describe("le notizie: il giro", () => {
     rispondi();
     const { container } = render(<NewsView {...props()} />);
     await pronta(container);
-    const uscite = () => container.querySelector("[data-foglio-uscite]") as HTMLElement;
+    const uscite = () => container.querySelector("[data-sheet-drawn]") as HTMLElement;
     expect(uscite()).toHaveTextContent(it0.noneDrawn);
     await userEvent.click(manopola());
     await screen.findByRole("article");
@@ -278,10 +278,10 @@ describe("le notizie: il giro", () => {
     const finite = "Le notizie Design di oggi sono finite: prova un altro pulsante, o torna domani.";
     expect(screen.getByRole("status")).toHaveTextContent(finite);
     // Il pannello sta nella stessa scatola della notizia.
-    const scatola = container.querySelector("[data-foglio-notizia]") as HTMLElement;
+    const scatola = container.querySelector("[data-sheet-story]") as HTMLElement;
     expect(scatola).toContainElement(screen.getByRole("status"));
     expect(screen.queryByRole("article")).toBeNull();
-    const voci = within(container.querySelector("[data-foglio-uscite]") as HTMLElement).getAllByRole("button");
+    const voci = within(container.querySelector("[data-sheet-drawn]") as HTMLElement).getAllByRole("button");
     expect(voci.map((b) => b.getAttribute("aria-label"))).toEqual(["Design: Fonts again", "I.A.: Agents are here"]);
     // Si torna a una notizia gia' uscita, e l'avviso tace.
     await userEvent.click(voci[1]);
@@ -296,7 +296,7 @@ describe("le notizie: il giro", () => {
     const ora = new Intl.DateTimeFormat("it", { hour: "numeric", minute: "2-digit" }).format(
       new Date(raccolta.collectedAt),
     );
-    expect(container.querySelector("[data-notizie-raccolte]")).toHaveTextContent(
+    expect(container.querySelector("[data-news-collected]")).toHaveTextContent(
       `Notizie raccolte alle ${ora} di oggi: domani sono altre.`,
     );
   });
@@ -332,18 +332,18 @@ describe("le notizie in inglese", () => {
     const gruppo = screen.getByRole("group", { name: en.group });
     expect(within(gruppo).getAllByRole("button").map((b) => b.textContent)).toEqual(["A.I.", "Design", "Code"]);
     await pronta(container);
-    expect(container.querySelector("[data-notizie-targa]")).toHaveTextContent("A.I. · 2 balls");
+    expect(container.querySelector("[data-news-nameplate]")).toHaveTextContent("A.I. · 2 balls");
     await userEvent.click(screen.getByRole("button", { name: en.knob }));
     const articolo = await screen.findByRole("article");
-    expect(container.querySelector("[data-foglio-testa] b")).toHaveTextContent("The A.I. Gazette");
+    expect(container.querySelector("[data-sheet-head] b")).toHaveTextContent("The A.I. Gazette");
     expect(articolo).toHaveTextContent("Hacker News · yesterday");
     expect(articolo).toHaveTextContent("front page");
     expect(within(articolo).getByRole("link", { name: /Read on example\.com/ })).toBeInTheDocument();
   });
 });
 
-const regoleDelRitaglio = rules(/\[data-notizie-ritaglio\]/);
-const regoleDelFoglio = rules(/\[data-notizie-foglio\]/);
+const regoleDelRitaglio = rules(/\[data-news-clipping\]/);
+const regoleDelFoglio = rules(/\[data-news-sheet\]/);
 /** Il corpo della regola col selettore, fuori o dentro una media query (la prima che c'e'). */
 const regola = (selettore: string, dove?: Options) => rules(selettore, dove)[0]?.body ?? "";
 const telefono: Options = { media: "(max-width: 959px)" };
@@ -352,40 +352,40 @@ describe("i colori delle notizie", () => {
   it("il foglio e il ritaglio sono carta nei due temi: dentro mai i colori che seguono il tema", () => {
     expect(regoleDelRitaglio.length).toBeGreaterThan(10);
     expect(regoleDelFoglio.length).toBeGreaterThan(8);
-    const vietati = /var\(--(fg|bg|fg-muted|line|accento-testo|verde)\)/;
+    const vietati = /var\(--(fg|bg|fg-muted|line|accent-text|theme-green)\)/;
     expect(regoleDelRitaglio.filter((r) => vietati.test(r.body)).map((r) => r.selector)).toEqual([]);
     expect(regoleDelFoglio.filter((r) => vietati.test(r.body)).map((r) => r.selector)).toEqual([]);
-    const foglio = regoleDelFoglio.find((r) => r.selector === "[data-notizie-foglio]")?.body ?? "";
-    expect(foglio).toMatch(/--carta:\s*var\(--paper\)/);
-    expect(foglio).toMatch(/background:\s*var\(--carta\)/);
-    const radice = regoleDelRitaglio.find((r) => r.selector === "[data-notizie-ritaglio]")?.body ?? "";
-    expect(radice).toMatch(/--carta:\s*var\(--paper\)/);
-    expect(radice).toMatch(/--inchiostro:\s*var\(--ink\)/);
-    expect(radice).toMatch(/--arancio:\s*var\(--accento-su-carta\)/);
+    const foglio = regoleDelFoglio.find((r) => r.selector === "[data-news-sheet]")?.body ?? "";
+    expect(foglio).toMatch(/--sheet-paper:\s*var\(--paper\)/);
+    expect(foglio).toMatch(/background:\s*var\(--sheet-paper\)/);
+    const radice = regoleDelRitaglio.find((r) => r.selector === "[data-news-clipping]")?.body ?? "";
+    expect(radice).toMatch(/--sheet-paper:\s*var\(--paper\)/);
+    expect(radice).toMatch(/--sheet-ink:\s*var\(--ink\)/);
+    expect(radice).toMatch(/--sheet-orange:\s*var\(--accent-on-paper\)/);
   });
 
   it("le categorie sono fisse: il verde e' quello di carta, e nessun tema le ridefinisce", () => {
     const valori = (proprieta: string) => rules().map((r) => r.declarations[proprieta]);
-    expect(valori("--notizie-codice")).toContain("#2F6F4E");
-    expect(valori("--on-notizie-ia")).toContain("var(--ink)");
-    expect(valori("--on-notizie-design")).toContain("var(--ink)");
-    expect(valori("--on-notizie-codice")).toContain("var(--paper)");
+    expect(valori("--news-codice")).toContain("#2F6F4E");
+    expect(valori("--on-news-ia")).toContain("var(--ink)");
+    expect(valori("--on-news-design")).toContain("var(--ink)");
+    expect(valori("--on-news-codice")).toContain("var(--paper)");
     const scuro = rules(/\[data-theme="dark"\]/).map((r) => r.body).join("");
-    expect(scuro).not.toMatch(/--(on-)?notizie-/);
+    expect(scuro).not.toMatch(/--(on-)?news-/);
   });
 
   it("l'anello di fuoco dei pulsanti e della manopola e' il testo della categoria, non l'arancio", () => {
-    const fuoco = rules("[data-notizie-pulsanti] button:focus-visible").find((r) =>
-      r.selectors.includes("[data-notizie-manopola]:focus-visible"),
+    const fuoco = rules("[data-news-buttons] button:focus-visible").find((r) =>
+      r.selectors.includes("[data-news-knob]:focus-visible"),
     )?.body;
-    expect(fuoco).toMatch(/outline:\s*3px solid var\(--su-tema\)/);
+    expect(fuoco).toMatch(/outline:\s*3px solid var\(--on-theme\)/);
   });
 
   it("il giallo ha sempre il contorno d'inchiostro: palline, pulsante e corpo", () => {
     for (const selettore of [
-      '[data-notizie-globo] > [data-cat="design"]',
-      '[data-notizie-pulsanti] [data-cat="design"] i',
-      '[data-notizie-macchina][data-cat="design"] [data-notizie-corpo]',
+      '[data-news-globe] > [data-cat="design"]',
+      '[data-news-buttons] [data-cat="design"] i',
+      '[data-news-machine][data-cat="design"] [data-news-body]',
     ]) {
       expect(regola(selettore), selettore).toMatch(/inset 0 0 0 [\d.]+px var\(--ink\)/);
     }
@@ -403,39 +403,39 @@ describe("i colori delle notizie", () => {
  */
 describe("il foglio non cambia misura da una notizia all'altra", () => {
   it("sul desktop il foglio ha un'altezza fissa, e la notizia la riempie", () => {
-    expect(regola("[data-notizie-foglio]")).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
-    expect(regola("[data-foglio-notizia]")).toMatch(/min-height:\s*0/);
-    expect(regola("[data-notizie-foglio] [data-notizie-ritaglio]")).toMatch(/height:\s*100%/);
+    expect(regola("[data-news-sheet]")).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
+    expect(regola("[data-sheet-story]")).toMatch(/min-height:\s*0/);
+    expect(regola("[data-news-sheet] [data-news-clipping]")).toMatch(/height:\s*100%/);
   });
 
   it("titolo a tre righe, riassunto a un numero fisso di righe, il resto si taglia", () => {
-    const titolo = regola("[data-notizie-foglio] [data-notizie-ritaglio] h3");
+    const titolo = regola("[data-news-sheet] [data-news-clipping] h3");
     expect(titolo).toMatch(/-webkit-line-clamp:\s*3/);
     expect(titolo).toMatch(/overflow:\s*hidden/);
-    const riassunto = regola("[data-notizie-ritaglio] [data-ritaglio-riassunto]");
+    const riassunto = regola("[data-news-clipping] [data-clipping-summary]");
     expect(riassunto).toMatch(/-webkit-line-clamp:\s*\d+/);
     expect(riassunto).toMatch(/overflow:\s*hidden/);
-    expect(regola("[data-notizie-ritaglio] [data-ritaglio-corpo]")).toMatch(/overflow:\s*hidden/);
+    expect(regola("[data-news-clipping] [data-clipping-body]")).toMatch(/overflow:\s*hidden/);
   });
 
   it("la fila delle gia' uscite scorre dentro, e ogni titolo sta in due righe", () => {
-    expect(regola("[data-foglio-uscite]")).toMatch(/overflow-y:\s*auto/);
-    expect(regola("[data-foglio-uscite] button span")).toMatch(/-webkit-line-clamp:\s*2/);
+    expect(regola("[data-sheet-drawn]")).toMatch(/overflow-y:\s*auto/);
+    expect(regola("[data-sheet-drawn] button span")).toMatch(/-webkit-line-clamp:\s*2/);
   });
 
   it("sul telefono la notizia e la fila hanno misure fisse, e la testata non va a capo", () => {
     expect(rules(undefined, telefono).length, "la media del telefono non ha regole").toBeGreaterThan(0);
-    expect(regola("[data-foglio-notizia]", telefono)).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
-    expect(regola("[data-foglio-uscite]", telefono)).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
-    expect(regola("[data-foglio-testa]", telefono)).toMatch(/flex-direction:\s*column/);
-    expect(regola("[data-foglio-testa] b")).toMatch(/white-space:\s*nowrap/);
+    expect(regola("[data-sheet-story]", telefono)).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
+    expect(regola("[data-sheet-drawn]", telefono)).toMatch(/(^|[^-])height:\s*\d+(\.\d+)?rem/);
+    expect(regola("[data-sheet-head]", telefono)).toMatch(/flex-direction:\s*column/);
+    expect(regola("[data-sheet-head] b")).toMatch(/white-space:\s*nowrap/);
   });
 
   it("i pallini gia' usciti non ci sono piu': c'e' la colonna coi titoli", async () => {
     rispondi();
     const { container } = render(<NewsView {...props()} />);
     await pronta(container);
-    expect(container.querySelector("[data-notizie-mazzetta]")).toBeNull();
-    expect(container.querySelector("[data-foglio-colonna]")).toHaveTextContent(it0.alreadyDrawn);
+    expect(container.querySelector("[data-news-bundle]")).toBeNull();
+    expect(container.querySelector("[data-sheet-column]")).toHaveTextContent(it0.alreadyDrawn);
   });
 });

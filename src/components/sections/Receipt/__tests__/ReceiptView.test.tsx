@@ -41,7 +41,7 @@ const props: ReceiptViewProps = {
 };
 
 const vero = (container: HTMLElement) =>
-  container.querySelector<HTMLElement>("[data-scontrino-carta]:not([data-fantasma])");
+  container.querySelector<HTMLElement>("[data-receipt-paper]:not([data-ghost])");
 
 describe("la stampante dei servizi", () => {
 
@@ -50,7 +50,7 @@ describe("la stampante dei servizi", () => {
     const sezione = screen.getByRole("region", { name: props.title });
     const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
     expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
-    expect(titolo).toHaveClass("titolo-sezione");
+    expect(titolo).toHaveClass("section-title");
   });
   it("e' la seconda sezione: arancione, con il suo id per l'effetto sopra l'apertura", () => {
     const { container } = render(<ReceiptView {...props} />);
@@ -64,17 +64,17 @@ describe("la stampante dei servizi", () => {
     const { container } = render(<ReceiptView {...props} />);
     const carta = vero(container);
     expect(carta).not.toBeNull();
-    expect(carta).toHaveAttribute("data-finito");
+    expect(carta).toHaveAttribute("data-finished");
     expect(carta).toHaveTextContent("TITOLO 0");
     expect(carta).toHaveTextContent(/TOTALE \.+ DA PARLARNE/);
-    expect(container.querySelector("[data-scontrino-tavola] svg")).toHaveAttribute("data-traccia");
+    expect(container.querySelector("[data-receipt-plate] svg")).toHaveAttribute("data-trace");
     expect(screen.getByRole("img", { name: "Schema 0" })).toBeInTheDocument();
   });
 
   it("scontrino e tavola hanno gli stessi pezzi, nello stesso ordine", () => {
     const { container } = render(<ReceiptView {...props} />);
-    const voci = [...vero(container)!.querySelectorAll('[data-riga="voce"]')].map((v) => v.textContent);
-    const note = [...container.querySelectorAll("[data-nota]")].map((n) => n.textContent);
+    const voci = [...vero(container)!.querySelectorAll('[data-line="item"]')].map((v) => v.textContent);
+    const note = [...container.querySelectorAll("[data-note]")].map((n) => n.textContent);
     const pezzi = props.services[0].pieces;
     expect(voci).toEqual(pezzi.map((p, k) => `${k + 1} ${p}`));
     expect(note).toEqual(pezzi.map((p, k) => `${k + 1} · ${p.toUpperCase()}`));
@@ -87,13 +87,13 @@ describe("la stampante dei servizi", () => {
     // con gli spazi al posto della data e il numero in fondo a destra.
     const scatola = document.createElement("div");
     scatola.innerHTML = renderToStaticMarkup(<ReceiptView {...props} />);
-    const righe = [...vero(scatola)!.querySelectorAll("[data-riga]")];
+    const righe = [...vero(scatola)!.querySelectorAll("[data-line]")];
     expect(righe[2].textContent).toBe(`${" ".repeat(24)}N. 01/04`);
   });
 
   it("nel browser la data arriva a sinistra, e il numero resta in fondo a destra", () => {
     const { container } = render(<ReceiptView {...props} />);
-    const righe = [...vero(container)!.querySelectorAll("[data-riga]")];
+    const righe = [...vero(container)!.querySelectorAll("[data-line]")];
     expect(righe[2].textContent).toMatch(/^\S.*\s+N\. 01\/04$/);
     expect(righe[2].textContent).toHaveLength(32);
   });
@@ -110,7 +110,7 @@ describe("la stampante dei servizi", () => {
     const { container } = render(<ReceiptView {...props} />);
     fireEvent.click(screen.getByRole("button", { name: /Titolo 2/ }));
     expect(vero(container)).toHaveTextContent("TITOLO 2");
-    expect(container.querySelectorAll("[data-scontrino-carta]:not([data-fantasma])")).toHaveLength(1);
+    expect(container.querySelectorAll("[data-receipt-paper]:not([data-ghost])")).toHaveLength(1);
     expect(screen.getByRole("img", { name: "Schema 2" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Titolo 2/ })).toHaveAttribute("aria-pressed", "true");
   });
@@ -126,21 +126,21 @@ describe("la stampante dei servizi", () => {
     fireEvent.click(screen.getByRole("button", { name: props.copy.tear }));
     expect(vero(container)).toBeNull();
     expect(screen.getByRole("button", { name: /Titolo 1/ })).toHaveFocus();
-    expect(container.querySelector("[data-scontrino-invito]")).toHaveTextContent(props.copy.hint);
+    expect(container.querySelector("[data-receipt-invite]")).toHaveTextContent(props.copy.hint);
   });
 
   it("lo scontrino si annuncia intero, una volta: la stampa visiva non si legge", () => {
     const { container } = render(<ReceiptView {...props} />);
     const annuncio = container.querySelector('[aria-live="polite"]');
     expect(annuncio).toHaveTextContent("Titolo 0. Testo 0");
-    for (const corpo of container.querySelectorAll("[data-scontrino-corpo]")) {
+    for (const corpo of container.querySelectorAll("[data-receipt-body]")) {
       expect(corpo).toHaveAttribute("aria-hidden", "true");
     }
   });
 
   it("i fantasmi tengono l'altezza: quattro, interi, e non si leggono", () => {
     const { container } = render(<ReceiptView {...props} />);
-    const fantasmi = container.querySelectorAll("[data-fantasma]");
+    const fantasmi = container.querySelectorAll("[data-ghost]");
     expect(fantasmi).toHaveLength(services.length);
     fantasmi.forEach((f, i) => {
       expect(f).toHaveAttribute("aria-hidden", "true");
@@ -151,7 +151,7 @@ describe("la stampante dei servizi", () => {
 
   it("il disegno e' stampato anche sulla carta, subito prima della lista che spiega", () => {
     const { container } = render(<ReceiptView {...props} />);
-    const figura = vero(container)!.querySelector('[data-riga="figura"]');
+    const figura = vero(container)!.querySelector('[data-line="figure"]');
     expect(figura?.querySelector("svg path")).not.toBeNull();
     expect(figura?.nextElementSibling).toHaveTextContent(`1 ${props.services[0].pieces[0]}`);
     // Solo i numeri: le parole sono quelle della lista, e il corpo non si legge.
@@ -163,14 +163,14 @@ describe("la stampante dei servizi", () => {
   it("un tasto stampa sulla carta il disegno del suo servizio", () => {
     const { container } = render(<ReceiptView {...props} />);
     fireEvent.click(screen.getByRole("button", { name: /Titolo 3/ }));
-    const numeri = vero(container)!.querySelectorAll('[data-riga="figura"] text');
+    const numeri = vero(container)!.querySelectorAll('[data-line="figure"] text');
     expect(numeri).toHaveLength(props.services[3].pieces.length);
   });
 
   it("anche i fantasmi hanno la figura: sul telefono l'altezza la conta", () => {
     const { container } = render(<ReceiptView {...props} />);
-    container.querySelectorAll("[data-fantasma]").forEach((f, i) => {
-      expect(f.querySelectorAll('[data-riga="figura"] text'), `fantasma ${i}`).toHaveLength(
+    container.querySelectorAll("[data-ghost]").forEach((f, i) => {
+      expect(f.querySelectorAll('[data-line="figure"] text'), `fantasma ${i}`).toHaveLength(
         props.services[i].pieces.length,
       );
     });
@@ -178,7 +178,7 @@ describe("la stampante dei servizi", () => {
 });
 
 /** Le regole del foglio di stile che riguardano la stampante, corpo compreso. */
-const regoleDellaStampante = rules(/\[data-(scontrino|marca|spia|fessura|riga)/);
+const regoleDellaStampante = rules(/\[data-(receipt|brand|indicator|slot|line)/);
 
 describe("i colori della stampante", () => {
   it("non chiedono niente ai token che cambiano col tema", () => {
@@ -189,7 +189,7 @@ describe("i colori della stampante", () => {
     // arancio. Nel DOM non si vede.
     expect(regoleDellaStampante.length).toBeGreaterThan(10);
     const colpevoli = regoleDellaStampante.filter((r) =>
-      /var\(\s*--(fg|line|bg|accento-testo)\b/.test(r.body),
+      /var\(\s*--(fg|line|bg|accent-text)\b/.test(r.body),
     );
     expect(colpevoli.map((r) => r.selector)).toEqual([]);
   });
@@ -199,7 +199,7 @@ describe("i colori della stampante", () => {
     const classi = [...container.querySelectorAll<HTMLElement>("[class]")].map((el) =>
       String(el.getAttribute("class")),
     );
-    expect(classi.filter((c) => /var\(\s*--(fg|line|bg|accento-testo)\b/.test(c))).toEqual([]);
+    expect(classi.filter((c) => /var\(\s*--(fg|line|bg|accent-text)\b/.test(c))).toEqual([]);
   });
 
   it("l'occhiello non resta quello globale", () => {
@@ -213,22 +213,22 @@ describe("i colori della stampante", () => {
   });
 
   it("il fuoco sta dentro il bordo, del colore del testo: l'anello arancio qui non si vede", () => {
-    expect(rules("[data-scontrino] :is(button, a):focus-visible")[0]?.body).toMatch(
+    expect(rules("[data-receipt] :is(button, a):focus-visible")[0]?.body).toMatch(
       /outline:\s*2px solid currentColor;[^]*outline-offset:\s*-/,
     );
   });
 
   it("lo scontrino vero non entra nel flusso: la pagina non cambia altezza a ogni stampa", () => {
-    expect(rules("[data-scontrino-carta]:not([data-fantasma])")[0]?.body).toMatch(/position:\s*absolute/);
-    expect(rules("[data-scontrino-carta][data-fantasma]")[0]?.body).toMatch(/visibility:\s*hidden/);
+    expect(rules("[data-receipt-paper]:not([data-ghost])")[0]?.body).toMatch(/position:\s*absolute/);
+    expect(rules("[data-receipt-paper][data-ghost]")[0]?.body).toMatch(/visibility:\s*hidden/);
   });
 
   it("sul telefono la tavola va via e il disegno si stampa sulla carta; sul desktop il contrario", () => {
     const telefono = { media: "(max-width: 860px)" };
     const nascosto = (r: Rule) => /display:\s*none/.test(r.body);
-    expect(rules(/\[data-scontrino-oggetto\]/, telefono).some(nascosto)).toBe(true);
-    expect(rules('[data-riga="figura"]', telefono).some((r) => /display:\s*block/.test(r.body))).toBe(true);
-    const fuori = rules('[data-riga="figura"]').filter((r) => !rules('[data-riga="figura"]', telefono).includes(r));
+    expect(rules(/\[data-receipt-object\]/, telefono).some(nascosto)).toBe(true);
+    expect(rules('[data-line="figure"]', telefono).some((r) => /display:\s*block/.test(r.body))).toBe(true);
+    const fuori = rules('[data-line="figure"]').filter((r) => !rules('[data-line="figure"]', telefono).includes(r));
     expect(fuori.some(nascosto)).toBe(true);
   });
 
@@ -237,8 +237,8 @@ describe("i colori della stampante", () => {
     // «Parliamone» e «strappa» non si potevano premere: il browser da' il clic
     // all'uscita trasparente che gli sta sopra. Sotto la stampante ci va
     // perche' e' la stampante a salire.
-    const regola = rules("[data-scontrino-carta]:not([data-fantasma])")[0]?.body;
+    const regola = rules("[data-receipt-paper]:not([data-ghost])")[0]?.body;
     expect(regola).not.toMatch(/z-index:\s*-/);
-    expect(rules("[data-scontrino-macchina]").some((r) => /z-index:\s*1/.test(r.body))).toBe(true);
+    expect(rules("[data-receipt-machine]").some((r) => /z-index:\s*1/.test(r.body))).toBe(true);
   });
 });

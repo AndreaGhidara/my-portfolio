@@ -101,7 +101,7 @@ export function slide(c: Folder, moto: FolderMotion): Slide {
   // Misurato al clic, dopo che useProfondita ha riportato davanti la cartella.
   const alto = c.face.offsetHeight - 16;
   const giu = window.innerHeight - c.li.getBoundingClientRect().top + 40;
-  const ombra = getComputedStyle(c.li).getPropertyValue("--cartella-ombra").trim();
+  const ombra = getComputedStyle(c.li).getPropertyValue("--folder-shadow").trim();
   const sfilato: Keyframe = {
     height: `${alto}px`,
     translate: `0 ${-SU}px`,
@@ -164,7 +164,7 @@ export function slide(c: Folder, moto: FolderMotion): Slide {
   const lasciaIlFoglio = (dialog: HTMLDialogElement) => {
     senzaFoglio = true;
     cancella(suDialog);
-    dialog.removeAttribute("data-velo");
+    dialog.removeAttribute("data-veil");
   };
 
   /* Via tutto quello che sta sul foglio PRIMA di close(), nello stesso task:
@@ -178,7 +178,7 @@ export function slide(c: Folder, moto: FolderMotion): Slide {
     fermo = true;
     cancella(suDialog);
     cancella(suCartella);
-    dialogAperto?.removeAttribute("data-velo");
+    dialogAperto?.removeAttribute("data-veil");
   };
 
   return {
@@ -188,7 +188,7 @@ export function slide(c: Folder, moto: FolderMotion): Slide {
         // Sincrono fino al primo await: a "none" il dialog e' aperto appena
         // dopo il commit, senza aspettare niente.
         if (!dialog.open) dialog.showModal();
-        dialog.setAttribute("data-velo", "");
+        dialog.setAttribute("data-veil", "");
         const entra = muovi(suDialog, dialog, [{ opacity: 0 }, { opacity: 1 }], { durata: 180, curva: "ease-out" });
         await finite([entra]);
         if (fermo || senzaFoglio) return;
@@ -197,9 +197,9 @@ export function slide(c: Folder, moto: FolderMotion): Slide {
       }
 
       await caduta;
-      const pratica = dialog.querySelector<HTMLElement>("[data-pratica]");
+      const pratica = dialog.querySelector<HTMLElement>("[data-dossier]");
       if (fermo || senzaFoglio || !pratica) return;
-      const parti = Array.from(dialog.querySelectorAll<HTMLElement>("[data-entra]"));
+      const parti = Array.from(dialog.querySelectorAll<HTMLElement>("[data-enter]"));
 
       // 3. APRE.
       if (!dialog.open) dialog.showModal();
@@ -210,7 +210,7 @@ export function slide(c: Folder, moto: FolderMotion): Slide {
       // Il velo arriva in transizione: serve un fotogramma col ::backdrop gia'
       // disegnato trasparente.
       requestAnimationFrame(() => {
-        if (!fermo && !senzaFoglio) dialog.setAttribute("data-velo", "");
+        if (!fermo && !senzaFoglio) dialog.setAttribute("data-veil", "");
       });
       const apre = muovi(
         suDialog,
@@ -243,7 +243,7 @@ export function slide(c: Folder, moto: FolderMotion): Slide {
 
     async close(dialog) {
       if (moto === "dissolvenza") {
-        dialog.removeAttribute("data-velo");
+        dialog.removeAttribute("data-veil");
         const esce = muovi(suDialog, dialog, [{ opacity: 1 }, { opacity: 0 }], { durata: 140, curva: "ease-in" });
         await finite([esce]);
         if (fermo || senzaFoglio) return;
@@ -251,8 +251,8 @@ export function slide(c: Folder, moto: FolderMotion): Slide {
         return;
       }
 
-      const pratica = dialog.querySelector<HTMLElement>("[data-pratica]");
-      const parti = Array.from(dialog.querySelectorAll<HTMLElement>("[data-entra]"));
+      const pratica = dialog.querySelector<HTMLElement>("[data-dossier]");
+      const parti = Array.from(dialog.querySelectorAll<HTMLElement>("[data-enter]"));
       const esce = parti.map((p) =>
         muovi(suDialog, p, [{ opacity: 1 }, { opacity: 0 }], { durata: 140, curva: "ease-out" }),
       );
@@ -264,9 +264,9 @@ export function slide(c: Folder, moto: FolderMotion): Slide {
       }
       // Si torna in cima prima di stringere: il foglio rientra dalla sua testa.
       dialog.scrollTop = 0;
-      const foglio = pratica.querySelector<HTMLElement>("[data-pratica-foglio]");
+      const foglio = pratica.querySelector<HTMLElement>("[data-dossier-sheet]");
       if (foglio) foglio.scrollTop = 0;
-      dialog.removeAttribute("data-velo");
+      dialog.removeAttribute("data-veil");
       // Rimisurata qui e non riusata dall'apertura: nel frattempo lo schermo
       // puo' aver cambiato misura.
       const { tono, carta, ...forma } = partenza(pratica);

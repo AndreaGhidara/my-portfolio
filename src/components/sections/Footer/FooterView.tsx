@@ -81,10 +81,10 @@ export function FooterView({
       {/* I tre blocchi della busta entrano uno dopo l'altro. L'attributo resta
           qui: [data-busta] porta il fondo, la patta e il taglio in fondo alla
           pagina, e un involucro in mezzo li staccherebbe dal contenuto. */}
-      <Reveal data-busta data-testid="busta" motion="dietro" stagger={0.12}>
-        <div data-busta-alto>
-          <p data-busta-profili data-testid="busta-profili">
-            <span data-busta-et>{ancheQui}</span>
+      <Reveal data-envelope data-testid="envelope" motion="dietro" stagger={0.12}>
+        <div data-envelope-top>
+          <p data-envelope-profiles data-testid="envelope-profiles">
+            <span data-envelope-label>{ancheQui}</span>
             <a
               href={urlFor("linkedin")}
               target="_blank"
@@ -114,20 +114,20 @@ export function FooterView({
             as="span"
             motion="alto"
             delay={0.25}
-            data-busta-affrancatura
-            data-testid="busta-affrancatura"
+            data-envelope-postage
+            data-testid="envelope-postage"
             aria-hidden="true"
           >
-            <span data-francobollo>
+            <span data-stamp>
               {/* Il monogramma e' testo grande, quindi carta su arancio (3,27:1)
                   e' ammessa. «ITALIA» e' a mezzo rem e sotto AA: sta in
                   --on-accent, che fa 5,08:1. Vedi contrast.test.ts. */}
-              <b data-francobollo-sigla>AG</b>
-              <span data-francobollo-paese data-testid="francobollo-paese">
+              <b data-stamp-code>AG</b>
+              <span data-stamp-country data-testid="stamp-country">
                 {paese}
               </span>
             </span>
-            <svg data-busta-annullo viewBox="0 0 100 100">
+            <svg data-envelope-postmark viewBox="0 0 100 100">
               <g fill="none" stroke="currentColor" strokeWidth="2.4">
                 <circle cx="50" cy="50" r="36" />
                 <circle cx="50" cy="50" r="29" strokeWidth="1.2" />
@@ -160,7 +160,7 @@ export function FooterView({
                 textAnchor="middle"
                 fontSize="9.5"
                 letterSpacing=".3"
-                data-testid="busta-annullo-data"
+                data-testid="envelope-postmark-date"
               >
                 <Today format="annullo" />
               </text>
@@ -168,28 +168,28 @@ export function FooterView({
           </Reveal>
         </div>
 
-        <div data-busta-indirizzo data-testid="busta-indirizzo">
-          <p data-busta-et>{rispondiA}</p>
-          <p data-busta-nome>{name}</p>
-          <a data-busta-mail href={`mailto:${email}`}>
+        <div data-envelope-address data-testid="envelope-address">
+          <p data-envelope-label>{rispondiA}</p>
+          <p data-envelope-name>{name}</p>
+          <a data-envelope-mail href={`mailto:${email}`}>
             {email}
           </a>
-          <p data-busta-citta>{citta}</p>
+          <p data-envelope-city>{citta}</p>
         </div>
 
-        <div data-busta-basso>
-          <p data-busta-tagline>{tagline}</p>
-          <div data-busta-basso-dx>
-            <span data-busta-codice aria-hidden="true">
+        <div data-envelope-bottom>
+          <p data-envelope-tagline>{tagline}</p>
+          <div data-envelope-bottom-right>
+            <span data-envelope-code aria-hidden="true">
               {barre.map((alta, i) => (
-                <i key={i} data-alta={alta ? "" : undefined} />
+                <i key={i} data-high={alta ? "" : undefined} />
               ))}
             </span>
             {/* Niente opacita' sul testo: l'opacita' comporrebbe il colore
                 contro lo sfondo prima che il contrasto venga misurato. La
                 distinzione arriva da dimensione e posizione, non da un colore
                 piu' debole. */}
-            <p data-footer-diritti>
+            <p data-footer-rights>
               © <Today format="anno" /> {name}. {rights}
             </p>
           </div>

@@ -24,12 +24,12 @@ import {
  * stringhe costanti, quindi server e client le serializzano uguali.
  */
 const MISURE = {
-  "--largo": `min(${TRACK_PARAMS.sheet.rem}rem, ${TRACK_PARAMS.sheet.vw}vw)`,
-  "--aria": `${TRACK_PARAMS.air}rem`,
-  "--arrivo": `min(${TRACK_PARAMS.arrival.rem}rem, ${TRACK_PARAMS.arrival.vw}vw)`,
-  "--coda": TRACK_PARAMS.tail,
-  "--velocita-fine": TRACK_PARAMS.speed.fine,
-  "--velocita-grossolana": TRACK_PARAMS.speed.coarse,
+  "--wide": `min(${TRACK_PARAMS.sheet.rem}rem, ${TRACK_PARAMS.sheet.vw}vw)`,
+  "--air": `${TRACK_PARAMS.air}rem`,
+  "--arrival": `min(${TRACK_PARAMS.arrival.rem}rem, ${TRACK_PARAMS.arrival.vw}vw)`,
+  "--tail": TRACK_PARAMS.tail,
+  "--speed-fine": TRACK_PARAMS.speed.fine,
+  "--speed-coarse": TRACK_PARAMS.speed.coarse,
 };
 
 /** L'altezza del palco, 100svh, letta da una sonda: il palco stesso in colonna
@@ -133,13 +133,13 @@ export function JourneyTrack({
         return;
       }
 
-      const arrivo = listaEl.querySelector<HTMLElement>("[data-journey-arrivo]");
-      const svg = listaEl.querySelector<SVGSVGElement>("[data-journey-onda] svg");
-      const fioca = svg?.querySelector<SVGPathElement>("[data-journey-onda-fioca]");
-      const piena = svg?.querySelector<SVGPathElement>("[data-journey-onda-piena]");
-      const fatto = svg?.querySelector<SVGRectElement>("[data-journey-fatto]");
-      const anno = root.querySelector<HTMLElement>("[data-journey-anno]");
-      const suggerito = root.querySelector<HTMLElement>("[data-journey-suggerimento]");
+      const arrivo = listaEl.querySelector<HTMLElement>("[data-journey-arrival]");
+      const svg = listaEl.querySelector<SVGSVGElement>("[data-journey-wave] svg");
+      const fioca = svg?.querySelector<SVGPathElement>("[data-journey-wave-faint]");
+      const piena = svg?.querySelector<SVGPathElement>("[data-journey-wave-full]");
+      const fatto = svg?.querySelector<SVGRectElement>("[data-journey-done]");
+      const anno = root.querySelector<HTMLElement>("[data-journey-year]");
+      const suggerito = root.querySelector<HTMLElement>("[data-journey-hint]");
       if (!arrivo || !svg || !fioca || !piena || !fatto || !anno) return;
 
       // Le misure: rifatte solo su onRefresh, che ScrollTrigger chiama anche a
@@ -158,7 +158,7 @@ export function JourneyTrack({
         // ScrollTrigger.create chiama onRefresh subito, prima che la scena sia
         // accesa: i fogli sono ancora in colonna, tutti allo stesso x, e l'onda
         // misurata li' non vuol dire niente. La disegna il refresh che segue.
-        if (!root.hasAttribute("data-scena")) return;
+        if (!root.hasAttribute("data-scene")) return;
         const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
         altezza = stageEl.offsetHeight;
         larghezza = stageEl.clientWidth;
@@ -182,7 +182,7 @@ export function JourneyTrack({
         const y0 = H / 2;
         const punti: TrackPoint[] = [[0, y0]];
         for (const [i, t] of tappe.entries()) {
-          punti.push([centri[i], y0 + parseFloat(t.dataset.scostamento ?? "0") * rem]);
+          punti.push([centri[i], y0 + parseFloat(t.dataset.offset ?? "0") * rem]);
         }
         punti.push([arrivo.offsetLeft + arrivo.offsetWidth / 2, y0]);
         svg.setAttribute("width", String(W));
@@ -202,17 +202,17 @@ export function JourneyTrack({
           "width",
           filledLine({ x, width: larghezza, arrivalEdge: bordoArrivo, arrivalEnd: fineArrivo, q: f.q }).toFixed(1),
         );
-        arrivo.style.setProperty("--luce", f.light.toFixed(4));
-        arrivo.style.setProperty("--sussulto", f.jolt.toFixed(4));
-        arrivo.style.setProperty("--caduta", f.fall.toFixed(4));
-        root.style.setProperty("--avanzamento", self.progress.toFixed(4));
-        suggerito?.toggleAttribute("data-mosso", fatta > 20);
+        arrivo.style.setProperty("--light", f.light.toFixed(4));
+        arrivo.style.setProperty("--jolt", f.jolt.toFixed(4));
+        arrivo.style.setProperty("--fall", f.fall.toFixed(4));
+        root.style.setProperty("--progress", self.progress.toFixed(4));
+        suggerito?.toggleAttribute("data-moved", fatta > 20);
 
-        let visto = tappe[0]?.dataset.anno ?? "";
+        let visto = tappe[0]?.dataset.year ?? "";
         for (const [i, t] of tappe.entries()) {
           const si = arrived({ stopCentre: centri[i], x, width: larghezza });
-          if (si !== t.hasAttribute("data-arrivata")) t.toggleAttribute("data-arrivata", si);
-          if (si) visto = t.dataset.anno ?? visto;
+          if (si !== t.hasAttribute("data-arrived")) t.toggleAttribute("data-arrived", si);
+          if (si) visto = t.dataset.year ?? visto;
         }
         if (visto !== annoScritto) {
           anno.textContent = visto;
@@ -241,7 +241,7 @@ export function JourneyTrack({
       attivo.current = trigger;
       const sezione = root.closest("section") ?? root;
       withoutShift(sezione, () => {
-        root.setAttribute("data-scena", "orizzontale");
+        root.setAttribute("data-scene", "horizontal");
         // La sezione e' appena cresciuta di migliaia di pixel: tutto quello che
         // sta sotto (il tuo turno, le entrate) va rimisurato, questo trigger
         // compreso, che e' nato misurando la colonna.
@@ -260,16 +260,16 @@ export function JourneyTrack({
         vivo = false;
         attivo.current = null;
         trigger.kill();
-        root.style.removeProperty("--avanzamento");
+        root.style.removeProperty("--progress");
         listaEl.style.removeProperty("--x");
-        for (const p of ["--luce", "--sussulto", "--caduta"]) arrivo.style.removeProperty(p);
-        for (const t of tappe) t.removeAttribute("data-arrivata");
+        for (const p of ["--light", "--jolt", "--fall"]) arrivo.style.removeProperty(p);
+        for (const t of tappe) t.removeAttribute("data-arrived");
         anno.textContent = String(annoIniziale);
-        suggerito?.removeAttribute("data-mosso");
+        suggerito?.removeAttribute("data-moved");
         // E' la stessa crescita al contrario: la sezione torna colonna, chi
         // sta sotto deve saperlo, e chi stava guardando sotto resta li'.
         withoutShift(sezione, () => {
-          root.removeAttribute("data-scena");
+          root.removeAttribute("data-scene");
           ScrollTrigger.refresh();
         });
       };
@@ -286,12 +286,12 @@ export function JourneyTrack({
     >
       {/* Alta 100svh, larga zero: dice quanto e' alto il palco anche quando
           il palco, in colonna, e' alto quanto il suo contenuto. */}
-      <div ref={sonda} data-journey-sonda aria-hidden="true" />
+      <div ref={sonda} data-journey-probe aria-hidden="true" />
       <div ref={track} data-journey-track>
         <div ref={stage} data-journey-stage>
-          <div data-journey-testata>
+          <div data-journey-header>
             {testata}
-            <p data-journey-anno aria-hidden="true">
+            <p data-journey-year aria-hidden="true">
               {annoIniziale}
             </p>
           </div>
@@ -299,24 +299,24 @@ export function JourneyTrack({
           <ol ref={lista} data-journey-list>
             {/* L'onda sta dentro la lista perche' scorre con lei: e' il primo
                 <li> e non conta per chi legge. */}
-            <li data-journey-onda aria-hidden="true">
+            <li data-journey-wave aria-hidden="true">
               <svg>
                 <defs>
                   <clipPath id="journey-fatto">
-                    <rect data-journey-fatto x="0" y="-9999" width="0" height="99999" />
+                    <rect data-journey-done x="0" y="-9999" width="0" height="99999" />
                   </clipPath>
                 </defs>
-                <path data-journey-onda-fioca />
-                <path data-journey-onda-piena clipPath="url(#journey-fatto)" />
+                <path data-journey-wave-faint />
+                <path data-journey-wave-full clipPath="url(#journey-fatto)" />
               </svg>
             </li>
             {children}
           </ol>
 
-          <p data-journey-suggerimento>
+          <p data-journey-hint>
             <span aria-hidden="true">&rarr;</span> {suggerimento}
           </p>
-          <div data-journey-avanzamento aria-hidden="true">
+          <div data-journey-progress aria-hidden="true">
             <i />
           </div>
         </div>

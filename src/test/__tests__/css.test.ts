@@ -28,7 +28,7 @@ beforeAll(() => {
     path.join(cartella, "primo.css"),
     [
       "/* LA TESTA */",
-      ":root { --carta: white; --carta: ivory; }",
+      ":root { --sheet-paper: white; --sheet-paper: ivory; }",
       "[data-a],",
       "[data-b] > i { color: red; padding: 1rem  2rem; }",
       "@media (max-width: 599px) {",
@@ -97,8 +97,8 @@ describe("il lettore del CSS", () => {
 
   it("il corpo e' una dichiarazione per riga, e fra le dichiarazioni vince l'ultima", () => {
     const [radice] = leggi(":root");
-    expect(radice.body).toBe("--carta: white;\n--carta: ivory;");
-    expect(radice.declarations).toEqual({ "--carta": "ivory" });
+    expect(radice.body).toBe("--sheet-paper: white;\n--sheet-paper: ivory;");
+    expect(radice.declarations).toEqual({ "--sheet-paper": "ivory" });
     expect(leggi("[data-c]")[1].body).toBe("display: grid !important;");
   });
 
