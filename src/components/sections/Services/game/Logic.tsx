@@ -2,10 +2,10 @@
 
 import { useState, type CSSProperties } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { numeroLivello, type LivelloProps } from "./levels";
-import { Icona, type IconaNodo } from "./icons";
-import { BOTTEGA, ILLUSTRAZIONI, VIEWBOX_ILLUSTRAZIONI, variabiliSito } from "./fakeSite";
-import { GIORNO_PIENO, Scena, TORTA_FINITA, type StatoNodo, type TestiScene } from "./logicScenes";
+import { levelNumber, type LevelProps } from "./levels";
+import { Icon, type NodeIcon } from "./icons";
+import { SHOP_PALETTE, ILLUSTRATIONS, ILLUSTRATION_VIEWBOX, siteVariables } from "./fakeSite";
+import { FULL_DAY, LogicScene, CAKE_DONE, type NodeState, type SceneCopy } from "./logicScenes";
 
 /**
  * Livello 2, dietro lo schermo. Si parte dalla schermata del Forno Aurora
@@ -28,7 +28,7 @@ type Nodo = {
   regola: { se: string; allora: string };
 };
 
-const ICONE: readonly IconaNodo[] = ["area", "catalogo", "prenotazioni", "pagamenti", "contatti", "gestionale"];
+const ICONE: readonly NodeIcon[] = ["area", "catalogo", "prenotazioni", "pagamenti", "contatti", "gestionale"];
 
 /** Dove stanno i sei nodi nel circuito, in percentuale: un anello. */
 const POS: readonly (readonly [number, number])[] = [
@@ -47,28 +47,28 @@ const FINE = ICONE.length;
 const dovePacco = (n: number): readonly [number, number] =>
   n === PARTENZA ? [50, -10] : n === FINE ? [50, 112] : POS[n];
 
-const vuoti = (): StatoNodo[] => ICONE.map(() => ({}));
+const vuoti = (): NodeState[] => ICONE.map(() => ({}));
 
-const STILE_SITO = variabiliSito(BOTTEGA.colori) as CSSProperties;
+const STILE_SITO = siteVariables(SHOP_PALETTE.colors) as CSSProperties;
 
-export function Logiche({ onAvanti }: LivelloProps) {
+export function Logic({ onNext: onAvanti }: LevelProps) {
   const t = useTranslations("services.gioco.logiche");
   const comune = useTranslations("services.gioco.comune");
   const locale = useLocale();
   const nodi = t.raw("nodi") as Nodo[];
-  const scene = t.raw("scene") as TestiScene;
+  const scene = t.raw("scene") as SceneCopy;
 
   // `n` e' dove sta l'ordine: PARTENZA, un nodo (0..5) o FINE.
   const [n, setN] = useState(PARTENZA);
-  const [stati, setStati] = useState<StatoNodo[]>(vuoti);
+  const [stati, setStati] = useState<NodeState[]>(vuoti);
   // Rotto in questa visita: su un nodo gia' fatto l'incidente si vede solo
   // appena rotto, e tornandoci non c'e' piu'.
   const [appena, setAppena] = useState(false);
 
   const s = stati[n] ?? {};
-  const rotti = stati.filter((x) => x.rotto).length;
+  const rotti = stati.filter((x) => x.broken).length;
 
-  const cambia = (dati: StatoNodo) => setStati((v) => v.map((x, i) => (i === n ? { ...x, ...dati } : x)));
+  const cambia = (dati: NodeState) => setStati((v) => v.map((x, i) => (i === n ? { ...x, ...dati } : x)));
 
   const vai = (i: number) => {
     setN(i);
@@ -76,18 +76,18 @@ export function Logiche({ onAvanti }: LivelloProps) {
   };
 
   const fai = () => {
-    cambia({ ok: true, ...(n === 1 && { scelta: 1 }), ...(n === 2 && { giorno: 5 }) });
+    cambia({ ok: true, ...(n === 1 && { choice: 1 }), ...(n === 2 && { day: 5 }) });
     setAppena(false);
   };
 
   const rompi = () => {
-    if (s.rotto) return;
-    cambia({ rotto: true });
+    if (s.broken) return;
+    cambia({ broken: true });
     setAppena(true);
     if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") navigator.vibrate([20, 40, 20]);
   };
 
-  const sceglie = (dati: StatoNodo) => {
+  const sceglie = (dati: NodeState) => {
     cambia({ ...dati, ok: true });
     setAppena(false);
   };
@@ -118,18 +118,18 @@ export function Logiche({ onAvanti }: LivelloProps) {
         </svg>
 
         <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: numeroLivello("logiche"), nome: comune("livelli.logiche") })}</span>
+          <span className="livello">{comune("etichetta", { numero: levelNumber("logiche"), nome: comune("livelli.logiche") })}</span>
           <span className="destra regole">
             {t("regole")}
             {stati.map((x, i) => (
-              <i key={i} className={x.rotto ? "si" : undefined} aria-hidden="true" />
+              <i key={i} className={x.broken ? "si" : undefined} aria-hidden="true" />
             ))}
           </span>
         </div>
 
         {nodi.map((nodo, i) => {
           const stato = stati[i];
-          const classi = ["nodo", i === n && "qui", stato.ok && "fatto", stato.rotto && "rotto"].filter(Boolean);
+          const classi = ["nodo", i === n && "qui", stato.ok && "fatto", stato.broken && "rotto"].filter(Boolean);
           return (
             <button
               key={i}
@@ -146,7 +146,7 @@ export function Logiche({ onAvanti }: LivelloProps) {
               }}
             >
               <span className="chip">
-                <Icona nome={ICONE[i]} />
+                <Icon name={ICONE[i]} />
                 <i className="num">{i + 1}</i>
               </span>
               <span className="nome">{nodo.nome}</span>
@@ -180,8 +180,8 @@ export function Logiche({ onAvanti }: LivelloProps) {
               <hr />
               <span>{t("fine.ordine")}</span>
               <span>
-                {scene.torte[stati[1].scelta ?? 1].nome.toLocaleUpperCase(locale)} ·{" "}
-                {(t.raw("fine.giorni") as string[])[stati[2].giorno ?? 5].toLocaleUpperCase(locale)}
+                {scene.torte[stati[1].choice ?? 1].nome.toLocaleUpperCase(locale)} ·{" "}
+                {(t.raw("fine.giorni") as string[])[stati[2].day ?? 5].toLocaleUpperCase(locale)}
               </span>
               <span>{t("fine.caparra")}</span>
               <hr />
@@ -202,7 +202,7 @@ export function Logiche({ onAvanti }: LivelloProps) {
         <div className="console">
           <div className="capo">
             <span className="chip">
-              <Icona nome={ICONE[n]} />
+              <Icon name={ICONE[n]} />
             </span>
             <div>
               <p className="mono">{t("nodo", { numero: n + 1, nome: nodi[n].nome })}</p>
@@ -212,7 +212,7 @@ export function Logiche({ onAvanti }: LivelloProps) {
           <p className="spiega">{nodi[n].spiega}</p>
           <div className="palco">
             {/* L'incidente prende il posto della scena, nella stessa scatola. */}
-            {s.rotto && (!s.ok || appena) ? (
+            {s.broken && (!s.ok || appena) ? (
               <div className="incidente" role="status">
                 <div className="errore">
                   <span aria-hidden="true">⚠</span>
@@ -235,14 +235,14 @@ export function Logiche({ onAvanti }: LivelloProps) {
               </div>
             ) : (
               <>
-                <Scena
-                  nodo={n}
-                  stato={s}
-                  testi={scene}
-                  onTorta={(i) => (i === TORTA_FINITA ? rompi() : sceglie({ scelta: i }))}
-                  onGiorno={(i) => (i === GIORNO_PIENO ? rompi() : sceglie({ giorno: i }))}
+                <LogicScene
+                  node={n}
+                  state={s}
+                  copy={scene}
+                  onCake={(i) => (i === CAKE_DONE ? rompi() : sceglie({ choice: i }))}
+                  onDay={(i) => (i === FULL_DAY ? rompi() : sceglie({ day: i }))}
                 />
-                {s.rotto && (
+                {s.broken && (
                   <span className="trovata">
                     <span aria-hidden="true">⚡ </span>
                     {t("trovata")}
@@ -251,9 +251,9 @@ export function Logiche({ onAvanti }: LivelloProps) {
               </>
             )}
           </div>
-          <div className={`azioni${s.ok && s.rotto ? "" : " due"}`}>
+          <div className={`azioni${s.ok && s.broken ? "" : " due"}`}>
             {s.ok ? (
-              <button type="button" className={s.rotto ? "solo" : "verde"} onClick={() => vai(n + 1)}>
+              <button type="button" className={s.broken ? "solo" : "verde"} onClick={() => vai(n + 1)}>
                 {n === FINE - 1 ? t("stampa") : t("avanti", { nome: nodi[n + 1].nome })} <b aria-hidden="true">→</b>
               </button>
             ) : (
@@ -262,10 +262,10 @@ export function Logiche({ onAvanti }: LivelloProps) {
                 {nodi[n].fai}
               </button>
             )}
-            {!(s.ok && s.rotto) && (
-              <button type="button" className="rompi" disabled={s.rotto} onClick={rompi}>
+            {!(s.ok && s.broken) && (
+              <button type="button" className="rompi" disabled={s.broken} onClick={rompi}>
                 <b aria-hidden="true">⚡</b>
-                {s.rotto ? t("giaRotto") : nodi[n].rompi}
+                {s.broken ? t("giaRotto") : nodi[n].rompi}
               </button>
             )}
           </div>
@@ -311,11 +311,11 @@ function Partenza({ onVia }: { onVia: () => void }) {
             </div>
             <div className="foto">
               <svg
-                viewBox={VIEWBOX_ILLUSTRAZIONI}
+                viewBox={ILLUSTRATION_VIEWBOX}
                 aria-hidden="true"
                 focusable="false"
                 // Il pane e' una stringa fissa di sitoFinto.ts, nessun dato da fuori.
-                dangerouslySetInnerHTML={{ __html: ILLUSTRAZIONI.pane }}
+                dangerouslySetInnerHTML={{ __html: ILLUSTRATIONS.pane }}
               />
             </div>
           </div>

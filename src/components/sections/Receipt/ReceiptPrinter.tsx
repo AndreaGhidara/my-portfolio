@@ -2,48 +2,48 @@
 
 import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useMotionLevel } from "@/animations/motionPolicy";
-import { due } from "@/lib/format";
-import { ScontrinoFigura, ScontrinoSchema } from "./ReceiptSchema";
+import { pad2 } from "@/lib/format";
+import { ReceiptFigure, ReceiptSchema } from "./ReceiptSchema";
 import {
-  CADUTA,
-  FIGURA,
-  INTERVALLO,
-  aScatti,
-  righeScontrino,
-  scattiAllaFigura,
-  scattiTotali,
-  stampante,
-  statoIniziale,
-  type Evento,
-  type Riga,
-  type Stampante,
+  DROP_MS,
+  FIGURE_MS,
+  TICK_MS,
+  linesAtTicks,
+  receiptLines,
+  ticksToFigure,
+  totalTicks,
+  printerReducer,
+  initialPrinter,
+  type PrinterEvent,
+  type ReceiptLine,
+  type PrinterState,
 } from "./receipt";
 
-export type ServizioStampabile = {
+export type PrintableService = {
   id: string;
-  titolo: string;
-  testo: string;
-  pezzi: string[];
+  title: string;
+  text: string;
+  pieces: string[];
   /** Il nome accessibile della tavola di questo servizio. */
-  disegno: string;
+  drawing: string;
 };
 
-export type TestiStampante = {
+export type PrinterCopy = {
   /** Sotto la stampante quando non c'e' uno scontrino. */
   hint: string;
   /** Il nome del gruppo dei tasti. */
-  tasti: string;
-  marca: string;
-  nome: string;
-  mestiere: string;
-  numero: string;
-  totale: string;
-  daParlarne: string;
-  parliamone: string;
-  strappa: string;
-  tavola: string;
-  scala: string;
-  firma: string;
+  keys: string;
+  brand: string;
+  name: string;
+  trade: string;
+  number: string;
+  total: string;
+  toDiscuss: string;
+  letsTalk: string;
+  tear: string;
+  plate: string;
+  scale: string;
+  signature: string;
 };
 
 /**
@@ -51,15 +51,15 @@ export type TestiStampante = {
  * classe; la figura e' il disegno del servizio, che il CSS mostra solo sul
  * telefono.
  */
-function Corpo({ righe, servizio }: { righe: Riga[]; servizio: ServizioStampabile }) {
+function Corpo({ righe, servizio }: { righe: ReceiptLine[]; servizio: PrintableService }) {
   return (
     <div data-scontrino-corpo aria-hidden="true">
       {righe.map((r, k) => (
-        <div key={k} data-riga={r.tipo}>
-          {r.tipo === "figura" ? (
-            <ScontrinoFigura forma={servizio.id} quanti={servizio.pezzi.length} />
+        <div key={k} data-riga={r.kind}>
+          {r.kind === "figura" ? (
+            <ReceiptFigure shape={servizio.id} count={servizio.pieces.length} />
           ) : (
-            r.testo
+            r.text
           )}
         </div>
       ))}
@@ -82,13 +82,13 @@ function Corpo({ righe, servizio }: { righe: Riga[]; servizio: ServizioStampabil
  * script). Stampare, strappare e cambiare servizio non cambiano mai l'altezza
  * della pagina, e le scene agganciate piu' sotto non si sfasano.
  */
-export function ScontrinoStampante({
-  servizi,
-  testi,
+export function ReceiptPrinter({
+  services: servizi,
+  copy: testi,
   locale,
 }: {
-  servizi: ServizioStampabile[];
-  testi: TestiStampante;
+  services: PrintableService[];
+  copy: PrinterCopy;
   locale: string;
 }) {
   const level = useMotionLevel();
@@ -112,35 +112,35 @@ export function ScontrinoStampante({
   const righe = useMemo(
     () =>
       servizi.map((s, indice) =>
-        righeScontrino({
-          nome: testi.nome,
-          mestiere: testi.mestiere,
-          data,
-          numero: testi.numero,
-          indice,
-          quanti: servizi.length,
-          titolo: s.titolo,
-          testo: s.testo,
-          pezzi: s.pezzi,
-          totale: testi.totale,
-          daParlarne: testi.daParlarne,
+        receiptLines({
+          name: testi.name,
+          trade: testi.trade,
+          date: data,
+          number: testi.number,
+          index: indice,
+          count: servizi.length,
+          title: s.title,
+          text: s.text,
+          pieces: s.pieces,
+          total: testi.total,
+          toDiscuss: testi.toDiscuss,
         }),
       ),
     [servizi, testi, data],
   );
-  const totali = useMemo(() => righe.map(scattiTotali), [righe]);
-  const soglie = useMemo(() => righe.map(scattiAllaFigura), [righe]);
+  const totali = useMemo(() => righe.map(totalTicks), [righe]);
+  const soglie = useMemo(() => righe.map(ticksToFigure), [righe]);
 
   const [stato, manda] = useReducer(
-    (s: Stampante, e: Evento) => stampante(s, e, totali),
+    (s: PrinterState, e: PrinterEvent) => printerReducer(s, e, totali),
     totali,
-    statoIniziale,
+    initialPrinter,
   );
 
   // Il livello cambia dopo il montaggio (e puo' cambiare ancora): spento,
   // quello che c'e' resta intero.
   useEffect(() => {
-    if (fermo) manda({ tipo: "completa" });
+    if (fermo) manda({ type: "completa" });
   }, [fermo]);
 
   /* Acceso, decide la prima osservazione della stampante. Gia' a meta' in
@@ -161,12 +161,12 @@ export function ScontrinoStampante({
             osservatore.disconnect();
             return;
           }
-          manda({ tipo: "svuota" });
+          manda({ type: "svuota" });
           return;
         }
         if (!dentro) return;
         osservatore.disconnect();
-        manda({ tipo: "autostampa" });
+        manda({ type: "autostampa" });
       },
       { threshold: 0.5 },
     );
@@ -176,19 +176,19 @@ export function ScontrinoStampante({
 
   // Il colpo che ha appena stampato la figura: la carta deve uscire sopra il disegno.
   const allaFigura =
-    stato.fase === "stampa" && stato.servizio !== null && stato.scatti === soglie[stato.servizio];
+    stato.phase === "stampa" && stato.service !== null && stato.ticks === soglie[stato.service];
 
   // I colpi gia' stampati, per il timer che riparte: letti al suo avvio, non
   // un motivo per rilanciarlo a ogni colpo.
-  const scattiOra = useRef(stato.scatti);
+  const scattiOra = useRef(stato.ticks);
   useLayoutEffect(() => {
-    scattiOra.current = stato.scatti;
-  }, [stato.scatti]);
+    scattiOra.current = stato.ticks;
+  }, [stato.ticks]);
 
   // I due tempi della stampante. Ognuno porta la generazione in cui e' nato:
   // se nel frattempo e' cambiata, il riduttore lo ignora.
   useEffect(() => {
-    if (stato.fase !== "stampa" || stato.servizio === null) return;
+    if (stato.phase !== "stampa" || stato.service === null) return;
     const gen = stato.gen;
     /* Sulla figura la stampa aspetta che la carta sia uscita. Solo se la
        figura si vede (il telefono): e' il CSS a deciderlo, e chiederlo al
@@ -196,7 +196,7 @@ export function ScontrinoStampante({
        fantasma, che c'e' sempre: sulla carta vera arriva solo con il suo colpo. */
     const figura = uscita.current?.querySelector<HTMLElement>('[data-fantasma] [data-riga="figura"]');
     const siVede = !!figura?.offsetHeight;
-    const soglia = soglie[stato.servizio];
+    const soglia = soglie[stato.service];
     let fatti = scattiOra.current;
     let colpo = 0;
     /* I colpi si contano qui, e il timer si ferma da solo nel colpo che
@@ -206,25 +206,25 @@ export function ScontrinoStampante({
     const batti = () => {
       colpo = window.setInterval(() => {
         fatti += 1;
-        manda({ tipo: "scatto", gen });
+        manda({ type: "scatto", gen });
         if (siVede && fatti === soglia) window.clearInterval(colpo);
-      }, INTERVALLO);
+      }, TICK_MS);
     };
     const aspetta = allaFigura && siVede;
-    const attesa = aspetta ? window.setTimeout(batti, FIGURA) : 0;
+    const attesa = aspetta ? window.setTimeout(batti, FIGURE_MS) : 0;
     if (!aspetta) batti();
     return () => {
       window.clearTimeout(attesa);
       window.clearInterval(colpo);
     };
-  }, [stato.fase, stato.gen, stato.servizio, soglie, allaFigura]);
+  }, [stato.phase, stato.gen, stato.service, soglie, allaFigura]);
 
   useEffect(() => {
-    if (stato.fase !== "strappo") return;
+    if (stato.phase !== "strappo") return;
     const gen = stato.gen;
-    const caduta = window.setTimeout(() => manda({ tipo: "caduto", gen }), CADUTA);
+    const caduta = window.setTimeout(() => manda({ type: "caduto", gen }), DROP_MS);
     return () => window.clearTimeout(caduta);
-  }, [stato.fase, stato.gen]);
+  }, [stato.phase, stato.gen]);
 
   /* La carta esce dalla fessura quanto e' stato stampato, prima del paint: la
      riga nuova non deve comparire per un fotogramma sotto il bordo. Parte da
@@ -236,58 +236,58 @@ export function ScontrinoStampante({
   useLayoutEffect(() => {
     const el = carta.current;
     if (!el) return;
-    if (stato.fase === "stampa") {
-      el.style.maxHeight = stato.scatti === 0 ? "0px" : `${el.scrollHeight + 4}px`;
+    if (stato.phase === "stampa") {
+      el.style.maxHeight = stato.ticks === 0 ? "0px" : `${el.scrollHeight + 4}px`;
       return;
     }
-    if (stato.fase !== "ferma") return;
+    if (stato.phase !== "ferma") return;
     if (!el.style.maxHeight) return;
     el.style.maxHeight = `${el.scrollHeight + 4}px`;
     const libera = () => el.style.removeProperty("max-height");
     const dopo = window.setTimeout(libera, 200);
     return () => window.clearTimeout(dopo);
-  }, [stato.fase, stato.scatti, stato.tracciato]);
+  }, [stato.phase, stato.ticks, stato.traced]);
 
-  const premi = (servizio: number) => manda({ tipo: "premi", servizio, subito: fermo });
+  const premi = (servizio: number) => manda({ type: "premi", service: servizio, immediate: fermo });
 
   const strappa = () => {
-    const premuto = stato.servizio;
-    manda({ tipo: "strappa", subito: fermo });
+    const premuto = stato.service;
+    manda({ type: "strappa", immediate: fermo });
     // Il bottone se ne va con lo scontrino: il fuoco torna al tasto che l'ha stampato.
     if (premuto !== null) tasti.current[premuto]?.focus({ preventScroll: true });
   };
 
-  const sulTasto = stato.fase === "strappo" ? stato.poi : stato.servizio;
-  const inCarta = stato.servizio === null ? null : servizi[stato.servizio];
-  const finito = stato.servizio !== null && stato.scatti >= (totali[stato.servizio] ?? 0);
-  const disegnato = servizi[stato.disegno] ?? servizi[0];
+  const sulTasto = stato.phase === "strappo" ? stato.next : stato.service;
+  const inCarta = stato.service === null ? null : servizi[stato.service];
+  const finito = stato.service !== null && stato.ticks >= (totali[stato.service] ?? 0);
+  const disegnato = servizi[stato.drawing] ?? servizi[0];
   const annuncio =
-    inCarta && stato.fase !== "strappo"
-      ? `${inCarta.titolo}. ${inCarta.testo} ${inCarta.pezzi.join(", ")}.`
+    inCarta && stato.phase !== "strappo"
+      ? `${inCarta.title}. ${inCarta.text} ${inCarta.pieces.join(", ")}.`
       : "";
 
   return (
     <>
       <div data-scontrino-oggetto>
         {disegnato && (
-          <ScontrinoSchema
-            key={stato.tracciato}
-            forma={disegnato.id}
-            titolo={disegnato.titolo}
-            pezzi={disegnato.pezzi}
-            etichetta={disegnato.disegno}
-            numero={due(stato.disegno + 1)}
-            anima={!fermo}
-            aspetta={stato.tavolaVuota}
-            tavola={testi.tavola}
-            scala={testi.scala}
-            firma={testi.firma}
+          <ReceiptSchema
+            key={stato.traced}
+            shape={disegnato.id}
+            title={disegnato.title}
+            pieces={disegnato.pieces}
+            label={disegnato.drawing}
+            number={pad2(stato.drawing + 1)}
+            animate={!fermo}
+            wait={stato.emptyPlate}
+            plate={testi.plate}
+            scale={testi.scale}
+            signature={testi.signature}
           />
         )}
       </div>
 
       <div data-scontrino-banco>
-        <div role="group" aria-label={testi.tasti} data-scontrino-tasti>
+        <div role="group" aria-label={testi.keys} data-scontrino-tasti>
           {servizi.map((s, i) => (
             <button
               key={s.id}
@@ -299,8 +299,8 @@ export function ScontrinoStampante({
               aria-pressed={sulTasto === i}
               onClick={() => premi(i)}
             >
-              <span aria-hidden="true">{due(i + 1)}</span>
-              {s.titolo}
+              <span aria-hidden="true">{pad2(i + 1)}</span>
+              {s.title}
             </button>
           ))}
         </div>
@@ -308,10 +308,10 @@ export function ScontrinoStampante({
         <div
           ref={macchina}
           data-scontrino-macchina
-          data-lavora={stato.fase === "stampa" ? "" : undefined}
+          data-lavora={stato.phase === "stampa" ? "" : undefined}
           aria-hidden="true"
         >
-          <span data-marca>{testi.marca}</span>
+          <span data-marca>{testi.brand}</span>
           <span data-spia />
           <span data-fessura />
         </div>
@@ -324,41 +324,41 @@ export function ScontrinoStampante({
             <div key={servizi[i].id} data-scontrino-carta data-fantasma aria-hidden="true">
               <Corpo righe={r} servizio={servizi[i]} />
               <div data-scontrino-azioni>
-                <span>{testi.parliamone}</span>
-                <span>{testi.strappa}</span>
+                <span>{testi.letsTalk}</span>
+                <span>{testi.tear}</span>
               </div>
             </div>
           ))}
 
-          {stato.servizio !== null && (
+          {stato.service !== null && (
             <div
-              key={stato.tracciato}
+              key={stato.traced}
               ref={carta}
               data-scontrino-carta
-              data-fase={stato.fase}
+              data-fase={stato.phase}
               data-finito={finito ? "" : undefined}
               // Sopra la figura la carta esce in tutto il tempo dell'attesa, a
               // velocita' costante: e' cosi' che il disegno sembra stampato.
               // Scritto qui e non nel CSS perche' resti uguale a FIGURA.
-              style={allaFigura ? { transitionDuration: `${FIGURA}ms` } : undefined}
+              style={allaFigura ? { transitionDuration: `${FIGURE_MS}ms` } : undefined}
             >
               <Corpo
-                righe={aScatti(righe[stato.servizio], stato.scatti)}
-                servizio={servizi[stato.servizio]}
+                righe={linesAtTicks(righe[stato.service], stato.ticks)}
+                servizio={servizi[stato.service]}
               />
               {/* Fuori portata finche' la stampa non e' finita: fino ad allora
                   sono fuori dal flusso (sezioni/scontrino.css), e un fuoco su un bottone
                   che non si vede non serve a nessuno. */}
-              <div data-scontrino-azioni inert={stato.fase !== "ferma"}>
-                <a href="#contact">{testi.parliamone}</a>
+              <div data-scontrino-azioni inert={stato.phase !== "ferma"}>
+                <a href="#contact">{testi.letsTalk}</a>
                 <button type="button" onClick={strappa}>
-                  {testi.strappa}
+                  {testi.tear}
                 </button>
               </div>
             </div>
           )}
 
-          {stato.servizio === null && <p data-scontrino-invito>{testi.hint}</p>}
+          {stato.service === null && <p data-scontrino-invito>{testi.hint}</p>}
 
           {/* Il servizio stampato si annuncia una volta, intero: la stampa a
               colpi e' per gli occhi, e letta cosi' sarebbe un balbettio. */}

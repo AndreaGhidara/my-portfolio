@@ -2,19 +2,19 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
-import { numeroLivello, type LivelloProps } from "./levels";
-import { Icona } from "./icons";
+import { levelNumber, type LevelProps } from "./levels";
+import { Icon } from "./icons";
 import {
-  CARATTERI_FINTI,
-  IMPAGINAZIONI_FINTE,
-  PALETTE_FINTE,
-  SCALA_INIZIALE,
-  SCALE_FINTE,
-  variabiliSito,
+  FAKE_FONTS,
+  FAKE_LAYOUTS,
+  FAKE_PALETTES,
+  INITIAL_SCALE,
+  FAKE_SCALES,
+  siteVariables,
 } from "./fakeSite";
-import { SitoFinto } from "./screenSite";
-import { ATTREZZI, Cassetto, type IdAttrezzo, type Scelte } from "./screenDrawer";
-import { Dietro } from "./screenBack";
+import { FakeSite } from "./screenSite";
+import { DRAWER_TOOLS, Drawer, type DrawerToolId, type Choices } from "./screenDrawer";
+import { ScreenBack } from "./screenBack";
 
 /**
  * Livello 1, lo schermo. Sotto il portatile sei attrezzi cambiano davvero la
@@ -28,13 +28,13 @@ import { Dietro } from "./screenBack";
  * schermo si fermano, e al rientro ripartono da capo.
  */
 
-const INIZIALI: Scelte = {
+const INIZIALI: Choices = {
   palette: 0,
-  caratteri: 0,
-  scala: SCALE_FINTE.indexOf(SCALA_INIZIALE),
-  impaginazione: 0,
+  fonts: 0,
+  scale: FAKE_SCALES.indexOf(INITIAL_SCALE),
+  layout: 0,
   img: "pane",
-  vista: "pc",
+  view: "pc",
 };
 
 const DOPO_ATTREZZI = 400;
@@ -49,10 +49,10 @@ const VITI = [
   { x: "calc(100% - 1rem)", y: "calc(100% - 1rem)" },
 ].map((v, i) => ({ ...v, r: `${30 + i * 40}deg` }));
 
-type Lampo = { campo: IdAttrezzo; n: number };
+type Lampo = { campo: DrawerToolId; n: number };
 
 /** Dove lampeggia la landing dopo una scelta: il punto appena cambiato. */
-function bersaglio(sito: HTMLElement, campo: IdAttrezzo): Element | null {
+function bersaglio(sito: HTMLElement, campo: DrawerToolId): Element | null {
   if (campo === "caratteri" || campo === "testi") return sito.querySelector("[data-titolo]");
   if (campo === "immagini") return sito.querySelector("[data-img]");
   if (campo === "telefono") return null;
@@ -63,26 +63,26 @@ function bersaglio(sito: HTMLElement, campo: IdAttrezzo): Element | null {
  * «Ricomincia», nell'anteprima del circuito, rifa' il livello da capo: si
  * rimonta il banco, e con lui spariscono stato e timer.
  */
-export function Schermo(props: LivelloProps) {
+export function Screen(props: LevelProps) {
   const [giro, setGiro] = useState(0);
   return <Banco key={giro} {...props} onRicomincia={() => setGiro((g) => g + 1)} />;
 }
 
-function Banco({ onAvanti, visibile, onRicomincia }: LivelloProps & { onRicomincia: () => void }) {
+function Banco({ onNext: onAvanti, visible: visibile, onRicomincia }: LevelProps & { onRicomincia: () => void }) {
   const t = useTranslations("services.gioco.schermo");
   const comune = useTranslations("services.gioco.comune");
 
-  const [scelte, setScelte] = useState<Scelte>(INIZIALI);
-  const [attivo, setAttivo] = useState<IdAttrezzo>("colori");
-  const [fatti, setFatti] = useState<readonly IdAttrezzo[]>([]);
+  const [scelte, setScelte] = useState<Choices>(INIZIALI);
+  const [attivo, setAttivo] = useState<DrawerToolId>("colori");
+  const [fatti, setFatti] = useState<readonly DrawerToolId[]>([]);
   const [pronto, setPronto] = useState(false);
   const [svitate, setSvitate] = useState<readonly boolean[]>(() => VITI.map(() => false));
   const [dietro, setDietro] = useState(false);
   const [lampo, setLampo] = useState<Lampo | null>(null);
 
-  const tuttiFatti = fatti.length === ATTREZZI.length;
+  const tuttiFatti = fatti.length === DRAWER_TOOLS.length;
   const aperto = svitate.every(Boolean);
-  const sulTelefono = scelte.vista === "cell";
+  const sulTelefono = scelte.view === "cell";
 
   // Il guscio passa una funzione nuova a ogni render: il timer dei 2,8 s non
   // deve ripartire per questo, solo quando cambia la visibilita'.
@@ -122,7 +122,7 @@ function Banco({ onAvanti, visibile, onRicomincia }: LivelloProps & { onRicominc
     }
   }, [lampo]);
 
-  const scegli = <C extends keyof Scelte>(campo: C, valore: Scelte[C]) => {
+  const scegli = <C extends keyof Choices>(campo: C, valore: Choices[C]) => {
     setScelte((s) => ({ ...s, [campo]: valore }));
     setFatti((f) => (f.includes(attivo) ? f : [...f, attivo]));
     setLampo((l) => ({ campo: attivo, n: (l?.n ?? 0) + 1 }));
@@ -130,9 +130,9 @@ function Banco({ onAvanti, visibile, onRicomincia }: LivelloProps & { onRicominc
 
   // Le viti stanno sul portatile: un attrezzo che non e' il telefono riporta
   // la vista al computer.
-  const apri = (k: IdAttrezzo) => {
+  const apri = (k: DrawerToolId) => {
     setAttivo(k);
-    if (k !== "telefono" && sulTelefono) setScelte((s) => ({ ...s, vista: "pc" }));
+    if (k !== "telefono" && sulTelefono) setScelte((s) => ({ ...s, view: "pc" }));
   };
 
   const svita = (i: number) => setSvitate((v) => v.map((x, j) => x || j === i));
@@ -145,27 +145,27 @@ function Banco({ onAvanti, visibile, onRicomincia }: LivelloProps & { onRicominc
         : null;
 
   const sito = {
-    impaginazione: IMPAGINAZIONI_FINTE[scelte.impaginazione].id,
-    illustrazione: scelte.img,
-    coppia: CARATTERI_FINTI[scelte.caratteri],
-    scala: SCALE_FINTE[scelte.scala],
+    layout: FAKE_LAYOUTS[scelte.layout].id,
+    illustration: scelte.img,
+    pair: FAKE_FONTS[scelte.fonts],
+    scale: FAKE_SCALES[scelte.scale],
   };
 
   return (
     <div
       className="banco"
       data-gioco-livello="schermo"
-      data-vista={scelte.vista}
+      data-vista={scelte.view}
       data-pronto={pronto || undefined}
       data-aperto={aperto || undefined}
       data-dietro={dietro || undefined}
-      style={variabiliSito(PALETTE_FINTE[scelte.palette].colori) as CSSProperties}
+      style={siteVariables(FAKE_PALETTES[scelte.palette].colors) as CSSProperties}
     >
       <div className="passo-1" inert={dietro}>
         <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: numeroLivello("schermo"), nome: comune("livelli.schermo") })}</span>
+          <span className="livello">{comune("etichetta", { numero: levelNumber("schermo"), nome: comune("livelli.schermo") })}</span>
           <span className="pallini" aria-hidden="true">
-            {ATTREZZI.map((a, i) => (
+            {DRAWER_TOOLS.map((a, i) => (
               <i key={a} className={i < fatti.length ? "si" : undefined} />
             ))}
           </span>
@@ -174,7 +174,7 @@ function Banco({ onAvanti, visibile, onRicomincia }: LivelloProps & { onRicominc
         <div className="portatile" inert={sulTelefono}>
           <div className="cornice-pc">
             <div className="schermo">
-              <SitoFinto ref={sitoPc} {...sito} />
+              <FakeSite ref={sitoPc} {...sito} />
             </div>
             {pronto &&
               VITI.map((v, i) => (
@@ -194,12 +194,12 @@ function Banco({ onAvanti, visibile, onRicomincia }: LivelloProps & { onRicominc
 
         <div className="cell" inert={!sulTelefono}>
           <div className="schermo">
-            <SitoFinto ref={sitoCell} {...sito} />
+            <FakeSite ref={sitoCell} {...sito} />
           </div>
         </div>
 
         <div className="attrezzi" role="group" aria-label={t("attrezzi")}>
-          {ATTREZZI.map((a) => (
+          {DRAWER_TOOLS.map((a) => (
             <button
               key={a}
               type="button"
@@ -207,23 +207,23 @@ function Banco({ onAvanti, visibile, onRicomincia }: LivelloProps & { onRicominc
               className={fatti.includes(a) ? "fatto" : undefined}
               onClick={() => apri(a)}
             >
-              <Icona nome={a} />
+              <Icon name={a} />
               {t(`attrezzo.${a}.nome`)}
             </button>
           ))}
         </div>
 
-        <Cassetto
-          attivo={attivo}
-          scelte={scelte}
-          provato={fatti.includes(attivo)}
-          messaggio={messaggio}
-          onScegli={scegli}
+        <Drawer
+          active={attivo}
+          choices={scelte}
+          tried={fatti.includes(attivo)}
+          message={messaggio}
+          onChoose={scegli}
         />
       </div>
 
       <div className="passo-2" inert={!dietro}>
-        {aperto && <Dietro onRicomincia={onRicomincia} />}
+        {aperto && <ScreenBack onRestart={onRicomincia} />}
       </div>
     </div>
   );

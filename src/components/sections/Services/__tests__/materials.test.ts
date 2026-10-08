@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { contrastRatio } from "@/styles/contrast";
 import { palette } from "@/styles/palette";
-import { regole } from "@/test/css";
+import { rules } from "@/test/css";
 import {
   LEDS,
   SURFACES,
@@ -161,7 +161,7 @@ describe("la scala dei materiali", () => {
  *  dentro `[data-theme="dark"] [data-desk-shape]`. Le ancore di materials.ts
  *  finiscono con la graffa o con la virgola della lista: si tolgono. */
 function blocco(selettore: string): string | null {
-  return regole(selettore.replace(/\s*[{,]\s*$/, ""))[0]?.corpo ?? null;
+  return rules(selettore.replace(/\s*[{,]\s*$/, ""))[0]?.body ?? null;
 }
 
 function pretende(selettore: string): string {
@@ -224,7 +224,7 @@ describe("il CSS dichiara esattamente la tavola dei materiali", () => {
     const led = pretende("[data-desk-leds] {");
     expect(led).toContain(recipeCss(LEDS.on));
     expect(led).toContain(recipeCss(LEDS.off));
-    expect(regole(/\[data-theme="dark"\] \[data-desk-leds\]/)).toEqual([]);
+    expect(rules(/\[data-theme="dark"\] \[data-desk-leds\]/)).toEqual([]);
   });
 
   it("i led sono ritagliati sulla sagoma che li porta", () => {
@@ -247,9 +247,9 @@ describe("l'ombra sta sulle superfici e su niente altro", () => {
     // Tutte le regole del sito, anche la prima di ogni media query: l'ombra
     // delle palline di carta dell'apertura c'e', ma il tavolo e' quello che
     // conta qui, e le palline non sono una superficie del tavolo.
-    const conOmbra = regole()
-      .filter((r) => /drop-shadow/.test(r.corpo))
-      .map((r) => r.selettore)
+    const conOmbra = rules()
+      .filter((r) => /drop-shadow/.test(r.body))
+      .map((r) => r.selector)
       .filter((selettore) => /\[data-desk/.test(selettore));
     expect(conOmbra).toEqual(["[data-desk-shape]"]);
   });

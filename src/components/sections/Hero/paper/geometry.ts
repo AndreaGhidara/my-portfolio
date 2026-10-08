@@ -8,10 +8,10 @@
  * disegnava le lettere specchiate.
  */
 
-export type Punto = { x: number; y: number };
+export type PaperPoint = { x: number; y: number };
 
 /** Una terna di vertici. */
-export type Terna = readonly [Punto, Punto, Punto];
+export type Triple = readonly [PaperPoint, PaperPoint, PaperPoint];
 
 /** I sei numeri di `CanvasRenderingContext2D.transform`. */
 export type Affine = readonly [number, number, number, number, number, number];
@@ -28,7 +28,7 @@ export type Affine = readonly [number, number, number, number, number, number];
  *
  * `null` quando il triangolo sorgente e' degenere: non c'e' niente da mappare.
  */
-export function mappaAffine(s: Terna, d: Terna): Affine | null {
+export function affineMap(s: Triple, d: Triple): Affine | null {
   const [{ x: x0, y: y0 }, { x: x1, y: y1 }, { x: x2, y: y2 }] = s;
   const [{ x: u0, y: v0 }, { x: u1, y: v1 }, { x: u2, y: v2 }] = d;
   const D = x0 * (y1 - y2) + x1 * (y2 - y0) + x2 * (y0 - y1);
@@ -44,7 +44,7 @@ export function mappaAffine(s: Terna, d: Terna): Affine | null {
 }
 
 /** Celle per lato della maglia. Dodici: sotto si vedono le facce, sopra si paga. */
-export const LATO = 12;
+export const GRID_SIDE = 12;
 
 /**
  * Il raggio della pallina, in frazione del lato del foglio. Da qui esce un
@@ -52,7 +52,7 @@ export const LATO = 12;
  * pallina si legge come pallina: a 0,46 (la prima stesura) il foglio
  * restava un quadrato rimpicciolito.
  */
-export const RAGGIO = 0.205;
+export const RADIUS = 0.205;
 
 /** Quanto il foglio si attorciglia mentre collassa, in radianti. */
 const TORSIONE = 2.6;
@@ -64,7 +64,7 @@ export function rng(seme: number): () => number {
   return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 }
 
-export function lisci(t: number): number {
+export function smooth(t: number): number {
   return t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
 }
 
@@ -73,7 +73,7 @@ export function lisci(t: number): number {
  * La grana grossa e' voluta: e' quella che tiene insieme le facce, cosi' la
  * carta si piega a pezzi invece di sbriciolarsi.
  */
-export function campo(r: () => number, n: number): (u: number, w: number) => number {
+export function noiseField(r: () => number, n: number): (u: number, w: number) => number {
   const g: number[] = [];
   for (let i = 0; i < (n + 1) * (n + 1); i++) g.push(r());
   return (u, w) => {
@@ -81,8 +81,8 @@ export function campo(r: () => number, n: number): (u: number, w: number) => num
     const y = w * n;
     const a = Math.min(n - 1, Math.floor(x));
     const b = Math.min(n - 1, Math.floor(y));
-    const fx = lisci(x - a);
-    const fy = lisci(y - b);
+    const fx = smooth(x - a);
+    const fy = smooth(y - b);
     const p = g[b * (n + 1) + a];
     const q = g[b * (n + 1) + a + 1];
     const s = g[(b + 1) * (n + 1) + a];
@@ -91,7 +91,7 @@ export function campo(r: () => number, n: number): (u: number, w: number) => num
   };
 }
 
-export type Vertice = {
+export type Vertex = {
   /** Dove sta il vertice sul foglio disteso, in 0..1. */
   u: number;
   w: number;
@@ -115,23 +115,23 @@ export type Vertice = {
  * pallina smette di essere leggibile, che e' tutto il punto. Una prova misura
  * quella scorrelazione, perche' e' la proprieta' e non un dettaglio.
  */
-export function maglia(seme: number): Vertice[] {
+export function buildMesh(seme: number): Vertex[] {
   const r = rng(seme);
-  const cZ = campo(r, 3);
-  const cR = campo(r, 3);
-  const cA = campo(r, 4);
-  const v: Vertice[] = [];
-  for (let j = 0; j <= LATO; j++) {
-    for (let i = 0; i <= LATO; i++) {
-      const u = i / LATO;
-      const w = j / LATO;
+  const cZ = noiseField(r, 3);
+  const cR = noiseField(r, 3);
+  const cA = noiseField(r, 4);
+  const v: Vertex[] = [];
+  for (let j = 0; j <= GRID_SIDE; j++) {
+    for (let i = 0; i <= GRID_SIDE; i++) {
+      const u = i / GRID_SIDE;
+      const w = j / GRID_SIDE;
       const ang = Math.atan2(w - 0.5, u - 0.5) + (cA(u, w) - 0.5) * TORSIONE;
       const rr = 0.18 + 0.82 * cR(u, w);
       v.push({
         u,
         w,
-        bx: Math.cos(ang) * RAGGIO * rr,
-        by: Math.sin(ang) * RAGGIO * rr,
+        bx: Math.cos(ang) * RADIUS * rr,
+        by: Math.sin(ang) * RADIUS * rr,
         z: cZ(u, w),
         ritardo: r() * 0.4,
       });
@@ -140,17 +140,17 @@ export function maglia(seme: number): Vertice[] {
   return v;
 }
 
-export type Posato = Punto & { z: number };
+export type Placed = PaperPoint & { z: number };
 
 /** Dove sta ogni vertice a un dato grado di accartocciamento. */
-export function posizioni(
-  mesh: readonly Vertice[],
+export function positions(
+  mesh: readonly Vertex[],
   t: number,
-  centro: Punto,
+  centro: PaperPoint,
   lato: number,
-): Posato[] {
+): Placed[] {
   return mesh.map((v) => {
-    const tt = lisci(Math.max(0, (t - v.ritardo) / (1 - v.ritardo)));
+    const tt = smooth(Math.max(0, (t - v.ritardo) / (1 - v.ritardo)));
     const px = v.u - 0.5;
     const py = v.w - 0.5;
     return {
@@ -161,7 +161,7 @@ export function posizioni(
   });
 }
 
-export type Cella = { i: number; j: number; z: number };
+export type Cell = { i: number; j: number; z: number };
 
 /**
  * Le celle dalla piu' lontana alla piu' vicina.
@@ -170,11 +170,11 @@ export type Cella = { i: number; j: number; z: number };
  * risultato e' un collage piatto: e' l'ordinamento in profondita' (piu'
  * dell'ombra) a far leggere una pallina invece di un'immagine schiacciata.
  */
-export function celleInProfondita(punti: readonly Posato[]): Cella[] {
-  const celle: Cella[] = [];
-  const a = (i: number, j: number) => punti[j * (LATO + 1) + i].z;
-  for (let j = 0; j < LATO; j++) {
-    for (let i = 0; i < LATO; i++) {
+export function cellsByDepth(punti: readonly Placed[]): Cell[] {
+  const celle: Cell[] = [];
+  const a = (i: number, j: number) => punti[j * (GRID_SIDE + 1) + i].z;
+  for (let j = 0; j < GRID_SIDE; j++) {
+    for (let i = 0; i < GRID_SIDE; i++) {
       celle.push({ i, j, z: (a(i, j) + a(i + 1, j) + a(i + 1, j + 1) + a(i, j + 1)) / 4 });
     }
   }
@@ -182,7 +182,7 @@ export function celleInProfondita(punti: readonly Posato[]): Cella[] {
 }
 
 /** Quanti gradini di opacita' del foglio si tengono in cache. */
-export const GRADINI = 5;
+export const SHADE_STEPS = 5;
 
 /**
  * Quanto si vede il foglio a un dato grado di piega, come indice di gradino.
@@ -192,6 +192,6 @@ export const GRADINI = 5;
  * piegandosi che prende luce. Disegnata subito era un quadrato del colore
  * della pagina, e se ne vedeva solo il bordo piegarsi: era il difetto.
  */
-export function veloPer(t: number): number {
-  return Math.round(lisci(Math.max(0, (t - 0.3) / 0.35)) * (GRADINI - 1));
+export function veilFor(t: number): number {
+  return Math.round(smooth(Math.max(0, (t - 0.3) / 0.35)) * (SHADE_STEPS - 1));
 }

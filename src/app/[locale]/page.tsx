@@ -1,11 +1,11 @@
 import { setRequestLocale } from "next-intl/server";
 import { Hero } from "@/components/sections/Hero";
-import { SottoIlFoglio } from "@/components/sections/Hero/UnderSheet";
-import { Scontrino } from "@/components/sections/Receipt";
+import { UnderSheet } from "@/components/sections/Hero/UnderSheet";
+import { Receipt } from "@/components/sections/Receipt";
 import { Services } from "@/components/sections/Services";
 import { Works } from "@/components/sections/Works";
 import { Journey } from "@/components/sections/Journey";
-import { Notizie } from "@/components/sections/News";
+import { News } from "@/components/sections/News";
 import { Contact } from "@/components/sections/Contact";
 
 /**
@@ -35,17 +35,17 @@ export default async function Home({
       {/* Insieme, e solo loro: Hero si ferma e la stampante gli passa sopra, e lo
           sticky di Hero finisce dove finisce questo contenitore. Dentro <main>
           resterebbe incollato dietro tutte le sezioni fino in fondo. */}
-      <SottoIlFoglio>
+      <UnderSheet>
         <Hero />
-        <Scontrino />
-      </SottoIlFoglio>
+        <Receipt />
+      </UnderSheet>
       <Services />
       <Works />
       {/* «Come possiamo proseguire» (Process) e' nascosta per scelta, non tolta:
           componente, testi e prove restano. Per rimetterla basta riportare qui
           <Process /> (import da "@/components/sections/Process"). */}
       <Journey />
-      <Notizie />
+      <News />
       <Contact />
     </>
   );

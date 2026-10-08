@@ -1,10 +1,10 @@
 import { StrictMode } from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { act, fireEvent, screen, within } from "@testing-library/react";
-import { renderConTesti } from "@/test/renderWithMessages";
+import { renderWithMessages } from "@/test/renderWithMessages";
 import it_ from "../../../../../../messages/it.json";
 import en_ from "../../../../../../messages/en.json";
-import { Pannello, SEQUENZA } from "../Panel";
+import { Panel, SEQUENCE } from "../Panel";
 
 const p = it_.services.gioco.pannello;
 
@@ -31,15 +31,15 @@ afterEach(() => {
 
 const monta = (props: Partial<{ onAvanti: () => void; visibile: boolean }> = {}) => {
   const onAvanti = props.onAvanti ?? vi.fn();
-  const r = renderConTesti(
+  const r = renderWithMessages(
     <StrictMode>
-      <Pannello onAvanti={onAvanti} visibile={props.visibile ?? true} />
+      <Panel onNext={onAvanti} visible={props.visibile ?? true} />
     </StrictMode>,
   );
   const visibile = (v: boolean) =>
     r.rerender(
       <StrictMode>
-        <Pannello onAvanti={onAvanti} visibile={v} />
+        <Panel onNext={onAvanti} visible={v} />
       </StrictMode>,
     );
   return { ...r, onAvanti, visibile };
@@ -47,8 +47,8 @@ const monta = (props: Partial<{ onAvanti: () => void; visibile: boolean }> = {})
 
 describe("il pannello, i testi", () => {
   it("gli avvisi dei messaggi sono tanti quanti la sequenza dei servizi, in tutte e due le lingue", () => {
-    expect(p.eventi).toHaveLength(SEQUENZA.length);
-    expect(en_.services.gioco.pannello.eventi).toHaveLength(SEQUENZA.length);
+    expect(p.eventi).toHaveLength(SEQUENCE.length);
+    expect(en_.services.gioco.pannello.eventi).toHaveLength(SEQUENCE.length);
   });
 });
 
@@ -166,7 +166,7 @@ describe("il pannello, fuori dallo schermo", () => {
 
 describe("il pannello, il resoconto", () => {
   const risolviTutto = (container: HTMLElement) => {
-    for (const [i, servizio] of SEQUENZA.entries()) {
+    for (const [i, servizio] of SEQUENCE.entries()) {
       passa(i === 0 ? 1400 : 2600);
       tocca(modulo(p.servizi[servizio]));
       tocca(
@@ -213,7 +213,7 @@ describe("il pannello, il resoconto", () => {
 
   it("in inglese il resoconto parla inglese", () => {
     const pe = en_.services.gioco.pannello;
-      renderConTesti(<Pannello onAvanti={vi.fn()} visibile />, { locale: "en" });
+      renderWithMessages(<Panel onNext={vi.fn()} visible />, { locale: "en" });
     tocca(screen.getByRole("button", { name: new RegExp(pe.spento.accendi) }));
     passa(1400);
     expect(screen.getByText(pe.acceso.spia.titolo)).toBeInTheDocument();

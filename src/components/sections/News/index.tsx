@@ -1,18 +1,18 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { NotizieView } from "./NewsView";
-import { testiNotizie } from "./copy";
+import { NewsView } from "./NewsView";
+import { newsCopy } from "./copy";
 
-export async function Notizie() {
+export async function News() {
   const t = await getTranslations("notizie");
   const locale = await getLocale();
 
   return (
-    <NotizieView
+    <NewsView
       eyebrow={t("eyebrow")}
       title={t("title")}
       intro={t("intro")}
       locale={locale}
-      testi={testiNotizie(t)}
+      copy={newsCopy(t)}
     />
   );
 }

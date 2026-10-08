@@ -37,7 +37,7 @@
  * dentro la zona che si guarda, e anticipare un po' evita che il contenuto si
  * faccia aspettare su un monitor alto.
  */
-export const INIZIO_ENTRATA = {
-  pieno: "top 82%",
-  ridotto: "top 72%",
+export const ENTRANCE_START = {
+  full: "top 82%",
+  reduced: "top 72%",
 } as const;

@@ -4,7 +4,7 @@ import { deskLayers, type SampleId } from "@/content/desk";
 import { metricById } from "@/content/metrics";
 import { DeskTable, type DeskLayerData } from "../DeskTable";
 import { SPECIMENS } from "../DeskSpecimen";
-import { regole } from "@/test/css";
+import { rules } from "@/test/css";
 
 /**
  * I due oggetti che un campione onesto non ce l'hanno, e perche'.
@@ -204,7 +204,7 @@ describe("di che colore sono", () => {
     // "I colori" sono i token del brand, che e' esattamente il motivo per cui
     // quel campione e' onesto.
     const colpevoli: string[] = [];
-    for (const { selettore, corpo } of regole(/data-desk-sample/)) {
+    for (const { selector: selettore, body: corpo } of rules(/data-desk-sample/)) {
       const hex = corpo.match(/#[0-9a-fA-F]{3,8}\b/g);
       if (hex) colpevoli.push(`${selettore} → ${hex.join(", ")}`);
     }
@@ -220,7 +220,7 @@ describe("di che colore sono", () => {
     // uno <i data-m="qualcosa"> mai dichiarato e' un elemento largo zero, che si
     // disegna, non si vede, e che nessuna prova di rendering sa distinguere da
     // un elemento disegnato bene.
-    const selettori = regole().map((r) => r.selettore);
+    const selettori = rules().map((r) => r.selector);
     const orfane = new Set<string>();
     for (const [id, disegno] of Object.entries(SPECIMENS)) {
       const { container } = render(<span data-desk-sample={id}>{disegno}</span>);

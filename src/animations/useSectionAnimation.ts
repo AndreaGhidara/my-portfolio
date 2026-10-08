@@ -2,11 +2,11 @@
 
 import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import { useMotionLevel, type MotionLevel } from "./motionPolicy";
-import { quandoLibero } from "./whenIdle";
+import { whenIdle } from "./whenIdle";
 import type * as Presets from "./presets";
 
 /** Quello che una sezione riceve per costruire le sue animazioni. */
-export type Scena = {
+export type SectionScene = {
   level: MotionLevel;
   gsap: typeof import("./gsap").gsap;
   ScrollTrigger: typeof import("./gsap").ScrollTrigger;
@@ -45,7 +45,7 @@ export type Scena = {
 const useEffettoDiLayout = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function useSectionAnimation(
-  build: (scena: Scena) => void | (() => void),
+  build: (scena: SectionScene) => void | (() => void),
   scope: RefObject<HTMLElement | null>,
   /** Dipendenze aggiuntive oltre al livello di movimento. */
   deps: unknown[] = [],
@@ -78,7 +78,7 @@ export function useSectionAnimation(
       }, scope.current ?? undefined);
     };
 
-    const annulla = quandoLibero(() => void avvia());
+    const annulla = whenIdle(() => void avvia());
 
     return () => {
       vivo = false;

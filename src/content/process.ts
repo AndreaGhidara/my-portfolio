@@ -17,7 +17,7 @@ import type { DeskShape } from "./desk";
 export type ProcessSample = "accordo" | "bozza" | "indirizzo" | "numero";
 
 /** Da che parte sta il disegno. Il testo sta dall'altra. */
-export type Lato = "dx" | "sx";
+export type ProcessSide = "dx" | "sx";
 
 export type ProcessDelivery = {
   /** E' anche la chiave di traduzione: process.list.<id>.* */
@@ -28,7 +28,7 @@ export type ProcessDelivery = {
    * vuota alta mezzo schermo, ed e' il difetto che questo impaginato ha per
    * costruzione se nessuno lo guarda.
    */
-  lato: Lato;
+  side: ProcessSide;
   /**
    * La sagoma e' quella del tavolo (le stesse di `public/brand/desk/`) e non
    * un disegno nuovo: il sito non aggiunge vocabolari di illustrazione, li
@@ -48,12 +48,12 @@ export type ProcessDelivery = {
    * che ogni disegno sia reclamato da un oggetto del tavolo, e questi non lo
    * sono).
    */
-  campione: ProcessSample;
+  sample: ProcessSample;
 };
 
 export const processDeliveries: ProcessDelivery[] = [
-  { id: "documento", lato: "sx", shape: "sheet", campione: "accordo" },
-  { id: "schermo", lato: "dx", shape: "sheet", campione: "bozza" },
-  { id: "link", lato: "sx", shape: "phone", campione: "indirizzo" },
-  { id: "numero", lato: "dx", shape: "card", campione: "numero" },
+  { id: "documento", side: "sx", shape: "sheet", sample: "accordo" },
+  { id: "schermo", side: "dx", shape: "sheet", sample: "bozza" },
+  { id: "link", side: "sx", shape: "phone", sample: "indirizzo" },
+  { id: "numero", side: "dx", shape: "card", sample: "numero" },
 ];

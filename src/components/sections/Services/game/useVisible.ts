@@ -14,7 +14,7 @@ import { useEffect, useState, type RefObject } from "react";
  * Il file si chiama come nel piano, l'hook comincia per `use`: e' da quel
  * prefisso che il linter riconosce un hook e ne controlla le regole.
  */
-export function useVisibile(ref: RefObject<Element | null>): boolean {
+export function useVisible(ref: RefObject<Element | null>): boolean {
   const [visibile, setVisibile] = useState(true);
 
   useEffect(() => {

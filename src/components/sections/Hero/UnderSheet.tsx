@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { MEDIA, useMotionLevel } from "@/animations/motionPolicy";
-import { attacco, copertura } from "./sheet";
+import { stickyTop, sheetCoverage } from "./sheet";
 
 /**
  * La seconda sezione passa sopra la prima. Hero si ferma sotto la testata,
@@ -20,7 +20,7 @@ import { attacco, copertura } from "./sheet";
  * HeaderScrollState, e non uno ScrollTrigger: e' una proporzione fra due
  * rettangoli, e Lenis muove comunque lo scroll della finestra.
  */
-export function SottoIlFoglio({ children }: { children: ReactNode }) {
+export function UnderSheet({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement | null>(null);
   const sonda = useRef<HTMLDivElement | null>(null);
   const level = useMotionLevel();
@@ -37,7 +37,7 @@ export function SottoIlFoglio({ children }: { children: ReactNode }) {
     let fotogramma = 0;
     let scritta = -1;
 
-    const quanto = () => copertura(hero.getBoundingClientRect(), sopra.getBoundingClientRect());
+    const quanto = () => sheetCoverage(hero.getBoundingClientRect(), sopra.getBoundingClientRect());
 
     const muovi = () => {
       // Tre decimali bastano all'occhio, e risparmiano le scritture (e il
@@ -67,7 +67,7 @@ export function SottoIlFoglio({ children }: { children: ReactNode }) {
       // mentre un dossier aperto la nasconde: per questo si rimisura alla
       // chiusura (vedi il MutationObserver sotto).
       const barraBassa = document.querySelector<HTMLElement>("[data-nav-basso]")?.offsetHeight ?? 0;
-      fermo = attacco({ testata, palco: sondaEl.offsetHeight, barraBassa, altezza });
+      fermo = stickyTop({ header: testata, stage: sondaEl.offsetHeight, bottomBar: barraBassa, height: altezza });
       hero.style.setProperty("--attacco", `${fermo}px`);
     };
 

@@ -2,7 +2,7 @@ import { Avatar } from "@/components/brand/Avatar";
 import { InkCircle } from "@/components/brand/InkCircle";
 import { Wordmark } from "@/components/brand/Wordmark";
 import { HeroMotion } from "./HeroMotion";
-import { CartaStropicciata } from "./CrumpledPaper";
+import { CrumpledPaper } from "./CrumpledPaper";
 
 export type HeroViewProps = {
   eyebrow: string;
@@ -33,7 +33,7 @@ export function HeroView({
           sostituisce le <img>: si sovrappone alla lettera che si sta toccando
           e ne segue il rettangolo, cosi' eredita il parallasse di HeroMotion e
           lascia intatto l'elemento LCP della pagina. Si monta solo a "full". */}
-      <CartaStropicciata />
+      <CrumpledPaper />
 
       <HeroMotion>
         <p className="eyebrow">{eyebrow}</p>

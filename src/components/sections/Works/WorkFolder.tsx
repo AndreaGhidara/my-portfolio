@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { due } from "@/lib/format";
+import { pad2 } from "@/lib/format";
 import { WorkShot } from "./WorkShot";
-import type { Cartella } from "./slide";
+import type { Folder } from "./slide";
 import type { WorkCaseData } from "./types";
 
 /**
@@ -25,27 +25,27 @@ import type { WorkCaseData } from "./types";
 export function WorkFolder({
   data,
   index,
-  totale,
+  total: totale,
   openLabel,
-  riservatoLabel,
-  riportaLabel,
+  confidentialLabel: riservatoLabel,
+  putBackLabel: riportaLabel,
   onOpen,
   onPreload,
-  onRiporta,
+  onPutBack: onRiporta,
 }: {
   data: WorkCaseData;
   index: number;
-  totale: number;
+  total: number;
   openLabel: string;
   /** La scritta del riquadro quando non c'e' una schermata da mostrare. */
-  riservatoLabel: string;
+  confidentialLabel: string;
   /** Per chi legge a voce: la linguetta non apre il caso, lo riporta davanti. */
-  riportaLabel: string;
-  onOpen: (cartella: Cartella) => void;
+  putBackLabel: string;
+  onOpen: (cartella: Folder) => void;
   /** Chiesto appena si capisce che questa cartella sta per aprirsi. */
   onPreload: () => void;
   /** La linguetta: questa cartella torna davanti. */
-  onRiporta: () => void;
+  onPutBack: () => void;
 }) {
   const li = useRef<HTMLLIElement | null>(null);
   const linguetta = useRef<HTMLButtonElement | null>(null);
@@ -60,11 +60,11 @@ export function WorkFolder({
     }
     onOpen({
       li: li.current,
-      linguetta: linguetta.current,
-      dorso: dorso.current,
-      faccia: faccia.current,
-      foglio: foglio.current,
-      apri: bottone.current,
+      tab: linguetta.current,
+      spine: dorso.current,
+      face: faccia.current,
+      sheet: foglio.current,
+      openButton: bottone.current,
     });
   };
 
@@ -104,7 +104,7 @@ export function WorkFolder({
       >
         <div>
           <p data-faccia-numero>
-            {due(index + 1)} / {due(totale)}
+            {pad2(index + 1)} / {pad2(totale)}
           </p>
           {/* Il titolo della cartella e' chi, non la frase: e' quello che
               distingue una cartella dall'altra nell'elenco dei titoli, ed e'
@@ -115,7 +115,7 @@ export function WorkFolder({
         </div>
 
         <div data-faccia-centro>
-          <p data-faccia-riga>{data.riga}</p>
+          <p data-faccia-riga>{data.tagline}</p>
           <div data-faccia-schermata>
             {data.screenshot ? (
               <WorkShot shot={data.screenshot} alt={data.screenshotAlt} />

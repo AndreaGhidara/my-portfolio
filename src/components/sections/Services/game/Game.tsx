@@ -10,15 +10,15 @@ import {
 } from "react";
 import { useTranslations } from "next-intl";
 import { palette } from "@/styles/palette";
-import { useVisibile } from "./useVisible";
-import { LIVELLI, numeroLivello, type IdLivello, type LivelloProps } from "./levels";
-import { Schermo } from "./Screen";
-import { Logiche } from "./Logic";
-import { Pannello } from "./Panel";
-import { Notte } from "./Night";
-import { Finale } from "./Ending";
+import { useVisible } from "./useVisible";
+import { LEVELS, levelNumber, type LevelId, type LevelProps } from "./levels";
+import { Screen } from "./Screen";
+import { Logic } from "./Logic";
+import { Panel } from "./Panel";
+import { Night } from "./Night";
+import { Ending } from "./Ending";
 
-export { LIVELLI, type IdLivello, type LivelloProps };
+export { LEVELS, type LevelId, type LevelProps };
 
 /**
  * Il gioco del metodo: sotto i 1024px prende il posto del tavolo. Quattro
@@ -49,16 +49,16 @@ export { LIVELLI, type IdLivello, type LivelloProps };
  */
 
 /** I quattro livelli e il finale, nell'ordine. Il finale e' il quinto passo. */
-type Passo = IdLivello | "finale";
-const PASSI: readonly Passo[] = [...LIVELLI, "finale"];
-const FINALE = LIVELLI.length;
+type Passo = LevelId | "finale";
+const PASSI: readonly Passo[] = [...LEVELS, "finale"];
+const FINALE = LEVELS.length;
 
-const COMPONENTI: Record<Passo, ComponentType<LivelloProps>> = {
-  schermo: Schermo,
-  logiche: Logiche,
-  pannello: Pannello,
-  notte: Notte,
-  finale: Finale,
+const COMPONENTI: Record<Passo, ComponentType<LevelProps>> = {
+  schermo: Screen,
+  logiche: Logic,
+  pannello: Panel,
+  notte: Night,
+  finale: Ending,
 };
 
 /**
@@ -81,10 +81,10 @@ const TOKEN_FISSI = {
  */
 const DOPPIO_TOCCO = 350;
 
-export function Gioco() {
+export function Game() {
   const t = useTranslations("services.gioco.comune");
   const radice = useRef<HTMLDivElement | null>(null);
-  const visibile = useVisibile(radice);
+  const visibile = useVisible(radice);
 
   // `qui` e' il passo aperto (0..3 i livelli, 4 il finale); `raggiunto` il
   // piu' lontano a cui si e' arrivati, ed e' quello che decide cosa si riapre.
@@ -154,7 +154,7 @@ export function Gioco() {
   return (
     <div ref={radice} data-gioco style={TOKEN_FISSI} onClickCapture={guardia}>
       <div data-gioco-barrette role="group" aria-label={t("barrette")}>
-        {LIVELLI.map((id, i) => {
+        {LEVELS.map((id, i) => {
           // Nel finale nessuna barretta e' «qui»: sono tutte fatte.
           const stato = i === qui ? "qui" : i <= raggiunto ? "fatto" : "dopo";
           return (
@@ -172,7 +172,7 @@ export function Gioco() {
               }}
             >
               <i aria-hidden="true" />
-              {t("etichetta", { numero: numeroLivello(id), nome: t(`livelli.${id}`) })}
+              {t("etichetta", { numero: levelNumber(id), nome: t(`livelli.${id}`) })}
             </button>
           );
         })}
@@ -187,8 +187,8 @@ export function Gioco() {
 
       <Livello
         key={`banco-${passo}`}
-        visibile={visibile}
-        onAvanti={qui === FINALE ? ricomincia : () => vai(qui + 1)}
+        visible={visibile}
+        onNext={qui === FINALE ? ricomincia : () => vai(qui + 1)}
       />
     </div>
   );

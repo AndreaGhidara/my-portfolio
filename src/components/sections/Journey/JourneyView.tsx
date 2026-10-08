@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { Reveal } from "@/animations/components/Reveal";
-import { POSA_ARRIVO, posa } from "./track";
-import { JourneyBinario } from "./JourneyTrack";
+import { ARRIVAL_POSE, poseAt } from "./track";
+import { JourneyTrack } from "./JourneyTrack";
 import { JourneyCard } from "./JourneyCard";
 
 export type JourneyEntryView = {
@@ -11,9 +11,9 @@ export type JourneyEntryView = {
   body: string;
   /** Cosa quel posto ha insegnato. È la cosa nuova: senza, restano tre voci
    *  di curriculum, e il titolo «Dove ho imparato» promette un'altra cosa. */
-  lezione: string;
+  lesson: string;
   year: number;
-  tesserino: boolean;
+  badge: boolean;
   /** Solo la tappa corrente: «2026 a oggi». */
   present?: boolean;
 };
@@ -24,11 +24,11 @@ export type JourneyViewProps = {
   eyebrow: string;
   title: string;
   present: string;
-  senzaTesserino: string;
-  etichettaLezione: string;
-  nota: string;
+  noBadge: string;
+  lessonLabel: string;
+  note: string;
   /** «continua a scorrere»: sotto la fila, finche' non si scorre. */
-  suggerimento: string;
+  hint: string;
   /** Nell'ordine in cui si percorrono: dalla prima tappa a oggi. */
   entries: JourneyEntryView[];
   stats: JourneyStat[];
@@ -38,10 +38,10 @@ export function JourneyView({
   eyebrow,
   title,
   present,
-  senzaTesserino,
-  etichettaLezione,
-  nota,
-  suggerimento,
+  noBadge: senzaTesserino,
+  lessonLabel: etichettaLezione,
+  note: nota,
+  hint: suggerimento,
   entries,
   stats,
 }: JourneyViewProps) {
@@ -54,15 +54,15 @@ export function JourneyView({
     // bordo della sezione, non finire sopra «Il tuo turno». clip non crea un
     // contenitore di scorrimento, quindi lo sticky regge.
     <section id="journey" aria-labelledby="titolo-journey" className="relative overflow-clip bg-[var(--accent)]">
-      <JourneyBinario
+      <JourneyTrack
         n={entries.length}
-        annoIniziale={entries[0]?.year ?? 0}
-        suggerimento={suggerimento}
-        testata={
+        startYear={entries[0]?.year ?? 0}
+        hint={suggerimento}
+        header={
           // Titolo in carta e occhiello in inchiostro, come nella seconda
           // sezione: sull'arancio la scala dei toni e' quella, e --on-accent
           // non si ribalta col tema mentre --fg-muted si'.
-          <Reveal moto="dietro" stagger={0.08}>
+          <Reveal motion="dietro" stagger={0.08}>
             <p className="eyebrow !text-[var(--on-accent)]">{eyebrow}</p>
             <h2 id="titolo-journey" className="titolo-sezione">{title}</h2>
           </Reveal>
@@ -72,10 +72,10 @@ export function JourneyView({
           <JourneyCard
             key={entry.id}
             entry={entry}
-            posa={posa(i)}
+            pose={poseAt(i)}
             present={present}
-            senzaTesserino={senzaTesserino}
-            etichettaLezione={etichettaLezione}
+            noBadge={senzaTesserino}
+            lessonLabel={etichettaLezione}
           />
         ))}
 
@@ -86,7 +86,7 @@ export function JourneyView({
             luce. */}
         <li
           data-journey-arrivo
-          style={{ "--r": `${POSA_ARRIVO.rotazione}deg` } as CSSProperties}
+          style={{ "--r": `${ARRIVAL_POSE.rotation}deg` } as CSSProperties}
         >
           <dl>
             {stats.map((stat) => (
@@ -100,7 +100,7 @@ export function JourneyView({
           </dl>
           <p data-journey-note>{nota}</p>
         </li>
-      </JourneyBinario>
+      </JourneyTrack>
     </section>
   );
 }

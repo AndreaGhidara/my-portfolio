@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { Posa } from "./track";
+import type { Pose } from "./track";
 import type { JourneyEntryView } from "./JourneyView";
 
 /**
@@ -25,23 +25,23 @@ import type { JourneyEntryView } from "./JourneyView";
 export function JourneyCard({
   entry,
   present,
-  senzaTesserino,
-  etichettaLezione,
-  posa,
+  noBadge: senzaTesserino,
+  lessonLabel: etichettaLezione,
+  pose: posa,
 }: {
   entry: JourneyEntryView;
-  posa: Posa;
+  pose: Pose;
   present: string;
-  senzaTesserino: string;
-  etichettaLezione: string;
+  noBadge: string;
+  lessonLabel: string;
 }) {
   return (
     <li
       data-journey-item
-      data-tesserino={entry.tesserino ? undefined : "no"}
+      data-tesserino={entry.badge ? undefined : "no"}
       data-anno={entry.year}
-      data-scostamento={posa.scostamento}
-      style={{ "--r": `${posa.rotazione}deg`, "--dy": `${posa.scostamento}rem` } as CSSProperties}
+      data-scostamento={posa.offset}
+      style={{ "--r": `${posa.rotation}deg`, "--dy": `${posa.offset}rem` } as CSSProperties}
     >
       <div data-journey-badge>
         <span data-journey-clip aria-hidden="true" />
@@ -51,13 +51,13 @@ export function JourneyCard({
             {entry.present ? ` ${present}` : null}
           </p>
           <h3>{entry.role}</h3>
-          <p data-journey-company>{entry.tesserino ? entry.company : senzaTesserino}</p>
+          <p data-journey-company>{entry.badge ? entry.company : senzaTesserino}</p>
         </div>
       </div>
 
       <div data-journey-sheet>
         <p data-journey-label>{etichettaLezione}</p>
-        <p data-journey-lesson>{entry.lezione}</p>
+        <p data-journey-lesson>{entry.lesson}</p>
         <p data-journey-body>{entry.body}</p>
       </div>
     </li>

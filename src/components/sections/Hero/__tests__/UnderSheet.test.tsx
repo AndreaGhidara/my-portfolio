@@ -2,9 +2,9 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { render } from "@testing-library/react";
-import { SottoIlFoglio } from "../UnderSheet";
+import { UnderSheet } from "../UnderSheet";
 import { HeroView } from "../HeroView";
-import { regole } from "@/test/css";
+import { rules } from "@/test/css";
 
 const radice = path.resolve(__dirname, "../../../../..");
 const leggi = (percorso: string) => readFileSync(path.resolve(radice, percorso), "utf8");
@@ -29,10 +29,10 @@ const props = {
 describe("la seconda sezione che passa sopra la prima", () => {
   it("parte spenta: l'effetto lo accende il componente, non il markup", () => {
     const { container } = render(
-      <SottoIlFoglio>
+      <UnderSheet>
         <section id="hero" />
         <section id="scontrino" />
-      </SottoIlFoglio>,
+      </UnderSheet>,
     );
     const palco = container.querySelector("[data-sotto-il-foglio]");
     expect(palco).not.toBeNull();
@@ -44,9 +44,9 @@ describe("la seconda sezione che passa sopra la prima", () => {
 
   it("la sonda non si legge", () => {
     const { container } = render(
-      <SottoIlFoglio>
+      <UnderSheet>
         <section id="hero" />
-      </SottoIlFoglio>,
+      </UnderSheet>,
     );
     expect(container.querySelector("[data-foglio-sonda]")).toHaveAttribute("aria-hidden", "true");
   });
@@ -55,7 +55,7 @@ describe("la seconda sezione che passa sopra la prima", () => {
     // Lo sticky di Hero vale fino alla fine del suo contenitore: dentro <main>
     // resterebbe incollato dietro tutte le sezioni fino in fondo alla pagina.
     const pagina = leggi("src/app/[locale]/page.tsx");
-    expect(pagina).toMatch(/<SottoIlFoglio>\s*<Hero \/>\s*<Scontrino \/>\s*<\/SottoIlFoglio>/);
+    expect(pagina).toMatch(/<UnderSheet>\s*<Hero \/>\s*<Receipt \/>\s*<\/UnderSheet>/);
   });
 
   it("il gioco delle lettere sta fuori da quello che si rimpicciolisce", () => {
@@ -70,8 +70,8 @@ describe("la seconda sezione che passa sopra la prima", () => {
 });
 
 describe("le regole dell'effetto in sections/under-sheet.css", () => {
-  const blocco = regole().filter((r) => r.file.endsWith(path.join("sections", "under-sheet.css")));
-  const dove = (selettore: RegExp) => blocco.filter((r) => selettore.test(r.selettore));
+  const blocco = rules().filter((r) => r.file.endsWith(path.join("sections", "under-sheet.css")));
+  const dove = (selettore: RegExp) => blocco.filter((r) => selettore.test(r.selector));
 
   it("hanno un blocco loro", () => {
     expect(blocco.length, "il blocco dell'effetto non c'e'").toBeGreaterThan(0);
@@ -83,25 +83,25 @@ describe("le regole dell'effetto in sections/under-sheet.css", () => {
     // mano alla sezione non serve a niente e confonderebbe chi legge.
     const sezione = dove(/#hero$/);
     expect(sezione.length, "nessuna regola su #hero: lo sticky dov'e'?").toBeGreaterThan(0);
-    for (const { corpo } of sezione) {
+    for (const { body: corpo } of sezione) {
       expect(corpo).not.toMatch(/z-index/);
       expect(corpo).not.toMatch(/isolation/);
     }
   });
 
   it("muovono Hero e la stampante solo sotto l'attributo di accensione", () => {
-    for (const { selettore } of dove(/#hero|#scontrino|\[data-hero-strato\]/)) {
+    for (const { selector: selettore } of dove(/#hero|#scontrino|\[data-hero-strato\]/)) {
       expect(selettore, `${selettore} vale anche a effetto spento`).toContain("[data-acceso]");
     }
   });
 
   it("il contenuto di Hero apre un contesto suo, o il ritratto buca il velo", () => {
-    expect(dove(/\[data-hero-strato\]$/).map((r) => r.corpo).join("\n")).toMatch(/isolation:\s*isolate/);
+    expect(dove(/\[data-hero-strato\]$/).map((r) => r.body).join("\n")).toMatch(/isolation:\s*isolate/);
   });
 
   it("velo e ombra sono inchiostro, non nero scritto a mano", () => {
-    expect(blocco.map((r) => r.corpo).join("\n")).not.toMatch(/#000\b|rgba?\(/);
-    expect(dove(/#hero::after$/).map((r) => r.corpo).join("\n")).toMatch(/var\(--ink\)/);
-    expect(dove(/#scontrino$/).map((r) => r.corpo).join("\n")).toMatch(/box-shadow:[^;]*var\(--ink\)/);
+    expect(blocco.map((r) => r.body).join("\n")).not.toMatch(/#000\b|rgba?\(/);
+    expect(dove(/#hero::after$/).map((r) => r.body).join("\n")).toMatch(/var\(--ink\)/);
+    expect(dove(/#scontrino$/).map((r) => r.body).join("\n")).toMatch(/box-shadow:[^;]*var\(--ink\)/);
   });
 });

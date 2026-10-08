@@ -1,18 +1,18 @@
 import { useEffect, useState, type RefObject } from "react";
-import { RADICE, RAMI } from "@/content/toolbox";
-import { NODI } from "./graph";
+import { ROOT, BRANCHES } from "@/content/toolbox";
+import { NODES } from "./graph";
 
 /**
  * L'ordine dell'entrata: dal cartellino in giu', per rami, come un albero che
  * si apre. Ogni nodo parte dal punto in cui sta suo padre.
  */
-export const ENTRATA = (() => {
-  const ordine: string[] = [RADICE.id];
+export const ENTRANCE = (() => {
+  const ordine: string[] = [ROOT.id];
   for (let i = 0; i < ordine.length; i++) {
-    for (const [a, b] of RAMI)
+    for (const [a, b] of BRANCHES)
       if (a === ordine[i] && !ordine.includes(b)) ordine.push(b);
   }
-  for (const n of NODI) if (!ordine.includes(n.id)) ordine.push(n.id);
+  for (const n of NODES) if (!ordine.includes(n.id)) ordine.push(n.id);
   return new Map(ordine.map((id, i) => [id, i]));
 })();
 
@@ -26,7 +26,7 @@ type Entrata = "attesa" | "entra" | null;
  * Senza movimento pieno l'entrata non c'e', e lo stato si azzera: se il
  * movimento torna, si riparte da capo come al primo montaggio.
  */
-export function useEntrata(
+export function useEntrance(
   banco: RefObject<HTMLElement | null>,
   pieno: boolean,
 ): Entrata {

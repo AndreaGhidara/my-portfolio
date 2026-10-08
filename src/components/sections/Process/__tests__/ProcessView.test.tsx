@@ -5,12 +5,12 @@ import { processDeliveries } from "@/content/process";
 
 const deliveries = processDeliveries.map((d, i) => ({
   id: d.id,
-  quando: `Quando ${i}`,
-  titolo: `Titolo ${i}`,
+  when: `Quando ${i}`,
+  title: `Titolo ${i}`,
   lead: `Lead ${i}`,
-  dentro: [`Dentro ${i}a`, `Dentro ${i}b`, `Dentro ${i}c`],
-  nonlo: `Non è ${i}`,
-  perche: `Perché ${i}`,
+  includes: [`Dentro ${i}a`, `Dentro ${i}b`, `Dentro ${i}c`],
+  excludes: `Non è ${i}`,
+  why: `Perché ${i}`,
 }));
 
 const props: ProcessViewProps = {
@@ -44,7 +44,7 @@ describe("ProcessView", () => {
     const { container } = render(<ProcessView {...props} />);
     const voci = container.querySelectorAll("[data-process-item]");
     const ultima = deliveries[deliveries.length - 1];
-    expect(voci[voci.length - 1]).toHaveTextContent(ultima.titolo);
+    expect(voci[voci.length - 1]).toHaveTextContent(ultima.title);
   });
 
   it("i lati si alternano: due voci di fila dallo stesso lato lasciano mezza colonna vuota", () => {

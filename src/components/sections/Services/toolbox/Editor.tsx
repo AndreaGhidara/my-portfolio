@@ -9,16 +9,16 @@ import {
   useState,
 } from "react";
 import type { MotionLevel } from "@/animations/motionPolicy";
-import { ZONE, type Capo, type ZonaId } from "@/content/toolbox";
-import { righeConfig, righeZona, type Riga } from "./code";
-import { Etichetta } from "./NodeLabel";
-import { attrezzo, pesiOrdinati } from "./graph";
-import type { Passo, TestiCassetta } from "./types";
+import { ZONES, type Garment, type ZoneId } from "@/content/toolbox";
+import { configLines, zoneLines, type CodeLine } from "./code";
+import { NodeLabel } from "./NodeLabel";
+import { toolById, sortedWeights } from "./graph";
+import type { ToolboxStep, ToolboxCopy } from "./types";
 
 /** Il ritmo a cui il file si riscrive, riga dopo riga. */
 const PASSO_RIGA = 70;
 
-type Aperto = { tipo: "config" } | { tipo: "zona"; zona: ZonaId };
+type Aperto = { tipo: "config" } | { tipo: "zona"; zona: ZoneId };
 
 /**
  * La cassetta sul telefono, e sul computer sotto i 1280px o senza mouse: una
@@ -31,31 +31,31 @@ type Aperto = { tipo: "config" } | { tipo: "zona"; zona: ZonaId };
  * fissa e il codice scorre dentro: scegliere un lavoro non sposta la pagina.
  */
 export function Editor({
-  testi,
-  capo,
-  passo,
-  foglioAperto,
-  puoIndietro,
-  onApri,
-  onNodo,
-  onCapo,
-  onIndietro,
-  onChiudi,
+  copy: testi,
+  garment: capo,
+  step: passo,
+  sheetOpen: foglioAperto,
+  canGoBack: puoIndietro,
+  onOpen: onApri,
+  onNode: onNodo,
+  onGarment: onCapo,
+  onBack: onIndietro,
+  onClose: onChiudi,
   level,
-  attiva,
+  active: attiva,
 }: {
-  testi: TestiCassetta;
-  capo: Capo | null;
-  passo: Passo;
-  foglioAperto: boolean;
-  puoIndietro: boolean;
-  onApri: (id: string) => void;
-  onNodo: (id: string) => void;
-  onCapo: (id: string) => void;
-  onIndietro: () => void;
-  onChiudi: () => void;
+  copy: ToolboxCopy;
+  garment: Garment | null;
+  step: ToolboxStep;
+  sheetOpen: boolean;
+  canGoBack: boolean;
+  onOpen: (id: string) => void;
+  onNode: (id: string) => void;
+  onGarment: (id: string) => void;
+  onBack: () => void;
+  onClose: () => void;
   level: MotionLevel;
-  attiva: boolean;
+  active: boolean;
 }) {
   const e = testi.editor;
   const [aperto, setAperto] = useState<Aperto>({ tipo: "config" });
@@ -65,11 +65,11 @@ export function Editor({
   const tastoFile = useRef<HTMLButtonElement | null>(null);
   const titoloId = useId();
 
-  const righe: Riga[] = useMemo(
+  const righe: CodeLine[] = useMemo(
     () =>
       aperto.tipo === "config"
-        ? righeConfig(capo, testi)
-        : righeZona(aperto.zona, capo, testi),
+        ? configLines(capo, testi)
+        : zoneLines(aperto.zona, capo, testi),
     [aperto, capo, testi],
   );
 
@@ -139,7 +139,7 @@ export function Editor({
   const titolo =
     aperto.tipo === "config"
       ? e.file
-      : `${e.cartella}/${testi.zone[aperto.zona].corto}.ts`;
+      : `${e.folder}/${testi.zones[aperto.zona].short}.ts`;
   const scritte = righe.slice(0, visibili);
   const scrivendo = visibili < righe.length;
 
@@ -149,7 +149,7 @@ export function Editor({
         data-cassetta-editor
         data-capo={capo ? "" : undefined}
         role="group"
-        aria-label={e.nome}
+        aria-label={e.name}
       >
         <div data-editor-titolo aria-hidden="true">
           <i />
@@ -158,7 +158,7 @@ export function Editor({
           <span>{titolo}</span>
         </div>
 
-        <div data-editor-albero role="toolbar" aria-label={e.cartelle}>
+        <div data-editor-albero role="toolbar" aria-label={e.folders}>
           <button
             type="button"
             ref={tastoFile}
@@ -168,19 +168,19 @@ export function Editor({
           >
             {e.file}
           </button>
-          {ZONE.map((z) => (
+          {ZONES.map((z) => (
             <button
               key={z.id}
               type="button"
               data-zona={z.id}
               data-serve={
-                (capo && capo.usa.some((id) => attrezzo(id)?.zona === z.id)) ||
+                (capo && capo.uses.some((id) => toolById(id)?.zone === z.id)) ||
                 undefined
               }
               aria-pressed={aperto.tipo === "zona" && aperto.zona === z.id}
               onClick={() => apri({ tipo: "zona", zona: z.id })}
             >
-              {testi.zone[z.id].corto}
+              {testi.zones[z.id].short}
             </button>
           ))}
         </div>
@@ -191,10 +191,10 @@ export function Editor({
               key={`${aperto.tipo}-${i}`}
               data-codice-riga
               data-nuova={
-                (riga.nuova && capo && aperto.tipo === "config") || undefined
+                (riga.isNew && capo && aperto.tipo === "config") || undefined
               }
             >
-              {riga.pezzi.map((p, k) =>
+              {riga.pieces.map((p, k) =>
                 p.tipo === "a" ? (
                   <button
                     key={k}
@@ -216,10 +216,10 @@ export function Editor({
         </div>
 
         <div data-editor-stato>
-          <span>✓ {capo ? testi.capi[capo.id].stato : e.zeroErrori}</span>
+          <span>✓ {capo ? testi.garments[capo.id].status : e.zeroErrors}</span>
           <span data-editor-mix aria-hidden="true">
             {capo &&
-              pesiOrdinati(capo).map(([z, pc]) => (
+              sortedWeights(capo).map(([z, pc]) => (
                 <i key={z} data-zona={z} style={{ width: `${pc}%` }} />
               ))}
           </span>
@@ -244,15 +244,15 @@ export function Editor({
         }}
       >
         {foglioAperto && (
-          <Etichetta
-            key={`${passo.tipo}-${passo.id}`}
-            passo={passo}
-            testi={testi}
-            onNodo={onNodo}
-            onCapo={onCapo}
-            titoloId={titoloId}
-            soloAttrezzi
-            azioni={
+          <NodeLabel
+            key={`${passo.kind}-${passo.id}`}
+            step={passo}
+            copy={testi}
+            onNode={onNodo}
+            onGarment={onCapo}
+            titleId={titoloId}
+            toolsOnly
+            actions={
               <>
                 <button
                   type="button"
@@ -260,14 +260,14 @@ export function Editor({
                   hidden={!puoIndietro}
                 >
                   <span aria-hidden="true">‹ </span>
-                  {testi.etichetta.indietro}
+                  {testi.label.back}
                 </button>
                 <button
                   type="button"
                   data-etichetta-chiudi
                   onClick={() => dialogo.current?.close()}
                 >
-                  {testi.etichetta.chiudi}
+                  {testi.label.close}
                   <span aria-hidden="true"> ✕</span>
                 </button>
               </>

@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { renderConTesti } from "@/test/renderWithMessages";
-import { installaIntersectionObserver } from "@/test/intersectionObserver";
+import { renderWithMessages } from "@/test/renderWithMessages";
+import { installIntersectionObserver } from "@/test/intersectionObserver";
 import it_ from "../../../../../../messages/it.json";
 import en_ from "../../../../../../messages/en.json";
-import { Gioco } from "../Game";
-import type { IdLivello, LivelloProps } from "../levels";
+import { Game } from "../Game";
+import type { LevelId, LevelProps } from "../levels";
 
 /**
  * Qui si prova il guscio, non i livelli: ognuno ha le sue prove. Al posto dei
@@ -15,8 +15,8 @@ import type { IdLivello, LivelloProps } from "../levels";
  * il guscio lo passa giu'. Il finale resta quello vero: e' del guscio.
  */
 const { livelloFinto } = vi.hoisted(() => ({
-  livelloFinto: (id: IdLivello) =>
-    function LivelloFinto({ onAvanti, visibile }: LivelloProps) {
+  livelloFinto: (id: LevelId) =>
+    function LivelloFinto({ onNext: onAvanti, visible: visibile }: LevelProps) {
       return (
         <div className="banco" data-gioco-livello={id} data-visibile={visibile ? "si" : "no"}>
           <div className="azioni">
@@ -28,10 +28,10 @@ const { livelloFinto } = vi.hoisted(() => ({
       );
     },
 }));
-vi.mock("../Screen", () => ({ Schermo: livelloFinto("schermo") }));
-vi.mock("../Logic", () => ({ Logiche: livelloFinto("logiche") }));
-vi.mock("../Panel", () => ({ Pannello: livelloFinto("pannello") }));
-vi.mock("../Night", () => ({ Notte: livelloFinto("notte") }));
+vi.mock("../Screen", () => ({ Screen: livelloFinto("schermo") }));
+vi.mock("../Logic", () => ({ Logic: livelloFinto("logiche") }));
+vi.mock("../Panel", () => ({ Panel: livelloFinto("pannello") }));
+vi.mock("../Night", () => ({ Night: livelloFinto("notte") }));
 
 const comune = it_.services.gioco.comune;
 const finale = it_.services.gioco.finale;
@@ -59,7 +59,7 @@ const premi = async (utente: ReturnType<typeof userEvent.setup>, el: Element) =>
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
-  installaIntersectionObserver();
+  installIntersectionObserver();
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -68,7 +68,7 @@ afterEach(() => {
 
 describe("il gioco, le barrette", () => {
   it("parte dal livello 1: e' l'unica barretta corrente, le altre non si aprono", () => {
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     expect(banco(container)).toHaveAttribute("data-gioco-livello", "schermo");
 
     const [prima, ...resto] = barrette();
@@ -83,7 +83,7 @@ describe("il gioco, le barrette", () => {
 
   it("la riga sotto le barrette dice cosa si fa nel livello, e cambia con lui", async () => {
     const utente = userEvent.setup();
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     expect(screen.getByText(comune.righe.schermo)).toBeInTheDocument();
     await premi(utente, avanti(container));
     expect(screen.getByText(comune.righe.logiche)).toBeInTheDocument();
@@ -92,7 +92,7 @@ describe("il gioco, le barrette", () => {
 
   it("riapre i livelli gia' raggiunti, non quelli dopo", async () => {
     const utente = userEvent.setup();
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     await premi(utente, avanti(container));
     await premi(utente, avanti(container));
     expect(banco(container)).toHaveAttribute("data-gioco-livello", "pannello");
@@ -113,7 +113,7 @@ describe("il gioco, le barrette", () => {
 describe("il gioco, il giro intero", () => {
   it("dai quattro segnaposto si arriva al finale, e li' le barrette sono tutte fatte", async () => {
     const utente = userEvent.setup();
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     for (const livello of ["schermo", "logiche", "pannello", "notte"]) {
       expect(banco(container)).toHaveAttribute("data-gioco-livello", livello);
       await premi(utente, avanti(container));
@@ -129,7 +129,7 @@ describe("il gioco, il giro intero", () => {
 
   it("«torna al sito» ricomincia dal livello 1, e i livelli dopo si richiudono", async () => {
     const utente = userEvent.setup();
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     for (let i = 0; i < 4; i++) await premi(utente, avanti(container));
 
     await premi(utente, screen.getByRole("button", { name: new RegExp(finale.tornaAlSito) }));
@@ -141,7 +141,7 @@ describe("il gioco, il giro intero", () => {
 
   it("«parliamone» porta ai Contatti", async () => {
     const utente = userEvent.setup();
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     for (let i = 0; i < 4; i++) await premi(utente, avanti(container));
     expect(screen.getByRole("link", { name: new RegExp(finale.parliamone) })).toHaveAttribute(
       "href",
@@ -151,7 +151,7 @@ describe("il gioco, il giro intero", () => {
 
   it("il finale elenca i quattro strati, nell'ordine dei livelli", async () => {
     const utente = userEvent.setup();
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     for (let i = 0; i < 4; i++) await premi(utente, avanti(container));
     const strati = within(banco(container)).getAllByRole("listitem");
     expect(strati.map((s) => s.textContent)).toEqual([
@@ -165,7 +165,7 @@ describe("il gioco, il giro intero", () => {
 
 describe("il doppio tocco", () => {
   it("due tocchi entro 350 ms fanno avanzare di un livello solo", () => {
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     fireEvent.click(avanti(container));
     expect(banco(container)).toHaveAttribute("data-gioco-livello", "logiche");
     vi.setSystemTime(Date.now() + 200);
@@ -174,7 +174,7 @@ describe("il doppio tocco", () => {
   });
 
   it("dopo 350 ms il secondo tocco passa", () => {
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     fireEvent.click(avanti(container));
     vi.setSystemTime(Date.now() + 360);
     fireEvent.click(avanti(container));
@@ -182,7 +182,7 @@ describe("il doppio tocco", () => {
   });
 
   it("le barrette non sono pulsanti del banco: si premono subito", () => {
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     fireEvent.click(avanti(container));
     fireEvent.click(barrette()[0]);
     expect(banco(container)).toHaveAttribute("data-gioco-livello", "schermo");
@@ -192,7 +192,7 @@ describe("il doppio tocco", () => {
 describe("il cambio di livello si sente", () => {
   it("il fuoco va sul banco nuovo, ma non al primo montaggio", async () => {
     const utente = userEvent.setup();
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     expect(document.activeElement).not.toBe(banco(container));
     await premi(utente, avanti(container));
     expect(document.activeElement).toBe(banco(container));
@@ -202,7 +202,7 @@ describe("il cambio di livello si sente", () => {
 
   it("la riga del livello e' una regione che si annuncia", async () => {
     const utente = userEvent.setup();
-    const { container } = renderConTesti(<Gioco />);
+    const { container } = renderWithMessages(<Game />);
     const riga = container.querySelector("[data-gioco-riga]") as HTMLElement;
     expect(riga).toHaveAttribute("aria-live", "polite");
     await premi(utente, avanti(container));
@@ -216,19 +216,19 @@ describe("il cambio di livello si sente", () => {
 describe("il gioco passa ai livelli se e' sullo schermo", () => {
   it("visibile parte vero, diventa falso quando il gioco esce, e torna vero al rientro", () => {
     vi.unstubAllGlobals();
-    const io = installaIntersectionObserver();
-    const { container } = renderConTesti(<Gioco />);
+    const io = installIntersectionObserver();
+    const { container } = renderWithMessages(<Game />);
     expect(banco(container)).toHaveAttribute("data-visibile", "si");
-    io.esce();
+    io.exit();
     expect(banco(container)).toHaveAttribute("data-visibile", "no");
-    io.entra();
+    io.enter();
     expect(banco(container)).toHaveAttribute("data-visibile", "si");
   });
 });
 
 describe("il gioco in inglese", () => {
   it("barrette e riga parlano la lingua della pagina", () => {
-    renderConTesti(<Gioco />, { locale: "en" });
+    renderWithMessages(<Game />, { locale: "en" });
     expect(barrette(en_.services.gioco.comune.barrette)[0]).toHaveTextContent("1 · screen");
     expect(screen.getByText(/First build the screen/)).toBeInTheDocument();
   });

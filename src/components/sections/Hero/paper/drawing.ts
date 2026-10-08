@@ -1,14 +1,14 @@
 import {
-  GRADINI,
-  LATO,
-  RAGGIO,
-  celleInProfondita,
-  mappaAffine,
-  posizioni,
+  SHADE_STEPS,
+  GRID_SIDE,
+  RADIUS,
+  cellsByDepth,
+  affineMap,
+  positions,
   rng,
-  type Punto,
-  type Terna,
-  type Vertice,
+  type PaperPoint,
+  type Triple,
+  type Vertex,
 } from "./geometry";
 
 /**
@@ -23,7 +23,7 @@ const SORG = 256;
 
 /** Il foglio con sopra la lettera. `velo` e' quanto si vede la carta: a zero
  *  c'e' solo l'inchiostro, ed e' cosi' finche' la piega non comincia. */
-export function sorgente(
+export function drawSource(
   lettera: CanvasImageSource,
   velo: number,
   carta: string,
@@ -76,17 +76,17 @@ export function sorgente(
 function tri(
   g: CanvasRenderingContext2D,
   tex: CanvasImageSource,
-  s: Terna,
-  d: Terna,
+  s: Triple,
+  d: Triple,
 ): void {
-  const m = mappaAffine(s, d);
+  const m = affineMap(s, d);
   if (!m) return;
   g.save();
   // Il triangolo si allarga di mezzo pixel dal suo centro: senza, fra una
   // faccia e l'altra resta una cucitura chiara di antialiasing.
   const cx = (d[0].x + d[1].x + d[2].x) / 3;
   const cy = (d[0].y + d[1].y + d[2].y) / 3;
-  const fuori = (p: Punto): Punto => {
+  const fuori = (p: PaperPoint): PaperPoint => {
     const dx = p.x - cx;
     const dy = p.y - cy;
     const l = Math.hypot(dx, dy) || 1;
@@ -106,10 +106,10 @@ function tri(
 
 /** Disegna il foglio a un dato grado di accartocciamento dentro `g`, che si
  *  assume gia' scalato in pixel CSS e grande `misura` x `misura`. */
-export function accartoccia(
+export function crumple(
   g: CanvasRenderingContext2D,
   tex: HTMLCanvasElement,
-  mesh: readonly Vertice[],
+  mesh: readonly Vertex[],
   t: number,
   misura: number,
   lato: number,
@@ -122,11 +122,11 @@ export function accartoccia(
     return;
   }
 
-  const punti = posizioni(mesh, t, centro, lato);
-  const celle = celleInProfondita(punti);
+  const punti = positions(mesh, t, centro, lato);
+  const celle = cellsByDepth(punti);
   const S = tex.width;
-  const s = (a: number, b: number): Punto => ({ x: (a / LATO) * S, y: (b / LATO) * S });
-  const d = (a: number, b: number) => punti[b * (LATO + 1) + a];
+  const s = (a: number, b: number): PaperPoint => ({ x: (a / GRID_SIDE) * S, y: (b / GRID_SIDE) * S });
+  const d = (a: number, b: number) => punti[b * (GRID_SIDE + 1) + a];
 
   for (const { i, j } of celle) {
     tri(g, tex, [s(i, j), s(i + 1, j), s(i + 1, j + 1)], [d(i, j), d(i + 1, j), d(i + 1, j + 1)]);
@@ -144,7 +144,7 @@ export function accartoccia(
     const pend = (b.z - a.z) * -0.8 + (e.z - a.z) * -0.8;
     const mx = (a.x + b.x + q.x + e.x) / 4 - centro.x;
     const my = (a.y + b.y + q.y + e.y) / 4 - centro.y;
-    const bordo = Math.min(1, Math.hypot(mx, my) / (lato * RAGGIO * 1.05));
+    const bordo = Math.min(1, Math.hypot(mx, my) / (lato * RADIUS * 1.05));
     const f = (Math.max(-1, Math.min(1, pend * 2.6)) - bordo * bordo * 0.55) * t;
     g.beginPath();
     g.moveTo(a.x, a.y);
@@ -160,4 +160,4 @@ export function accartoccia(
   }
 }
 
-export { GRADINI };
+export { SHADE_STEPS };

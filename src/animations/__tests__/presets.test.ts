@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { pulizia } from "../presets";
+import { cleanup } from "../presets";
 
 describe("la ragnatela si disegna da capo a coda", () => {
   /**
@@ -45,14 +45,14 @@ describe("la pulizia di fine entrata", () => {
     // Nemmeno una chiave a undefined: `clearProps: undefined` bastava a far
     // registrare il plugin di GSAP, che poi faceva split su undefined e
     // lanciava a ogni fotogramma di ogni entrata.
-    expect(pulizia(document.createElement("div"))).toEqual({});
-    expect(pulizia(document.createElement("div"), false)).toEqual({});
+    expect(cleanup(document.createElement("div"))).toEqual({});
+    expect(cleanup(document.createElement("div"), false)).toEqual({});
   });
 
   it("a movimento finito toglie transform e opacita', e lascia il resto", () => {
     const el = conStili("translate(0px, 0px)", "1");
     el.style.zIndex = "3";
-    const vars = pulizia(el, true);
+    const vars = cleanup(el, true);
     (vars.onComplete as () => void)();
     expect(el.style.transform).toBe("");
     expect(el.style.opacity).toBe("");
@@ -63,7 +63,7 @@ describe("la pulizia di fine entrata", () => {
     // I pezzi del tavolo hanno un'opacita' scritta da React come funzione CSS:
     // toglierla vorrebbe dire buttare via la regola della camera.
     const el = conStili("rotate(3deg)", "0.5");
-    const vars = pulizia(el, "transform");
+    const vars = cleanup(el, "transform");
     (vars.onComplete as () => void)();
     expect(el.style.transform).toBe("");
     expect(el.style.opacity).toBe("0.5");
@@ -72,7 +72,7 @@ describe("la pulizia di fine entrata", () => {
   it("ripulisce tutti i bersagli, non solo il primo", () => {
     const uno = conStili("translate(1px, 0px)", "1");
     const due = conStili("translate(2px, 0px)", "1");
-    const vars = pulizia([uno, due], true);
+    const vars = cleanup([uno, due], true);
     (vars.onComplete as () => void)();
     expect(uno.style.transform).toBe("");
     expect(due.style.transform).toBe("");

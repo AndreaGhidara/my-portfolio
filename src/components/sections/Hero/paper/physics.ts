@@ -5,7 +5,7 @@
  * questo gesto vive.
  */
 
-export type Pezzo = {
+export type Piece = {
   /** In coordinate della FINESTRA: le palline si posano sul suo bordo basso. */
   x: number;
   y: number;
@@ -15,16 +15,16 @@ export type Pezzo = {
   rot: number;
   /** Gradi al secondo. */
   vrot: number;
-  raggio: number;
+  radius: number;
   /** Mentre e' in mano non cade. */
-  tenuta: boolean;
+  held: boolean;
 };
 
-export type Muri = { largo: number; alto: number };
+export type Walls = { width: number; height: number };
 
 /** Quanto scende al secondo. Piu' alta della gravita' vera: su uno schermo,
  *  9,8 m/s² si legge come un palloncino. */
-export const GRAVITA = 2600;
+export const GRAVITY = 2600;
 /** Quanto la carta perde volando: e' leggera e frena. */
 const ARIA = 0.994;
 /** Quanto rimbalza toccando. Bassa: la carta non e' una pallina di gomma. */
@@ -40,11 +40,11 @@ const POSA = 70;
  * indietro, poi la gravita' le richiama. E' quello che fa leggere «la carta
  * scende con te» invece di «la carta e' incollata allo schermo».
  */
-export function passo(p: Pezzo, dt: number, muri: Muri, scorrimento: number): Pezzo {
-  if (p.tenuta) return p;
+export function physicsStep(p: Piece, dt: number, muri: Walls, scorrimento: number): Piece {
+  if (p.held) return p;
 
   p.y -= scorrimento;
-  p.vy += GRAVITA * dt;
+  p.vy += GRAVITY * dt;
   p.x += p.vx * dt;
   p.y += p.vy * dt;
   p.vx *= ARIA;
@@ -52,7 +52,7 @@ export function passo(p: Pezzo, dt: number, muri: Muri, scorrimento: number): Pe
   p.rot += p.vrot * dt;
   p.vrot *= 0.985;
 
-  const basso = muri.alto - p.raggio - 10;
+  const basso = muri.height - p.radius - 10;
   if (p.y > basso) {
     p.y = basso;
     if (Math.abs(p.vy) > POSA) {
@@ -66,17 +66,17 @@ export function passo(p: Pezzo, dt: number, muri: Muri, scorrimento: number): Pe
     // quanto sta scorrendo. Senza, la pallina ferma continuava a ruotare.
     p.vrot = p.vx * 1.4;
   }
-  if (p.y < p.raggio) {
-    p.y = p.raggio;
+  if (p.y < p.radius) {
+    p.y = p.radius;
     p.vy = Math.abs(p.vy) * RIMBALZO;
   }
-  if (p.x < p.raggio) {
-    p.x = p.raggio;
+  if (p.x < p.radius) {
+    p.x = p.radius;
     p.vx = Math.abs(p.vx) * RIMBALZO;
     p.vrot *= -0.7;
   }
-  if (p.x > muri.largo - p.raggio) {
-    p.x = muri.largo - p.raggio;
+  if (p.x > muri.width - p.radius) {
+    p.x = muri.width - p.radius;
     p.vx = -Math.abs(p.vx) * RIMBALZO;
     p.vrot *= -0.7;
   }
@@ -84,17 +84,17 @@ export function passo(p: Pezzo, dt: number, muri: Muri, scorrimento: number): Pe
 }
 
 /** Ferma o quasi: serve a sapere quando si puo' smettere di ridisegnare. */
-export function aRiposo(p: Pezzo, muri: Muri): boolean {
+export function atRest(p: Piece, muri: Walls): boolean {
   return (
-    !p.tenuta &&
+    !p.held &&
     Math.abs(p.vx) < 6 &&
     Math.abs(p.vy) < 6 &&
-    p.y >= muri.alto - p.raggio - 11
+    p.y >= muri.height - p.radius - 11
   );
 }
 
 /** La velocita' del lancio, dalle ultime posizioni del puntatore. */
-export function lancio(storia: readonly { x: number; y: number; t: number }[]): {
+export function fling(storia: readonly { x: number; y: number; t: number }[]): {
   vx: number;
   vy: number;
 } {

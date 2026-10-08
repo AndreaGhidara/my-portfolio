@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { act, fireEvent, screen, within } from "@testing-library/react";
-import { renderConTesti } from "@/test/renderWithMessages";
+import { renderWithMessages } from "@/test/renderWithMessages";
 import it_ from "../../../../../../messages/it.json";
-import { Schermo } from "../Screen";
-import { PALETTE_FINTE } from "../fakeSite";
+import { Screen } from "../Screen";
+import { FAKE_PALETTES } from "../fakeSite";
 
 const t = it_.services.gioco.schermo;
 const ATTREZZI = ["colori", "caratteri", "testi", "sezioni", "immagini", "telefono"] as const;
@@ -42,22 +42,22 @@ afterEach(() => {
 
 describe("livello 1, gli attrezzi", () => {
   it("una palette scelta e' premuta e passa al sito finto", () => {
-    const { container } = renderConTesti(<Schermo onAvanti={() => {}} visibile />);
+    const { container } = renderWithMessages(<Screen onNext={() => {}} visible />);
 
     expect(attrezzo("colori")).toHaveAttribute("aria-pressed", "true");
     const [bottega, notte] = scelte("colori");
     expect(bottega).toHaveAttribute("aria-pressed", "true");
-    expect(banco(container).style.getPropertyValue("--sf")).toBe(PALETTE_FINTE[0].colori.fondo);
+    expect(banco(container).style.getPropertyValue("--sf")).toBe(FAKE_PALETTES[0].colors.background);
 
     clicca(notte);
     expect(notte).toHaveAttribute("aria-pressed", "true");
     expect(bottega).toHaveAttribute("aria-pressed", "false");
-    expect(banco(container).style.getPropertyValue("--sf")).toBe(PALETTE_FINTE[1].colori.fondo);
+    expect(banco(container).style.getPropertyValue("--sf")).toBe(FAKE_PALETTES[1].colors.background);
     expect(attrezzo("colori")).toHaveClass("fatto");
   });
 
   it("aprire un altro attrezzo cambia il cassetto, e l'attrezzo e' fatto solo dopo una scelta", () => {
-    renderConTesti(<Schermo onAvanti={() => {}} visibile />);
+    renderWithMessages(<Screen onNext={() => {}} visible />);
 
     clicca(attrezzo("sezioni"));
     expect(attrezzo("sezioni")).toHaveAttribute("aria-pressed", "true");
@@ -70,7 +70,7 @@ describe("livello 1, gli attrezzi", () => {
   });
 
   it("il telefono porta la vista sul telefono, e un altro attrezzo la riporta al computer", () => {
-    const { container } = renderConTesti(<Schermo onAvanti={() => {}} visibile />);
+    const { container } = renderWithMessages(<Screen onNext={() => {}} visible />);
 
     clicca(attrezzo("telefono"));
     clicca(scelte("telefono")[1]);
@@ -83,7 +83,7 @@ describe("livello 1, gli attrezzi", () => {
 
 describe("livello 1, le viti", () => {
   it("compaiono solo quando tutti e sei gli attrezzi sono provati", () => {
-    renderConTesti(<Schermo onAvanti={() => {}} visibile />);
+    renderWithMessages(<Screen onNext={() => {}} visible />);
 
     for (const k of ATTREZZI.slice(0, 5)) {
       clicca(attrezzo(k));
@@ -99,7 +99,7 @@ describe("livello 1, le viti", () => {
   });
 
   it("finiti gli attrezzi sul telefono, le viti aspettano il ritorno al computer", () => {
-    renderConTesti(<Schermo onAvanti={() => {}} visibile />);
+    renderWithMessages(<Screen onNext={() => {}} visible />);
 
     for (const k of ATTREZZI) {
       clicca(attrezzo(k));
@@ -116,7 +116,7 @@ describe("livello 1, le viti", () => {
 
   it("svitate tutte e quattro, dopo 2,8 secondi passa al livello dopo", () => {
     const onAvanti = vi.fn();
-    const { container } = renderConTesti(<Schermo onAvanti={onAvanti} visibile />);
+    const { container } = renderWithMessages(<Screen onNext={onAvanti} visible />);
 
     provaTutto();
     avanza(400);
@@ -132,18 +132,18 @@ describe("livello 1, le viti", () => {
 
   it("fuori dallo schermo non passa, e al rientro i 2,8 secondi ripartono da capo", () => {
     const onAvanti = vi.fn();
-    const { rerender } = renderConTesti(<Schermo onAvanti={onAvanti} visibile />);
+    const { rerender } = renderWithMessages(<Screen onNext={onAvanti} visible />);
 
     provaTutto();
     avanza(400);
     for (const v of viti()) clicca(v);
     avanza(2000);
 
-    rerender(<Schermo onAvanti={onAvanti} visibile={false} />);
+    rerender(<Screen onNext={onAvanti} visible={false} />);
     avanza(5000);
     expect(onAvanti).not.toHaveBeenCalled();
 
-    rerender(<Schermo onAvanti={onAvanti} visibile />);
+    rerender(<Screen onNext={onAvanti} visible />);
     avanza(2799);
     expect(onAvanti).not.toHaveBeenCalled();
     avanza(1);
@@ -152,7 +152,7 @@ describe("livello 1, le viti", () => {
 
   it("smontato a meta', non passa piu'", () => {
     const onAvanti = vi.fn();
-    const { unmount } = renderConTesti(<Schermo onAvanti={onAvanti} visibile />);
+    const { unmount } = renderWithMessages(<Screen onNext={onAvanti} visible />);
 
     provaTutto();
     avanza(400);
@@ -165,7 +165,7 @@ describe("livello 1, le viti", () => {
 
 describe("livello 1, in inglese", () => {
   it("le linguette e il cassetto parlano inglese", () => {
-    renderConTesti(<Schermo onAvanti={() => {}} visibile />, { locale: "en" });
+    renderWithMessages(<Screen onNext={() => {}} visible />, { locale: "en" });
     expect(screen.getByRole("group", { name: "The tools" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Palette" })).toBeInTheDocument();
   });

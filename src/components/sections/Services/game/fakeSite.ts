@@ -15,25 +15,25 @@
  * palette cambiano anche loro.
  */
 
-export type ColoriFinti = {
-  fondo: string;
-  superficie: string;
-  testo: string;
-  accento: string;
-  grigio: string;
+export type FakeColors = {
+  background: string;
+  surface: string;
+  text: string;
+  accent: string;
+  grey: string;
 };
 
-export type IdPaletta = "bottega" | "notte" | "salvia" | "cipria" | "oceano" | "terracotta";
+export type PaletteId = "bottega" | "notte" | "salvia" | "cipria" | "oceano" | "terracotta";
 
-export type PalettaFinta = { id: IdPaletta; colori: ColoriFinti };
+export type FakePalette = { id: PaletteId; colors: FakeColors };
 
-const paletta = (id: IdPaletta, [fondo, superficie, testo, accento, grigio]: string[]): PalettaFinta => ({
+const paletta = (id: PaletteId, [fondo, superficie, testo, accento, grigio]: string[]): FakePalette => ({
   id,
-  colori: { fondo, superficie, testo, accento, grigio },
+  colors: { background: fondo, surface: superficie, text: testo, accent: accento, grey: grigio },
 });
 
 /** Le sei palette, nell'ordine dell'attrezzo «colori». La prima e' quella di partenza. */
-export const PALETTE_FINTE: readonly PalettaFinta[] = [
+export const FAKE_PALETTES: readonly FakePalette[] = [
   paletta("bottega", ["#F5F1E8", "#E9E1D2", "#14120F", "#E4572E", "#6E6759"]),
   paletta("notte", ["#16140F", "#26221B", "#F3EDE0", "#F2C94C", "#A79E8C"]),
   paletta("salvia", ["#EEF0E8", "#DCE4D5", "#1D2A20", "#3E7D57", "#5F6F63"]),
@@ -43,16 +43,16 @@ export const PALETTE_FINTE: readonly PalettaFinta[] = [
 ];
 
 /** La palette con cui il Forno Aurora nasce, e con cui il livello 2 lo mostra. */
-export const BOTTEGA = PALETTE_FINTE[0];
+export const SHOP_PALETTE = FAKE_PALETTES[0];
 
-export type VariabiliSito = Record<"--sf" | "--ss" | "--st" | "--sa" | "--sm", string>;
+export type SiteVariables = Record<"--sf" | "--ss" | "--st" | "--sa" | "--sm", string>;
 
 /** Le cinque variabili da scrivere sul contenitore del sito finto (style). */
-export function variabiliSito(c: ColoriFinti): VariabiliSito {
-  return { "--sf": c.fondo, "--ss": c.superficie, "--st": c.testo, "--sa": c.accento, "--sm": c.grigio };
+export function siteVariables(c: FakeColors): SiteVariables {
+  return { "--sf": c.background, "--ss": c.surface, "--st": c.text, "--sa": c.accent, "--sm": c.grey };
 }
 
-export type IdCoppia = "archivo" | "fraunces" | "grotesk" | "playfair";
+export type FontPairId = "archivo" | "fraunces" | "grotesk" | "playfair";
 
 /**
  * Le coppie di caratteri: uno per i titoli, uno per leggere. I valori sono
@@ -64,93 +64,93 @@ export type IdCoppia = "archivo" | "fraunces" | "grotesk" | "playfair";
  * `peso` e' il peso del titolo, ed e' quello caricato: chiederne un altro
  * vorrebbe dire un grassetto finto disegnato dal browser.
  */
-export type CoppiaFinta = { id: IdCoppia; nome: string; titolo: string; peso: number; paragrafo: string };
+export type FakeFontPair = { id: FontPairId; name: string; heading: string; weight: number; body: string };
 
 const PARAGRAFO = "var(--font-body), system-ui, sans-serif";
 
-export const CARATTERI_FINTI: readonly CoppiaFinta[] = [
-  { id: "archivo", nome: "Archivo", titolo: "var(--font-display), sans-serif", peso: 400, paragrafo: PARAGRAFO },
-  { id: "fraunces", nome: "Fraunces", titolo: "var(--font-finto-fraunces), Georgia, serif", peso: 600, paragrafo: PARAGRAFO },
-  { id: "grotesk", nome: "Grotesk", titolo: "var(--font-finto-grotesk), sans-serif", peso: 700, paragrafo: PARAGRAFO },
-  { id: "playfair", nome: "Playfair", titolo: "var(--font-finto-playfair), Georgia, serif", peso: 800, paragrafo: PARAGRAFO },
+export const FAKE_FONTS: readonly FakeFontPair[] = [
+  { id: "archivo", name: "Archivo", heading: "var(--font-display), sans-serif", weight: 400, body: PARAGRAFO },
+  { id: "fraunces", name: "Fraunces", heading: "var(--font-finto-fraunces), Georgia, serif", weight: 600, body: PARAGRAFO },
+  { id: "grotesk", name: "Grotesk", heading: "var(--font-finto-grotesk), sans-serif", weight: 700, body: PARAGRAFO },
+  { id: "playfair", name: "Playfair", heading: "var(--font-finto-playfair), Georgia, serif", weight: 800, body: PARAGRAFO },
 ];
 
-export type IdScala = "compatta" | "equilibrata" | "generosa";
+export type ScaleId = "compatta" | "equilibrata" | "generosa";
 
 /**
  * Le tre scale dei testi. `k` moltiplica le misure del sito finto; h1, h2 e p
  * sono i pixel che il campione dell'attrezzo dichiara.
  */
-export type ScalaFinta = { id: IdScala; k: number; h1: number; h2: number; p: number };
+export type FakeScale = { id: ScaleId; k: number; h1: number; h2: number; p: number };
 
-export const SCALE_FINTE: readonly ScalaFinta[] = [
+export const FAKE_SCALES: readonly FakeScale[] = [
   { id: "compatta", k: 0.82, h1: 38, h2: 22, p: 14 },
   { id: "equilibrata", k: 1, h1: 48, h2: 28, p: 16 },
   { id: "generosa", k: 1.2, h1: 60, h2: 34, p: 18 },
 ];
 
 /** La scala di partenza. */
-export const SCALA_INIZIALE = SCALE_FINTE[1];
+export const INITIAL_SCALE = FAKE_SCALES[1];
 
-export type IdImpaginazione = "classica" | "manifesto" | "copertina" | "bento";
+export type LayoutId = "classica" | "manifesto" | "copertina" | "bento";
 
 /**
  * Il disegnino di un'impaginazione, sul pulsante dell'attrezzo «sezioni».
  * Non e' il sito finto: e' interfaccia del gioco, quindi i suoi toni sono i
  * token del portfolio (una cella senza tono e' --graph).
  */
-export type TonoMini = "ink" | "muted" | "mutedDark" | "orange";
-export type CellaMini = {
-  tono?: TonoMini;
-  colonna?: string;
-  riga?: string;
-  larghezza?: string;
-  altezza?: string;
+export type MiniTone = "ink" | "muted" | "mutedDark" | "orange";
+export type MiniCell = {
+  tone?: MiniTone;
+  column?: string;
+  row?: string;
+  width?: string;
+  height?: string;
 };
-export type MiniImpaginazione = {
-  colonne?: string;
-  righe?: string;
-  fondo?: TonoMini;
+export type MiniLayout = {
+  columns?: string;
+  rows?: string;
+  background?: MiniTone;
   /** Le celle in fondo al riquadro invece che a riempirlo. */
-  inFondo?: boolean;
-  celle: CellaMini[];
+  atBottom?: boolean;
+  cells: MiniCell[];
 };
 
-export type ImpaginazioneFinta = { id: IdImpaginazione; mini: MiniImpaginazione };
+export type FakeLayout = { id: LayoutId; mini: MiniLayout };
 
-export const IMPAGINAZIONI_FINTE: readonly ImpaginazioneFinta[] = [
+export const FAKE_LAYOUTS: readonly FakeLayout[] = [
   {
     id: "classica",
-    mini: { colonne: "1fr 1fr", righe: "1fr .5fr", celle: [{ tono: "orange" }, {}, {}, {}] },
+    mini: { columns: "1fr 1fr", rows: "1fr .5fr", cells: [{ tone: "orange" }, {}, {}, {}] },
   },
   {
     id: "manifesto",
-    mini: { righe: "1fr .35fr", celle: [{ tono: "ink" }, { tono: "orange" }] },
+    mini: { rows: "1fr .35fr", cells: [{ tone: "ink" }, { tone: "orange" }] },
   },
   {
     id: "copertina",
-    mini: { fondo: "muted", inFondo: true, celle: [{ tono: "orange", altezza: "5px", larghezza: "55%" }] },
+    mini: { background: "muted", atBottom: true, cells: [{ tone: "orange", height: "5px", width: "55%" }] },
   },
   {
     id: "bento",
     mini: {
-      colonne: "1.3fr 1fr .9fr",
-      righe: "1fr 1fr 1fr",
-      celle: [
-        { riga: "span 2" },
-        { tono: "mutedDark", colonna: "2 / 4", riga: "span 2" },
+      columns: "1.3fr 1fr .9fr",
+      rows: "1fr 1fr 1fr",
+      cells: [
+        { row: "span 2" },
+        { tone: "mutedDark", column: "2 / 4", row: "span 2" },
         {},
-        { tono: "ink" },
-        { tono: "orange" },
+        { tone: "ink" },
+        { tone: "orange" },
       ],
     },
   },
 ];
 
-export type IdIllustrazione = "pane" | "vetrina" | "torta" | "cornetto";
+export type IllustrationId = "pane" | "vetrina" | "torta" | "cornetto";
 
 /** Le illustrazioni si disegnano in un svg con questo viewBox. */
-export const VIEWBOX_ILLUSTRAZIONI = "0 0 120 90";
+export const ILLUSTRATION_VIEWBOX = "0 0 120 90";
 
 // Il riempimento segue la palette; il tratto d'inchiostro passa da
 // currentColor, perche' un elemento non puo' avere due attributi style. Chi
@@ -166,7 +166,7 @@ const MOLLICA = "color-mix(in oklab, var(--sa) 22%, #FFF8EC)";
  *
  * `pane` e' anche la foto della schermata di partenza del livello 2.
  */
-export const ILLUSTRAZIONI: Record<IdIllustrazione, string> = {
+export const ILLUSTRATIONS: Record<IllustrationId, string> = {
   pane: `<rect width="120" height="90" ${f("ss")}/><circle cx="60" cy="44" r="36" ${f("sf")} opacity=".55"/>
     <rect y="72" width="120" height="18" ${f("sm")} opacity=".28"/><line x1="0" y1="72" x2="120" y2="72" ${t()} stroke-width="1.4"/>
     <path d="M22 70 C 21 58, 20 44, 24 28" fill="none" ${t()} stroke-width="1.2"/>${[
@@ -280,4 +280,4 @@ export const ILLUSTRAZIONI: Record<IdIllustrazione, string> = {
 };
 
 /** Le illustrazioni nell'ordine dell'attrezzo «immagini». */
-export const ORDINE_ILLUSTRAZIONI: readonly IdIllustrazione[] = ["pane", "vetrina", "torta", "cornetto"];
+export const ILLUSTRATION_ORDER: readonly IllustrationId[] = ["pane", "vetrina", "torta", "cornetto"];

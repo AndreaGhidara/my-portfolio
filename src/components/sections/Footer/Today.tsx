@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { due } from "@/lib/format";
+import { pad2 } from "@/lib/format";
 
 /**
  * La data di oggi, scritta dal browser.
@@ -14,7 +14,7 @@ import { due } from "@/lib/format";
  * - "annullo": gg.mm.aa, come su un timbro postale.
  * - "anno": l'anno a quattro cifre, per il copyright.
  */
-export function Oggi({ formato }: { formato: "annullo" | "anno" }) {
+export function Today({ format: formato }: { format: "annullo" | "anno" }) {
   const [testo, setTesto] = useState("");
   useEffect(() => {
     const oggi = new Date();
@@ -22,7 +22,7 @@ export function Oggi({ formato }: { formato: "annullo" | "anno" }) {
       setTesto(String(oggi.getFullYear()));
       return;
     }
-    setTesto(`${due(oggi.getDate())}.${due(oggi.getMonth() + 1)}.${String(oggi.getFullYear()).slice(-2)}`);
+    setTesto(`${pad2(oggi.getDate())}.${pad2(oggi.getMonth() + 1)}.${String(oggi.getFullYear()).slice(-2)}`);
   }, [formato]);
   return <>{testo}</>;
 }

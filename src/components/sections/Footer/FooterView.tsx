@@ -1,16 +1,16 @@
 import { Reveal } from "@/animations/components/Reveal";
-import { Oggi } from "./Today";
+import { Today } from "./Today";
 export type FooterViewProps = {
   tagline: string;
   /** L'etichetta sopra l'indirizzo: «Rispondi a». */
-  rispondiA: string;
+  replyTo: string;
   /** L'etichetta sopra i profili. NON e' «Mittente»: vedi sotto. */
-  ancheQui: string;
-  citta: string;
+  alsoHere: string;
+  city: string;
   /** L'ufficio sull'annullo postale. */
-  ufficio: string;
+  office: string;
   /** Il paese sul francobollo. */
-  paese: string;
+  country: string;
   rights: string;
   name: string;
   email: string;
@@ -50,11 +50,11 @@ export type FooterViewProps = {
  */
 export function FooterView({
   tagline,
-  rispondiA,
-  ancheQui,
-  citta,
-  ufficio,
-  paese,
+  replyTo: rispondiA,
+  alsoHere: ancheQui,
+  city: citta,
+  office: ufficio,
+  country: paese,
   rights,
   name,
   email,
@@ -81,7 +81,7 @@ export function FooterView({
       {/* I tre blocchi della busta entrano uno dopo l'altro. L'attributo resta
           qui: [data-busta] porta il fondo, la patta e il taglio in fondo alla
           pagina, e un involucro in mezzo li staccherebbe dal contenuto. */}
-      <Reveal data-busta data-testid="busta" moto="dietro" stagger={0.12}>
+      <Reveal data-busta data-testid="busta" motion="dietro" stagger={0.12}>
         <div data-busta-alto>
           <p data-busta-profili data-testid="busta-profili">
             <span data-busta-et>{ancheQui}</span>
@@ -112,7 +112,7 @@ export function FooterView({
               vita. `as="span"` perche' qui dentro sta in una riga di testo. */}
           <Reveal
             as="span"
-            moto="alto"
+            motion="alto"
             delay={0.25}
             data-busta-affrancatura
             data-testid="busta-affrancatura"
@@ -162,7 +162,7 @@ export function FooterView({
                 letterSpacing=".3"
                 data-testid="busta-annullo-data"
               >
-                <Oggi formato="annullo" />
+                <Today format="annullo" />
               </text>
             </svg>
           </Reveal>
@@ -190,7 +190,7 @@ export function FooterView({
                 distinzione arriva da dimensione e posizione, non da un colore
                 piu' debole. */}
             <p data-footer-diritti>
-              © <Oggi formato="anno" /> {name}. {rights}
+              © <Today format="anno" /> {name}. {rights}
             </p>
           </div>
         </div>

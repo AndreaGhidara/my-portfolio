@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { SOGLIA_IN_CIMA } from "./atTop";
+import { AT_TOP_THRESHOLD } from "./atTop";
 
 /**
  * Tiene aggiornato data-at-top su <html>, che TopStateScript ha già
@@ -18,7 +18,7 @@ export function HeaderScrollState() {
     const root = document.documentElement;
 
     const sync = () => {
-      if (window.scrollY < SOGLIA_IN_CIMA) root.setAttribute("data-at-top", "");
+      if (window.scrollY < AT_TOP_THRESHOLD) root.setAttribute("data-at-top", "");
       else root.removeAttribute("data-at-top");
     };
 

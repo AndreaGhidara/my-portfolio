@@ -2,19 +2,19 @@
 
 import { useId, type RefObject } from "react";
 import { site } from "@/content/site";
-import { due } from "@/lib/format";
+import { pad2 } from "@/lib/format";
 import { WorkShot } from "./WorkShot";
 import type { WorkCaseData, WorkCaseLabels } from "./types";
 
 export type WorkDialogProps = {
-  dialogo: RefObject<HTMLDialogElement | null>;
+  dialog: RefObject<HTMLDialogElement | null>;
   data: WorkCaseData | null;
   /** Il posto della cartella nell'archivio, da uno. */
-  numero: number;
-  totale: number;
+  number: number;
+  total: number;
   labels: WorkCaseLabels;
   /** ×, Esc e clic sul velo: la chiusura la anima usePratica. */
-  onChiudi: () => void;
+  onRequestClose: () => void;
   /** Il dialog si e' chiuso, orchestrato o no. */
   onClose: () => void;
 };
@@ -37,9 +37,9 @@ const dominio = (url: string) => new URL(url).hostname.replace(/^www\./, "");
  * (vedi sezioni/lavori.css), e niente di quello che si ribalta col tema entra qui,
  * .eyebrow compreso.
  */
-export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, onClose }: WorkDialogProps) {
+export function WorkDialog({ dialog: dialogo, data, number: numero, total: totale, labels, onRequestClose: onChiudi, onClose }: WorkDialogProps) {
   const titleId = useId();
-  const stato = data?.stato === "in-corso" ? labels.inCorso : labels.consegnato;
+  const stato = data?.status === "in-corso" ? labels.inProgress : labels.delivered;
 
   return (
     <dialog
@@ -65,7 +65,7 @@ export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, on
         <>
           <button type="button" data-pratica-chiudi data-entra onClick={onChiudi}>
             <span aria-hidden="true">×</span>
-            <span className="sr-only">{labels.chiudi}</span>
+            <span className="sr-only">{labels.close}</span>
           </button>
 
           <article data-pratica>
@@ -77,32 +77,32 @@ export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, on
             <div data-pratica-foglio>
               <header data-pratica-testa data-entra>
                 <p>
-                  <b>{site.name}</b> <span>{labels.archivio}</span>
+                  <b>{site.name}</b> <span>{labels.archive}</span>
                 </p>
                 <p data-pratica-numero>
-                  {labels.pratica}{" "}
+                  {labels.dossier}{" "}
                   <strong>
-                    {due(numero)} / {due(totale)}
+                    {pad2(numero)} / {pad2(totale)}
                   </strong>
                 </p>
               </header>
 
               <dl data-pratica-campi data-entra>
                 <div>
-                  <dt>{labels.cliente}</dt>
+                  <dt>{labels.client}</dt>
                   <dd>{data.name}</dd>
                 </div>
                 <div>
-                  <dt>{labels.anno}</dt>
+                  <dt>{labels.year}</dt>
                   <dd>{data.year}</dd>
                 </div>
                 <div>
-                  <dt>{labels.stato}</dt>
+                  <dt>{labels.status}</dt>
                   <dd>{stato}</dd>
                 </div>
                 <div>
                   <dt>{labels.online}</dt>
-                  <dd>{data.url ? dominio(data.url) : labels.riservato}</dd>
+                  <dd>{data.url ? dominio(data.url) : labels.confidential}</dd>
                 </div>
               </dl>
 
@@ -110,8 +110,8 @@ export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, on
                 {/* La riga della faccia torna qui come la situazione trovata:
                     e' lei ad aver fatto aprire la pratica. */}
                 <div data-pratica-oggetto data-entra>
-                  <p>{labels.comEra}</p>
-                  <p>{data.riga}</p>
+                  <p>{labels.before}</p>
+                  <p>{data.tagline}</p>
                 </div>
 
                 <div data-pratica-destra>
@@ -123,25 +123,25 @@ export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, on
                       <div data-pratica-schermata>
                         <WorkShot shot={data.screenshot} alt={data.screenshotAlt} />
                       </div>
-                      <figcaption>{labels.allegato}</figcaption>
+                      <figcaption>{labels.attachment}</figcaption>
                     </figure>
                   ) : (
                     <p data-pratica-riservato data-entra>
-                      {labels.riservato}
+                      {labels.confidential}
                     </p>
                   )}
 
                   {data.metrics.length > 0 && (
                     <section data-pratica-numeri data-entra>
                       {/* Un lavoro in corso non ha una fine da cui rilevare. */}
-                      <h3>{data.stato === "in-corso" ? labels.rilevatoFinora : labels.rilevato}</h3>
+                      <h3>{data.status === "in-corso" ? labels.measuredSoFar : labels.measured}</h3>
                       <dl>
                         {data.metrics.map((metric) => (
                           <div key={metric.id}>
                             <dt>{metric.label}</dt>
                             <dd>
                               <b>{metric.value}</b>
-                              {metric.estimated && <small>{labels.stima}</small>}
+                              {metric.estimated && <small>{labels.estimate}</small>}
                             </dd>
                           </div>
                         ))}
@@ -157,9 +157,9 @@ export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, on
               <ol data-pratica-voci>
                 {(
                   [
-                    [labels.lavoro, data.lavoro],
-                    [labels.scelta, data.scelta],
-                    [labels.conduzione, data.conduzione],
+                    [labels.work, data.work],
+                    [labels.choice, data.choice],
+                    [labels.approach, data.approach],
                   ] as const
                 ).map(([titolo, testo], n) => (
                   <li key={titolo} data-entra>
@@ -183,16 +183,16 @@ export function WorkDialog({ dialogo, data, numero, totale, labels, onChiudi, on
                       cliccabile: l'assenza si legge come un dato. */}
                   {data.url ? (
                     <a data-pratica-link href={data.url} target="_blank" rel="noopener noreferrer">
-                      {labels.visita} <span aria-hidden="true">↗</span>
+                      {labels.visit} <span aria-hidden="true">↗</span>
                     </a>
                   ) : (
-                    <span data-pratica-senza-link>{labels.riservato}</span>
+                    <span data-pratica-senza-link>{labels.confidential}</span>
                   )}
                 </div>
                 <p data-pratica-timbro>{stato}</p>
                 <p data-pratica-firma>
-                  <em>{labels.firmaNome}</em>
-                  {labels.firmaRuolo}
+                  <em>{labels.signatureName}</em>
+                  {labels.signatureRole}
                 </p>
               </footer>
             </div>

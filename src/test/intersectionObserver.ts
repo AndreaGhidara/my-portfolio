@@ -9,7 +9,7 @@ import { vi } from "vitest";
  *
  * Si toglie con vi.unstubAllGlobals(), come ogni altro stub globale.
  */
-export function installaIntersectionObserver() {
+export function installIntersectionObserver() {
   const vivi = new Set<Osservatore>();
 
   class Osservatore {
@@ -48,14 +48,14 @@ export function installaIntersectionObserver() {
     });
 
   return {
-    entra: (el?: Element) => avvisa(true, el),
-    esce: (el?: Element) => avvisa(false, el),
+    enter: (el?: Element) => avvisa(true, el),
+    exit: (el?: Element) => avvisa(false, el),
     /** Quanti osservatori sono ancora attaccati: zero dopo lo smontaggio. */
-    attivi: () => vivi.size,
+    active: () => vivi.size,
   };
 }
 
 /** Il browser vecchio, o l'ambiente senza: IntersectionObserver non c'e'. */
-export function togliIntersectionObserver() {
+export function removeIntersectionObserver() {
   vi.stubGlobal("IntersectionObserver", undefined);
 }

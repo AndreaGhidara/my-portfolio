@@ -12,7 +12,7 @@ export function HeroMotion({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement | null>(null);
 
   useSectionAnimation(({ level, gsap, presets }) => {
-    const { cresce, paint, reveal, stamp } = presets;
+    const { grow, paint, reveal, stamp } = presets;
     const root = scope.current;
     if (!root) return;
 
@@ -35,7 +35,7 @@ export function HeroMotion({ children }: { children: ReactNode }) {
        66% dell'altezza dell'immagine. Crescendo dal 50% la testa si aprirebbe
        a cavallo del bordo. */
     intro.add(
-      cresce(ritratto, { level, origine: "50% 66%" }) ?? gsap.timeline(),
+      grow(ritratto, { level, origin: "50% 66%" }) ?? gsap.timeline(),
       "-=0.55",
     );
     /* Il claim e il resto della copia entrano insieme, ma in due modi diversi,

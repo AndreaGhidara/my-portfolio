@@ -2,8 +2,8 @@
 
 import { useEffect, useState, type RefObject } from "react";
 import { MEDIA } from "@/animations/motionPolicy";
-import { ciSta, ridecidere } from "./archive";
-import { praticaAperta } from "./useDossier";
+import { fits, shouldRedecide } from "./archive";
+import { isDossierOpen } from "./useDossier";
 
 /**
  * Quanto chiede e quanto ha ogni faccia, ad archivio acceso. Si misura su una
@@ -34,7 +34,7 @@ function facceNellaSonda(lista: HTMLElement) {
   const facce = [...sonda.querySelectorAll<HTMLElement>("[data-faccia]")].map((faccia) => {
     const posto = faccia.offsetHeight;
     faccia.style.height = "auto";
-    return { contenuto: faccia.offsetHeight, posto };
+    return { content: faccia.offsetHeight, room: posto };
   });
   sonda.remove();
   return facce;
@@ -50,7 +50,7 @@ function facceNellaSonda(lista: HTMLElement) {
  * in svh) e col puntatore fine solo quando l'archivio non e' sullo schermo. Se
  * lo e', la decisione aspetta che esca.
  */
-export function useArchivioAcceso(schedario: RefObject<HTMLOListElement | null>): boolean {
+export function useArchiveLight(schedario: RefObject<HTMLOListElement | null>): boolean {
   const [ciStanno, setCiStanno] = useState(false);
 
   useEffect(() => {
@@ -73,13 +73,13 @@ export function useArchivioAcceso(schedario: RefObject<HTMLOListElement | null>)
       // A pratica aperta l'archivio sotto non si spegne: una rotazione del
       // telefono misurerebbe una lista con la cartella caduta. Si decide alla
       // chiusura.
-      if (praticaAperta()) {
+      if (isDossierOpen()) {
         inSospeso = true;
         return;
       }
       inSospeso = false;
       const facce = facceNellaSonda(lista);
-      const esito = ciSta(facce);
+      const esito = fits(facce);
       if (racconta) {
         console.debug(
           `[archivio] ${esito ? "acceso" : "colonna"} a ${window.innerWidth}x${window.innerHeight}`,
@@ -91,13 +91,13 @@ export function useArchivioAcceso(schedario: RefObject<HTMLOListElement | null>)
     const alResize = () => {
       // A pratica aperta si segna e basta, senza toccare `larghezza`: alla
       // chiusura si confronta con quella di prima dell'apertura.
-      if (praticaAperta()) {
+      if (isDossierOpen()) {
         resizeSospeso = true;
         return;
       }
       const cambiata = window.innerWidth !== larghezza;
       larghezza = window.innerWidth;
-      const quando = ridecidere({ larghezzaCambiata: cambiata, puntatoreFine: fine.matches, inVista });
+      const quando = shouldRedecide({ widthChanged: cambiata, finePointer: fine.matches, inView: inVista });
       if (quando === "ora") decidi();
       else if (quando === "dopo") inSospeso = true;
     };
@@ -110,7 +110,7 @@ export function useArchivioAcceso(schedario: RefObject<HTMLOListElement | null>)
        rimodella l'archivio sotto gli occhi; il resto solo se l'archivio non e'
        sullo schermo, come fa l'IntersectionObserver. */
     const dossier = new MutationObserver(() => {
-      if (praticaAperta()) return;
+      if (isDossierOpen()) return;
       if (resizeSospeso) {
         resizeSospeso = false;
         alResize();

@@ -5,12 +5,12 @@
  * importa a runtime dal guscio che lo monta sarebbe un giro chiuso. Gioco.tsx
  * lo riesporta: e' li' che si va a cercarlo.
  */
-export const LIVELLI = ["schermo", "logiche", "pannello", "notte"] as const;
+export const LEVELS = ["schermo", "logiche", "pannello", "notte"] as const;
 
-export type IdLivello = (typeof LIVELLI)[number];
+export type LevelId = (typeof LEVELS)[number];
 
 /** Il numero che il giocatore legge: il primo livello e' l'1. */
-export const numeroLivello = (id: IdLivello) => LIVELLI.indexOf(id) + 1;
+export const levelNumber = (id: LevelId) => LEVELS.indexOf(id) + 1;
 
 /**
  * Le props di ogni livello, finale compreso.
@@ -21,4 +21,4 @@ export const numeroLivello = (id: IdLivello) => LIVELLI.indexOf(id) + 1;
  * - `visibile`: il gioco e' sullo schermo. Quando e' false i timer del
  *   livello si fermano; quando torna true riprendono (vedi useVisibile).
  */
-export type LivelloProps = { onAvanti: () => void; visibile: boolean };
+export type LevelProps = { onNext: () => void; visible: boolean };

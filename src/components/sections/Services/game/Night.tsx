@@ -2,23 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { numeroLivello, type LivelloProps } from "./levels";
-import { Icona } from "./icons";
+import { levelNumber, type LevelProps } from "./levels";
+import { Icon } from "./icons";
 import {
-  EVENTI,
-  NOTTE_MINUTI,
-  PASSI,
-  PASSO_MS,
-  VOCI,
-  minutoDelPasso,
-  oraDi,
-  oreOnline,
-  striscia,
-  tagli,
-  type Voce,
+  NIGHT_EVENTS,
+  NIGHT_MINUTES,
+  NIGHT_STEPS,
+  STEP_MS,
+  NIGHT_ITEMS,
+  minuteOfStep,
+  clockTime,
+  hoursOnline,
+  uptimeStrip,
+  outages,
+  type NightItem,
 } from "./nightData";
 
-type Testi = Record<Voce, { fatto: string; parato: string }>;
+type Testi = Record<NightItem, { fatto: string; parato: string }>;
 
 /** Le ore scritte sotto la striscia: una ogni due, dalle 23 alle 7. */
 const ORE = [23, 1, 3, 5, 7];
@@ -34,31 +34,31 @@ const ORE = [23, 1, 3, 5, 7];
  * Per questo fermarlo e farlo ripartire (fuori dallo schermo, in StrictMode)
  * non perde niente e non conta doppio.
  */
-export function Notte({ onAvanti, visibile }: LivelloProps) {
+export function Night({ onNext: onAvanti, visible: visibile }: LevelProps) {
   const t = useTranslations("services.gioco.notte");
   const comune = useTranslations("services.gioco.comune");
   const eventi = t.raw("eventi") as Testi;
 
-  const [pronti, setPronti] = useState<ReadonlySet<Voce>>(() => new Set());
+  const [pronti, setPronti] = useState<ReadonlySet<NightItem>>(() => new Set());
   const [dorme, setDorme] = useState(false);
   const [passo, setPasso] = useState(0);
 
-  const mattina = dorme && passo >= PASSI;
+  const mattina = dorme && passo >= NIGHT_STEPS;
   const corre = dorme && !mattina && visibile;
 
   useEffect(() => {
     if (!corre) return;
-    const id = setInterval(() => setPasso((p) => Math.min(p + 1, PASSI)), PASSO_MS);
+    const id = setInterval(() => setPasso((p) => Math.min(p + 1, NIGHT_STEPS)), STEP_MS);
     return () => clearInterval(id);
   }, [corre]);
 
-  const adesso = minutoDelPasso(passo);
-  const accaduti = EVENTI.filter((e) => e.minuto <= adesso);
-  const pezzi = striscia(tagli(pronti, adesso), adesso);
-  const lungo = adesso / NOTTE_MINUTI;
-  const tutto = pronti.size === VOCI.length;
+  const adesso = minuteOfStep(passo);
+  const accaduti = NIGHT_EVENTS.filter((e) => e.minute <= adesso);
+  const pezzi = uptimeStrip(outages(pronti, adesso), adesso);
+  const lungo = adesso / NIGHT_MINUTES;
+  const tutto = pronti.size === NIGHT_ITEMS.length;
 
-  const accendi = (voce: Voce) =>
+  const accendi = (voce: NightItem) =>
     setPronti((prima) => {
       const dopo = new Set(prima);
       if (!dopo.delete(voce)) dopo.add(voce);
@@ -78,11 +78,11 @@ export function Notte({ onAvanti, visibile }: LivelloProps) {
       <div className="sopra">
         <div className="stelle" aria-hidden="true" />
         <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: numeroLivello("notte"), nome: comune("livelli.notte") })}</span>
+          <span className="livello">{comune("etichetta", { numero: levelNumber("notte"), nome: comune("livelli.notte") })}</span>
           <span className="destra">{mattina ? t("cielo.apre") : t("titolo")}</span>
         </div>
         <div className="orologio">
-          <b data-notte-ora>{oraDi(adesso)}</b>
+          <b data-notte-ora>{clockTime(adesso)}</b>
           <span>{t("cielo.orologio")}</span>
         </div>
         <span
@@ -92,7 +92,7 @@ export function Notte({ onAvanti, visibile }: LivelloProps) {
         />
         <div className="traccia" aria-hidden="true">
           {pezzi.map((p, i) => (
-            <i key={i} className={p.giu ? "giu" : "su"} style={{ inlineSize: `${(p.minuti / NOTTE_MINUTI) * 100}%` }} />
+            <i key={i} className={p.down ? "giu" : "su"} style={{ inlineSize: `${(p.minutes / NIGHT_MINUTES) * 100}%` }} />
           ))}
         </div>
         <div className="ore" aria-hidden="true">
@@ -102,11 +102,11 @@ export function Notte({ onAvanti, visibile }: LivelloProps) {
         </div>
         <div className="cronaca" data-notte-cronaca>
           {accaduti.map((e) => {
-            const ok = pronti.has(e.voce);
+            const ok = pronti.has(e.item);
             return (
-              <p key={e.voce}>
-                <b>{oraDi(e.minuto)}</b>
-                <span>{eventi[e.voce].fatto}</span>
+              <p key={e.item}>
+                <b>{clockTime(e.minute)}</b>
+                <span>{eventi[e.item].fatto}</span>
                 <span className={`scudo ${ok ? "si" : "no"}`}>{ok ? t("parato") : t("giu")}</span>
               </p>
             );
@@ -124,7 +124,7 @@ export function Notte({ onAvanti, visibile }: LivelloProps) {
             <p className="spiega">{t("prepara.spiega")}</p>
             <div className="palco">
               <div className="lista">
-                {VOCI.map((voce) => (
+                {NIGHT_ITEMS.map((voce) => (
                   <button
                     key={voce}
                     type="button"
@@ -133,7 +133,7 @@ export function Notte({ onAvanti, visibile }: LivelloProps) {
                     onClick={() => accendi(voce)}
                   >
                     <span className="ic">
-                      <Icona nome={voce} />
+                      <Icon name={voce} />
                     </span>
                     <span>
                       <b>{t(`voci.${voce}`)}</b>
@@ -154,7 +154,7 @@ export function Notte({ onAvanti, visibile }: LivelloProps) {
           <>
             <div>
               <p className="mono">{mattina ? t("mattina.occhiello") : t("corsa.occhiello")}</p>
-              <h3>{mattina ? (tutto ? t("mattina.tutto") : t("mattina.ore", { ore: oreOnline(pronti) })) : t("corsa.titolo")}</h3>
+              <h3>{mattina ? (tutto ? t("mattina.tutto") : t("mattina.ore", { ore: hoursOnline(pronti) })) : t("corsa.titolo")}</h3>
             </div>
             <p className="spiega">
               {mattina ? (tutto ? t("mattina.spiegaTutto") : t("mattina.spiegaParte")) : t("corsa.spiega")}
@@ -162,15 +162,15 @@ export function Notte({ onAvanti, visibile }: LivelloProps) {
             <div className="palco">
               <div className="lista" aria-live="polite">
                 {accaduti.map((e) => {
-                  const ok = pronti.has(e.voce);
+                  const ok = pronti.has(e.item);
                   return (
-                    <div key={e.voce} className="riga corta">
+                    <div key={e.item} className="riga corta">
                       <span className="ic">
-                        <Icona nome={e.voce} />
+                        <Icon name={e.item} />
                       </span>
                       <span>
-                        <b>{t(`voci.${e.voce}`)}</b>
-                        <small>{ok ? eventi[e.voce].parato : danno(e.danno)}</small>
+                        <b>{t(`voci.${e.item}`)}</b>
+                        <small>{ok ? eventi[e.item].parato : danno(e.damage)}</small>
                       </span>
                       <span className={ok ? "si" : "no"} aria-hidden="true">
                         {ok ? "✓" : "✗"}

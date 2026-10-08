@@ -9,7 +9,7 @@ describe("i campioni delle consegne", () => {
     // tavolo fa sui suoi: un campione dichiarato senza disegno e' un buco in
     // pagina, un disegno che nessuno chiama e' codice morto che il giorno dopo
     // qualcuno "sistema" cambiandolo.
-    const dichiarati = new Set(processDeliveries.map((d) => d.campione));
+    const dichiarati = new Set(processDeliveries.map((d) => d.sample));
     const disegnati = new Set(Object.keys(PROCESS_SPECIMENS) as ProcessSample[]);
     for (const id of dichiarati) {
       expect(disegnati.has(id), `il campione "${id}" non sa disegnarsi`).toBe(true);
@@ -20,7 +20,7 @@ describe("i campioni delle consegne", () => {
   });
 
   it("nessuna consegna divide il campione con un'altra: un frammento è di una cosa sola", () => {
-    const usati = processDeliveries.map((d) => d.campione);
+    const usati = processDeliveries.map((d) => d.sample);
     expect(new Set(usati).size).toBe(usati.length);
   });
 

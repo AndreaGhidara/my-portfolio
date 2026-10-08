@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { site } from "@/content/site";
-import { creaChiedi } from "@/lib/news/fetcher";
-import { raccogli } from "@/lib/news/collector";
+import { createFetcher } from "@/lib/news/fetcher";
+import { collectNews } from "@/lib/news/collector";
 
 /**
  * Le notizie della sezione «Le notizie della settimana». Si chiamano da qui e
@@ -14,7 +14,7 @@ import { raccogli } from "@/lib/news/collector";
  */
 export const dynamic = "force-dynamic";
 
-const chiedi = creaChiedi(
+const chiedi = createFetcher(
   (url, init) => fetch(url, init),
   (url) => {
     const headers: Record<string, string> = {
@@ -30,5 +30,5 @@ const chiedi = creaChiedi(
 );
 
 export async function GET() {
-  return NextResponse.json(await raccogli(chiedi, new Date()));
+  return NextResponse.json(await collectNews(chiedi, new Date()));
 }

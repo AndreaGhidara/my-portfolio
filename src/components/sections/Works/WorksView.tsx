@@ -14,7 +14,7 @@ export type WorksViewProps = {
 export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewProps) {
   return (
     <section id="works" aria-labelledby="titolo-works" className="relative px-[var(--gutter)] py-[var(--section-y)]">
-      <Reveal className="mx-auto max-w-4xl" moto="dietro" stagger={0.08}>
+      <Reveal className="mx-auto max-w-4xl" motion="dietro" stagger={0.08}>
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="eyebrow">{eyebrow}</p>
@@ -28,7 +28,7 @@ export function WorksView({ eyebrow, title, intro, labels, items }: WorksViewPro
 
       {/* L'archivio esce dalla colonna del testo: ogni cartella e' larga quanto
           la pagina, tolto il gutter. */}
-      <WorksShelf lavori={items} labels={labels} />
+      <WorksShelf works={items} labels={labels} />
     </section>
   );
 }

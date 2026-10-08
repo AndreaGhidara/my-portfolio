@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { ThemeToggle } from "../ThemeToggle";
 import { ThemeScript } from "../ThemeScript";
 import { TopStateScript } from "../TopStateScript";
-import { SOGLIA_IN_CIMA } from "../atTop";
+import { AT_TOP_THRESHOLD } from "../atTop";
 
 beforeEach(() => {
   document.documentElement.removeAttribute("data-theme");
@@ -60,12 +60,12 @@ describe("TopStateScript", () => {
     const codice = container.querySelector("script")?.innerHTML ?? "";
     const root = document.documentElement;
 
-    Object.defineProperty(window, "scrollY", { value: SOGLIA_IN_CIMA - 1, configurable: true });
+    Object.defineProperty(window, "scrollY", { value: AT_TOP_THRESHOLD - 1, configurable: true });
     root.removeAttribute("data-at-top");
     new Function(codice)();
     expect(root.hasAttribute("data-at-top")).toBe(true);
 
-    Object.defineProperty(window, "scrollY", { value: SOGLIA_IN_CIMA, configurable: true });
+    Object.defineProperty(window, "scrollY", { value: AT_TOP_THRESHOLD, configurable: true });
     root.removeAttribute("data-at-top");
     new Function(codice)();
     expect(root.hasAttribute("data-at-top")).toBe(false);

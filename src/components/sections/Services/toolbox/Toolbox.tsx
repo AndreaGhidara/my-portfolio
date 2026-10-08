@@ -2,11 +2,11 @@
 
 import { useEffect, useReducer, useState } from "react";
 import { useMotionLevel } from "@/animations/motionPolicy";
-import { CAPI, RADICE, ZONE } from "@/content/toolbox";
+import { GARMENTS, ROOT, ZONES } from "@/content/toolbox";
 import { Editor } from "./Editor";
-import { attrezziDi, capo as capoPerId } from "./graph";
-import { Mappa } from "./ToolboxMap";
-import type { Passo, TestiCassetta } from "./types";
+import { toolsIn, garmentById as capoPerId } from "./graph";
+import { ToolboxMap } from "./ToolboxMap";
+import type { ToolboxStep, ToolboxCopy } from "./types";
 
 /**
  * Dove si vede la mappa: con il mouse, e da 1280px in su. Sotto, o con il
@@ -14,29 +14,29 @@ import type { Passo, TestiCassetta } from "./types";
  * davvero quale delle due scatole si vede: qui serve solo a sapere quale
  * animare.
  */
-export const VISTA_MAPPA = "(pointer: fine) and (min-width: 1280px)";
+export const MAP_QUERY = "(pointer: fine) and (min-width: 1280px)";
 
 type Stato = {
-  storia: Passo[];
-  capo: string | null;
+  history: ToolboxStep[];
+  garment: string | null;
   /** Da quale passo della storia e' partito il foglio del telefono, se e' aperto. */
-  foglio: number | null;
+  sheet: number | null;
 };
 
 type Azione =
-  | { tipo: "nodo"; id: string }
-  | { tipo: "capo"; id: string | null }
-  | { tipo: "indietro" }
-  | { tipo: "apri"; id: string }
-  | { tipo: "chiudi" };
+  | { type: "nodo"; id: string }
+  | { type: "capo"; id: string | null }
+  | { type: "indietro" }
+  | { type: "apri"; id: string }
+  | { type: "chiudi" };
 
-const INIZIO: Passo = { tipo: "nodo", id: RADICE.id };
+const INIZIO: ToolboxStep = { kind: "nodo", id: ROOT.id };
 
-function uguale(a: Passo | undefined, b: Passo) {
-  return !!a && a.tipo === b.tipo && a.id === b.id;
+function uguale(a: ToolboxStep | undefined, b: ToolboxStep) {
+  return !!a && a.kind === b.kind && a.id === b.id;
 }
 
-function avanti(storia: Passo[], p: Passo): Passo[] {
+function avanti(storia: ToolboxStep[], p: ToolboxStep): ToolboxStep[] {
   return uguale(storia[storia.length - 1], p) ? storia : [...storia, p];
 }
 
@@ -49,31 +49,31 @@ function avanti(storia: Passo[], p: Passo): Passo[] {
  * «indietro» riporta per ultimo. Tornando su un capo la mappa lo ricuce; tornando
  * al cartellino con un capo scelto, torna la cassetta intera.
  */
-export function riduci(s: Stato, a: Azione): Stato {
-  switch (a.tipo) {
+export function toolboxReducer(s: Stato, a: Azione): Stato {
+  switch (a.type) {
     case "nodo":
-      return { ...s, storia: avanti(s.storia, { tipo: "nodo", id: a.id }) };
+      return { ...s, history: avanti(s.history, { kind: "nodo", id: a.id }) };
     case "capo":
       return {
         ...s,
-        capo: a.id,
-        storia: avanti(s.storia, a.id ? { tipo: "capo", id: a.id } : INIZIO),
+        garment: a.id,
+        history: avanti(s.history, a.id ? { kind: "capo", id: a.id } : INIZIO),
       };
     case "apri": {
-      const storia = avanti(s.storia, { tipo: "nodo", id: a.id });
-      return { ...s, storia, foglio: storia.length - 1 };
+      const storia = avanti(s.history, { kind: "nodo", id: a.id });
+      return { ...s, history: storia, sheet: storia.length - 1 };
     }
     case "chiudi":
-      return { ...s, foglio: null };
+      return { ...s, sheet: null };
     case "indietro": {
-      const fondo = s.foglio ?? 0;
-      if (s.storia.length - 1 <= fondo) return s;
-      const storia = s.storia.slice(0, -1);
+      const fondo = s.sheet ?? 0;
+      if (s.history.length - 1 <= fondo) return s;
+      const storia = s.history.slice(0, -1);
       const cima = storia[storia.length - 1];
-      let capo = s.capo;
-      if (cima.tipo === "capo") capo = cima.id;
-      else if (cima.id === RADICE.id) capo = null;
-      return { ...s, storia, capo };
+      let capo = s.garment;
+      if (cima.kind === "capo") capo = cima.id;
+      else if (cima.id === ROOT.id) capo = null;
+      return { ...s, history: storia, garment: capo };
     }
   }
 }
@@ -81,7 +81,7 @@ export function riduci(s: Stato, a: Azione): Stato {
 function useVistaMappa(): boolean | null {
   const [mappa, setMappa] = useState<boolean | null>(null);
   useEffect(() => {
-    const lista = window.matchMedia(VISTA_MAPPA);
+    const lista = window.matchMedia(MAP_QUERY);
     const aggiorna = () => setMappa(lista.matches);
     aggiorna();
     lista.addEventListener("change", aggiorna);
@@ -97,102 +97,102 @@ function useVistaMappa(): boolean | null {
  * L'elenco per scomparti e' quello che legge uno screen reader, e quello che si
  * vede senza JavaScript.
  */
-export function Cassetta({ testi }: { testi: TestiCassetta }) {
+export function Toolbox({ copy: testi }: { copy: ToolboxCopy }) {
   const level = useMotionLevel();
   const vistaMappa = useVistaMappa();
-  const [stato, manda] = useReducer(riduci, {
-    storia: [INIZIO],
-    capo: null,
-    foglio: null,
+  const [stato, manda] = useReducer(toolboxReducer, {
+    history: [INIZIO],
+    garment: null,
+    sheet: null,
   });
-  const capo = stato.capo ? (capoPerId(stato.capo) ?? null) : null;
-  const passo = stato.storia[stato.storia.length - 1];
+  const capo = stato.garment ? (capoPerId(stato.garment) ?? null) : null;
+  const passo = stato.history[stato.history.length - 1];
 
   // Il foglio e' del telefono: se la finestra si allarga fino alla mappa, si chiude.
   useEffect(() => {
-    if (vistaMappa && stato.foglio !== null) manda({ tipo: "chiudi" });
-  }, [vistaMappa, stato.foglio]);
+    if (vistaMappa && stato.sheet !== null) manda({ type: "chiudi" });
+  }, [vistaMappa, stato.sheet]);
 
-  const e = testi.etichetta;
+  const e = testi.label;
   const indietroMappa =
-    stato.storia.length > 1 ? (
+    stato.history.length > 1 ? (
       <button
         type="button"
-        onClick={() => manda({ tipo: "indietro" })}
+        onClick={() => manda({ type: "indietro" })}
       >
         <span aria-hidden="true">‹ </span>
-        {e.indietro}
+        {e.back}
       </button>
     ) : null;
 
   return (
     <div data-cassetta data-motion={level}>
-      <div data-cassetta-cuci role="group" aria-label={testi.cuciPer}>
-        <span aria-hidden="true">{testi.cuciPer}</span>
-        {CAPI.map((c) => (
+      <div data-cassetta-cuci role="group" aria-label={testi.sewFor}>
+        <span aria-hidden="true">{testi.sewFor}</span>
+        {GARMENTS.map((c) => (
           <button
             key={c.id}
             type="button"
-            aria-pressed={stato.capo === c.id}
-            onClick={() => manda({ tipo: "capo", id: c.id })}
+            aria-pressed={stato.garment === c.id}
+            onClick={() => manda({ type: "capo", id: c.id })}
           >
-            {testi.capi[c.id].nome}
+            {testi.garments[c.id].name}
           </button>
         ))}
         <button
           type="button"
           data-tutta
-          aria-pressed={stato.capo === null}
-          onClick={() => manda({ tipo: "capo", id: null })}
+          aria-pressed={stato.garment === null}
+          onClick={() => manda({ type: "capo", id: null })}
         >
-          {testi.tutta}
+          {testi.whole}
         </button>
       </div>
-      <p data-cassetta-partenza>{testi.partenza}</p>
+      <p data-cassetta-partenza>{testi.start}</p>
 
       <div data-cassetta-scena>
-        <Mappa
-          testi={testi}
-          capo={capo}
-          passo={passo}
-          onNodo={(id) => manda({ tipo: "nodo", id })}
-          onCapo={(id) => manda({ tipo: "capo", id })}
-          azioni={indietroMappa}
+        <ToolboxMap
+          copy={testi}
+          garment={capo}
+          step={passo}
+          onNode={(id) => manda({ type: "nodo", id })}
+          onGarment={(id) => manda({ type: "capo", id })}
+          actions={indietroMappa}
           level={level}
-          attiva={vistaMappa === true}
+          active={vistaMappa === true}
         />
         <Editor
-          testi={testi}
-          capo={capo}
-          passo={passo}
-          foglioAperto={stato.foglio !== null && vistaMappa === false}
-          puoIndietro={
-            stato.foglio !== null && stato.storia.length - 1 > stato.foglio
+          copy={testi}
+          garment={capo}
+          step={passo}
+          sheetOpen={stato.sheet !== null && vistaMappa === false}
+          canGoBack={
+            stato.sheet !== null && stato.history.length - 1 > stato.sheet
           }
-          onApri={(id) => manda({ tipo: "apri", id })}
-          onNodo={(id) => manda({ tipo: "nodo", id })}
-          onCapo={(id) => manda({ tipo: "capo", id })}
-          onIndietro={() => manda({ tipo: "indietro" })}
-          onChiudi={() => manda({ tipo: "chiudi" })}
+          onOpen={(id) => manda({ type: "apri", id })}
+          onNode={(id) => manda({ type: "nodo", id })}
+          onGarment={(id) => manda({ type: "capo", id })}
+          onBack={() => manda({ type: "indietro" })}
+          onClose={() => manda({ type: "chiudi" })}
           level={level}
-          attiva={vistaMappa === false}
+          active={vistaMappa === false}
         />
       </div>
 
       <div data-cassetta-elenco>
-        <h3>{testi.elenco}</h3>
-        {ZONE.map((z) => (
+        <h3>{testi.list}</h3>
+        {ZONES.map((z) => (
           // Un div e non una section: nove scomparti sarebbero nove landmark,
           // e la mappa della pagina ne resterebbe sommersa. Basta l'h4.
           <div key={z.id}>
-            <h4>{testi.zone[z.id].nome}</h4>
-            <p>{testi.zone[z.id].cosa}</p>
+            <h4>{testi.zones[z.id].name}</h4>
+            <p>{testi.zones[z.id].what}</p>
             <ul>
-              {attrezziDi(z.id).map((a) => (
+              {toolsIn(z.id).map((a) => (
                 <li key={a.id}>
-                  <b>{a.nome}</b>: {testi.attrezzi[a.id].cosa}{" "}
+                  <b>{a.name}</b>: {testi.tools[a.id].what}{" "}
                   <span>
-                    ({a.provato === "lavoro" ? e.lavoro : e.conosciuto})
+                    ({a.experience === "lavoro" ? e.atWork : e.known})
                   </span>
                 </li>
               ))}

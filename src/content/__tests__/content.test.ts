@@ -63,9 +63,9 @@ describe("servizi", () => {
     // Sono le voci dello scontrino e i richiami della tavola: la tavola ha sei
     // posti, e sotto i quattro il disegno resta mezzo vuoto.
     for (const service of services) {
-      expect(service.pezzi.length, service.id).toBeGreaterThanOrEqual(4);
-      expect(service.pezzi.length, service.id).toBeLessThanOrEqual(6);
-      for (const pezzo of service.pezzi) {
+      expect(service.pieces.length, service.id).toBeGreaterThanOrEqual(4);
+      expect(service.pieces.length, service.id).toBeLessThanOrEqual(6);
+      for (const pezzo of service.pieces) {
         expect(itKeys).toContain(`services.list.${service.id}.pezzi.${pezzo}`);
         expect(enKeys).toContain(`services.list.${service.id}.pezzi.${pezzo}`);
       }
@@ -87,7 +87,7 @@ describe("lavori", () => {
   });
 
   it("lo stato e' scritto, non ricavato dall'anno: in corso solo il lavoro di adesso", () => {
-    expect(Object.fromEntries(works.map((w) => [w.id, w.stato]))).toEqual({
+    expect(Object.fromEntries(works.map((w) => [w.id, w.status]))).toEqual({
       riservato: "in-corso",
       bdroppy: "consegnato",
       aidify: "consegnato",

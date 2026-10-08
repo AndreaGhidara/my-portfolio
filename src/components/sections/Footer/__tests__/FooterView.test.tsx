@@ -6,11 +6,11 @@ import { FooterView } from "../FooterView";
 
 const props = {
   tagline: "Costruisco software per il web. Da Torino, per chi ha un'attività da far crescere.",
-  rispondiA: "Rispondi a",
-  ancheQui: "Anche qui",
-  citta: "10100 Torino (TO), Italia",
-  ufficio: "TORINO",
-  paese: "ITALIA",
+  replyTo: "Rispondi a",
+  alsoHere: "Anche qui",
+  city: "10100 Torino (TO), Italia",
+  office: "TORINO",
+  country: "ITALIA",
   rights: "Tutti i diritti riservati.",
   name: "Andrea Ghidara",
   email: "andrea.ghidara.dev@gmail.com",
@@ -59,10 +59,10 @@ describe("FooterView", () => {
     // disegno di busta con dentro un piede qualsiasi.
     render(<FooterView {...props} />);
     const indirizzo = screen.getByTestId("busta-indirizzo");
-    expect(within(indirizzo).getByText(props.rispondiA)).toBeVisible();
+    expect(within(indirizzo).getByText(props.replyTo)).toBeVisible();
     expect(within(indirizzo).getByText(props.name)).toBeVisible();
     expect(within(indirizzo).getByRole("link", { name: props.email })).toBeVisible();
-    expect(within(indirizzo).getByText(props.citta)).toBeVisible();
+    expect(within(indirizzo).getByText(props.city)).toBeVisible();
   });
 
   it("la tagline resta nel piede: è l'unico posto del sito in cui esiste", () => {
@@ -77,7 +77,7 @@ describe("FooterView", () => {
     // L'etichetta dice cosa c'e' davvero li' dentro: altri posti dove trovarlo.
     render(<FooterView {...props} />);
     const profili = screen.getByTestId("busta-profili");
-    expect(within(profili).getByText(props.ancheQui)).toBeVisible();
+    expect(within(profili).getByText(props.alsoHere)).toBeVisible();
     expect(screen.queryByText(/mittente/i)).not.toBeInTheDocument();
   });
 

@@ -8,17 +8,17 @@
  * (docs/prototipi/2026-09-27-cartelle-archivio.html): cambiarli qui senza
  * ripassare da li' e' ritarare a occhio chiuso.
  */
-export const PARAMETRI = {
+export const ARCHIVE_PARAMS = {
   /** Px: quanto piu' in basso si ferma ogni cartella rispetto alla precedente. */
-  passo: 14,
+  step: 14,
   /** Vh d'aria fra una cartella e la successiva: lo scroll lo da' gia' l'altezza della cartella. */
-  distanza: 10,
+  distance: 10,
   /** Luminosita' persa per ogni cartella che ne copre un'altra. */
-  scurisce: 0.22,
+  darkens: 0.22,
   /** Scala persa per ogni cartella che ne copre un'altra. */
-  stringe: 0.03,
+  narrows: 0.03,
   /** Percento della larghezza: di quanto e' sfalsata ogni linguetta, ed e' anche la sua larghezza. */
-  larghezzaLinguetta: 23,
+  tabWidth: 23,
 } as const;
 
 const limita = (v: number) => Math.min(1, Math.max(0, v));
@@ -27,14 +27,14 @@ const limita = (v: number) => Math.min(1, Math.max(0, v));
  * Quanto una cartella che arriva copre quella sotto: 0 finche' la sua cima sta
  * sotto lo schermo, 1 quando e' ferma al suo `top` sticky.
  */
-export function copertura({
-  cima,
-  fermo,
-  schermo,
+export function archiveCoverage({
+  top: cima,
+  stop: fermo,
+  screen: schermo,
 }: {
-  cima: number;
-  fermo: number;
-  schermo: number;
+  top: number;
+  stop: number;
+  screen: number;
 }): number {
   const corsa = schermo - fermo;
   // Una corsa nulla o negativa e' una cartella gia' arrivata o mai partita:
@@ -48,7 +48,7 @@ export function copertura({
  * arrivano sopra. `cime` sono i rettangoli di adesso, `fermi` i `top` sticky
  * (misurati una volta, non a ogni fotogramma). L'ultima non e' mai sotto.
  */
-export function profondita(
+export function depths(
   cime: readonly number[],
   fermi: readonly number[],
   schermo: number,
@@ -56,7 +56,7 @@ export function profondita(
   return cime.map((_, i) => {
     let p = 0;
     for (let j = i + 1; j < cime.length; j++) {
-      p += copertura({ cima: cime[j], fermo: fermi[j], schermo });
+      p += archiveCoverage({ top: cime[j], stop: fermi[j], screen: schermo });
     }
     return p;
   });
@@ -74,18 +74,18 @@ export function profondita(
  * la cima della prima nel documento, `passo` altezza di una cartella piu' la
  * distanza fra due: sono tutte alte uguali, apposta.
  */
-export function ritorno({
-  inizio,
-  passo,
-  fermi,
+export function returnTop({
+  start: inizio,
+  step: passo,
+  stops: fermi,
   i,
-  schermo,
+  screen: schermo,
 }: {
-  inizio: number;
-  passo: number;
-  fermi: readonly number[];
+  start: number;
+  step: number;
+  stops: readonly number[];
   i: number;
-  schermo: number;
+  screen: number;
 }): number {
   const ferma = inizio + i * passo - fermi[i];
   if (i + 1 >= fermi.length) return ferma;
@@ -101,10 +101,10 @@ export function ritorno({
  * Un pixel di tolleranza per gli arrotondamenti. Una faccia alta zero non ci
  * sta: vuol dire che non c'e' stato layout da misurare.
  */
-export function ciSta(facce: readonly { contenuto: number; posto: number }[]): boolean {
+export function fits(facce: readonly { content: number; room: number }[]): boolean {
   return (
     facce.length > 0 &&
-    facce.every(({ contenuto, posto }) => posto > 0 && contenuto <= posto + 1)
+    facce.every(({ content: contenuto, room: posto }) => posto > 0 && contenuto <= posto + 1)
   );
 }
 
@@ -118,14 +118,14 @@ export function ciSta(facce: readonly { contenuto: number; posto: number }[]): b
  * l'archivio e' sullo schermo: passare da una forma all'altra sotto gli occhi
  * di chi legge fa saltare la pagina. Si aspetta che esca.
  */
-export function ridecidere({
-  larghezzaCambiata,
-  puntatoreFine,
-  inVista,
+export function shouldRedecide({
+  widthChanged: larghezzaCambiata,
+  finePointer: puntatoreFine,
+  inView: inVista,
 }: {
-  larghezzaCambiata: boolean;
-  puntatoreFine: boolean;
-  inVista: boolean;
+  widthChanged: boolean;
+  finePointer: boolean;
+  inView: boolean;
 }): "ora" | "dopo" | "mai" {
   if (larghezzaCambiata) return "ora";
   if (!puntatoreFine) return "mai";
@@ -151,15 +151,15 @@ export function ridecidere({
  *   gia' alla soglia). E' un gradino di tono piccolo, e capita solo mentre la
  *   cartella scende da due a tre.
  */
-export const LINGUETTA = {
-  pieno: 0.3,
-  chiaro: 2.05,
-  buioMinimo: 0.55,
+export const TAB = {
+  full: 0.3,
+  light: 2.05,
+  minDark: 0.55,
 } as const;
 
 /** Il tono del testo della linguetta a profondita' `p`: 0 di sempre, 1 pieno, 2 carta. */
-export function tonoLinguetta(p: number): 0 | 1 | 2 {
-  if (p >= LINGUETTA.chiaro) return 2;
-  if (p >= LINGUETTA.pieno) return 1;
+export function tabTone(p: number): 0 | 1 | 2 {
+  if (p >= TAB.light) return 2;
+  if (p >= TAB.full) return 1;
   return 0;
 }

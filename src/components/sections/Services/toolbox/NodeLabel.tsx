@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
 import {
-  attrezzo,
-  attrezziDi,
-  capiCon,
-  capo as capoPerId,
-  nodo,
-  pesiOrdinati,
-  vicini,
+  toolById,
+  toolsIn,
+  garmentsWith,
+  garmentById as capoPerId,
+  nodeById,
+  sortedWeights,
+  neighbours,
 } from "./graph";
-import type { Passo, TestiCassetta } from "./types";
+import type { ToolboxStep, ToolboxCopy } from "./types";
 
 /**
  * L'etichetta cucita dentro il capo: marca, composizione, fibre, cura, e in
@@ -19,33 +19,33 @@ import type { Passo, TestiCassetta } from "./types";
  * il percorso da tastiera per la cassetta intera: dal cartellino si scende
  * agli scomparti, dagli scomparti agli attrezzi, dagli attrezzi a chi li usa.
  */
-export function Etichetta({
-  passo,
-  testi,
-  onNodo,
-  onCapo,
-  azioni,
-  titoloId,
-  soloAttrezzi = false,
+export function NodeLabel({
+  step: passo,
+  copy: testi,
+  onNode: onNodo,
+  onGarment: onCapo,
+  actions: azioni,
+  titleId: titoloId,
+  toolsOnly: soloAttrezzi = false,
 }: {
-  passo: Passo;
-  testi: TestiCassetta;
-  onNodo: (id: string) => void;
-  onCapo: (id: string) => void;
+  step: ToolboxStep;
+  copy: ToolboxCopy;
+  onNode: (id: string) => void;
+  onGarment: (id: string) => void;
   /** Indietro, e sul telefono chiudi: stanno nell'orlo. */
-  azioni?: ReactNode;
-  titoloId?: string;
+  actions?: ReactNode;
+  titleId?: string;
   /** Sul telefono «si abbina a» elenca solo attrezzi: gli snodi li' non esistono. */
-  soloAttrezzi?: boolean;
+  toolsOnly?: boolean;
 }) {
-  const e = testi.etichetta;
+  const e = testi.label;
 
   const nomeNodo = (id: string) => {
-    const n = nodo(id);
+    const n = nodeById(id);
     if (!n) return id;
-    if (n.tipo === "radice") return testi.radice.nome;
-    if (n.tipo === "snodo") return testi.zone[n.zona!].snodo;
-    return attrezzo(id)!.nome;
+    if (n.kind === "radice") return testi.root.name;
+    if (n.kind === "snodo") return testi.zones[n.zone!].junction;
+    return toolById(id)!.name;
   };
 
   const chipNodo = (id: string) => (
@@ -53,7 +53,7 @@ export function Etichetta({
       key={id}
       type="button"
       data-cassetta-chip
-      data-zona={nodo(id)?.zona ?? undefined}
+      data-zona={nodeById(id)?.zone ?? undefined}
       onClick={() => onNodo(id)}
     >
       {nomeNodo(id)}
@@ -67,112 +67,112 @@ export function Etichetta({
       data-cassetta-chip
       onClick={() => onCapo(id)}
     >
-      {testi.capi[id].nome}
+      {testi.garments[id].name}
     </button>
   );
 
   let titolo: string;
   let riga: string;
   let corpo: ReactNode;
-  let taglia = e.tagliaUno;
+  let taglia = e.sizeOne;
 
-  if (passo.tipo === "capo") {
+  if (passo.kind === "capo") {
     const c = capoPerId(passo.id)!;
-    const tc = testi.capi[c.id];
-    titolo = tc.nome;
-    riga = tc.perche;
-    taglia = tc.taglia;
+    const tc = testi.garments[c.id];
+    titolo = tc.name;
+    riga = tc.why;
+    taglia = tc.size;
     corpo = (
       <>
         <p data-etichetta-voce>
-          {e.composizione} <span data-etichetta-stima>· {e.stima}</span>
+          {e.composition} <span data-etichetta-stima>· {e.estimate}</span>
         </p>
         <ul data-etichetta-comp>
-          {pesiOrdinati(c).map(([z, pc]) => (
+          {sortedWeights(c).map(([z, pc]) => (
             <li key={z} data-zona={z}>
               <span aria-hidden="true" style={{ width: `${pc}%` }} />
               <em>
-                {pc}% {testi.zone[z].nome}
+                {pc}% {testi.zones[z].name}
               </em>
             </li>
           ))}
         </ul>
-        <p data-etichetta-voce>{e.fibre}</p>
-        <div data-etichetta-chips>{c.usa.map(chipNodo)}</div>
-        <p data-etichetta-voce>{e.cura}</p>
-        {c.alt.map(({ da, a }) => (
+        <p data-etichetta-voce>{e.fibres}</p>
+        <div data-etichetta-chips>{c.uses.map(chipNodo)}</div>
+        <p data-etichetta-voce>{e.care}</p>
+        {c.alt.map(({ from: da, to: a }) => (
           <p key={da} data-etichetta-cura>
-            <i aria-hidden="true">↺</i> {e.curaSe} <b>{attrezzo(a)!.nome}</b>{" "}
-            {e.alPosto} <b>{attrezzo(da)!.nome}</b>: {tc.alt[da]}.
+            <i aria-hidden="true">↺</i> {e.careIf} <b>{toolById(a)!.name}</b>{" "}
+            {e.insteadOf} <b>{toolById(da)!.name}</b>: {tc.alt[da]}.
           </p>
         ))}
       </>
     );
   } else {
-    const n = nodo(passo.id)!;
+    const n = nodeById(passo.id)!;
     // Lo scomparto di un attrezzo ha gia' la sua voce: qui non si ripete.
-    const conChi = vicini(n.id).filter(
+    const conChi = neighbours(n.id).filter(
       (id) =>
-        (!soloAttrezzi || nodo(id)?.tipo === "attrezzo") &&
-        !(n.tipo === "attrezzo" && id === n.zona),
+        (!soloAttrezzi || nodeById(id)?.kind === "attrezzo") &&
+        !(n.kind === "attrezzo" && id === n.zone),
     );
     const abbina = conChi.length ? (
       <>
-        <p data-etichetta-voce>{e.siAbbina}</p>
+        <p data-etichetta-voce>{e.pairsWith}</p>
         <div data-etichetta-chips>{conChi.map(chipNodo)}</div>
       </>
     ) : null;
 
-    if (n.tipo === "radice") {
-      titolo = testi.radice.nome;
-      riga = testi.radice.cosa;
+    if (n.kind === "radice") {
+      titolo = testi.root.name;
+      riga = testi.root.what;
       corpo = abbina;
-    } else if (n.tipo === "snodo") {
-      const z = testi.zone[n.zona!];
-      const dentro = attrezziDi(n.zona!).map((a) => a.id);
+    } else if (n.kind === "snodo") {
+      const z = testi.zones[n.zone!];
+      const dentro = toolsIn(n.zone!).map((a) => a.id);
       // Oltre a quello che contiene, lo scomparto porta agli scomparti
       // vicini: da tastiera e' l'unico modo di passare dal back-end ai dati
       // senza scendere dentro un attrezzo.
       const fuori = conChi.filter((id) => !dentro.includes(id));
-      titolo = z.nome;
-      riga = z.cosa;
+      titolo = z.name;
+      riga = z.what;
       corpo = (
         <>
-          <p data-etichetta-voce>{e.contiene}</p>
+          <p data-etichetta-voce>{e.contains}</p>
           <div data-etichetta-chips>{dentro.map(chipNodo)}</div>
           {fuori.length > 0 && (
             <>
-              <p data-etichetta-voce>{e.siAbbina}</p>
+              <p data-etichetta-voce>{e.pairsWith}</p>
               <div data-etichetta-chips>{fuori.map(chipNodo)}</div>
             </>
           )}
         </>
       );
     } else {
-      const a = attrezzo(n.id)!;
-      const per = capiCon(n.id);
-      titolo = a.nome;
-      riga = testi.attrezzi[a.id].cosa;
+      const a = toolById(n.id)!;
+      const per = garmentsWith(n.id);
+      titolo = a.name;
+      riga = testi.tools[a.id].what;
       corpo = (
         <>
-          <p data-etichetta-voce>{e.provato}</p>
-          <p data-etichetta-riga data-provato={a.provato}>
-            {a.provato === "lavoro" ? e.lavoro : e.conosciuto}
+          <p data-etichetta-voce>{e.tried}</p>
+          <p data-etichetta-riga data-provato={a.experience}>
+            {a.experience === "lavoro" ? e.atWork : e.known}
           </p>
-          <p data-etichetta-voce>{e.scomparto}</p>
+          <p data-etichetta-voce>{e.compartment}</p>
           <div data-etichetta-chips>
             {soloAttrezzi ? (
-              <span data-etichetta-riga>{testi.zone[a.zona].nome}</span>
+              <span data-etichetta-riga>{testi.zones[a.zone].name}</span>
             ) : (
-              chipNodo(a.zona)
+              chipNodo(a.zone)
             )}
           </div>
-          <p data-etichetta-voce>{e.entraIn}</p>
+          <p data-etichetta-voce>{e.fitsIn}</p>
           <div data-etichetta-chips>
             {per.length ? (
               per.map((c) => chipCapo(c.id))
             ) : (
-              <span data-etichetta-riga>{e.suRichiesta}</span>
+              <span data-etichetta-riga>{e.onRequest}</span>
             )}
           </div>
           {abbina}
@@ -184,7 +184,7 @@ export function Etichetta({
   return (
     <div data-etichetta>
       <div data-etichetta-orlo>{azioni}</div>
-      <p data-etichetta-marca>{e.marca}</p>
+      <p data-etichetta-marca>{e.brand}</p>
       <h3 id={titoloId}>{titolo}</h3>
       <p data-etichetta-riga>{riga}</p>
       {corpo}

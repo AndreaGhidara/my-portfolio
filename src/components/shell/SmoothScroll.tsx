@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import type Lenis from "lenis";
 import { useMotionLevel } from "@/animations/motionPolicy";
-import { quandoLibero } from "@/animations/whenIdle";
+import { whenIdle } from "@/animations/whenIdle";
 
 /**
  * Lo scroll fluido acceso in questo momento, o null. Serve a chi deve portare
@@ -19,7 +19,7 @@ import { quandoLibero } from "@/animations/whenIdle";
  */
 let attiva: Lenis | null = null;
 
-export function lenisAttiva(): Lenis | null {
+export function activeLenis(): Lenis | null {
   return attiva;
 }
 
@@ -93,7 +93,7 @@ export function SmoothScroll() {
     // Dopo la prima pittura, come le animazioni: qui non c'e' niente da
     // mostrare, c'e' solo da rendere piu' morbido un gesto che l'utente non ha
     // ancora fatto.
-    const annulla = quandoLibero(() => void avvia());
+    const annulla = whenIdle(() => void avvia());
 
     return () => {
       vivo = false;

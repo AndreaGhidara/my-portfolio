@@ -19,13 +19,13 @@ export async function Contact() {
         title: t("client.title"),
         body: t("client.body"),
       }}
-      dopo={{
-        etichetta: t("dopo.etichetta"),
-        momenti: DOPO_IDS.map((id) => ({
+      after={{
+        label: t("dopo.etichetta"),
+        moments: DOPO_IDS.map((id) => ({
           id,
-          quando: t(`dopo.momenti.${id}.quando`),
-          titolo: t(`dopo.momenti.${id}.titolo`),
-          testo: t(`dopo.momenti.${id}.testo`),
+          when: t(`dopo.momenti.${id}.quando`),
+          title: t(`dopo.momenti.${id}.titolo`),
+          text: t(`dopo.momenti.${id}.testo`),
         })),
       }}
       recruiter={{

@@ -20,33 +20,33 @@
  * corsa si cancellano le animazioni e resta il CSS di prima.
  */
 
-export type Cartella = {
+export type Folder = {
   li: HTMLElement;
-  linguetta: HTMLElement;
-  dorso: HTMLElement;
-  faccia: HTMLElement;
-  foglio: HTMLElement;
+  tab: HTMLElement;
+  spine: HTMLElement;
+  face: HTMLElement;
+  sheet: HTMLElement;
   /** «Apri il caso»: dove torna il fuoco a pratica chiusa. */
-  apri: HTMLElement;
+  openButton: HTMLElement;
 };
 
 /** I quattro tempi, oppure (movimento a "none") una dissolvenza e basta. */
-export type Moto = "quattro-tempi" | "dissolvenza";
+export type FolderMotion = "quattro-tempi" | "dissolvenza";
 
 /** Quel tanto di Animation che serve qui, e che si sa finto senza WAAPI. */
-export type Mossa = { finished: Promise<unknown>; cancel(): void };
+export type Move = { finished: Promise<unknown>; cancel(): void };
 
-export type Scivolata = {
+export type Slide = {
   /** Tempi 3 e 4. Si chiama dopo il commit: il contenuto dev'essere nel DOM. */
-  apri(dialog: HTMLDialogElement): Promise<void>;
+  open(dialog: HTMLDialogElement): Promise<void>;
   /** La chiusura orchestrata: le parti svaniscono, il foglio si stringe, close(). */
-  chiudi(dialog: HTMLDialogElement): Promise<void>;
+  close(dialog: HTMLDialogElement): Promise<void>;
   /** Il dialog si e' chiuso senza chiedere: del foglio non si anima piu' niente. */
-  lasciaIlFoglio(dialog: HTMLDialogElement): void;
+  releaseSheet(dialog: HTMLDialogElement): void;
   /** La cartella risale da sotto, e il foglio rientra nella tasca. */
-  risali(): Promise<void>;
+  rise(): Promise<void>;
   /** Tutto fermo: fine corsa, o componente smontato a meta'. */
-  ferma(): void;
+  stop(): void;
 };
 
 const MORBIDO = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -65,30 +65,30 @@ const INCLINA = -1.4;
  * Element.animate, o un'animazione gia' finita dove non esiste (jsdom): il
  * resto del codice non deve sapere se il browser anima davvero.
  */
-export function anima(
+export function animate(
   el: Element,
   frames: Keyframe[],
   { durata, ritardo = 0, curva = MORBIDO }: { durata: number; ritardo?: number; curva?: string },
-): Mossa {
+): Move {
   if (typeof el.animate !== "function") return { finished: Promise.resolve(), cancel() {} };
   return el.animate(frames, { duration: durata, delay: ritardo, easing: curva, fill: "both" });
 }
 
 /** cancel() rigetta `finished`: chi aspettava una mossa fermata smette e basta. */
-const finite = (mosse: Mossa[]) =>
+const finite = (mosse: Move[]) =>
   Promise.all(mosse.map((m) => m.finished.catch(() => undefined))).then(() => undefined);
 
-export function scivola(c: Cartella, moto: Moto): Scivolata {
+export function slide(c: Folder, moto: FolderMotion): Slide {
   /* Due mucchi: quello del dialog se ne va col foglio della pratica, quello
      della cartella solo quando la cartella e' di nuovo al suo posto. */
-  const suDialog = new Set<Mossa>();
-  const suCartella = new Set<Mossa>();
-  const muovi = (mucchio: Set<Mossa>, el: Element, frames: Keyframe[], opzioni: Parameters<typeof anima>[2]) => {
-    const m = anima(el, frames, opzioni);
+  const suDialog = new Set<Move>();
+  const suCartella = new Set<Move>();
+  const muovi = (mucchio: Set<Move>, el: Element, frames: Keyframe[], opzioni: Parameters<typeof animate>[2]) => {
+    const m = animate(el, frames, opzioni);
     mucchio.add(m);
     return m;
   };
-  const cancella = (mucchio: Set<Mossa>) => {
+  const cancella = (mucchio: Set<Move>) => {
     for (const m of mucchio) m.cancel();
     mucchio.clear();
   };
@@ -96,10 +96,10 @@ export function scivola(c: Cartella, moto: Moto): Scivolata {
   let fermo = false;
   let senzaFoglio = false;
   let dialogAperto: HTMLDialogElement | null = null;
-  const cade = [c.linguetta, c.dorso, c.faccia];
+  const cade = [c.tab, c.spine, c.face];
 
   // Misurato al clic, dopo che useProfondita ha riportato davanti la cartella.
-  const alto = c.faccia.offsetHeight - 16;
+  const alto = c.face.offsetHeight - 16;
   const giu = window.innerHeight - c.li.getBoundingClientRect().top + 40;
   const ombra = getComputedStyle(c.li).getPropertyValue("--cartella-ombra").trim();
   const sfilato: Keyframe = {
@@ -110,13 +110,13 @@ export function scivola(c: Cartella, moto: Moto): Scivolata {
   };
   const caduto = (i: number): Keyframe => ({ translate: `0 ${giu}px`, rotate: `${i === 2 ? 1.6 : 1}deg` });
 
-  let sfila: Mossa | null = null;
-  let scende: Mossa[] = [];
+  let sfila: Move | null = null;
+  let scende: Move[] = [];
   let caduta: Promise<void> = Promise.resolve();
 
   if (moto === "quattro-tempi") {
     // 1. SFILA. Un fotogramma solo: si parte dal foglio com'e' nel CSS.
-    sfila = muovi(suCartella, c.foglio, [sfilato], { durata: 420 });
+    sfila = muovi(suCartella, c.sheet, [sfilato], { durata: 420 });
     // 2. SCENDE. La faccia un attimo dopo la linguetta: la cartella si piega
     // appena cadendo, invece di scendere come un blocco.
     scende = cade.map((el, i) =>
@@ -140,10 +140,10 @@ export function scivola(c: Cartella, moto: Moto): Scivolata {
   const partenza = (pratica: HTMLElement) => {
     const li = c.li.getBoundingClientRect();
     const r = {
-      left: li.left + c.foglio.offsetLeft,
-      top: li.top + c.foglio.offsetTop - SU,
-      width: c.foglio.offsetWidth,
-      height: c.foglio.offsetHeight,
+      left: li.left + c.sheet.offsetLeft,
+      top: li.top + c.sheet.offsetTop - SU,
+      width: c.sheet.offsetWidth,
+      height: c.sheet.offsetHeight,
     };
     const d = pratica.getBoundingClientRect();
     const alta = Math.max(1, Math.min(d.height, window.innerHeight - d.top));
@@ -156,7 +156,7 @@ export function scivola(c: Cartella, moto: Moto): Scivolata {
       // -3rem: la linguetta della pratica sta sopra il foglio, e resta.
       clipPath: `inset(-3rem -3rem ${sotto > 0 ? `${sotto}px` : "-3rem"} -3rem)`,
       // Sullo scuro il foglio della cartella e' un tono sotto la carta.
-      tono: getComputedStyle(c.foglio).backgroundColor,
+      tono: getComputedStyle(c.sheet).backgroundColor,
       carta: getComputedStyle(pratica).backgroundColor,
     };
   };
@@ -182,7 +182,7 @@ export function scivola(c: Cartella, moto: Moto): Scivolata {
   };
 
   return {
-    async apri(dialog) {
+    async open(dialog) {
       dialogAperto = dialog;
       if (moto === "dissolvenza") {
         // Sincrono fino al primo await: a "none" il dialog e' aperto appena
@@ -206,7 +206,7 @@ export function scivola(c: Cartella, moto: Moto): Scivolata {
       dialog.scrollTop = 0;
       const { tono, carta, ...forma } = partenza(pratica);
       // Il foglio della cartella lo copre la pratica, che parte identica.
-      muovi(suDialog, c.foglio, [{ visibility: "hidden" }, { visibility: "hidden" }], { durata: 1 });
+      muovi(suDialog, c.sheet, [{ visibility: "hidden" }, { visibility: "hidden" }], { durata: 1 });
       // Il velo arriva in transizione: serve un fotogramma col ::backdrop gia'
       // disegnato trasparente.
       requestAnimationFrame(() => {
@@ -241,7 +241,7 @@ export function scivola(c: Cartella, moto: Moto): Scivolata {
       }
     },
 
-    async chiudi(dialog) {
+    async close(dialog) {
       if (moto === "dissolvenza") {
         dialog.removeAttribute("data-velo");
         const esce = muovi(suDialog, dialog, [{ opacity: 1 }, { opacity: 0 }], { durata: 140, curva: "ease-in" });
@@ -284,9 +284,9 @@ export function scivola(c: Cartella, moto: Moto): Scivolata {
       chiudiDialog(dialog);
     },
 
-    lasciaIlFoglio,
+    releaseSheet: lasciaIlFoglio,
 
-    async risali() {
+    async rise() {
       if (moto === "dissolvenza" || fermo) return;
       // La cartella risale da sotto e si assesta; parte prima la faccia.
       for (const m of scende) {
@@ -309,12 +309,12 @@ export function scivola(c: Cartella, moto: Moto): Scivolata {
         sfila.cancel();
         suCartella.delete(sfila);
       }
-      const riposa = muovi(suCartella, c.foglio, [{ ...sfilato, offset: 0 }], { durata: 380, curva: RIENTRA });
+      const riposa = muovi(suCartella, c.sheet, [{ ...sfilato, offset: 0 }], { durata: 380, curva: RIENTRA });
       await finite([riposa]);
       if (fermo) return;
       ferma();
     },
 
-    ferma,
+    stop: ferma,
   };
 }

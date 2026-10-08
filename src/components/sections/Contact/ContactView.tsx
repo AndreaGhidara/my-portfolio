@@ -2,13 +2,13 @@ import { Reveal } from "@/animations/components/Reveal";
 import { ContactForm, type ContactFormCopy } from "./ContactForm";
 
 /** Un momento di quello che succede dopo l'invio. L'ordine è nel tempo. */
-export type ContactMomento = { id: string; quando: string; titolo: string; testo: string };
+export type ContactMoment = { id: string; when: string; title: string; text: string };
 
 export type ContactViewProps = {
   eyebrow: string;
   title: string;
   client: { eyebrow: string; title: string; body: string };
-  dopo: { etichetta: string; momenti: ContactMomento[] };
+  after: { label: string; moments: ContactMoment[] };
   recruiter: {
     eyebrow: string;
     title: string;
@@ -45,7 +45,7 @@ export function ContactView({
   eyebrow,
   title,
   client,
-  dopo,
+  after: dopo,
   recruiter,
   cvPath,
   email,
@@ -57,14 +57,14 @@ export function ContactView({
   return (
     <section id="contact" aria-labelledby="titolo-contact" className="relative px-[var(--gutter)] py-[var(--section-y)]">
       <div className="mx-auto max-w-[56rem]">
-        <Reveal moto="dietro" stagger={0.08}>
+        <Reveal motion="dietro" stagger={0.08}>
           <p className="eyebrow">{eyebrow}</p>
           <h2 id="titolo-contact" className="titolo-sezione">{title}</h2>
         </Reveal>
 
         {/* Il foglio e il cartellino entrano uno dopo l'altro, e l'attributo
             resta qui: `[data-contact-due]` e' la griglia a due colonne. */}
-        <Reveal data-contact-due moto="dietro" stagger={0.12}>
+        <Reveal data-contact-due motion="dietro" stagger={0.12}>
           {/* Il foglio: quello che scrivi finisce su una cosa che qualcuno
               legge, non dentro un sistema. Le righe al posto dei riquadri sono
               tutto quello che serve a dirlo. */}
@@ -76,16 +76,16 @@ export function ContactView({
           </div>
 
           <div>
-            <p data-contact-dopo-et>{dopo.etichetta}</p>
+            <p data-contact-dopo-et>{dopo.label}</p>
             {/* Ordinata: i tre momenti hanno un ordine nel tempo, e non e' una
                 scelta di impaginato. */}
             <ol data-contact-tempi>
-              {dopo.momenti.map((momento) => (
+              {dopo.moments.map((momento) => (
                 <li key={momento.id}>
-                  <span data-contact-quando>{momento.quando}</span>
+                  <span data-contact-quando>{momento.when}</span>
                   <div>
-                    <b>{momento.titolo}</b>
-                    <p>{momento.testo}</p>
+                    <b>{momento.title}</b>
+                    <p>{momento.text}</p>
                   </div>
                 </li>
               ))}
@@ -95,7 +95,7 @@ export function ContactView({
 
         {/* Il cartellino entra dopo il foglio: e' la seconda uscita, e la
             sequenza dice quale delle due e' la principale. */}
-        <Reveal data-contact-badge moto="alto" delay={0.05}>
+        <Reveal data-contact-badge motion="alto" delay={0.05}>
           <span data-contact-clip aria-hidden="true" />
           <div data-contact-badge-body>
             <div>

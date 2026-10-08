@@ -3,25 +3,25 @@
 import { useId, useMemo, useRef, useState, type ReactNode } from "react";
 import type { MotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
-import { ZONE, type Capo, type ZonaId } from "@/content/toolbox";
-import { Etichetta } from "./NodeLabel";
+import { ZONES, type Garment, type ZoneId } from "@/content/toolbox";
+import { NodeLabel } from "./NodeLabel";
 import {
-  NODI,
-  altezza,
-  attrezzo,
-  cucitura,
-  curva,
-  larghezza,
-  padre,
-  strada,
-  tappe,
-  vicini,
+  NODES,
+  nodeHeight,
+  toolById,
+  seam,
+  curve,
+  nodeWidth,
+  parentOf,
+  pathTo,
+  garmentStops,
+  neighbours,
 } from "./graph";
-import { FILI, riposo, type Filo } from "./motion";
-import type { Passo, TestiCassetta } from "./types";
-import { useAgo } from "./useNeedle";
-import { ENTRATA, useEntrata } from "./useEntrance";
-import { useTrascinamento } from "./useDrag";
+import { THREADS, restPositions, type Thread } from "./motion";
+import type { ToolboxStep, ToolboxCopy } from "./types";
+import { useNeedle } from "./useNeedle";
+import { ENTRANCE, useEntrance } from "./useEntrance";
+import { useDrag } from "./useDrag";
 
 const LARGO = 1200;
 const ALTO = 820;
@@ -44,25 +44,25 @@ const ALTO = 820;
  * il percorso da tastiera sono i bottoni «cuci per» e l'etichetta qui accanto,
  * che da ogni nodo porta ai suoi vicini; chi legge ha l'elenco per scomparti.
  */
-export function Mappa({
-  testi,
-  capo,
-  passo,
-  onNodo,
-  onCapo,
-  azioni,
+export function ToolboxMap({
+  copy: testi,
+  garment: capo,
+  step: passo,
+  onNode: onNodo,
+  onGarment: onCapo,
+  actions: azioni,
   level,
-  attiva,
+  active: attiva,
 }: {
-  testi: TestiCassetta;
-  capo: Capo | null;
-  passo: Passo;
-  onNodo: (id: string) => void;
-  onCapo: (id: string) => void;
-  azioni: ReactNode;
+  copy: ToolboxCopy;
+  garment: Garment | null;
+  step: ToolboxStep;
+  onNode: (id: string) => void;
+  onGarment: (id: string) => void;
+  actions: ReactNode;
   level: MotionLevel;
   /** Se e' la vista che il CSS mostra adesso: l'altra non si anima. */
-  attiva: boolean;
+  active: boolean;
 }) {
   const banco = useRef<HTMLDivElement | null>(null);
   const svg = useRef<SVGSVGElement | null>(null);
@@ -70,9 +70,9 @@ export function Mappa({
   const [acceso, setAcceso] = useState<string | null>(null);
   const idMaschera = useId().replace(/:/g, "");
 
-  const percorso = useMemo(() => (capo ? tappe(capo) : []), [capo]);
+  const percorso = useMemo(() => (capo ? garmentStops(capo) : []), [capo]);
   const disegnoCucitura = useMemo(
-    () => cucitura(percorso.map((id) => riposo.get(id)!)),
+    () => seam(percorso.map((id) => restPositions.get(id)!)),
     [percorso],
   );
 
@@ -87,21 +87,21 @@ export function Mappa({
 
   const pieno = level === "full" && attiva;
 
-  const entrata = useEntrata(banco, pieno);
-  const { cucituraRef, mascheraRef, agoRef, cuciti } = useAgo({
-    capo,
-    pieno,
-    cucitura: disegnoCucitura,
-    tappe: percorso.length,
+  const entrata = useEntrance(banco, pieno);
+  const { cucituraRef, mascheraRef, agoRef, cuciti } = useNeedle({
+    garment: capo,
+    full: pieno,
+    seam: disegnoCucitura,
+    stops: percorso.length,
     svg,
     gsapRef,
   });
   const { gruppi, tracciati, presa, giu, muovi, su, annulla } =
-    useTrascinamento({
+    useDrag({
       svg,
       gsapRef,
-      pieno,
-      onClic: (id) => {
+      full: pieno,
+      onTap: (id) => {
         onNodo(id);
         if (!capo) setAcceso(id);
       },
@@ -110,21 +110,21 @@ export function Mappa({
   /* La strada fino al cartellino, e i vicini: solo senza un capo scelto,
      perche' con un capo la mappa racconta gia' un'altra cosa. */
   const luce = !capo && acceso ? acceso : null;
-  const stradaAccesa = luce ? strada(luce) : [];
-  const nodiAccesi = new Set(luce ? [...stradaAccesa, ...vicini(luce)] : []);
-  const filoAcceso = (f: Filo) =>
+  const stradaAccesa = luce ? pathTo(luce) : [];
+  const nodiAccesi = new Set(luce ? [...stradaAccesa, ...neighbours(luce)] : []);
+  const filoAcceso = (f: Thread) =>
     !!luce &&
     (f.a === luce ||
       f.b === luce ||
       (stradaAccesa.includes(f.a) &&
         stradaAccesa.includes(f.b) &&
-        (padre(f.b) === f.a || padre(f.a) === f.b)));
+        (parentOf(f.b) === f.a || parentOf(f.a) === f.b)));
 
   const tappaDi = new Map(percorso.map((id, i) => [id, i]));
   const zoneUsate = new Set(
-    capo ? capo.usa.map((id) => attrezzo(id)!.zona) : [],
+    capo ? capo.uses.map((id) => toolById(id)!.zone) : [],
   );
-  const scelto = passo.tipo === "nodo" ? passo.id : null;
+  const scelto = passo.kind === "nodo" ? passo.id : null;
 
   return (
     <div data-cassetta-mappa>
@@ -182,7 +182,7 @@ export function Mappa({
           </defs>
 
           <g>
-            {ZONE.map((z) => {
+            {ZONES.map((z) => {
               const [x, y, w, h] = z.r;
               return (
                 <g
@@ -217,7 +217,7 @@ export function Mappa({
                     textAnchor="end"
                     data-conta
                   >
-                    {testi.zone[z.id].conta}
+                    {testi.zones[z.id].count}
                   </text>
                 </g>
               );
@@ -225,14 +225,14 @@ export function Mappa({
           </g>
 
           <g>
-            {FILI.map((f, i) => (
+            {THREADS.map((f, i) => (
               <path
                 key={`${f.a}-${f.b}`}
                 ref={(el) => {
                   tracciati.current[i] = el;
                 }}
-                d={curva(riposo.get(f.a)!, riposo.get(f.b)!)}
-                data-filo={f.incrocio ? "incrocio" : "ramo"}
+                d={curve(restPositions.get(f.a)!, restPositions.get(f.b)!)}
+                data-filo={f.crossing ? "incrocio" : "ramo"}
                 data-acceso={filoAcceso(f) || undefined}
               />
             ))}
@@ -248,16 +248,16 @@ export function Mappa({
           )}
 
           <g>
-            {NODI.map((n) => {
+            {NODES.map((n) => {
               const testo =
-                n.tipo === "radice"
-                  ? testi.radice.nome
-                  : n.tipo === "snodo"
-                    ? testi.zone[n.zona!].snodo
-                    : attrezzo(n.id)!.nome;
-              const w = larghezza(n.tipo, testo);
-              const h = altezza(n.tipo);
-              const genitore = riposo.get(padre(n.id) ?? n.id)!;
+                n.kind === "radice"
+                  ? testi.root.name
+                  : n.kind === "snodo"
+                    ? testi.zones[n.zone!].junction
+                    : toolById(n.id)!.name;
+              const w = nodeWidth(n.kind, testo);
+              const h = nodeHeight(n.kind);
+              const genitore = restPositions.get(parentOf(n.id) ?? n.id)!;
               const passo = tappaDi.get(n.id);
               return (
                 <g
@@ -267,8 +267,8 @@ export function Mappa({
                     else gruppi.current.delete(n.id);
                   }}
                   transform={`translate(${n.x} ${n.y})`}
-                  data-nodo={n.tipo}
-                  data-zona={n.zona ?? undefined}
+                  data-nodo={n.kind}
+                  data-zona={n.zone ?? undefined}
                   data-acceso={nodiAccesi.has(n.id) || undefined}
                   data-scelto={(!capo && scelto === n.id) || undefined}
                   data-cucito={
@@ -291,7 +291,7 @@ export function Mappa({
                       {
                         "--dx": `${genitore.x - n.x}px`,
                         "--dy": `${genitore.y - n.y}px`,
-                        "--i": ENTRATA.get(n.id) ?? 0,
+                        "--i": ENTRANCE.get(n.id) ?? 0,
                       } as React.CSSProperties
                     }
                   >
@@ -300,7 +300,7 @@ export function Mappa({
                       y={-h / 2}
                       width={w}
                       height={h}
-                      rx={n.tipo === "snodo" ? 13 : 3}
+                      rx={n.kind === "snodo" ? 13 : 3}
                       data-fondo
                     />
                     <rect
@@ -308,10 +308,10 @@ export function Mappa({
                       y={-h / 2 + 3}
                       width={w - 6}
                       height={h - 6}
-                      rx={n.tipo === "snodo" ? 10 : 2}
+                      rx={n.kind === "snodo" ? 10 : 2}
                       data-punti
                     />
-                    <text y={n.tipo === "radice" ? 5 : 4} textAnchor="middle">
+                    <text y={n.kind === "radice" ? 5 : 4} textAnchor="middle">
                       {testo}
                     </text>
                   </g>
@@ -331,15 +331,15 @@ export function Mappa({
         <aside
           data-cassetta-pannello
           aria-live="polite"
-          aria-label={testi.etichetta.nome}
+          aria-label={testi.label.name}
         >
-          <Etichetta
-            key={`${passo.tipo}-${passo.id}`}
-            passo={passo}
-            testi={testi}
-            onNodo={onNodo}
-            onCapo={onCapo}
-            azioni={azioni}
+          <NodeLabel
+            key={`${passo.kind}-${passo.id}`}
+            step={passo}
+            copy={testi}
+            onNode={onNodo}
+            onGarment={onCapo}
+            actions={azioni}
           />
         </aside>
       </div>
@@ -348,7 +348,7 @@ export function Mappa({
 }
 
 /** La trama di ogni pezza: pieni e vuoti, righe, punti, quadretti. Il colore lo decide il CSS. */
-const TRAMA: Record<ZonaId, "righe" | "punti" | "quadretti" | null> = {
+const TRAMA: Record<ZoneId, "righe" | "punti" | "quadretti" | null> = {
   front: null,
   stili: "punti",
   mezzo: null,

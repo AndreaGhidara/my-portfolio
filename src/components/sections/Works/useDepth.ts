@@ -2,12 +2,12 @@
 
 import { useCallback, useRef, type RefObject } from "react";
 import { MEDIA } from "@/animations/motionPolicy";
-import { senzaSpostare } from "@/animations/withoutShift";
+import { withoutShift } from "@/animations/withoutShift";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
-import { lenisAttiva } from "@/components/shell/SmoothScroll";
-import { profondita, ritorno, tonoLinguetta } from "./archive";
-import type { Cartella } from "./slide";
-import { praticaAperta } from "./useDossier";
+import { activeLenis } from "@/components/shell/SmoothScroll";
+import { depths, returnTop, tabTone } from "./archive";
+import type { Folder } from "./slide";
+import { isDossierOpen } from "./useDossier";
 
 /** Ms: quanto dura lo scroll che porta davanti la cartella prima che cada. */
 const SVELTO = 350;
@@ -21,7 +21,7 @@ const SVELTO = 350;
  * arriva se lo scroll viene interrotto.
  */
 function scorri(y: number, modo: "subito" | "svelto" | "morbido"): Promise<void> {
-  const lenis = lenisAttiva();
+  const lenis = activeLenis();
   if (modo === "subito") {
     if (lenis) lenis.scrollTo(y, { immediate: true });
     else window.scrollTo({ top: y, behavior: "instant" });
@@ -57,8 +57,8 @@ function scorri(y: number, modo: "subito" | "svelto" | "morbido"): Promise<void>
  * vedersi sotto la testata del sito: si scorre quel tanto, svelti. Null se
  * c'e' gia' (o se non c'e' layout da misurare).
  */
-function portaInVista(cartella: Cartella): Promise<void> | null {
-  const foglio = cartella.foglio.getBoundingClientRect();
+function portaInVista(cartella: Folder): Promise<void> | null {
+  const foglio = cartella.sheet.getBoundingClientRect();
   if (foglio.height === 0) return null;
   const testata = document.querySelector<HTMLElement>("[data-site-header]")?.offsetHeight ?? 0;
   // 40px: i 22 di cui il foglio sale sfilando, e un respiro.
@@ -90,7 +90,7 @@ type Acceso = {
  * nell'archivio: `riporta`, il clic sulla linguetta, e `prepara`, la cartella
  * in vista prima che cada.
  */
-export function useProfondita(schedario: RefObject<HTMLOListElement | null>, ciStanno: boolean) {
+export function useDepth(schedario: RefObject<HTMLOListElement | null>, ciStanno: boolean) {
   const acceso = useRef<Acceso | null>(null);
 
   useSectionAnimation(
@@ -104,9 +104,9 @@ export function useProfondita(schedario: RefObject<HTMLOListElement | null>, ciS
         /* La colonna: ogni cartella scatta quando tocca a lei. Un innesco
            solo per tutte farebbe partire la quarta quando e' ancora fuori
            dallo schermo, e la sua entrata non la vedrebbe nessuno. */
-        const { daDietro } = presets;
+        const { fromBehind } = presets;
         for (const cartella of cartelle) {
-          daDietro(cartella, { level, trigger: cartella, clearProps: true });
+          fromBehind(cartella, { level, trigger: cartella, clearProps: true });
         }
         return;
       }
@@ -136,7 +136,7 @@ export function useProfondita(schedario: RefObject<HTMLOListElement | null>, ciS
       };
 
       const quanto = () =>
-        profondita(
+        depths(
           cartelle.map((c) => c.getBoundingClientRect().top),
           fermi,
           schermo,
@@ -145,7 +145,7 @@ export function useProfondita(schedario: RefObject<HTMLOListElement | null>, ciS
       const muovi = () => {
         // A pratica aperta la cartella e' caduta, e Lenis e' fermo: niente da
         // riscrivere. Si rifa' alla chiusura (vedi `dossier` sotto).
-        if (praticaAperta()) return;
+        if (isDossierOpen()) return;
         // Tre decimali bastano all'occhio, e risparmiano le scritture (e il
         // ricalcolo degli stili della cartella) quando lo scroll non cambia
         // niente.
@@ -156,7 +156,7 @@ export function useProfondita(schedario: RefObject<HTMLOListElement | null>, ciS
           cartelle[i].style.setProperty("--profondita", String(v));
           // Il tono del testo della linguetta: un attributo e non un conto in
           // CSS, perche' e' una soglia, e il CSS le soglie non le sa fare.
-          const tono = tonoLinguetta(v);
+          const tono = tabTone(v);
           if (tono === toni[i]) continue;
           toni[i] = tono;
           cartelle[i].setAttribute("data-tono-linguetta", String(tono));
@@ -172,14 +172,14 @@ export function useProfondita(schedario: RefObject<HTMLOListElement | null>, ciS
         });
       };
       const alResize = () => {
-        if (praticaAperta()) return;
+        if (isDossierOpen()) return;
         misura();
         muovi();
       };
       // Come in SottoIlFoglio: chiusa la pratica, si rimisura quello che un
       // resize nel frattempo ha cambiato.
       const dossier = new MutationObserver(() => {
-        if (!praticaAperta()) alResize();
+        if (!isDossierOpen()) alResize();
       });
 
       /* Il ritorno: la pagina risale fin dove la cartella si e' appena fermata.
@@ -191,8 +191,8 @@ export function useProfondita(schedario: RefObject<HTMLOListElement | null>, ciS
          carattere arrivato tardi puo' averle spostate. */
       const vaiA = (i: number, modo: "subito" | "svelto" | "morbido") => {
         misura();
-        const y = Math.max(0, ritorno({ inizio, passo, fermi, i, schermo }));
-        return scorri(y, modo === "morbido" && !lenisAttiva() && level !== "full" ? "subito" : modo);
+        const y = Math.max(0, returnTop({ start: inizio, step: passo, stops: fermi, i, screen: schermo }));
+        return scorri(y, modo === "morbido" && !activeLenis() && level !== "full" ? "subito" : modo);
       };
       /** Il ritorno morbido della linguetta in corsa, se ce n'e' uno. */
       let ritornoInCorsa: object | null = null;
@@ -212,7 +212,7 @@ export function useProfondita(schedario: RefObject<HTMLOListElement | null>, ciS
       };
 
       const sezione = lista.closest("section") ?? lista;
-      senzaSpostare(sezione, () => {
+      withoutShift(sezione, () => {
         lista.setAttribute("data-archivio-acceso", "");
         // La sezione e' appena cresciuta di qualche schermo: tutto quello che
         // sta sotto (le entrate, il percorso) va rimisurato.
@@ -265,7 +265,7 @@ export function useProfondita(schedario: RefObject<HTMLOListElement | null>, ciS
         }
         // La stessa crescita al contrario: chi sta sotto deve saperlo, e chi
         // stava guardando sotto resta li'.
-        senzaSpostare(sezione, () => {
+        withoutShift(sezione, () => {
           lista.removeAttribute("data-archivio-acceso");
           ScrollTrigger.refresh();
         });
@@ -294,7 +294,7 @@ export function useProfondita(schedario: RefObject<HTMLOListElement | null>, ciS
   );
 
   const prepara = useCallback(
-    (i: number, cartella: Cartella) => (acceso.current ? acceso.current.preparaCaduta(i) : portaInVista(cartella)),
+    (i: number, cartella: Folder) => (acceso.current ? acceso.current.preparaCaduta(i) : portaInVista(cartella)),
     [],
   );
 

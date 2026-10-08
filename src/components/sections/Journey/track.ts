@@ -10,41 +10,41 @@
  */
 
 /** Un punto del tracciato, in pixel del binario: [x, y]. */
-export type Punto = readonly [number, number];
+export type TrackPoint = readonly [number, number];
 
 /** Inclinazione in gradi e scostamento verticale in rem di un foglio. */
-export type Posa = { rotazione: number; scostamento: number };
+export type Pose = { rotation: number; offset: number };
 
-export const PARAMETRI = {
+export const TRACK_PARAMS = {
   /**
    * Px di scroll per ogni px di strada orizzontale. Sul puntatore grossolano
    * serve piu' corsa: la spinta del pollice porta via molto di piu' di una
    * rotella, e la fila correrebbe via. Il componente non la legge: vive nel
    * CSS, che calcola l'altezza del track; qui sta perche' il numero sia uno.
    */
-  velocita: { fine: 1.2, grossolana: 1.8 },
+  speed: { fine: 1.2, coarse: 1.8 },
   /** Altezze di palco a fila ferma: il filo si completa, l'arrivo si accende e cade. */
-  coda: 1.4,
+  tail: 1.4,
   /** Larghezza di una tappa: il minore fra i rem e i vw. */
-  foglio: { rem: 26, vw: 82 },
+  sheet: { rem: 26, vw: 82 },
   /** Rem di aria fra una tappa e l'altra (e fra l'ultima e l'arrivo). */
-  aria: 12,
+  air: 12,
   /** Larghezza del foglio dei numeri: il minore fra i rem e i vw. */
-  arrivo: { rem: 18, vw: 70 },
+  arrival: { rem: 18, vw: 70 },
   /** Rem di cui l'onda sale e scende fra due punti. */
-  ampiezza: 3.5,
+  amplitude: 3.5,
   /** Gobbe fra il centro di un foglio e il successivo. */
-  onde: 1,
+  waves: 1,
   /**
    * Frazione della larghezza dello schermo che il filo pieno lascia tratteggiata
    * prima del foglio dei numeri durante il viaggio: e' il tratto che la coda
    * riempie, e senza il foglio si accenderebbe senza che il filo ci arrivi.
    */
-  varco: 0.18,
+  gap: 0.18,
   /** Una tappa e' arrivata quando il suo centro e' entro questa frazione di schermo dal centro. */
-  sogliaArrivo: 0.25,
+  arrivalThreshold: 0.25,
   /** I tempi della coda, in frazione della coda: filo pieno, foglio acceso, inizio della caduta. */
-  tempi: { riempito: 0.4, acceso: 0.65, cade: 0.75 },
+  timings: { filled: 0.4, lit: 0.65, falls: 0.75 },
 } as const;
 
 /**
@@ -52,11 +52,11 @@ export const PARAMETRI = {
  * quattro fogli con la stessa inclinazione si leggono come una griglia storta,
  * non come fogli appoggiati uno per uno.
  */
-export const POSE: readonly Posa[] = [
-  { rotazione: -1.1, scostamento: -1.5 },
-  { rotazione: 0.7, scostamento: 1.75 },
-  { rotazione: -0.4, scostamento: -0.5 },
-  { rotazione: 1.3, scostamento: 1.25 },
+export const POSES: readonly Pose[] = [
+  { rotation: -1.1, offset: -1.5 },
+  { rotation: 0.7, offset: 1.75 },
+  { rotation: -0.4, offset: -0.5 },
+  { rotation: 1.3, offset: 1.25 },
 ];
 
 /**
@@ -83,14 +83,14 @@ export const POSE: readonly Posa[] = [
  * query: `min-height` sul telefono segue il viewport grande, quello a barre
  * nascoste. Un iPhone SE ha un palco di circa 548px e resta in colonna.
  */
-export const ALTEZZA_MINIMA = 600;
+export const MIN_HEIGHT = 600;
 
 /** Il foglio dei numeri sta sulla riga: e' li' che l'onda finisce. */
-export const POSA_ARRIVO: Posa = { rotazione: -0.8, scostamento: 0 };
+export const ARRIVAL_POSE: Pose = { rotation: -0.8, offset: 0 };
 
 /** La posa della tappa `i`, in ciclo: una quinta tappa riprende dalla prima. */
-export function posa(i: number): Posa {
-  return POSE[i % POSE.length];
+export function poseAt(i: number): Pose {
+  return POSES[i % POSES.length];
 }
 
 const limita = (v: number) => Math.min(1, Math.max(0, v));
@@ -106,7 +106,7 @@ const limita = (v: number) => Math.min(1, Math.max(0, v));
  * fossero tutti lunghi uguali; non lo sono (l'ingresso, l'arrivo piu' stretto),
  * e senza questa continuita' l'onda fa uno spigolo proprio li'.
  */
-export function tracciaOnda(punti: readonly Punto[], ampiezza: number, onde: number): string {
+export function wavePath(punti: readonly TrackPoint[], ampiezza: number, onde: number): string {
   let d = `M${punti[0][0]},${punti[0][1]}`;
   let verso = -1;
   let pendenza: number | null = null;
@@ -141,14 +141,14 @@ export function tracciaOnda(punti: readonly Punto[], ampiezza: number, onde: num
  * e track e palco si misurano sullo stesso elemento, mai su window.innerHeight,
  * che sul telefono cambia con la barra del browser.
  */
-export function viaggio({
+export function travel({
   track,
-  palco,
-  coda,
+  stage: palco,
+  tail: coda,
 }: {
   track: number;
-  palco: number;
-  coda: number;
+  stage: number;
+  tail: number;
 }): number {
   return Math.max(0, track - palco * (1 + coda));
 }
@@ -160,18 +160,18 @@ export function viaggio({
  * il foglio che si accende, `caduta` il foglio che si scolla, `sussulto` il
  * piccolo salto mentre si accende. Si chiama a ogni fotogramma: solo conti.
  */
-export function fasi({
-  fatta,
-  viaggio,
-  coda,
-  altezza,
+export function phases({
+  done: fatta,
+  travel: viaggio,
+  tail: coda,
+  height: altezza,
 }: {
-  fatta: number;
-  viaggio: number;
-  coda: number;
-  altezza: number;
+  done: number;
+  travel: number;
+  tail: number;
+  height: number;
 }) {
-  const { riempito, acceso, cade } = PARAMETRI.tempi;
+  const { filled: riempito, lit: acceso, falls: cade } = TRACK_PARAMS.timings;
   const lunghezzaCoda = coda * altezza;
   // Un viaggio o una coda nulli sono gia' compiuti: senza, 0/0 da' NaN e il
   // NaN finisce dritto in una custom property.
@@ -181,10 +181,10 @@ export function fasi({
   return {
     p,
     q,
-    pieno01: limita(q / riempito),
-    luce,
-    caduta: limita((q - cade) / (1 - cade)),
-    sussulto: Math.sin(Math.PI * luce),
+    filled01: limita(q / riempito),
+    light: luce,
+    fall: limita((q - cade) / (1 - cade)),
+    jolt: Math.sin(Math.PI * luce),
   };
 }
 
@@ -195,37 +195,37 @@ export function fasi({
  * si riempie, e a varco pieno la linea entra nel foglio fino a `fineArrivo`.
  * Il salto dal bordo a `fineArrivo` non si vede: l'onda passa dietro il foglio.
  */
-export function lineaPiena({
+export function filledLine({
   x,
-  larghezza,
-  bordoArrivo,
-  fineArrivo,
+  width: larghezza,
+  arrivalEdge: bordoArrivo,
+  arrivalEnd: fineArrivo,
   q,
 }: {
   x: number;
-  larghezza: number;
-  bordoArrivo: number;
-  fineArrivo: number;
+  width: number;
+  arrivalEdge: number;
+  arrivalEnd: number;
   q: number;
 }): number {
-  const pieno01 = limita(q / PARAMETRI.tempi.riempito);
+  const pieno01 = limita(q / TRACK_PARAMS.timings.filled);
   if (pieno01 >= 1) return Math.max(0, fineArrivo);
   const centro = x + larghezza / 2;
-  const varco = larghezza * PARAMETRI.varco;
+  const varco = larghezza * TRACK_PARAMS.gap;
   return Math.max(0, Math.min(centro, bordoArrivo - varco) + pieno01 * varco);
 }
 
 /** Una tappa e' arrivata quando il suo centro e' entro la soglia dal centro dello schermo. */
-export function arrivata({
-  centroTappa,
+export function arrived({
+  stopCentre: centroTappa,
   x,
-  larghezza,
+  width: larghezza,
 }: {
-  centroTappa: number;
+  stopCentre: number;
   x: number;
-  larghezza: number;
+  width: number;
 }): boolean {
-  return centroTappa < x + larghezza / 2 + larghezza * PARAMETRI.sogliaArrivo;
+  return centroTappa < x + larghezza / 2 + larghezza * TRACK_PARAMS.arrivalThreshold;
 }
 
 /**
@@ -235,16 +235,16 @@ export function arrivata({
  * sommati fanno uno schermo meno mezzo foglio e mezzo arrivo. Per questo la
  * stessa formula si puo' scrivere in CSS per l'altezza del track.
  */
-export function strada({
+export function trackRoute({
   n,
-  foglio,
-  aria,
-  arrivo,
+  sheet: foglio,
+  air: aria,
+  arrival: arrivo,
 }: {
   n: number;
-  foglio: number;
-  aria: number;
-  arrivo: number;
+  sheet: number;
+  air: number;
+  arrival: number;
 }): number {
   return (n - 0.5) * foglio + n * aria + arrivo / 2;
 }

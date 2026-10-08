@@ -1,7 +1,7 @@
 import { DeskStage } from "./DeskStage";
 import type { DeskLayerData } from "./DeskTable";
-import { CassettaView } from "./toolbox/ToolboxView";
-import type { TestiCassetta } from "./toolbox/types";
+import { ToolboxView } from "./toolbox/ToolboxView";
+import type { ToolboxCopy } from "./toolbox/types";
 
 export type ServicesViewProps = {
   eyebrow: string;
@@ -16,7 +16,7 @@ export type ServicesViewProps = {
   note: string;
   punch: string;
   layers: DeskLayerData[];
-  cassetta: { eyebrow: string; title: string; lead: string; testi: TestiCassetta };
+  toolbox: { eyebrow: string; title: string; lead: string; copy: ToolboxCopy };
 };
 
 /**
@@ -37,7 +37,7 @@ export function ServicesView({
   note,
   punch,
   layers,
-  cassetta,
+  toolbox: cassetta,
 }: ServicesViewProps) {
   return (
     // Il nome della sezione e' il titolo del tavolo: l'id sta in DeskStage.
@@ -55,7 +55,7 @@ export function ServicesView({
         punch={punch}
         layers={layers}
       />
-      <CassettaView {...cassetta} />
+      <ToolboxView {...cassetta} />
     </section>
   );
 }

@@ -1,18 +1,18 @@
 import { Reveal } from "@/animations/components/Reveal";
 import {
-  ScontrinoStampante,
-  type ServizioStampabile,
-  type TestiStampante,
+  ReceiptPrinter,
+  type PrintableService,
+  type PrinterCopy,
 } from "./ReceiptPrinter";
 
-export type ScontrinoViewProps = {
+export type ReceiptViewProps = {
   eyebrow: string;
   title: string;
   lead: string;
   /** Per la data dello scontrino, che si scrive nel browser. */
   locale: string;
-  servizi: ServizioStampabile[];
-  testi: TestiStampante;
+  services: PrintableService[];
+  copy: PrinterCopy;
 };
 
 /**
@@ -27,7 +27,7 @@ export type ScontrinoViewProps = {
  * Il fondo e' arancione e di notte resta arancione: dentro solo carta e
  * inchiostro, come nel percorso. Le regole stanno in sezioni/scontrino.css.
  */
-export function ScontrinoView({ eyebrow, title, lead, locale, servizi, testi }: ScontrinoViewProps) {
+export function ReceiptView({ eyebrow, title, lead, locale, services: servizi, copy: testi }: ReceiptViewProps) {
   return (
     <section
       id="scontrino"
@@ -35,13 +35,13 @@ export function ScontrinoView({ eyebrow, title, lead, locale, servizi, testi }: 
       data-scontrino
       className="relative bg-[var(--accent)]"
     >
-      <Reveal moto="dietro" stagger={0.08} data-scontrino-testa>
+      <Reveal motion="dietro" stagger={0.08} data-scontrino-testa>
         <p className="eyebrow">{eyebrow}</p>
         <h2 id="titolo-scontrino" className="titolo-sezione">{title}</h2>
         <p data-scontrino-lead>{lead}</p>
       </Reveal>
 
-      <ScontrinoStampante servizi={servizi} testi={testi} locale={locale} />
+      <ReceiptPrinter services={servizi} copy={testi} locale={locale} />
     </section>
   );
 }

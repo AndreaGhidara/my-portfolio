@@ -1,4 +1,4 @@
-import { SOGLIA_IN_CIMA } from "./atTop";
+import { AT_TOP_THRESHOLD } from "./atTop";
 
 /**
  * Va reso dentro <head>, come ThemeScript: segna se la pagina è ancora in
@@ -11,7 +11,7 @@ import { SOGLIA_IN_CIMA } from "./atTop";
  */
 export function TopStateScript() {
   const code = `(function(){try{
-    if (window.scrollY < ${SOGLIA_IN_CIMA}) document.documentElement.setAttribute('data-at-top','');
+    if (window.scrollY < ${AT_TOP_THRESHOLD}) document.documentElement.setAttribute('data-at-top','');
   }catch(e){}})();`;
 
   return <script dangerouslySetInnerHTML={{ __html: code }} />;

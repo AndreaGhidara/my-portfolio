@@ -4,9 +4,9 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { palette } from "@/styles/palette";
-import { GRADINI, RAGGIO, maglia, veloPer, type Vertice } from "./paper/geometry";
-import { accartoccia, sorgente } from "./paper/drawing";
-import { aRiposo, lancio, passo, type Pezzo } from "./paper/physics";
+import { SHADE_STEPS, RADIUS, buildMesh, veilFor, type Vertex } from "./paper/geometry";
+import { crumple, drawSource } from "./paper/drawing";
+import { atRest, fling, physicsStep, type Piece } from "./paper/physics";
 
 /**
  * Le lettere del nome sono fogli: si sgualciscono al passaggio, si prendono,
@@ -26,7 +26,7 @@ import { aRiposo, lancio, passo, type Pezzo } from "./paper/physics";
  * jsdom (dove il livello e' sempre "none") questo componente non disegna mai:
  * una tela li' non ha un contesto 2D.
  */
-export function CartaStropicciata() {
+export function CrumpledPaper() {
   const livello = useMotionLevel();
   const strato = useRef<HTMLDivElement | null>(null);
 
@@ -52,7 +52,7 @@ export function CartaStropicciata() {
 
     type Lettera = {
       img: HTMLImageElement;
-      mesh: Vertice[];
+      mesh: Vertex[];
       tele: Map<number, HTMLCanvasElement>;
       tela: HTMLCanvasElement | null;
       t: number;
@@ -63,7 +63,7 @@ export function CartaStropicciata() {
 
     const lettere: Lettera[] = immagini.map((img, indice) => ({
       img,
-      mesh: maglia(11 + indice * 13),
+      mesh: buildMesh(11 + indice * 13),
       tele: new Map(),
       tela: null,
       t: 0,
@@ -72,7 +72,7 @@ export function CartaStropicciata() {
       indice,
     }));
 
-    const pezzi: Array<Pezzo & { el: HTMLCanvasElement; misura: number; L: Lettera }> = [];
+    const pezzi: Array<Piece & { el: HTMLCanvasElement; misura: number; L: Lettera }> = [];
     let presa: (typeof pezzi)[number] | null = null;
     let storia: Array<{ x: number; y: number; t: number }> = [];
     let scarto = 0;
@@ -81,10 +81,10 @@ export function CartaStropicciata() {
     let ticchetta = 0;
 
     const tessuto = (L: Lettera, t: number) => {
-      const k = veloPer(t);
+      const k = veilFor(t);
       let tex = L.tele.get(k);
       if (!tex) {
-        tex = sorgente(L.img, k / (GRADINI - 1), carta, riga);
+        tex = drawSource(L.img, k / (SHADE_STEPS - 1), carta, riga);
         L.tele.set(k, tex);
       }
       return tex;
@@ -117,7 +117,7 @@ export function CartaStropicciata() {
       const g = el.getContext("2d");
       if (!g) return;
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
-      accartoccia(g, tessuto(L, L.t), L.mesh, L.t, misura, misura * 0.94);
+      crumple(g, tessuto(L, L.t), L.mesh, L.t, misura, misura * 0.94);
       L.img.style.opacity = L.t > 0.012 ? "0" : "";
     };
 
@@ -132,7 +132,7 @@ export function CartaStropicciata() {
       const g = el.getContext("2d");
       if (g) {
         g.setTransform(dpr, 0, 0, dpr, 0, 0);
-        accartoccia(g, tessuto(L, 1), L.mesh, 1, misura, misura * 0.94);
+        crumple(g, tessuto(L, 1), L.mesh, 1, misura, misura * 0.94);
       }
       overlay.appendChild(el);
       L.via = true;
@@ -149,8 +149,8 @@ export function CartaStropicciata() {
         vy: 0,
         rot: 0,
         vrot: 0,
-        raggio: misura * (RAGGIO + 0.04),
-        tenuta: false,
+        radius: misura * (RADIUS + 0.04),
+        held: false,
       };
       pezzi.push(p);
       return p;
@@ -166,7 +166,7 @@ export function CartaStropicciata() {
     function giro(ora: number) {
       const dt = Math.min(0.032, (ora - prima) / 1000);
       prima = ora;
-      const muri = { largo: window.innerWidth, alto: window.innerHeight };
+      const muri = { width: window.innerWidth, height: window.innerHeight };
       const applica = scarto;
       scarto = 0;
       let daFare = false;
@@ -188,11 +188,11 @@ export function CartaStropicciata() {
       }
 
       for (const p of pezzi) {
-        passo(p, dt, muri, applica);
+        physicsStep(p, dt, muri, applica);
         p.el.style.transform = `translate(${(p.x - p.misura / 2).toFixed(1)}px,${(
           p.y - p.misura / 2
         ).toFixed(1)}px) rotate(${p.rot.toFixed(1)}deg)`;
-        if (!aRiposo(p, muri)) daFare = true;
+        if (!atRest(p, muri)) daFare = true;
       }
 
       if (daFare || presa) ticchetta = requestAnimationFrame(giro);
@@ -226,7 +226,7 @@ export function CartaStropicciata() {
       L.t = 1;
       const p = stacca(L);
       if (!p) return;
-      p.tenuta = true;
+      p.held = true;
       storia = [];
       presa = p;
       // Trascinando sopra il claim partiva la selezione del testo e il gesto
@@ -249,11 +249,11 @@ export function CartaStropicciata() {
     };
     const su = () => {
       if (!presa) return;
-      const v = lancio(storia);
+      const v = fling(storia);
       presa.vx = v.vx;
       presa.vy = v.vy;
       presa.vrot = v.vx * 1.4;
-      presa.tenuta = false;
+      presa.held = false;
       presa = null;
       document.body.removeAttribute("data-carta-presa");
       sveglia();
@@ -265,7 +265,7 @@ export function CartaStropicciata() {
       if (pezzi.length) sveglia();
       // Tornando in cima il nome si rimette da solo: non puo' restare rotto
       // per chi torna indietro a cercarlo.
-      if (y < 40 && pezzi.length && pezzi.every((p) => !p.tenuta && Math.abs(p.vy) < 25)) {
+      if (y < 40 && pezzi.length && pezzi.every((p) => !p.held && Math.abs(p.vy) < 25)) {
         rimetti.current();
       }
     };

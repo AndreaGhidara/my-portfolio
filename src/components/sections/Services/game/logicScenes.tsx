@@ -6,9 +6,9 @@ import type { CSSProperties } from "react";
  * arrivano da Logiche.tsx.
  */
 
-export type StatoNodo = { ok?: boolean; rotto?: boolean; scelta?: number; giorno?: number };
+export type NodeState = { ok?: boolean; broken?: boolean; choice?: number; day?: number };
 
-export type TestiScene = {
+export type SceneCopy = {
   email: string;
   dentro: string;
   torte: { nome: string; prezzo: string }[];
@@ -30,18 +30,18 @@ export type TestiScene = {
 const PIENO = [20, 35, 40, 30, 60, 85, 100];
 
 /** La torta che non c'e' piu' e il giorno tutto pieno: toccarli e' rompere. */
-export const TORTA_FINITA = 2;
-export const GIORNO_PIENO = 6;
+export const CAKE_DONE = 2;
+export const FULL_DAY = 6;
 
 type Props = {
-  nodo: number;
-  stato: StatoNodo;
-  testi: TestiScene;
-  onTorta: (i: number) => void;
-  onGiorno: (i: number) => void;
+  node: number;
+  state: NodeState;
+  copy: SceneCopy;
+  onCake: (i: number) => void;
+  onDay: (i: number) => void;
 };
 
-export function Scena({ nodo, stato, testi, onTorta, onGiorno }: Props) {
+export function LogicScene({ node: nodo, state: stato, copy: testi, onCake: onTorta, onDay: onGiorno }: Props) {
   switch (nodo) {
     case 0:
       return (
@@ -62,14 +62,14 @@ export function Scena({ nodo, stato, testi, onTorta, onGiorno }: Props) {
             <button
               key={torta.nome}
               type="button"
-              className={`torta${stato.scelta === i ? " scelta" : ""}${i === TORTA_FINITA ? " finita" : ""}`}
-              aria-pressed={stato.scelta === i}
+              className={`torta${stato.choice === i ? " scelta" : ""}${i === CAKE_DONE ? " finita" : ""}`}
+              aria-pressed={stato.choice === i}
               onClick={() => onTorta(i)}
             >
               <span className="disco" aria-hidden="true" />
               {torta.nome}
               <small>{torta.prezzo}</small>
-              {i === TORTA_FINITA && <em className="timbro">{testi.finita}</em>}
+              {i === CAKE_DONE && <em className="timbro">{testi.finita}</em>}
             </button>
           ))}
         </div>
@@ -84,8 +84,8 @@ export function Scena({ nodo, stato, testi, onTorta, onGiorno }: Props) {
                 // Le iniziali si ripetono (M, M): la chiave e' la posizione.
                 key={i}
                 type="button"
-                className={`giorno${p === 100 ? " pieno" : ""}${stato.giorno === i ? " scelto" : ""}`}
-                aria-pressed={stato.giorno === i}
+                className={`giorno${p === 100 ? " pieno" : ""}${stato.day === i ? " scelto" : ""}`}
+                aria-pressed={stato.day === i}
                 style={{ "--pieno": `${p}%` } as CSSProperties}
                 onClick={() => onGiorno(i)}
               >

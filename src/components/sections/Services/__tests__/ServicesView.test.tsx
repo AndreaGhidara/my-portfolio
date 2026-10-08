@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { screen, within } from "@testing-library/react";
-import { renderConTesti as render } from "@/test/renderWithMessages";
+import { renderWithMessages as render } from "@/test/renderWithMessages";
 import { ServicesView } from "../ServicesView";
 import type { ServicesViewProps } from "../ServicesView";
 import { LABEL, drawWidth } from "../layers";
-import { testi } from "../toolbox/__tests__/fixture";
+import { copyFor } from "../toolbox/__tests__/fixture";
 
 /** Il quarto, come nel tavolo vero. */
 const MUTO = 3;
@@ -32,11 +32,11 @@ const props: ServicesViewProps = {
   blank: "E la tua, qual è?",
   note: "23.777 caffè",
   layers: [layer("site", 6), layer("logic", 6), layer("infra", 6), layer("growth", 6, true)],
-  cassetta: {
+  toolbox: {
     eyebrow: "Gli attrezzi",
     title: "Tutto quello che so usare.",
     lead: "La mia cassetta.",
-    testi: testi("it"),
+    copy: copyFor("it"),
   },
 };
 
@@ -66,7 +66,7 @@ describe("la sezione del tavolo", () => {
     expect(figli[0]).toHaveAttribute("data-desk");
     expect(figli[1]).toHaveAttribute("data-cassetta-sezione");
     expect(within(figli[1] as HTMLElement).getByRole("heading", { level: 2 })).toHaveTextContent(
-      props.cassetta.title,
+      props.toolbox.title,
     );
   });
 

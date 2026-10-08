@@ -13,7 +13,7 @@ import { useSectionAnimation } from "../useSectionAnimation";
  *   dal suo `data-lato`. Alterna destra e sinistra perche' ALTERNA
  *   l'impaginato, non perche' l'animazione conti i figli.
  */
-export type Moto = "sale" | "dietro" | "alto" | "lati";
+export type RevealMotion = "sale" | "dietro" | "alto" | "lati";
 
 type RevealProps = {
   children: ReactNode;
@@ -25,7 +25,7 @@ type RevealProps = {
   /** Ritardo fra i figli diretti, se ce n'è più di uno. */
   stagger?: number;
   /** Da dove arriva. Default: `sale`. */
-  moto?: Moto;
+  motion?: RevealMotion;
   /** Da attivare dove il CSS usa `transform` anche per altro (un hover che
    *  solleva, per esempio): l'entrata ripulisce quello che ha scritto. */
   clearProps?: boolean;
@@ -42,7 +42,7 @@ export function Reveal({
   className,
   delay = 0,
   stagger = 0.07,
-  moto = "sale",
+  motion: moto = "sale",
   clearProps = false,
   ...rest
 }: RevealProps) {
@@ -50,7 +50,7 @@ export function Reveal({
 
   useSectionAnimation(
     ({ level, presets }) => {
-      const { daDietro, daLato, dallAlto, reveal } = presets;
+      const { fromBehind, fromSide, fromAbove, reveal } = presets;
       const root = scope.current;
       if (!root) return;
       const figli = Array.from(root.children);
@@ -62,15 +62,15 @@ export function Reveal({
         // affaccia, e chi scorre piano le troverebbe gia' tutte a posto.
         for (const figlio of figli) {
           const verso = figlio.getAttribute("data-lato") === "sx" ? "sx" : "dx";
-          daLato(figlio, { level, trigger: figlio, verso, delay, clearProps });
+          fromSide(figlio, { level, trigger: figlio, direction: verso, delay, clearProps });
         }
         return;
       }
 
       const targets = figli.length > 1 ? figli : root;
       const comune = { level, trigger: root, delay, stagger, clearProps };
-      if (moto === "dietro") daDietro(targets, comune);
-      else if (moto === "alto") dallAlto(targets, comune);
+      if (moto === "dietro") fromBehind(targets, comune);
+      else if (moto === "alto") fromAbove(targets, comune);
       else reveal(targets, comune);
     },
     scope,

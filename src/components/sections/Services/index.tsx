@@ -3,7 +3,7 @@ import { deskLayers } from "@/content/desk";
 import { metricById } from "@/content/metrics";
 import { ServicesView } from "./ServicesView";
 import type { DeskLayerData } from "./DeskTable";
-import { testiCassetta } from "./toolbox/copy";
+import { toolboxCopy } from "./toolbox/copy";
 
 export async function Services() {
   const t = await getTranslations("services");
@@ -30,7 +30,7 @@ export async function Services() {
     })),
   }));
 
-  const cassetta = testiCassetta(tc);
+  const cassetta = toolboxCopy(tc);
 
   return (
     <ServicesView
@@ -42,11 +42,11 @@ export async function Services() {
       note={`${caffe.value} ${tMetrics(caffe.id)}`}
       punch={t("punch")}
       layers={layers}
-      cassetta={{
+      toolbox={{
         eyebrow: tc("eyebrow"),
         title: tc("title"),
         lead: tc("lead"),
-        testi: cassetta,
+        copy: cassetta,
       }}
     />
   );

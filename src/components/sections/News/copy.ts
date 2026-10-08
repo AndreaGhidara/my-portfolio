@@ -1,5 +1,5 @@
-import { CATEGORIE } from "@/lib/news/types";
-import type { TestiNotizie } from "./types";
+import { CATEGORIES } from "@/lib/news/types";
+import type { NewsCopy } from "./types";
 
 /** La `t` di next-intl sul namespace `notizie`: serve anche `raw`, per i modelli. */
 type Traduci = { (chiave: string): string; raw(chiave: string): unknown };
@@ -12,19 +12,19 @@ type Traduci = { (chiave: string): string; raw(chiave: string): unknown };
  * I modelli con le graffe passano crudi: li riempie la macchina, con valori
  * che il server non conosce (quante palline restano, a che ora sono arrivate).
  */
-export function testiNotizie(t: Traduci): TestiNotizie {
+export function newsCopy(t: Traduci): NewsCopy {
   const modello = (chiave: string) => String(t.raw(chiave));
   return {
-    categorie: Object.fromEntries(
-      CATEGORIE.map((c) => [c, { nome: t(`categorie.${c}.nome`), testata: t(`categorie.${c}.testata`) }]),
-    ) as TestiNotizie["categorie"],
-    timbri: {
+    categories: Object.fromEntries(
+      CATEGORIES.map((c) => [c, { name: t(`categorie.${c}.nome`), masthead: t(`categorie.${c}.testata`) }]),
+    ) as NewsCopy["categories"],
+    stamps: {
       "prima-pagina": t("timbri.primaPagina"),
       paper: t("timbri.paper"),
       "piu-letto": t("timbri.piuLetto"),
       release: t("timbri.release"),
     },
-    dati: {
+    figures: {
       punti: t("dati.punti"),
       commenti: t("dati.commenti"),
       voti: t("dati.voti"),
@@ -33,23 +33,23 @@ export function testiNotizie(t: Traduci): TestiNotizie {
       lettura: t("dati.lettura"),
       versione: t("dati.versione"),
     },
-    minuti: modello("minuti"),
-    rilascio: modello("rilascio"),
-    leggiSu: modello("leggiSu"),
-    targa: modello("targa"),
-    targaUna: modello("targaUna"),
-    finite: modello("finite"),
-    raccolteOggi: modello("raccolteOggi"),
-    raccolteIl: modello("raccolteIl"),
-    gruppo: t("gruppo"),
-    manopola: t("manopola"),
-    aiuto: t("aiuto"),
-    attesa: t("attesa"),
-    vuota: t("vuota"),
-    errore: t("errore"),
-    giaUscite: t("giaUscite"),
-    testata: t("testata"),
-    nessunaUscita: t("nessunaUscita"),
-    senzaRiassunto: t("senzaRiassunto"),
+    minutes: modello("minuti"),
+    release: modello("rilascio"),
+    readOn: modello("leggiSu"),
+    plate: modello("targa"),
+    plateOne: modello("targaUna"),
+    exhausted: modello("finite"),
+    collectedToday: modello("raccolteOggi"),
+    collectedOn: modello("raccolteIl"),
+    group: t("gruppo"),
+    knob: t("manopola"),
+    help: t("aiuto"),
+    waiting: t("attesa"),
+    empty: t("vuota"),
+    error: t("errore"),
+    alreadyDrawn: t("giaUscite"),
+    masthead: t("testata"),
+    noneDrawn: t("nessunaUscita"),
+    noSummary: t("senzaRiassunto"),
   };
 }

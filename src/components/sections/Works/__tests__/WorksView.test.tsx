@@ -3,44 +3,44 @@ import { render, screen, fireEvent, act, within, waitFor } from "@testing-librar
 import userEvent from "@testing-library/user-event";
 import { WorksView } from "../WorksView";
 import { SHOT_SIZES } from "../WorkShot";
-import { LINGUETTA, PARAMETRI } from "../archive";
-import { regole } from "@/test/css";
+import { TAB, ARCHIVE_PARAMS } from "../archive";
+import { rules } from "@/test/css";
 
 const labels = {
-  lavoro: "Il lavoro",
-  scelta: "La soluzione scelta",
-  conduzione: "Come è stata condotta",
-  visita: "Visita il sito",
+  work: "Il lavoro",
+  choice: "La soluzione scelta",
+  approach: "Come è stata condotta",
+  visit: "Visita il sito",
   screenshotAlt: "{name}: schermata",
-  riservato: "Coperto da accordo di riservatezza",
-  apri: "Apri il caso",
-  chiudi: "Chiudi",
-  riporta: "riporta davanti la cartella",
-  archivio: "Archivio lavori",
-  pratica: "Pratica n.",
-  comEra: "Com'era, quando sono arrivato",
-  cliente: "Cliente",
-  anno: "Anno",
-  stato: "Stato",
+  confidential: "Coperto da accordo di riservatezza",
+  open: "Apri il caso",
+  close: "Chiudi",
+  putBack: "riporta davanti la cartella",
+  archive: "Archivio lavori",
+  dossier: "Pratica n.",
+  before: "Com'era, quando sono arrivato",
+  client: "Cliente",
+  year: "Anno",
+  status: "Stato",
   online: "Online",
-  allegato: "Allegato A · la piattaforma oggi",
-  rilevato: "Rilevato a fine lavoro",
-  rilevatoFinora: "Rilevato finora",
-  stima: "stima",
-  consegnato: "Consegnato",
-  inCorso: "In corso",
-  firmaNome: "A. Ghidara",
-  firmaRuolo: "sviluppatore",
+  attachment: "Allegato A · la piattaforma oggi",
+  measured: "Rilevato a fine lavoro",
+  measuredSoFar: "Rilevato finora",
+  estimate: "stima",
+  delivered: "Consegnato",
+  inProgress: "In corso",
+  signatureName: "A. Ghidara",
+  signatureRole: "sviluppatore",
 };
 
 const items = [
   {
     id: "bdroppy",
     name: "BDroppy",
-    riga: "La piattaforma era ferma su Next 14.",
-    lavoro: "Una piattaforma che vende ogni giorno e non poteva fermarsi.",
-    scelta: "Migrare una rotta alla volta invece di riscrivere da zero.",
-    conduzione: "Vecchia e nuova dietro lo stesso indirizzo, una rotta per volta.",
+    tagline: "La piattaforma era ferma su Next 14.",
+    work: "Una piattaforma che vende ogni giorno e non poteva fermarsi.",
+    choice: "Migrare una rotta alla volta invece di riscrivere da zero.",
+    approach: "Vecchia e nuova dietro lo stesso indirizzo, una rotta per volta.",
     url: "https://www.bdroppy.com",
     screenshot: {
       src: "/works/bdroppy.webp",
@@ -50,17 +50,17 @@ const items = [
     },
     screenshotAlt: "BDroppy: schermata",
     year: 2024,
-    stato: "consegnato" as const,
+    status: "consegnato" as const,
     tech: ["Next.js", "TypeScript"],
     metrics: [{ id: "bdroppyComponents", value: "120", label: "componenti migrati", estimated: true }],
   },
   {
     id: "aidify",
     name: "Aidify",
-    riga: "Assistenza sommersa dalle stesse dieci domande.",
-    lavoro: "Un assistente per le domande che tornano sempre.",
-    scelta: "Legato al catalogo e agli ordini veri, non a un modello che indovina.",
-    conduzione: "Il confine di quello che sa e' scritto nel codice: oltre quello passa a una persona.",
+    tagline: "Assistenza sommersa dalle stesse dieci domande.",
+    work: "Un assistente per le domande che tornano sempre.",
+    choice: "Legato al catalogo e agli ordini veri, non a un modello che indovina.",
+    approach: "Il confine di quello che sa e' scritto nel codice: oltre quello passa a una persona.",
     url: "https://aidify.cx",
     screenshot: {
       src: "/works/aidify.webp",
@@ -70,7 +70,7 @@ const items = [
     },
     screenshotAlt: "Aidify: schermata",
     year: 2024,
-    stato: "consegnato" as const,
+    status: "consegnato" as const,
     tech: ["Next.js", "Supabase"],
     metrics: [],
   },
@@ -122,7 +122,7 @@ describe("WorksView", () => {
   it("ogni cartella chiusa mostra il lavoro in una frase: è ciò che fa riconoscere il cliente, e da telefono non c'è hover che lo riveli", () => {
     render(<WorksView {...props} />);
     for (const item of items) {
-      expect(screen.getByText(item.riga)).toBeVisible();
+      expect(screen.getByText(item.tagline)).toBeVisible();
     }
   });
 
@@ -150,15 +150,15 @@ describe("WorksView", () => {
   it("i numeri tarati nel prototipo arrivano al CSS dal modulo, non da una seconda copia", () => {
     const { container } = render(<WorksView {...props} />);
     const archivio = container.querySelector<HTMLElement>("[data-work-shelf]")!;
-    expect(archivio.style.getPropertyValue("--passo")).toBe(`${PARAMETRI.passo}px`);
-    expect(archivio.style.getPropertyValue("--distanza")).toBe(`${PARAMETRI.distanza}vh`);
-    expect(archivio.style.getPropertyValue("--scurisce")).toBe(String(PARAMETRI.scurisce));
-    expect(archivio.style.getPropertyValue("--stringe")).toBe(String(PARAMETRI.stringe));
+    expect(archivio.style.getPropertyValue("--passo")).toBe(`${ARCHIVE_PARAMS.step}px`);
+    expect(archivio.style.getPropertyValue("--distanza")).toBe(`${ARCHIVE_PARAMS.distance}vh`);
+    expect(archivio.style.getPropertyValue("--scurisce")).toBe(String(ARCHIVE_PARAMS.darkens));
+    expect(archivio.style.getPropertyValue("--stringe")).toBe(String(ARCHIVE_PARAMS.narrows));
     expect(archivio.style.getPropertyValue("--larghezza-linguetta")).toBe(
-      `${PARAMETRI.larghezzaLinguetta}%`,
+      `${ARCHIVE_PARAMS.tabWidth}%`,
     );
     expect(archivio.style.getPropertyValue("--buio-minimo")).toBe(
-      `${LINGUETTA.buioMinimo * 100}%`,
+      `${TAB.minDark * 100}%`,
     );
   });
 
@@ -209,7 +209,7 @@ describe("WorksView", () => {
     const riservato = { ...items[1], id: "riservato", screenshot: undefined, url: undefined };
     const { container } = render(<WorksView {...props} items={[riservato]} />);
     const riquadro = container.querySelector("[data-faccia-schermata]");
-    expect(riquadro).toHaveTextContent(labels.riservato);
+    expect(riquadro).toHaveTextContent(labels.confidential);
     expect(riquadro!.querySelector("img")).toBeNull();
   });
 
@@ -224,7 +224,7 @@ describe("WorksView", () => {
   it("all'inizio nessun dossier è aperto", () => {
     render(<WorksView {...props} />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(screen.queryByText(items[0].scelta)).not.toBeInTheDocument();
+    expect(screen.queryByText(items[0].choice)).not.toBeInTheDocument();
   });
 
   it("«Apri il caso» apre il dossier con la soluzione scelta", async () => {
@@ -233,14 +233,14 @@ describe("WorksView", () => {
 
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeVisible();
-    expect(screen.getByText(items[0].scelta)).toBeVisible();
-    expect(screen.getByText(items[0].conduzione)).toBeVisible();
+    expect(screen.getByText(items[0].choice)).toBeVisible();
+    expect(screen.getByText(items[0].approach)).toBeVisible();
   });
 
   it("anche un click sulla faccia apre il dossier: la cartella e' la copertina", async () => {
     render(<WorksView {...props} />);
-    await userEvent.click(screen.getByText(items[1].riga));
-    expect(screen.getByText(items[1].scelta)).toBeVisible();
+    await userEvent.click(screen.getByText(items[1].tagline));
+    expect(screen.getByText(items[1].choice)).toBeVisible();
   });
 
   it("la linguetta non apre il dossier: riporta davanti la sua cartella", async () => {
@@ -269,7 +269,7 @@ describe("WorksView", () => {
   it("il link al sito si apre in una scheda nuova, in sicurezza", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[0]);
-    const link = screen.getByRole("link", { name: new RegExp(labels.visita) });
+    const link = screen.getByRole("link", { name: new RegExp(labels.visit) });
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });
@@ -284,8 +284,8 @@ describe("WorksView", () => {
   it("il dossier mostra il caso della cartella cliccata, non sempre il primo", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[1]);
-    expect(screen.getByText(items[1].scelta)).toBeVisible();
-    expect(screen.queryByText(items[0].scelta)).not.toBeInTheDocument();
+    expect(screen.getByText(items[1].choice)).toBeVisible();
+    expect(screen.queryByText(items[0].choice)).not.toBeInTheDocument();
   });
 
   it("il riquadro non e' mai vuoto: l'anteprima sfocata c'e' dal primo frame, la schermata vera no", async () => {
@@ -389,7 +389,7 @@ const riservato = {
   id: "riservato",
   name: "Riservato",
   year: 2026,
-  stato: "in-corso" as const,
+  status: "in-corso" as const,
   screenshot: undefined,
   url: undefined,
   metrics: [{ id: "riservatoCycleTime", value: "15 min", label: "per un passaggio che prima chiedeva ore", estimated: true }],
@@ -420,24 +420,24 @@ describe("la pratica", () => {
     const testa = screen.getByRole("dialog").querySelector("[data-pratica-testa]");
     expect(testa).toHaveTextContent("Pratica n.");
     expect(testa).toHaveTextContent("02 / 02");
-    expect(testa).toHaveTextContent(labels.archivio);
+    expect(testa).toHaveTextContent(labels.archive);
   });
 
   it("il timbro dice lo stato, e la firma chi l'ha fatto", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[0]);
     const dialog = screen.getByRole("dialog");
-    expect(dialog.querySelector("[data-pratica-timbro]")).toHaveTextContent(labels.consegnato);
-    expect(dialog.querySelector("[data-pratica-firma]")).toHaveTextContent(`${labels.firmaNome}${labels.firmaRuolo}`);
+    expect(dialog.querySelector("[data-pratica-timbro]")).toHaveTextContent(labels.delivered);
+    expect(dialog.querySelector("[data-pratica-firma]")).toHaveTextContent(`${labels.signatureName}${labels.signatureRole}`);
   });
 
   it("i numeri stimati lo dicono accanto al numero, e a lavoro finito sono «a fine lavoro»", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[0]);
     const numeri = screen.getByRole("dialog").querySelector<HTMLElement>("[data-pratica-numeri]")!;
-    expect(within(numeri).getByRole("heading", { name: labels.rilevato })).toBeInTheDocument();
+    expect(within(numeri).getByRole("heading", { name: labels.measured })).toBeInTheDocument();
     const valore = within(numeri).getByText("120");
-    expect(valore.parentElement).toHaveTextContent(`120${labels.stima}`);
+    expect(valore.parentElement).toHaveTextContent(`120${labels.estimate}`);
   });
 
   it("un numero non stimato non porta la scritta «stima»", async () => {
@@ -445,7 +445,7 @@ describe("la pratica", () => {
     render(<WorksView {...props} items={[misurato]} />);
     await userEvent.click(apri()[0]);
     const numeri = screen.getByRole("dialog").querySelector("[data-pratica-numeri]");
-    expect(numeri).not.toHaveTextContent(labels.stima);
+    expect(numeri).not.toHaveTextContent(labels.estimate);
   });
 
   it("il riservato: niente schermata ne' link, «Online» e il posto del link dicono perche', timbro «In corso»", async () => {
@@ -456,21 +456,21 @@ describe("la pratica", () => {
       ["Cliente", "Riservato"],
       ["Anno", "2026"],
       ["Stato", "In corso"],
-      ["Online", labels.riservato],
+      ["Online", labels.confidential],
     ]);
     expect(dialog.querySelector("img")).toBeNull();
-    expect(dialog.querySelector("[data-pratica-riservato]")).toHaveTextContent(labels.riservato);
+    expect(dialog.querySelector("[data-pratica-riservato]")).toHaveTextContent(labels.confidential);
     expect(within(dialog).queryByRole("link")).toBeNull();
-    expect(dialog.querySelector("[data-pratica-senza-link]")).toHaveTextContent(labels.riservato);
-    expect(dialog.querySelector("[data-pratica-timbro]")).toHaveTextContent(labels.inCorso);
+    expect(dialog.querySelector("[data-pratica-senza-link]")).toHaveTextContent(labels.confidential);
+    expect(dialog.querySelector("[data-pratica-timbro]")).toHaveTextContent(labels.inProgress);
   });
 
   it("su un lavoro in corso i numeri sono «rilevati finora», non a fine lavoro", async () => {
     render(<WorksView {...props} items={[riservato]} />);
     await userEvent.click(apri()[0]);
     const numeri = screen.getByRole("dialog").querySelector<HTMLElement>("[data-pratica-numeri]")!;
-    expect(within(numeri).getByRole("heading", { name: labels.rilevatoFinora })).toBeInTheDocument();
-    expect(numeri).not.toHaveTextContent(labels.rilevato);
+    expect(within(numeri).getByRole("heading", { name: labels.measuredSoFar })).toBeInTheDocument();
+    expect(numeri).not.toHaveTextContent(labels.measured);
   });
 
   it("dentro la pratica niente .eyebrow: porta i colori della pagina, che si ribaltano col tema", async () => {
@@ -492,7 +492,7 @@ describe("aprire e chiudere la pratica", () => {
   it("× chiude: la pagina torna libera e il fuoco torna su «Apri il caso» della cartella aperta", async () => {
     const { container } = render(<WorksView {...props} />);
     await userEvent.click(apri()[1]);
-    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: labels.chiudi }));
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: labels.close }));
 
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     await waitFor(() => expect(document.documentElement).not.toHaveAttribute("data-dialog-open"));
@@ -523,7 +523,7 @@ describe("aprire e chiudere la pratica", () => {
   it("un clic dentro il foglio non chiude", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[0]);
-    await userEvent.click(screen.getAllByText(items[0].scelta)[0]);
+    await userEvent.click(screen.getAllByText(items[0].choice)[0]);
     expect(screen.getByRole("dialog")).toBeVisible();
   });
 
@@ -544,7 +544,7 @@ describe("aprire e chiudere la pratica", () => {
   it("dopo la chiusura si riapre, e mostra il caso nuovo", async () => {
     render(<WorksView {...props} />);
     await userEvent.click(apri()[0]);
-    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: labels.chiudi }));
+    await userEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: labels.close }));
     await waitFor(() => expect(document.documentElement).not.toHaveAttribute("data-dialog-open"));
     await userEvent.click(apri()[1]);
     expect(screen.getByRole("dialog", { name: "Aidify · 2024" })).toBeVisible();
@@ -600,21 +600,21 @@ describe("aprire e chiudere la pratica", () => {
 });
 
 /** Le regole del foglio di stile che riguardano l'archivio, corpo compreso. */
-const regoleDellArchivio = regole(/\[data-(work-shelf|cartella|linguetta|dorso|foglio|faccia|apri)/);
+const regoleDellArchivio = rules(/\[data-(work-shelf|cartella|linguetta|dorso|foglio|faccia|apri)/);
 
 describe("i colori dell'archivio", () => {
   it("vengono dalla tavolozza: miscele dei token, niente colori scritti", () => {
     // tokens.test.ts guarda gli esadecimali; qui anche rgb() e hsl(), che quella
     // prova non vede. Il prototipo aveva le ombre in rgba.
     expect(regoleDellArchivio.length).toBeGreaterThan(10);
-    const colpevoli = regoleDellArchivio.filter((r) => /#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i.test(r.corpo));
-    expect(colpevoli.map((r) => r.selettore)).toEqual([]);
+    const colpevoli = regoleDellArchivio.filter((r) => /#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i.test(r.body));
+    expect(colpevoli.map((r) => r.selector)).toEqual([]);
   });
 
   it("linguetta e dorso hanno lo stesso fondo, ed e' il fondo che le salda in una cartella", () => {
     const fondo = (sel: RegExp) =>
-      regoleDellArchivio.find((r) => sel.test(r.selettore) && /background-color:/.test(r.corpo))
-        ?.corpo.match(/background-color:\s*([^;]+);/)?.[1];
+      regoleDellArchivio.find((r) => sel.test(r.selector) && /background-color:/.test(r.body))
+        ?.body.match(/background-color:\s*([^;]+);/)?.[1];
     expect(fondo(/^\[data-linguetta\]$/)).toBe("var(--cartella-dorso)");
     expect(fondo(/^\[data-dorso\]$/)).toBe("var(--cartella-dorso)");
   });
@@ -623,13 +623,13 @@ describe("i colori dell'archivio", () => {
     // Correzione 4 della spec: sul chiaro faccia = --superficie, dorso
     // inchiostro al 10%, bordo al 24%, foglio carta. Sullo scuro i gradini del
     // prototipo: una cartella col fondo della pagina li' non avrebbe corpo.
-    const chiaro = regole("[data-work-shelf]")[0]?.corpo ?? "";
+    const chiaro = rules("[data-work-shelf]")[0]?.body ?? "";
     expect(chiaro).toMatch(/--cartella-faccia:\s*var\(--superficie\)/);
     expect(chiaro).toMatch(/--cartella-dorso:\s*color-mix\(in oklab, var\(--ink\) 10%, var\(--paper\)\)/);
     expect(chiaro).toMatch(/--cartella-bordo:\s*color-mix\(in oklab, var\(--ink\) 24%, var\(--paper\)\)/);
     expect(chiaro).toMatch(/--cartella-foglio:\s*var\(--paper\)/);
 
-    const scuro = regole('[data-theme="dark"] [data-work-shelf]')[0]?.corpo;
+    const scuro = rules('[data-theme="dark"] [data-work-shelf]')[0]?.body;
     expect(scuro, "l'archivio non ha i suoi colori sul tema scuro").toBeTruthy();
     for (const token of ["faccia", "dorso", "bordo", "foglio"]) {
       expect(scuro).toMatch(new RegExp(`--cartella-${token}:`));
@@ -639,17 +639,17 @@ describe("i colori dell'archivio", () => {
 
 describe("l'archivio sta tutto sotto l'attributo", () => {
   it("senza l'attributo niente e' sticky: la colonna si legge senza JavaScript", () => {
-    const sticky = regoleDellArchivio.filter((r) => /position:\s*sticky/.test(r.corpo));
+    const sticky = regoleDellArchivio.filter((r) => /position:\s*sticky/.test(r.body));
     expect(sticky.length).toBeGreaterThan(0);
-    for (const r of sticky) expect(r.selettore).toContain("[data-archivio-acceso]");
+    for (const r of sticky) expect(r.selector).toContain("[data-archivio-acceso]");
   });
 
   it("scurire e stringere solo le cartelle che possono finire sotto: l'ultima mai", () => {
-    const effetti = regoleDellArchivio.filter((r) => /\bfilter:|\bscale:|will-change:/.test(r.corpo));
+    const effetti = regoleDellArchivio.filter((r) => /\bfilter:|\bscale:|will-change:/.test(r.body));
     expect(effetti.length).toBeGreaterThan(0);
     for (const r of effetti) {
-      expect(r.selettore).toContain("[data-archivio-acceso]");
-      expect(r.selettore).toContain(":not(:last-child)");
+      expect(r.selector).toContain("[data-archivio-acceso]");
+      expect(r.selector).toContain(":not(:last-child)");
     }
   });
 
@@ -658,23 +658,23 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
     // fondo scendeva a 1,74:1 sul chiaro (misurato). Il fondo invece si
     // mischia con l'inchiostro quanto il resto della cartella, e il testo
     // cambia tono (vedi tonoLinguetta).
-    const filtri = regoleDellArchivio.filter((r) => /\bfilter:/.test(r.corpo));
+    const filtri = regoleDellArchivio.filter((r) => /\bfilter:/.test(r.body));
     expect(filtri.length).toBeGreaterThan(0);
     for (const r of filtri) {
-      expect(r.selettore).toMatch(/:not\(\[data-linguetta\]\)$/);
+      expect(r.selector).toMatch(/:not\(\[data-linguetta\]\)$/);
     }
     const fondo = regoleDellArchivio.find(
-      (r) => r.selettore.includes("[data-archivio-acceso]") && /\[data-linguetta\]$/.test(r.selettore) && /background-color:/.test(r.corpo),
+      (r) => r.selector.includes("[data-archivio-acceso]") && /\[data-linguetta\]$/.test(r.selector) && /background-color:/.test(r.body),
     );
-    expect(fondo?.corpo).toMatch(/color-mix\(in srgb, var\(--cartella-dorso\), var\(--ink\) calc\(var\(--profondita, 0\) \* var\(--scurisce\) \* 100%\)\)/);
+    expect(fondo?.body).toMatch(/color-mix\(in srgb, var\(--cartella-dorso\), var\(--ink\) calc\(var\(--profondita, 0\) \* var\(--scurisce\) \* 100%\)\)/);
     // Dietro @supports: un color-mix con calc che il browser rifiuta diventa
     // trasparente, non torna al fondo di prima.
-    expect(fondo?.dentro).toContain("@supports (background-color: color-mix(in srgb, red calc(1 * 10%), blue))");
+    expect(fondo?.inside).toContain("@supports (background-color: color-mix(in srgb, red calc(1 * 10%), blue))");
   });
 
   it("i tre toni della linguetta: sul chiaro cambiano il testo, sullo scuro no", () => {
     const colore = (selettore: RegExp, valore: RegExp) =>
-      regole(selettore).some((r) => valore.test(r.corpo));
+      rules(selettore).some((r) => valore.test(r.body));
     expect(colore(/\[data-tono-linguetta="1"\] > \[data-linguetta\]$/, /color:\s*var\(--fg\)/)).toBe(true);
     expect(colore(/\[data-tono-linguetta="2"\] > \[data-linguetta\]/, /color:\s*var\(--paper\)/)).toBe(true);
     expect(
@@ -686,30 +686,30 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
     // La fascia fra le linguette e la faccia e' dorso: trasparente al
     // puntatore, un click li' apriva il dossier di una cartella nascosta.
     const dorso = regoleDellArchivio.find(
-      (r) => r.selettore.includes("[data-archivio-acceso]") && /\[data-dorso\]$/.test(r.selettore),
+      (r) => r.selector.includes("[data-archivio-acceso]") && /\[data-dorso\]$/.test(r.selector),
     );
-    expect(dorso?.corpo).toMatch(/pointer-events:\s*auto/);
+    expect(dorso?.body).toMatch(/pointer-events:\s*auto/);
   });
 
   it("dentro l'archivio i testi piccoli hanno un tenue piu' scuro, e l'arancio scuro e' schiarito", () => {
     // I rapporti sono in contrast.test.ts, misurati sui colori risolti.
-    const chiaro = regole("[data-work-shelf]")[0]?.corpo ?? "";
+    const chiaro = rules("[data-work-shelf]")[0]?.body ?? "";
     expect(chiaro).toMatch(/--cartella-tenue:\s*color-mix\(in oklab, var\(--fg-muted\) 80%, var\(--fg\)\)/);
-    const scuro = regole('[data-theme="dark"] [data-work-shelf]')[0]?.corpo ?? "";
+    const scuro = rules('[data-theme="dark"] [data-work-shelf]')[0]?.body ?? "";
     expect(scuro).toMatch(/--cartella-tenue:\s*var\(--fg-muted\)/);
     expect(scuro).toMatch(/--accento-testo:\s*color-mix\(in oklab, var\(--accent\) 90%, var\(--paper\)\)/);
     // Il tenue globale compare solo dentro la definizione del tenue suo.
     const tenui = regoleDellArchivio.filter((r) =>
-      /var\(--fg-muted\)/.test(r.corpo.replace(/--cartella-tenue:[^;]*;/g, "")),
+      /var\(--fg-muted\)/.test(r.body.replace(/--cartella-tenue:[^;]*;/g, "")),
     );
-    expect(tenui.map((r) => r.selettore), "un testo dell'archivio usa ancora il tenue globale").toEqual([]);
+    expect(tenui.map((r) => r.selector), "un testo dell'archivio usa ancora il tenue globale").toEqual([]);
   });
 
   it("il puntatore passa attraverso le cartelle e prende solo faccia e linguetta", () => {
     // Le cartelle archiviate stanno una sopra l'altra: senza, la scatola di
     // quella davanti coprirebbe le linguette di quelle dietro.
     const eventi = (sel: string) =>
-      regoleDellArchivio.find((r) => r.selettore === sel && /pointer-events:/.test(r.corpo))?.corpo;
+      regoleDellArchivio.find((r) => r.selector === sel && /pointer-events:/.test(r.body))?.body;
     expect(eventi("[data-cartella]")).toMatch(/pointer-events:\s*none/);
     expect(eventi("[data-linguetta]")).toMatch(/pointer-events:\s*auto/);
     expect(eventi("[data-faccia]")).toMatch(/pointer-events:\s*auto/);
@@ -717,10 +717,10 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
 
   it("sotto i 600px la linguetta porta solo il nome e la faccia perde le tecnologie", () => {
     const telefono = { media: "(max-width: 599px)" };
-    const anno = regole(/\[data-linguetta-anno\]$/, telefono);
+    const anno = rules(/\[data-linguetta-anno\]$/, telefono);
     expect(anno.length, "manca il blocco del telefono dell'archivio").toBeGreaterThan(0);
-    expect(anno.map((r) => r.corpo).join("\n")).toMatch(/display:\s*none/);
-    expect(regole(/\[data-faccia-tech\]$/, telefono).map((r) => r.corpo).join("\n")).toMatch(/display:\s*none/);
+    expect(anno.map((r) => r.body).join("\n")).toMatch(/display:\s*none/);
+    expect(rules(/\[data-faccia-tech\]$/, telefono).map((r) => r.body).join("\n")).toMatch(/display:\s*none/);
   });
 
   it("il centro della faccia non si stringe sotto il suo contenuto, o la soglia non vede niente", () => {
@@ -729,30 +729,30 @@ describe("l'archivio sta tutto sotto l'attributo", () => {
     // piede invece di debordare: misurato a 390x664, il riquadro del
     // riservato scendeva 17px sotto il centro fin dentro «Apri il caso», e la
     // soglia diceva che ci stava.
-    const centro = regoleDellArchivio.filter((r) => /\[data-faccia-centro\]$/.test(r.selettore));
+    const centro = regoleDellArchivio.filter((r) => /\[data-faccia-centro\]$/.test(r.selector));
     expect(centro.length).toBeGreaterThan(0);
-    for (const r of centro) expect(r.corpo).not.toMatch(/min-height:\s*0/);
+    for (const r of centro) expect(r.body).not.toMatch(/min-height:\s*0/);
   });
 
   it("la riga grande cresce anche con l'altezza, non solo con la larghezza", () => {
     // Su un portatile basso (1366x768) la riga del riservato a 3,6vw chiedeva
     // cento pixel piu' della faccia. `vh` davanti per chi `svh` non lo conosce.
-    const riga = regoleDellArchivio.filter((r) => /\[data-faccia-riga\]$/.test(r.selettore) && /font-size:/.test(r.corpo));
-    const corpo = riga.map((r) => r.corpo).join("");
+    const riga = regoleDellArchivio.filter((r) => /\[data-faccia-riga\]$/.test(r.selector) && /font-size:/.test(r.body));
+    const corpo = riga.map((r) => r.body).join("");
     expect(corpo).toMatch(/font-size:\s*clamp\(1\.45rem, min\(3\.6vw, [\d.]+vh\), 3\.1rem\);\s*font-size:\s*clamp\(1\.45rem, min\(3\.6vw, [\d.]+svh\), 3\.1rem\)/);
   });
 
   it("la faccia si toglie la barra in basso, o «Apri il caso» ci finisce sotto", () => {
     const faccia = regoleDellArchivio.find(
-      (r) => r.selettore.includes("[data-archivio-acceso]") && /\[data-faccia\]$/.test(r.selettore) && /height:/.test(r.corpo),
+      (r) => r.selector.includes("[data-archivio-acceso]") && /\[data-faccia\]$/.test(r.selector) && /height:/.test(r.body),
     );
-    expect(faccia?.corpo).toContain("var(--barra-bassa)");
-    expect(faccia?.corpo).toContain("100svh");
+    expect(faccia?.body).toContain("var(--barra-bassa)");
+    expect(faccia?.body).toContain("100svh");
   });
 });
 
 /** Le regole della pratica: tutte sotto il dialog, anche dentro le media query. */
-const regoleDellaPratica = regole(/\[data-work-dialog\]/);
+const regoleDellaPratica = rules(/\[data-work-dialog\]/);
 
 describe("i colori della pratica", () => {
   it("il foglio e' carta nei due temi: dentro mai i colori che seguono il tema", () => {
@@ -761,31 +761,31 @@ describe("i colori della pratica", () => {
     // il foglio diventerebbe inchiostro su inchiostro.
     expect(regoleDellaPratica.length).toBeGreaterThan(20);
     const vietati = /var\(--(fg|bg|fg-muted|line|accento-testo|cartella-[\w-]+)\)/;
-    const colpevoli = regoleDellaPratica.filter((r) => vietati.test(r.corpo));
-    expect(colpevoli.map((r) => r.selettore)).toEqual([]);
+    const colpevoli = regoleDellaPratica.filter((r) => vietati.test(r.body));
+    expect(colpevoli.map((r) => r.selector)).toEqual([]);
   });
 
   it("i colori del foglio sono i suoi, e vengono dalla tavolozza", () => {
-    const radice = regoleDellaPratica.find((r) => r.selettore === "[data-work-dialog]")?.corpo ?? "";
+    const radice = regoleDellaPratica.find((r) => r.selector === "[data-work-dialog]")?.body ?? "";
     expect(radice).toMatch(/--carta:\s*var\(--paper\)/);
     expect(radice).toMatch(/--inchiostro:\s*var\(--ink\)/);
     expect(radice).toMatch(/--tenue:\s*var\(--muted\)/);
     expect(radice).toMatch(/--arancio:\s*var\(--accento-su-carta\)/);
-    const scritti = regoleDellaPratica.filter((r) => /#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i.test(r.corpo));
-    expect(scritti.map((r) => r.selettore)).toEqual([]);
+    const scritti = regoleDellaPratica.filter((r) => /#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i.test(r.body));
+    expect(scritti.map((r) => r.selector)).toEqual([]);
   });
 
   it("il timbro non si fonde con la carta: il suo colore e' quello misurato in contrast.test.ts", () => {
-    expect(regoleDellaPratica.filter((r) => /mix-blend-mode/.test(r.corpo))).toEqual([]);
+    expect(regoleDellaPratica.filter((r) => /mix-blend-mode/.test(r.body))).toEqual([]);
   });
 
   it("sul computer il foglio si scorre invece di tagliare il testo", () => {
-    const computer = regole(/\[data-pratica-foglio\]$/, { media: "(min-width: 1024px) and (min-height: 700px)" });
+    const computer = rules(/\[data-pratica-foglio\]$/, { media: "(min-width: 1024px) and (min-height: 700px)" });
     expect(computer.length, "manca il blocco del computer della pratica").toBeGreaterThan(0);
-    expect(computer.map((r) => r.corpo).join("\n")).toMatch(/overflow-y:\s*auto/);
+    expect(computer.map((r) => r.body).join("\n")).toMatch(/overflow-y:\s*auto/);
     const nascosti = regoleDellaPratica.filter(
-      (r) => /\[data-pratica(-foglio)?\]$/.test(r.selettore) && /overflow(-y)?:\s*hidden/.test(r.corpo),
+      (r) => /\[data-pratica(-foglio)?\]$/.test(r.selector) && /overflow(-y)?:\s*hidden/.test(r.body),
     );
-    expect(nascosti.map((r) => r.selettore)).toEqual([]);
+    expect(nascosti.map((r) => r.selector)).toEqual([]);
   });
 });

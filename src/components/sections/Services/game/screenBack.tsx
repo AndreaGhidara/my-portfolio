@@ -2,8 +2,8 @@
 
 import { useId } from "react";
 import { useTranslations } from "next-intl";
-import { Icona, type IconaNodo } from "./icons";
-import { numeroLivello } from "./levels";
+import { Icon, type NodeIcon } from "./icons";
+import { levelNumber } from "./levels";
 
 /**
  * L'anteprima del livello 2: lo schermo e' caduto e si vede il circuito che
@@ -15,7 +15,7 @@ import { numeroLivello } from "./levels";
  * larghezza.
  */
 
-const NODI: Record<IconaNodo, [number, number]> = {
+const NODI: Record<NodeIcon, [number, number]> = {
   contatti: [70, 110],
   area: [150, 96],
   catalogo: [230, 110],
@@ -24,7 +24,7 @@ const NODI: Record<IconaNodo, [number, number]> = {
   gestionale: [150, 318],
 };
 
-type Punto = IconaNodo | "ingresso";
+type Punto = NodeIcon | "ingresso";
 const PUNTI: Record<Punto, [number, number]> = { ...NODI, ingresso: [150, 40] };
 
 const FILI: [Punto, Punto][] = [
@@ -51,7 +51,7 @@ const SCINTILLE = ["var(--bulb)", "var(--orange)", "var(--schermo-verde-chiaro)"
 /** Il lato della tessera di un nodo, in unita' del disegno. */
 const LATO = 28;
 
-export function Dietro({ onRicomincia }: { onRicomincia: () => void }) {
+export function ScreenBack({ onRestart: onRicomincia }: { onRestart: () => void }) {
   const t = useTranslations("services.gioco.schermo.dietro");
   const comune = useTranslations("services.gioco.comune");
   // useId porta caratteri che in url(#...) e in href non tutti digeriscono.
@@ -110,7 +110,7 @@ export function Dietro({ onRicomincia }: { onRicomincia: () => void }) {
           <g key={nome} className="nodo">
             <rect x={x - LATO / 2} y={y - LATO / 2} width={LATO} height={LATO} rx="5" />
             <svg x={x - LATO / 2 + 3} y={y - LATO / 2 + 3} width={LATO - 6} height={LATO - 6}>
-              <Icona nome={nome as IconaNodo} />
+              <Icon name={nome as NodeIcon} />
             </svg>
           </g>
         ))}
@@ -120,7 +120,7 @@ export function Dietro({ onRicomincia }: { onRicomincia: () => void }) {
       </svg>
 
       <div className="testa">
-        <span className="livello">{comune("etichetta", { numero: numeroLivello("logiche"), nome: t("testa") })}</span>
+        <span className="livello">{comune("etichetta", { numero: levelNumber("logiche"), nome: t("testa") })}</span>
       </div>
 
       <div className="didascalia">

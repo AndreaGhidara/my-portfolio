@@ -1,4 +1,4 @@
-import type { Moto } from "./slide";
+import type { FolderMotion } from "./slide";
 
 /**
  * La pratica in corso, dal clic a quando la cartella e' di nuovo ferma, come
@@ -11,24 +11,24 @@ import type { Moto } from "./slide";
  *
  * `C` e' la cartella: qui si porta e basta, non si tocca.
  */
-export type Fase = "apre" | "aperta" | "chiude" | "risale";
+export type DossierPhase = "apre" | "aperta" | "chiude" | "risale";
 
-export type Corso<C> = {
-  fase: Fase;
+export type DossierRun<C> = {
+  phase: DossierPhase;
   /** Quale cartella, nell'ordine dell'archivio. */
   i: number;
-  cartella: C;
-  moto: Moto;
+  folder: C;
+  motion: FolderMotion;
   /** Tempo 1 partito: la cartella e' davanti, in vista, e cade. */
-  caduta: boolean;
+  fall: boolean;
   /** Il contenuto e' nel DOM (l'effetto dopo il commit e' passato). */
-  montata: boolean;
+  mounted: boolean;
   /** I tempi 3 e 4 sono partiti. */
-  avviata: boolean;
+  started: boolean;
   /** Esc o × durante l'apertura: si chiude appena aperta. */
-  chiudiDopo: boolean;
+  closeAfter: boolean;
   /** Un clic durante la risalita: QUALE cartella, da aprire appena ferma. */
-  apriDopo: { i: number; cartella: C; moto: Moto } | null;
+  openAfter: { i: number; folder: C; motion: FolderMotion } | null;
 };
 
 /**
@@ -36,89 +36,89 @@ export type Corso<C> = {
  * (lo scroll prima della caduta, l'apertura, la risalita) portano la
  * generazione in cui sono nate, e se non e' piu' quella non fanno niente.
  */
-export type Pratica<C> = { gen: number; corso: Corso<C> | null };
+export type Dossier<C> = { gen: number; run: DossierRun<C> | null };
 
-export type Evento<C> =
+export type DossierEvent<C> =
   /** Il clic sulla cartella. */
-  | { tipo: "apri"; i: number; cartella: C; moto: Moto }
+  | { type: "apri"; i: number; folder: C; motion: FolderMotion }
   /** La cartella e' davanti e in vista: cade. */
-  | { tipo: "cade"; gen: number }
+  | { type: "cade"; gen: number }
   /** Il contenuto della pratica e' nel DOM. */
-  | { tipo: "montata" }
+  | { type: "montata" }
   /** I tempi 3 e 4 sono finiti. */
-  | { tipo: "aperta"; gen: number }
+  | { type: "aperta"; gen: number }
   /** ×, Esc sul dialog, clic sul velo. */
-  | { tipo: "chiudi" }
+  | { type: "chiudi" }
   /** Esc prima che il dialog esista: niente cancel, ma non si perde. */
-  | { tipo: "esc" }
+  | { type: "esc" }
   /** Il close del dialog, da qualunque parte arrivi. */
-  | { tipo: "chiusa" }
+  | { type: "chiusa" }
   /** La cartella e' risalita. */
-  | { tipo: "ferma"; gen: number }
+  | { type: "ferma"; gen: number }
   /** Il componente se ne va a meta'. */
-  | { tipo: "smonta" };
+  | { type: "smonta" };
 
-export const NESSUNA_PRATICA: Pratica<never> = { gen: 0, corso: null };
+export const NO_DOSSIER: Dossier<never> = { gen: 0, run: null };
 
 /* Tempi 3 e 4: partono quando ci sono tutti e due, la cartella che cade e il
    contenuto nel DOM. */
-const avvia = <C>(c: Corso<C>): Corso<C> => (c.caduta && c.montata && !c.avviata ? { ...c, avviata: true } : c);
+const avvia = <C>(c: DossierRun<C>): DossierRun<C> => (c.fall && c.mounted && !c.started ? { ...c, started: true } : c);
 
-export function pratica<C>(s: Pratica<C>, e: Evento<C>): Pratica<C> {
-  const c = s.corso;
-  switch (e.tipo) {
+export function dossierReducer<C>(s: Dossier<C>, e: DossierEvent<C>): Dossier<C> {
+  const c = s.run;
+  switch (e.type) {
     case "apri":
       if (!c) {
         return {
           gen: s.gen + 1,
-          corso: {
-            fase: "apre",
+          run: {
+            phase: "apre",
             i: e.i,
-            cartella: e.cartella,
-            moto: e.moto,
-            caduta: false,
-            montata: false,
-            avviata: false,
-            chiudiDopo: false,
-            apriDopo: null,
+            folder: e.folder,
+            motion: e.motion,
+            fall: false,
+            mounted: false,
+            started: false,
+            closeAfter: false,
+            openAfter: null,
           },
         };
       }
       // Durante l'apertura o la chiusura il clic non si accavalla; durante
       // la risalita si ricorda, e vince l'ultimo.
-      if (c.fase !== "risale") return s;
-      return { ...s, corso: { ...c, apriDopo: { i: e.i, cartella: e.cartella, moto: e.moto } } };
+      if (c.phase !== "risale") return s;
+      return { ...s, run: { ...c, openAfter: { i: e.i, folder: e.folder, motion: e.motion } } };
 
     case "cade":
-      if (e.gen !== s.gen || c?.fase !== "apre" || c.caduta) return s;
-      return { ...s, corso: avvia({ ...c, caduta: true }) };
+      if (e.gen !== s.gen || c?.phase !== "apre" || c.fall) return s;
+      return { ...s, run: avvia({ ...c, fall: true }) };
 
     case "montata":
-      if (c?.fase !== "apre" || c.montata) return s;
-      return { ...s, corso: avvia({ ...c, montata: true }) };
+      if (c?.phase !== "apre" || c.mounted) return s;
+      return { ...s, run: avvia({ ...c, mounted: true }) };
 
     case "aperta":
-      if (e.gen !== s.gen || c?.fase !== "apre") return s;
-      return { ...s, corso: { ...c, fase: c.chiudiDopo ? "chiude" : "aperta" } };
+      if (e.gen !== s.gen || c?.phase !== "apre") return s;
+      return { ...s, run: { ...c, phase: c.closeAfter ? "chiude" : "aperta" } };
 
     case "chiudi":
-      if (c?.fase === "apre") return c.chiudiDopo ? s : { ...s, corso: { ...c, chiudiDopo: true } };
-      if (c?.fase !== "aperta" || !c.caduta) return s;
-      return { ...s, corso: { ...c, fase: "chiude" } };
+      if (c?.phase === "apre") return c.closeAfter ? s : { ...s, run: { ...c, closeAfter: true } };
+      if (c?.phase !== "aperta" || !c.fall) return s;
+      return { ...s, run: { ...c, phase: "chiude" } };
 
     case "esc":
-      if (c?.fase !== "apre" || c.chiudiDopo) return s;
-      return { ...s, corso: { ...c, chiudiDopo: true } };
+      if (c?.phase !== "apre" || c.closeAfter) return s;
+      return { ...s, run: { ...c, closeAfter: true } };
 
     case "chiusa":
-      if (!c || c.fase === "risale") return s;
-      return { ...s, corso: { ...c, fase: "risale" } };
+      if (!c || c.phase === "risale") return s;
+      return { ...s, run: { ...c, phase: "risale" } };
 
     case "ferma":
-      if (e.gen !== s.gen || c?.fase !== "risale") return s;
-      return { ...s, corso: null };
+      if (e.gen !== s.gen || c?.phase !== "risale") return s;
+      return { ...s, run: null };
 
     case "smonta":
-      return c ? { gen: s.gen + 1, corso: null } : s;
+      return c ? { gen: s.gen + 1, run: null } : s;
   }
 }

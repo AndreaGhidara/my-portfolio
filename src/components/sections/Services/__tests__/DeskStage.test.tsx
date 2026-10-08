@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act, cleanup, waitFor } from "@testing-library/react";
-import { renderConTesti } from "@/test/renderWithMessages";
-import { regole } from "@/test/css";
+import { renderWithMessages } from "@/test/renderWithMessages";
+import { rules } from "@/test/css";
 import { DeskStage } from "../DeskStage";
 import { cameraScale } from "../layers";
 
@@ -103,7 +103,7 @@ afterEach(() => {
 describe("sotto i 1024px la sezione e' il gioco", () => {
   it("il gioco sta nel palco al posto del gemello verticale, e il tavolo largo resta", () => {
     mockMedia(() => false);
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     const stage = palco(container);
     expect(stage.querySelector("[data-gioco]")).not.toBeNull();
     expect(stage.querySelector('[data-desk-world][data-layout="tall"]')).toBeNull();
@@ -113,7 +113,7 @@ describe("sotto i 1024px la sezione e' il gioco", () => {
 
   it("viene dopo la testata e prima della tesi: e' li' che il gemello stava", () => {
     mockMedia(() => false);
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     const figli = [...palco(container).children];
     const gioco = figli.findIndex((el) => el.hasAttribute("data-gioco"));
     expect(gioco).toBeGreaterThan(figli.findIndex((el) => el.hasAttribute("data-desk-title")));
@@ -124,20 +124,20 @@ describe("sotto i 1024px la sezione e' il gioco", () => {
 describe("il palco dichiara il livello", () => {
   it("lo scrive dove il CSS lo cerca: e' li' che si appende l'altezza del track", () => {
     mockMedia(() => false);
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     expect(container.querySelector("[data-desk]")).toHaveAttribute("data-motion");
   });
 
   it("chi ha chiesto meno movimento non viene agganciato", () => {
     mockMedia((q) => q.includes("prefers-reduced-motion"));
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     expect(container.querySelector("[data-desk]")).toHaveAttribute("data-motion", "none");
   });
 
   it("su touch il tavolo non si aggancia: reduced, non full", () => {
     // Schermo largo, ma puntatore non fine: e' un tablet, e il tavolo resta fermo.
     mockMedia((q) => q.includes("min-width"));
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     expect(container.querySelector("[data-desk]")).toHaveAttribute("data-motion", "reduced");
   });
 });
@@ -145,7 +145,7 @@ describe("il palco dichiara il livello", () => {
 describe("il patto del fallback regge anche sul palco", () => {
   it("a movimento ridotto nessuno scrive --p: vale 1, e il tavolo si vede intero", () => {
     mockMedia((q) => q.includes("min-width"));
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     expect(palco(container).style.getPropertyValue("--p")).toBe("");
     expect(palco(container).style.getPropertyValue("--s")).toBe("");
   });
@@ -154,7 +154,7 @@ describe("il patto del fallback regge anche sul palco", () => {
 describe("la camera", () => {
   it("al fotogramma zero il piano e' ingrandito e il tavolo e' ancora vuoto", async () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     const stage = palco(container);
     // La camera non parte piu' durante il render: GSAP si carica al volo dopo
     // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
@@ -165,7 +165,7 @@ describe("la camera", () => {
 
   it("scrive due property e non tocca un elemento: le opacita' le fa il CSS", async () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     // Il palco porta solo --p e --s. Se un giorno la camera cominciasse a
     // scrivere opacita' o transform, questo conto cambia, ed e' il punto.
     // La camera non parte piu' durante il render: GSAP si carica al volo dopo
@@ -184,7 +184,7 @@ describe("la camera", () => {
 
   it("chi accende la riduzione del movimento a meta' strada ritrova il tavolo intero", async () => {
     const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     // La camera non parte piu' durante il render: GSAP si carica al volo dopo
     // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
     await waitFor(() => expect(palco(container).style.getPropertyValue("--p")).not.toBe(""));
@@ -208,7 +208,7 @@ describe("la camera", () => {
     // 1024px per una fermata del Tab che nemmeno si vede.
     const vivi = ascoltatoriDelFuoco();
     const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     expect(vivi.size).toBe(1);
 
     cambiaIdea((q) => q.includes("prefers-reduced-motion"));
@@ -226,7 +226,7 @@ describe("la camera", () => {
     const salta = vi.fn();
     vi.stubGlobal("scrollTo", salta);
     const cambiaIdea = mockMedia((q) => !q.includes("prefers-reduced-motion"));
-    const { container } = renderConTesti(<DeskStage {...props} />);
+    const { container } = renderWithMessages(<DeskStage {...props} />);
     const postit = container.querySelector(
       '[data-desk-world][data-layout="wide"] [data-desk-blank]',
     ) as HTMLElement;
@@ -259,7 +259,7 @@ describe("la camera", () => {
   it("guardia: smontando il palco l'ascoltatore se ne va con lui", () => {
     const vivi = ascoltatoriDelFuoco();
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
-    const { unmount } = renderConTesti(<DeskStage {...props} />);
+    const { unmount } = renderWithMessages(<DeskStage {...props} />);
     expect(vivi.size).toBe(1);
     unmount();
     expect(vivi.size).toBe(0);
@@ -268,13 +268,13 @@ describe("la camera", () => {
   it("guardia: a movimento ridotto non viene attaccato per niente", () => {
     const vivi = ascoltatoriDelFuoco();
     mockMedia((q) => q.includes("prefers-reduced-motion"));
-    renderConTesti(<DeskStage {...props} />);
+    renderWithMessages(<DeskStage {...props} />);
     expect(vivi.size).toBe(0);
   });
 
   it("smontando il palco le due property se ne vanno con lui", async () => {
     mockMedia((q) => !q.includes("prefers-reduced-motion"));
-    const { container, unmount } = renderConTesti(<DeskStage {...props} />);
+    const { container, unmount } = renderWithMessages(<DeskStage {...props} />);
     const stage = palco(container);
     // La camera non parte piu' durante il render: GSAP si carica al volo dopo
     // la prima pittura (vedi useSectionAnimation), quindi qui si aspetta.
@@ -310,10 +310,10 @@ describe("il post-it dice una cosa sola per volta", () => {
     // movimento, chi arriva con un puntatore grosso), e li' l'hover non
     // succede mai: senza una regola che spenga la nota nello stesso caso, le
     // due scritte si leggono una sopra l'altra.
-    const ferma = regole(/\[data-desk\]:not\(\[data-motion="full"\]\)/).find((r) =>
-      /\[data-desk-note\]/.test(r.selettore),
+    const ferma = rules(/\[data-desk\]:not\(\[data-motion="full"\]\)/).find((r) =>
+      /\[data-desk-note\]/.test(r.selector),
     );
     expect(ferma, "manca la regola che spegne la nota a tavolo fermo").toBeDefined();
-    expect(ferma!.corpo).toMatch(/opacity:\s*0/);
+    expect(ferma!.body).toMatch(/opacity:\s*0/);
   });
 });

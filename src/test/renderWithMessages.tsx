@@ -15,7 +15,7 @@ const MESSAGGI = { it, en } as const;
  * Il fuso e' fisso perche' next-intl, senza, avvisa a ogni render: nessuno di
  * questi componenti scrive una data.
  */
-export function renderConTesti(
+export function renderWithMessages(
   ui: ReactElement,
   { locale = "it", ...opzioni }: { locale?: keyof typeof MESSAGGI } & Omit<RenderOptions, "wrapper"> = {},
 ) {

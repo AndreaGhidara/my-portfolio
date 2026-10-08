@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { LIVELLI, type LivelloProps } from "./levels";
+import { LEVELS, type LevelProps } from "./levels";
 
 /**
  * La fine del giro: il cielo della notte del livello 4 si fa giorno, e sotto
@@ -12,7 +12,7 @@ import { LIVELLI, type LivelloProps } from "./levels";
  * livello 1. «Parliamone» non e' un pulsante: e' il link ai Contatti, e sul
  * telefono e' l'unica via ai Contatti dentro la sezione.
  */
-export function Finale({ onAvanti }: LivelloProps) {
+export function Ending({ onNext: onAvanti }: LevelProps) {
   const t = useTranslations("services.gioco.finale");
 
   return (
@@ -39,7 +39,7 @@ export function Finale({ onAvanti }: LivelloProps) {
         <div />
         <div className="palco">
           <ol className="strati">
-            {LIVELLI.map((id, i) => (
+            {LEVELS.map((id, i) => (
               <li key={id}>
                 <span aria-hidden="true">{i + 1}</span>
                 {t(`strati.${id}`)}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, type RefObject } from "react";
-import { curva } from "./graph";
-import { FILI, inMappa, oltreSoglia, riposo, type Punto } from "./motion";
+import { curve } from "./graph";
+import { THREADS, toMapPoint, pastThreshold, restPositions, type MapPoint } from "./motion";
 
 type Gsap = typeof import("gsap").gsap;
 
@@ -13,21 +13,21 @@ type Gsap = typeof import("gsap").gsap;
  * Restituisce i ref da appendere a nodi e fili, i gestori del puntatore e la
  * presa in corso, che il passaggio del mouse deve rispettare.
  */
-export function useTrascinamento({
+export function useDrag({
   svg,
   gsapRef,
-  pieno,
-  onClic,
+  full: pieno,
+  onTap: onClic,
 }: {
   svg: RefObject<SVGSVGElement | null>;
   gsapRef: RefObject<Gsap | null>;
-  pieno: boolean;
-  onClic: (id: string) => void;
+  full: boolean;
+  onTap: (id: string) => void;
 }) {
   const gruppi = useRef(new Map<string, SVGGElement>());
   const tracciati = useRef<(SVGPathElement | null)[]>([]);
   const posizioni = useRef(
-    new Map<string, Punto>([...riposo].map(([id, p]) => [id, { ...p }])),
+    new Map<string, MapPoint>([...restPositions].map(([id, p]) => [id, { ...p }])),
   );
   const presa = useRef<{
     id: string;
@@ -41,11 +41,11 @@ export function useTrascinamento({
   /** Riscrive solo i fili del nodo che si muove, non tutti e ottanta. */
   const ridisegna = (id: string) => {
     const pos = posizioni.current;
-    FILI.forEach((f, i) => {
+    THREADS.forEach((f, i) => {
       if (f.a !== id && f.b !== id) return;
       tracciati.current[i]?.setAttribute(
         "d",
-        curva(pos.get(f.a)!, pos.get(f.b)!),
+        curve(pos.get(f.a)!, pos.get(f.b)!),
       );
     });
     const p = pos.get(id)!;
@@ -57,10 +57,10 @@ export function useTrascinamento({
       );
   };
 
-  const versoMappa = (x: number, y: number): Punto => {
+  const versoMappa = (x: number, y: number): MapPoint => {
     const m = svg.current?.getScreenCTM();
     if (!m) return { x, y };
-    return inMappa(m.inverse(), x, y);
+    return toMapPoint(m.inverse(), x, y);
   };
 
   const giu = (id: string) => (e: React.PointerEvent<SVGGElement>) => {
@@ -84,7 +84,7 @@ export function useTrascinamento({
     if (!pr || !pieno || !gsapRef.current) return;
     if (
       !pr.mosso &&
-      !oltreSoglia({ x: pr.x0, y: pr.y0 }, { x: e.clientX, y: e.clientY })
+      !pastThreshold({ x: pr.x0, y: pr.y0 }, { x: e.clientX, y: e.clientY })
     )
       return;
     pr.mosso = true;
@@ -109,7 +109,7 @@ export function useTrascinamento({
   const molla = (id: string) => {
     const gsap = gsapRef.current;
     const p = posizioni.current.get(id)!;
-    const r = riposo.get(id)!;
+    const r = restPositions.get(id)!;
     if (!gsap) {
       p.x = r.x;
       p.y = r.y;
@@ -151,7 +151,7 @@ export function useTrascinamento({
   // Rimesso tutto al suo posto quando il movimento si spegne a meta' presa.
   useEffect(() => {
     if (pieno) return;
-    for (const [id, r] of riposo) {
+    for (const [id, r] of restPositions) {
       const p = posizioni.current.get(id)!;
       if (p.x === r.x && p.y === r.y) continue;
       p.x = r.x;

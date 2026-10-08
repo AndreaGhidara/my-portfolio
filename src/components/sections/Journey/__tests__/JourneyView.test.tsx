@@ -2,16 +2,16 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { JourneyView, type JourneyViewProps } from "../JourneyView";
 import { journey } from "@/content/journey";
-import { regole } from "@/test/css";
+import { rules } from "@/test/css";
 
 const props: JourneyViewProps = {
   eyebrow: "Percorso",
   title: "Dove ho imparato",
   present: "a oggi",
-  senzaTesserino: "Nessun tesserino",
-  etichettaLezione: "Cosa mi ha insegnato",
-  nota: "Da freelance il tesserino non te lo dà nessuno.",
-  suggerimento: "continua a scorrere",
+  noBadge: "Nessun tesserino",
+  lessonLabel: "Cosa mi ha insegnato",
+  note: "Da freelance il tesserino non te lo dà nessuno.",
+  hint: "continua a scorrere",
   // Come le prepara index.tsx: «a oggi» sulla piu' recente, calcolato sul dato
   // (che e' dal piu' recente), poi la lista girata per raccontarla dal 2023.
   entries: journey
@@ -19,11 +19,11 @@ const props: JourneyViewProps = {
       id: e.id,
       company: e.company,
       year: e.year,
-      tesserino: e.tesserino,
+      badge: e.badge,
       present: index === 0,
       role: `Ruolo ${e.id}`,
       body: `Corpo ${e.id}`,
-      lezione: `Lezione ${e.id}`,
+      lesson: `Lezione ${e.id}`,
     }))
     .reverse(),
   stats: [
@@ -71,8 +71,8 @@ describe("JourneyView", () => {
     // Il gancio sta sul <li> perché è di lì che pende la regola dello stile.
     const { container } = render(<JourneyView {...props} />);
     const senza = container.querySelectorAll('[data-journey-item][data-tesserino="no"]');
-    expect(senza).toHaveLength(journey.filter((e) => !e.tesserino).length);
-    expect(senza[0]).toHaveTextContent(props.senzaTesserino);
+    expect(senza).toHaveLength(journey.filter((e) => !e.badge).length);
+    expect(senza[0]).toHaveTextContent(props.noBadge);
     expect(screen.queryByText("Freelance")).toBeNull();
   });
 
@@ -106,7 +106,7 @@ describe("JourneyView", () => {
     const ultima = voci[voci.length - 1];
     expect(ultima).toHaveAttribute("data-journey-arrivo");
     expect(ultima.querySelectorAll("dl dd")).toHaveLength(2);
-    expect(ultima).toHaveTextContent(props.nota);
+    expect(ultima).toHaveTextContent(props.note);
   });
 
   it("onda, anno grande e barra non si leggono: sono disegno", () => {
@@ -125,7 +125,7 @@ describe("JourneyView", () => {
 });
 
 /** Le regole del foglio di stile che riguardano il percorso, corpo compreso. */
-const regoleDelPercorso = regole(/\[data-journey-/);
+const regoleDelPercorso = rules(/\[data-journey-/);
 
 describe("i colori del percorso", () => {
   it("non chiedono niente ai token che cambiano col tema", () => {
@@ -136,9 +136,9 @@ describe("i colori del percorso", () => {
     // posta, e vale per la stessa ragione. Nel DOM non si vede.
     expect(regoleDelPercorso.length).toBeGreaterThan(10);
     const colpevoli = regoleDelPercorso.filter((r) =>
-      /var\(\s*--(fg|line|bg)\b/.test(r.corpo),
+      /var\(\s*--(fg|line|bg)\b/.test(r.body),
     );
-    expect(colpevoli.map((r) => r.selettore)).toEqual([]);
+    expect(colpevoli.map((r) => r.selector)).toEqual([]);
   });
 
   it("nemmeno le classi scritte nel componente li chiedono", () => {
@@ -159,6 +159,6 @@ describe("i colori del percorso", () => {
     // `.eyebrow` porta --fg-muted, e la prova qui sopra non lo vede: quella
     // regola non nomina il percorso. Dentro un tesserino di carta va
     // ridichiarato, o di notte l'anno sparisce.
-    expect(regoleDelPercorso.some((r) => /\.eyebrow/.test(r.selettore))).toBe(true);
+    expect(regoleDelPercorso.some((r) => /\.eyebrow/.test(r.selector))).toBe(true);
   });
 });

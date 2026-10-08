@@ -4,8 +4,8 @@ import { gsap, ScrollTrigger } from "./gsap";
 import type { MotionLevel } from "./motionPolicy";
 // La riga d'innesco sta in ./finestre: e' un modulo di soli dati, senza
 // "use client", cosi' la possono leggere anche i Server Component.
-import { INIZIO_ENTRATA } from "./timing";
-export { INIZIO_ENTRATA } from "./timing";
+import { ENTRANCE_START } from "./timing";
+export { ENTRANCE_START } from "./timing";
 
 /**
  * La pulizia di fine entrata, fatta a mano.
@@ -40,7 +40,7 @@ export { INIZIO_ENTRATA } from "./timing";
  */
 const PROPRIETA_DEL_MOTO = "transform,opacity,translate,rotate,scale,transform-origin";
 
-export function pulizia(
+export function cleanup(
   targets: gsap.TweenTarget,
   clearProps?: boolean | string,
 ): gsap.TweenVars {
@@ -63,7 +63,7 @@ export function pulizia(
 
 /** La riga d'innesco che tocca a questo livello. Vedi INIZIO_ENTRATA. */
 function inizio(level: MotionLevel): string {
-  return level === "full" ? INIZIO_ENTRATA.pieno : INIZIO_ENTRATA.ridotto;
+  return level === "full" ? ENTRANCE_START.full : ENTRANCE_START.reduced;
 }
 
 type Common = {
@@ -164,14 +164,14 @@ export function paint(
  * sembra uno zoom, una che sfora di un soffio e torna sembra una cosa che si
  * posa.
  */
-export function cresce(
+export function grow(
   target: Element | null,
   {
     level,
     trigger,
-    origine = "50% 50%",
+    origin: origine = "50% 50%",
     delay = 0,
-  }: Common & { origine?: string; delay?: number },
+  }: Common & { origin?: string; delay?: number },
 ): gsap.core.Tween | null {
   if (level === "none" || !target) return null;
 
@@ -190,7 +190,7 @@ export function cresce(
        cambiando larghezza dello schermo il cerchio cambia misura e la testa
        resterebbe alzata dei pixel di prima. Si toglie, e il CSS torna
        padrone. */
-    ...pulizia(target, true),
+    ...cleanup(target, true),
     scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
   });
 }
@@ -224,7 +224,7 @@ export function reveal(
        alzano di 6px al passaggio del mouse), l'entrata gli lascia addosso un
        translate(0,0) e quel sollevamento non succede piu'. Qui si ripulisce
        quello che l'entrata ha scritto, e il CSS torna padrone. */
-    ...pulizia(targets, clearProps),
+    ...cleanup(targets, clearProps),
     scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
   });
 }
@@ -240,16 +240,16 @@ export function reveal(
  * telefono e' una pagina che balla, e chi scorre veloce lo prende in faccia a
  * meta' strada.
  */
-export function daLato(
+export function fromSide(
   targets: gsap.TweenTarget,
   {
     level,
     trigger,
-    verso,
+    direction: verso,
     stagger = 0,
     delay = 0,
     clearProps = false,
-  }: Common & { verso: "sx" | "dx"; stagger?: number; delay?: number; clearProps?: boolean | string },
+  }: Common & { direction: "sx" | "dx"; stagger?: number; delay?: number; clearProps?: boolean | string },
 ): gsap.core.Tween | null {
   if (level === "none") return null;
 
@@ -262,7 +262,7 @@ export function daLato(
     ease: "power3.out",
     delay,
     stagger,
-    ...pulizia(targets, clearProps),
+    ...cleanup(targets, clearProps),
     scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
   });
 }
@@ -274,7 +274,7 @@ export function daLato(
  * che la cosa era piu' lontana un attimo prima. Sopra il 10% di scala si legge
  * come un ingrandimento, e un ingrandimento su un titolo grande e' un effetto.
  */
-export function daDietro(
+export function fromBehind(
   targets: gsap.TweenTarget,
   {
     level,
@@ -294,7 +294,7 @@ export function daDietro(
     ease: "power3.out",
     delay,
     stagger,
-    ...pulizia(targets, clearProps),
+    ...cleanup(targets, clearProps),
     scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
   });
 }
@@ -306,7 +306,7 @@ export function daDietro(
  * busta. Il rimbalzo (`back.out`) e' quello che lo fa leggere come una cosa
  * appoggiata da una mano invece che come un blocco che scivola.
  */
-export function dallAlto(
+export function fromAbove(
   targets: gsap.TweenTarget,
   {
     level,
@@ -327,7 +327,7 @@ export function dallAlto(
     ease: "back.out(1.4)",
     delay,
     stagger,
-    ...pulizia(targets, clearProps),
+    ...cleanup(targets, clearProps),
     scrollTrigger: trigger ? { trigger, start: inizio(level), once: true } : undefined,
   });
 }

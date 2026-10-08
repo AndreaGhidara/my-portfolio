@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { quandoLibero } from "../whenIdle";
+import { whenIdle } from "../whenIdle";
 
 describe("quandoLibero", () => {
   afterEach(() => {
@@ -14,7 +14,7 @@ describe("quandoLibero", () => {
     vi.stubGlobal("cancelIdleCallback", annulla);
     const fn = vi.fn();
 
-    const ferma = quandoLibero(fn);
+    const ferma = whenIdle(fn);
     expect(richiedi).toHaveBeenCalledWith(expect.any(Function), { timeout: 800 });
 
     ferma();
@@ -27,12 +27,12 @@ describe("quandoLibero", () => {
     // requestIdleCallback, e jsdom non ne ha uno.
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     const fn = vi.fn();
-    quandoLibero(fn);
+    whenIdle(fn);
     vi.advanceTimersByTime(200);
     expect(fn).toHaveBeenCalledTimes(1);
 
     const altra = vi.fn();
-    const ferma = quandoLibero(altra);
+    const ferma = whenIdle(altra);
     ferma();
     vi.advanceTimersByTime(1000);
     expect(altra).not.toHaveBeenCalled();

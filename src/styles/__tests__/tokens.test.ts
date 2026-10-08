@@ -2,9 +2,9 @@ import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { palette } from "../palette";
-import { regole, type Regola } from "@/test/css";
+import { rules, type Rule } from "@/test/css";
 
-const dice = (dove: Regola[], dichiarazione: RegExp) => dove.some((r) => dichiarazione.test(r.corpo));
+const dice = (dove: Rule[], dichiarazione: RegExp) => dove.some((r) => dichiarazione.test(r.body));
 
 describe("i fogli di stile", () => {
   it("l'anello dei bottoni dell'apertura sta DENTRO, perche' il fuoco sta fuori", () => {
@@ -14,7 +14,7 @@ describe("i fogli di stile", () => {
     // stesso disegno: chi naviga da tastiera non saprebbe piu' dove si trova, e
     // chi usa il mouse vedrebbe comparire in hover la cosa che altrove
     // significa «sei qui». Dentro contro fuori e' tutta la differenza.
-    const bottoni = regole(/\[data-hero-cta\]/);
+    const bottoni = rules(/\[data-hero-cta\]/);
     expect(bottoni.length, "le regole dei bottoni dell'apertura non ci sono piu'").toBeGreaterThan(0);
     expect(dice(bottoni, /box-shadow:\s*inset/)).toBe(true);
     expect(dice(bottoni, /\boutline\s*:/), "l'anello e' diventato un outline: si confonde col fuoco").toBe(
@@ -22,21 +22,21 @@ describe("i fogli di stile", () => {
     );
     // E si sposta solo dove il puntatore esiste: su touch l'hover resta
     // appiccicato dopo il tocco e lascerebbe l'anello sul bottone sbagliato.
-    expect(bottoni.some((r) => r.dentro.includes("@media (hover: hover)"))).toBe(true);
+    expect(bottoni.some((r) => r.inside.includes("@media (hover: hover)"))).toBe(true);
   });
 
   it("definisce ogni token della palette con lo stesso valore", () => {
     const paletteVarsInCss = ["paper", "ink", "orange", "graph", "muted"];
     for (const name of paletteVarsInCss) {
-      expect(regole().map((r) => r.dichiarazioni[`--${name}`])).toContain(
+      expect(rules().map((r) => r.declarations[`--${name}`])).toContain(
         palette[name as keyof typeof palette],
       );
     }
   });
 
   it("definisce il tema scuro invertendo carta e inchiostro", () => {
-    expect(regole('[data-theme="dark"]').length).toBeGreaterThan(0);
-    expect(dice(regole(/\[data-theme="dark"\]/), /--bg:\s*var\(--ink\)/)).toBe(true);
+    expect(rules('[data-theme="dark"]').length).toBeGreaterThan(0);
+    expect(dice(rules(/\[data-theme="dark"\]/), /--bg:\s*var\(--ink\)/)).toBe(true);
   });
 
   it("un dossier chiuso resta display:none", () => {
@@ -45,9 +45,9 @@ describe("i fogli di stile", () => {
     // <dialog> chiuso. Il dossier chiuso restava disegnato e, senza figli,
     // diventava una scatola alta 2px: una linea sotto le cartelle, `fixed`
     // dopo la prima apertura, quindi incollata allo schermo mentre si scorre.
-    expect(dice(regole("[data-work-dialog]:not([open])"), /display:\s*none/)).toBe(true);
+    expect(dice(rules("[data-work-dialog]:not([open])"), /display:\s*none/)).toBe(true);
 
-    expect(dice(regole(/\[data-work-dialog\]$/), /display\s*:/)).toBe(false);
+    expect(dice(rules(/\[data-work-dialog\]$/), /display\s*:/)).toBe(false);
   });
 
   it("ogni sagoma del tavolo ha due strati, e i due file esistono davvero", () => {
@@ -57,7 +57,7 @@ describe("i fogli di stile", () => {
     for (const sagoma of ["sheet", "card", "postit", "plate", "rack", "phone", "laptop"]) {
       for (const file of [`${sagoma}.svg`, `${sagoma}-fill.svg`]) {
         expect(
-          regole().some((r) => r.corpo.includes(`url("/brand/desk/${file}")`)),
+          rules().some((r) => r.body.includes(`url("/brand/desk/${file}")`)),
           `${file} non e' montato nel foglio di stile`,
         ).toBe(true);
         expect(
@@ -104,8 +104,8 @@ describe("i fogli di stile", () => {
     // sigla e' a 1,5rem e puo' restare carta; «ITALIA» e' a 0,5rem e deve
     // stare in --on-accent, che fa 5,08:1. Il prototipo le aveva tutte e due
     // in carta, ed e' il difetto che questa prova blocca.
-    const sigla = regole("[data-francobollo-sigla]")[0]?.corpo;
-    const paese = regole("[data-francobollo-paese]")[0]?.corpo;
+    const sigla = rules("[data-francobollo-sigla]")[0]?.body;
+    const paese = rules("[data-francobollo-paese]")[0]?.body;
     expect(sigla, "la sigla del francobollo non c'e' piu'").toBeTruthy();
     expect(paese, "il paese del francobollo non c'e' piu'").toBeTruthy();
     expect(sigla).toMatch(/font-size:\s*1\.5rem/);
@@ -119,8 +119,8 @@ describe("i fogli di stile", () => {
     // Il piede non mette padding proprio, o quel padding diventerebbe una
     // cornice del colore del blocco tutto intorno alla busta: e' esattamente
     // cio' che la busta doveva smettere di avere.
-    const piede = regole("[data-footer]")[0]?.corpo;
-    const busta = regole("[data-busta]")[0]?.corpo;
+    const piede = rules("[data-footer]")[0]?.body;
+    const busta = rules("[data-busta]")[0]?.body;
     expect(piede, "le regole del piede non ci sono piu'").toBeTruthy();
     expect(busta, "le regole della busta non ci sono piu'").toBeTruthy();
     expect(piede, "il piede ha di nuovo un padding: torna la cornice").not.toMatch(/padding/);
@@ -131,7 +131,7 @@ describe("i fogli di stile", () => {
     // Il blocco d'inchiostro era cio' che chiudeva la pagina. Una busta color
     // carta a filo del fondo la lascerebbe aperta: e' il rischio scritto per
     // la proposta A nel prototipo, e il rimedio e' lo stesso, il taglio.
-    const taglio = regole("[data-busta]::after")[0]?.corpo;
+    const taglio = rules("[data-busta]::after")[0]?.body;
     expect(taglio, "il taglio in fondo alla pagina non c'e' piu'").toBeTruthy();
     expect(taglio).toMatch(/background-color:\s*var\(--fg\)/);
   });
@@ -143,7 +143,7 @@ describe("la barra in basso", () => {
     // di sezioni appiccicata sopra sarebbe una seconda navigazione dentro una
     // cosa che ne ha gia' una, e coprirebbe il contenuto che sei appena andato
     // ad aprire.
-    expect(dice(regole(/html\[data-dialog-open\].*\[data-nav-basso\]/), /display:\s*none/)).toBe(true);
+    expect(dice(rules(/html\[data-dialog-open\].*\[data-nav-basso\]/), /display:\s*none/)).toBe(true);
   });
 
   it("la busta si fa da parte, o la barra le sta sopra l'ultima riga", () => {
@@ -151,13 +151,13 @@ describe("la barra in basso", () => {
     // colore del blocco tutto intorno, che e' cio' che la busta ha smesso di
     // avere (vedi la prova qui sopra).
     const stretto = { media: "(max-width: 767px)" };
-    expect(regole(undefined, stretto).length, "manca il blocco sotto i 768px").toBeGreaterThan(0);
-    const spazio = regole(/\[data-busta\]/, stretto).find((r) => /padding-block-end/.test(r.corpo));
+    expect(rules(undefined, stretto).length, "manca il blocco sotto i 768px").toBeGreaterThan(0);
+    const spazio = rules(/\[data-busta\]/, stretto).find((r) => /padding-block-end/.test(r.body));
     expect(spazio, "la busta non lascia spazio alla barra").toBeTruthy();
     // E deve stare DOPO la dichiarazione di `padding` della busta, o la
     // scorciatoia se lo riprende.
-    const tutte = regole();
-    expect(tutte.indexOf(spazio!)).toBeGreaterThan(tutte.indexOf(regole("[data-busta]")[0]));
+    const tutte = rules();
+    expect(tutte.indexOf(spazio!)).toBeGreaterThan(tutte.indexOf(rules("[data-busta]")[0]));
   });
 });
 
@@ -167,8 +167,8 @@ describe("la superficie del tema scuro", () => {
     // il bordo basta. Su inchiostro no: lo schedario diventa un reticolo
     // piatto e l'accostamento delle cartelle non si vede piu'. Sul chiaro il
     // token resta il fondo di pagina, quindi li' non cambia niente.
-    expect(dice(regole(":root"), /--superficie:/)).toBe(true);
-    expect(dice(regole(/\[data-theme="dark"\]$/), /--superficie:/)).toBe(true);
+    expect(dice(rules(":root"), /--superficie:/)).toBe(true);
+    expect(dice(rules(/\[data-theme="dark"\]$/), /--superficie:/)).toBe(true);
   });
 });
 
@@ -178,7 +178,7 @@ describe("le entrate laterali non allargano la pagina", () => {
     // cioe' la pagina trascinabile di lato per tutta la durata dell'entrata.
     // hidden non va bene: farebbe di queste due un contenitore di scorrimento,
     // e l'intestazione appiccicata in cima smetterebbe di appiccicarsi.
-    const regola = regole("#services").find((r) => r.selettore === "#services, #process")?.corpo;
+    const regola = rules("#services").find((r) => r.selector === "#services, #process")?.body;
     expect(regola, "manca il ritaglio orizzontale delle sezioni con entrate laterali").toBeTruthy();
     expect(regola).toMatch(/overflow-x:\s*clip/);
     expect(regola).not.toMatch(/overflow-x:\s*hidden/);
@@ -190,14 +190,14 @@ describe("le consegne sul tablet", () => {
     // Misurato a 768px prima della correzione: il testo si fermava a 34rem e
     // restava a sinistra, con 184px di vuoto a destra e il disegno centrato
     // sotto. Tutto spinto da una parte.
-    const testo = regole(/\[data-process-text\]/, { media: "(max-width: 899px)" });
+    const testo = rules(/\[data-process-text\]/, { media: "(max-width: 899px)" });
     expect(dice(testo, /margin-inline:\s*auto/), "il testo delle consegne non si centra sotto i 900px").toBe(true);
   });
 
   it("la testata si centra fino a 1023px, non solo dove le consegne sono una colonna", () => {
     // Fra i 900 e i 1023 le consegne sono gia' a due colonne, ma la testata
     // col suo tetto stretto resterebbe appoggiata a sinistra.
-    const testata = regole(/\[data-process-testata\]/, { media: "(max-width: 1023px)" });
+    const testata = rules(/\[data-process-testata\]/, { media: "(max-width: 1023px)" });
     expect(dice(testata, /margin-inline:\s*auto/), "la testata del processo non si centra sotto i 1024px").toBe(
       true,
     );

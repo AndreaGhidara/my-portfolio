@@ -1,14 +1,14 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { LINGUETTA, PARAMETRI } from "./archive";
+import { TAB, ARCHIVE_PARAMS } from "./archive";
 import { WorkFolder } from "./WorkFolder";
 import { WorkDialog } from "./WorkDialog";
 import { preloadShot } from "./preloadShot";
 import type { WorkCaseData, WorkCaseLabels } from "./types";
-import { useArchivioAcceso } from "./useArchiveLight";
-import { usePratica } from "./useDossier";
-import { useProfondita } from "./useDepth";
+import { useArchiveLight } from "./useArchiveLight";
+import { useDossier } from "./useDossier";
+import { useDepth } from "./useDepth";
 
 /**
  * Le misure dell'archivio arrivano al CSS da qui, scritte nel markup del
@@ -16,12 +16,12 @@ import { useProfondita } from "./useDepth";
  * il percorso con binario.ts.
  */
 const MISURE = {
-  "--passo": `${PARAMETRI.passo}px`,
-  "--distanza": `${PARAMETRI.distanza}vh`,
-  "--scurisce": PARAMETRI.scurisce,
-  "--stringe": PARAMETRI.stringe,
-  "--larghezza-linguetta": `${PARAMETRI.larghezzaLinguetta}%`,
-  "--buio-minimo": `${LINGUETTA.buioMinimo * 100}%`,
+  "--passo": `${ARCHIVE_PARAMS.step}px`,
+  "--distanza": `${ARCHIVE_PARAMS.distance}vh`,
+  "--scurisce": ARCHIVE_PARAMS.darkens,
+  "--stringe": ARCHIVE_PARAMS.narrows,
+  "--larghezza-linguetta": `${ARCHIVE_PARAMS.tabWidth}%`,
+  "--buio-minimo": `${TAB.minDark * 100}%`,
 };
 
 /**
@@ -39,16 +39,16 @@ const MISURE = {
  * - usePratica apre e chiude il dossier, uno solo per tutte le cartelle.
  */
 export function WorksShelf({
-  lavori,
+  works: lavori,
   labels,
 }: {
-  lavori: WorkCaseData[];
+  works: WorkCaseData[];
   labels: WorkCaseLabels;
 }) {
   const schedario = useRef<HTMLOListElement | null>(null);
-  const ciStanno = useArchivioAcceso(schedario);
-  const { riporta, prepara } = useProfondita(schedario, ciStanno);
-  const { attiva, dialogo, apri, chiudi, alClose } = usePratica(schedario, prepara);
+  const ciStanno = useArchiveLight(schedario);
+  const { riporta, prepara } = useDepth(schedario, ciStanno);
+  const { attiva, dialogo, apri, chiudi, alClose } = useDossier(schedario, prepara);
 
   return (
     <>
@@ -67,24 +67,24 @@ export function WorksShelf({
             key={item.id}
             data={item}
             index={index}
-            totale={lavori.length}
-            openLabel={labels.apri}
-            riservatoLabel={labels.riservato}
-            riportaLabel={labels.riporta}
+            total={lavori.length}
+            openLabel={labels.open}
+            confidentialLabel={labels.confidential}
+            putBackLabel={labels.putBack}
             onOpen={(cartella) => apri(index, cartella)}
             onPreload={() => preloadShot(item.screenshot)}
-            onRiporta={() => riporta(index)}
+            onPutBack={() => riporta(index)}
           />
         ))}
       </ol>
 
       <WorkDialog
-        dialogo={dialogo}
+        dialog={dialogo}
         data={attiva === null ? null : (lavori[attiva] ?? null)}
-        numero={(attiva ?? 0) + 1}
-        totale={lavori.length}
+        number={(attiva ?? 0) + 1}
+        total={lavori.length}
         labels={labels}
-        onChiudi={chiudi}
+        onRequestClose={chiudi}
         onClose={alClose}
       />
     </>

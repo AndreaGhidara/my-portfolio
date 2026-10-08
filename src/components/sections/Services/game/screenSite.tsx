@@ -3,35 +3,35 @@
 import type { CSSProperties, Ref } from "react";
 import { useTranslations } from "next-intl";
 import {
-  ILLUSTRAZIONI,
-  VIEWBOX_ILLUSTRAZIONI,
-  type CoppiaFinta,
-  type IdIllustrazione,
-  type IdImpaginazione,
-  type ScalaFinta,
+  ILLUSTRATIONS,
+  ILLUSTRATION_VIEWBOX,
+  type FakeFontPair,
+  type IllustrationId,
+  type LayoutId,
+  type FakeScale,
 } from "./fakeSite";
 
 /**
  * Un'illustrazione del sito finto. Il markup e' una stringa fissa di
  * sitoFinto.ts, nessun dato da fuori: dangerouslySetInnerHTML qui e' sicuro.
  */
-export function Illustrazione({ id }: { id: IdIllustrazione }) {
+export function Illustration({ id }: { id: IllustrationId }) {
   return (
     <svg
-      viewBox={VIEWBOX_ILLUSTRAZIONI}
+      viewBox={ILLUSTRATION_VIEWBOX}
       preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
       focusable="false"
-      dangerouslySetInnerHTML={{ __html: ILLUSTRAZIONI[id] }}
+      dangerouslySetInnerHTML={{ __html: ILLUSTRATIONS[id] }}
     />
   );
 }
 
 type SitoProps = {
-  impaginazione: IdImpaginazione;
-  illustrazione: IdIllustrazione;
-  coppia: CoppiaFinta;
-  scala: ScalaFinta;
+  layout: LayoutId;
+  illustration: IllustrationId;
+  pair: FakeFontPair;
+  scale: FakeScale;
   ref?: Ref<HTMLDivElement>;
 };
 
@@ -44,13 +44,13 @@ type SitoProps = {
  * chi naviga per titoli non deve trovarci il pane fra le sezioni del
  * portfolio. `data-titolo` e `data-img` sono i bersagli del lampo.
  */
-export function SitoFinto({ impaginazione, illustrazione, coppia, scala, ref }: SitoProps) {
+export function FakeSite({ layout: impaginazione, illustration: illustrazione, pair: coppia, scale: scala, ref }: SitoProps) {
   const t = useTranslations("services.gioco.schermo.sito");
 
   const stile = {
-    "--ft": coppia.titolo,
-    "--fw": coppia.peso,
-    "--fp": coppia.paragrafo,
+    "--ft": coppia.heading,
+    "--fw": coppia.weight,
+    "--fp": coppia.body,
     "--k": scala.k,
   } as CSSProperties;
 
@@ -65,7 +65,7 @@ export function SitoFinto({ impaginazione, illustrazione, coppia, scala, ref }: 
   );
   const immagine = (
     <div className="s-img" data-img>
-      <Illustrazione id={illustrazione} />
+      <Illustration id={illustrazione} />
     </div>
   );
   const em = <em>{t("titoloEm")}</em>;
@@ -82,7 +82,7 @@ export function SitoFinto({ impaginazione, illustrazione, coppia, scala, ref }: 
             {em}
           </p>
           <div className="bollo" data-img>
-            <Illustrazione id={illustrazione} />
+            <Illustration id={illustrazione} />
           </div>
           <span className="bollo-testo">{t("bollo")}</span>
         </div>

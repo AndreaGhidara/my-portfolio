@@ -274,19 +274,19 @@ const CLOUD = {
   ),
 } satisfies Record<string, ReactNode>;
 
-export type IconaAttrezzo = keyof typeof ATTREZZI;
-export type IconaNodo = keyof typeof NODI;
-export type IconaServizio = keyof typeof SERVIZI;
-export type IconaCloud = keyof typeof CLOUD;
-export type NomeIcona = IconaAttrezzo | IconaNodo | IconaServizio | IconaCloud;
+export type ToolIcon = keyof typeof ATTREZZI;
+export type NodeIcon = keyof typeof NODI;
+export type ServiceIcon = keyof typeof SERVIZI;
+export type CloudIcon = keyof typeof CLOUD;
+export type IconName = ToolIcon | NodeIcon | ServiceIcon | CloudIcon;
 
-const DISEGNI: Record<NomeIcona, ReactNode> = { ...ATTREZZI, ...NODI, ...SERVIZI, ...CLOUD };
+const DISEGNI: Record<IconName, ReactNode> = { ...ATTREZZI, ...NODI, ...SERVIZI, ...CLOUD };
 
 /**
  * Un'icona, misurata da chi la contiene: l'svg riempie il suo genitore (la
  * classe `.ic` di base.css, o la scatola del livello).
  */
-export function Icona({ nome, className }: { nome: NomeIcona; className?: string }) {
+export function Icon({ name: nome, className }: { name: IconName; className?: string }) {
   return (
     <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false" className={className}>
       {DISEGNI[nome]}

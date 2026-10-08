@@ -1,14 +1,14 @@
 import {
-  ATTREZZI,
-  CAPI,
-  INCROCI,
-  RADICE,
-  RAMI,
-  SNODI,
-  ZONE,
-  type Attrezzo,
-  type Capo,
-  type ZonaId,
+  TOOLS,
+  GARMENTS,
+  CROSSINGS,
+  ROOT,
+  BRANCHES,
+  JUNCTIONS,
+  ZONES,
+  type Tool,
+  type Garment,
+  type ZoneId,
 } from "@/content/toolbox";
 
 /**
@@ -23,51 +23,51 @@ type Nodo = {
   id: string;
   x: number;
   y: number;
-  tipo: TipoNodo;
-  zona: ZonaId | null;
+  kind: TipoNodo;
+  zone: ZoneId | null;
 };
 
-export const NODI: readonly Nodo[] = [
-  { id: RADICE.id, x: RADICE.x, y: RADICE.y, tipo: "radice", zona: null },
-  ...SNODI.map((s) => ({
+export const NODES: readonly Nodo[] = [
+  { id: ROOT.id, x: ROOT.x, y: ROOT.y, kind: "radice", zone: null },
+  ...JUNCTIONS.map((s) => ({
     id: s.id,
     x: s.x,
     y: s.y,
-    tipo: "snodo" as const,
-    zona: s.id,
+    kind: "snodo" as const,
+    zone: s.id,
   })),
-  ...ATTREZZI.map((a) => ({
+  ...TOOLS.map((a) => ({
     id: a.id,
     x: a.x,
     y: a.y,
-    tipo: "attrezzo" as const,
-    zona: a.zona,
+    kind: "attrezzo" as const,
+    zone: a.zone,
   })),
 ];
 
-const perId = new Map(NODI.map((n) => [n.id, n]));
-const attrezzoPerId = new Map(ATTREZZI.map((a) => [a.id, a]));
+const perId = new Map(NODES.map((n) => [n.id, n]));
+const attrezzoPerId = new Map(TOOLS.map((a) => [a.id, a]));
 
-export function nodo(id: string): Nodo | undefined {
+export function nodeById(id: string): Nodo | undefined {
   return perId.get(id);
 }
 
-export function attrezzo(id: string): Attrezzo | undefined {
+export function toolById(id: string): Tool | undefined {
   return attrezzoPerId.get(id);
 }
 
-export function capo(id: string): Capo | undefined {
-  return CAPI.find((c) => c.id === id);
+export function garmentById(id: string): Garment | undefined {
+  return GARMENTS.find((c) => c.id === id);
 }
 
-export function attrezziDi(zona: ZonaId): Attrezzo[] {
-  return ATTREZZI.filter((a) => a.zona === zona);
+export function toolsIn(zona: ZoneId): Tool[] {
+  return TOOLS.filter((a) => a.zone === zona);
 }
 
 /** Tutti quelli con cui un nodo ha un filo, rami e incroci insieme. */
-export function vicini(id: string): string[] {
+export function neighbours(id: string): string[] {
   const fuori: string[] = [];
-  for (const [a, b] of [...RAMI, ...INCROCI]) {
+  for (const [a, b] of [...BRANCHES, ...CROSSINGS]) {
     if (a === id && !fuori.includes(b)) fuori.push(b);
     if (b === id && !fuori.includes(a)) fuori.push(a);
   }
@@ -76,14 +76,14 @@ export function vicini(id: string): string[] {
 
 /** Il padre di ogni nodo nell'albero: il primo ramo che lo nomina come figlio. */
 const padri = new Map<string, string>();
-for (const [a, b] of RAMI) if (!padri.has(b)) padri.set(b, a);
+for (const [a, b] of BRANCHES) if (!padri.has(b)) padri.set(b, a);
 
-export function padre(id: string): string | undefined {
+export function parentOf(id: string): string | undefined {
   return padri.get(id);
 }
 
 /** Dal nodo su fino al cartellino (o fino a dove l'albero finisce). */
-export function strada(id: string): string[] {
+export function pathTo(id: string): string[] {
   const s = [id];
   let su = padri.get(id);
   while (su && !s.includes(su)) {
@@ -94,13 +94,13 @@ export function strada(id: string): string[] {
 }
 
 /** I capi in cui un attrezzo entra. */
-export function capiCon(id: string): Capo[] {
-  return CAPI.filter((c) => c.usa.includes(id));
+export function garmentsWith(id: string): Garment[] {
+  return GARMENTS.filter((c) => c.uses.includes(id));
 }
 
 /** Le zone di un capo, dalla piu' pesante. */
-export function pesiOrdinati(c: Capo): [ZonaId, number][] {
-  return (Object.entries(c.peso) as [ZonaId, number][]).sort(
+export function sortedWeights(c: Garment): [ZoneId, number][] {
+  return (Object.entries(c.weight) as [ZoneId, number][]).sort(
     (a, b) => b[1] - a[1],
   );
 }
@@ -109,21 +109,21 @@ export function pesiOrdinati(c: Capo): [ZonaId, number][] {
  * L'ordine in cui l'ago passa: dal cartellino in giu', riga per riga, da
  * sinistra a destra. E' l'ordine in cui si legge la mappa.
  */
-export function tappe(c: Capo): string[] {
-  const usati = c.usa
+export function garmentStops(c: Garment): string[] {
+  const usati = c.uses
     .map((id) => perId.get(id))
     .filter((n): n is Nodo => !!n)
     .sort((a, b) => a.y - b.y || a.x - b.x)
     .map((n) => n.id);
-  return [RADICE.id, ...usati];
+  return [ROOT.id, ...usati];
 }
 
 /** Gli scomparti di un capo nell'ordine delle zone, con i loro attrezzi. */
-export function perZona(c: Capo): { zona: ZonaId; attrezzi: string[] }[] {
-  return ZONE.map((z) => ({
-    zona: z.id,
-    attrezzi: c.usa.filter((id) => attrezzoPerId.get(id)?.zona === z.id),
-  })).filter((g) => g.attrezzi.length > 0);
+export function byZone(c: Garment): { zone: ZoneId; tools: string[] }[] {
+  return ZONES.map((z) => ({
+    zone: z.id,
+    tools: c.uses.filter((id) => attrezzoPerId.get(id)?.zone === z.id),
+  })).filter((g) => g.tools.length > 0);
 }
 
 /**
@@ -132,17 +132,17 @@ export function perZona(c: Capo): { zona: ZonaId; attrezzi: string[] }[] {
  * dentro il bordo a punti senza misurare niente nel browser (il server rende
  * la mappa gia' finita).
  */
-export function larghezza(tipo: TipoNodo, testo: string): number {
+export function nodeWidth(tipo: TipoNodo, testo: string): number {
   if (tipo === "radice") return 170;
   return Math.max(70, testo.length * (tipo === "snodo" ? 7.6 : 7.3) + 24);
 }
 
-export function altezza(tipo: TipoNodo): number {
+export function nodeHeight(tipo: TipoNodo): number {
   return tipo === "radice" ? 46 : tipo === "snodo" ? 26 : 30;
 }
 
 /** Il filo fra due nodi: una cubica con i controlli a meta' altezza. */
-export function curva(
+export function curve(
   a: { x: number; y: number },
   b: { x: number; y: number },
 ): string {
@@ -155,7 +155,7 @@ export function curva(
  * giu' come un punto a mano. Restituisce anche le curve parziali, perche'
  * sapere dove sta ogni tappa lungo il filo serve a dire quando l'ago ci passa.
  */
-export function cucitura(punti: { x: number; y: number }[]): {
+export function seam(punti: { x: number; y: number }[]): {
   d: string;
   parziali: string[];
 } {

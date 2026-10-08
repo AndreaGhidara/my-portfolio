@@ -5,7 +5,7 @@ import type { ScrollTrigger as TipoScrollTrigger } from "gsap/ScrollTrigger";
 import { useMotionLevel } from "@/animations/motionPolicy";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import { DeskTable, type DeskLayerData } from "./DeskTable";
-import { Gioco } from "./game/Game";
+import { Game } from "./game/Game";
 import { CENTRE, FIRST_RING_REACH, SHAPE_BOX, cameraScale } from "./layers";
 
 /** Quanta parte dell'altezza del palco occupa il laptop al fotogramma zero. */
@@ -146,7 +146,7 @@ export function DeskStage({
   }, [level, spegni]);
 
   useSectionAnimation(({ level: resolved, ScrollTrigger, presets }) => {
-    const { daDietro } = presets;
+    const { fromBehind } = presets;
     const stageEl = stage.current;
     const trackEl = track.current;
 
@@ -162,7 +162,7 @@ export function DeskStage({
 
       const testata = scope.current?.querySelector<HTMLElement>("[data-desk-title]");
       if (testata) {
-        daDietro(Array.from(testata.children), {
+        fromBehind(Array.from(testata.children), {
           level: resolved,
           trigger: testata,
           stagger: 0.08,
@@ -288,7 +288,7 @@ export function DeskStage({
               cambio (display:none sopra e sotto soglia). Niente soglia in JavaScript: misurare lo
               schermo prima di disegnare vorrebbe dire un primo fotogramma
               sbagliato, e un buco fra le due soglie. */}
-          <Gioco />
+          <Game />
 
           <p data-desk-punch>{punch}</p>
         </div>

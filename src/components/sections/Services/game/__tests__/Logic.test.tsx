@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { renderConTesti } from "@/test/renderWithMessages";
+import { renderWithMessages } from "@/test/renderWithMessages";
 import it_ from "../../../../../../messages/it.json";
 import en_ from "../../../../../../messages/en.json";
-import { Logiche } from "../Logic";
+import { Logic } from "../Logic";
 
 const testi = it_.services.gioco.logiche;
 
@@ -15,7 +15,7 @@ const pulsante = (nome: string) => screen.getByRole("button", { name: new RegExp
 
 const monta = (onAvanti = vi.fn(), locale: "it" | "en" = "it") => {
   const utente = userEvent.setup();
-  const resa = renderConTesti(<Logiche onAvanti={onAvanti} visibile />, { locale });
+  const resa = renderWithMessages(<Logic onNext={onAvanti} visible />, { locale });
   return { utente, onAvanti, ...resa };
 };
 
@@ -127,7 +127,7 @@ describe("le logiche, in inglese", () => {
   it("i testi ci sono, e non sono quelli italiani", async () => {
     const en = en_.services.gioco.logiche;
     const utente = userEvent.setup();
-    renderConTesti(<Logiche onAvanti={vi.fn()} visibile />, { locale: "en" });
+    renderWithMessages(<Logic onNext={vi.fn()} visible />, { locale: "en" });
     expect(screen.getByText(en.partenza.appuntoTitolo)).toBeInTheDocument();
     await utente.click(screen.getByRole("button", { name: new RegExp(en.partenza.prenota) }));
     expect(screen.getByText(en.nodi[0].titolo)).toBeInTheDocument();

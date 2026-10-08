@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { deskLayers } from "@/content/desk";
-import { regole } from "@/test/css";
+import { rules } from "@/test/css";
 import it_ from "../../../../../messages/it.json";
 import en_ from "../../../../../messages/en.json";
 import {
@@ -432,9 +432,9 @@ describe("la camera", () => {
  * in silenzio la rete di sicurezza della geometria su un margin-bottom.
  */
 function blocco(selettore: string): string {
-  const [trovata] = regole(selettore);
+  const [trovata] = rules(selettore);
   if (!trovata) throw new Error(`il foglio di stile non ha piu' la regola ${selettore}`);
-  return trovata.corpo;
+  return trovata.body;
 }
 
 function misura(testo: string, dichiarazione: RegExp, dove: string): number[] {
@@ -668,8 +668,8 @@ describe("il titolo e la tesi hanno gli stessi numeri nei due file", () => {
  * sezioni ne hanno una loro, con le loro chiavi, e non sono la camera.
  */
 const CAMERA = (() => {
-  const dentro = regole(/\[data-desk/, { media: "(prefers-reduced-motion: no-preference)" });
-  return { dentro, fuori: regole().filter((r) => !dentro.includes(r)) };
+  const dentro = rules(/\[data-desk/, { media: "(prefers-reduced-motion: no-preference)" });
+  return { dentro, fuori: rules().filter((r) => !dentro.includes(r)) };
 })();
 
 /**
@@ -690,8 +690,8 @@ describe("il patto del fallback e' scritto in ogni riga che legge la camera", ()
     // sparisca per chi non ha il JavaScript, e nient'altro se ne accorgerebbe.
     // Le letture del tavolo: il gioco del metodo ha un --p suo, la lunghezza
     // di una barra, che con la camera non c'entra.
-    const letture = regole(/\[data-desk/).flatMap((r) =>
-      [...r.corpo.matchAll(/var\(\s*--[ps]\b[^)]*\)/g)].map((m) => m[0]),
+    const letture = rules(/\[data-desk/).flatMap((r) =>
+      [...r.body.matchAll(/var\(\s*--[ps]\b[^)]*\)/g)].map((m) => m[0]),
     );
     // Se un giorno le letture sparissero tutte, il ciclo qui sotto sarebbe vero
     // per vuoto: il conto dice che ce ne sono ancora.
@@ -712,7 +712,7 @@ describe("il movimento ha una porta sola, e due chiavi per quella porta", () => 
     // data-motion. Una regola scritta qui dentro senza la chiave si
     // applicherebbe anche a un tablet, dove il palco non aggancia niente: piano
     // sticky, track alto 380vh e nessuno che scriva --p.
-    const selettori = CAMERA.dentro.flatMap((r) => r.selettori);
+    const selettori = CAMERA.dentro.flatMap((r) => r.selectors);
     expect(selettori.length).toBeGreaterThanOrEqual(9);
     for (const selettore of selettori) {
       expect(selettore, `${selettore} entra senza chiave`).toContain(
@@ -726,7 +726,7 @@ describe("il movimento ha una porta sola, e due chiavi per quella porta", () => 
     // corsa e un palco che sta fermo mentre passano. Fuori da quella porta
     // vorrebbero dire tre schermi di vuoto da scorrere a mano, con il tavolo
     // gia' finito e fermo, che e' il modo peggiore di rompere il fallback.
-    const corpi = (dove: typeof CAMERA.dentro) => dove.map((r) => r.corpo).join("\n");
+    const corpi = (dove: typeof CAMERA.dentro) => dove.map((r) => r.body).join("\n");
     expect(corpi(CAMERA.dentro)).toContain("380vh");
     expect(corpi(CAMERA.dentro)).toContain("position: sticky");
     expect(corpi(CAMERA.fuori)).not.toContain("380vh");
@@ -736,7 +736,7 @@ describe("il movimento ha una porta sola, e due chiavi per quella porta", () => 
     // impaginato, non una camera: nessun binario, nessuna altezza di schermo,
     // niente da agganciare. Quello che non deve uscire di qui e' il palco che
     // sta fermo con i suoi 380vh dietro, e sono questi due selettori.
-    for (const { selettore, corpo } of CAMERA.fuori) {
+    for (const { selector: selettore, body: corpo } of CAMERA.fuori) {
       if (!/position:\s*sticky/.test(corpo)) continue;
       expect(selettore, `${selettore} rende sticky il palco fuori dalla porta`)
         .not.toMatch(/data-desk-stage|data-desk-track/);

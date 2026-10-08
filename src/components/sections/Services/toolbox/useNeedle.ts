@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState, type RefObject } from "react";
-import type { Capo } from "@/content/toolbox";
-import { avanti, durataAgo, posaAgo, tappeCucite } from "./motion";
+import type { Garment } from "@/content/toolbox";
+import { advance, needleDuration, needlePose, sewnStops } from "./motion";
 
 type Gsap = typeof import("gsap").gsap;
 
@@ -13,20 +13,20 @@ type Gsap = typeof import("gsap").gsap;
  * Restituisce i ref da appendere a maschera, filo e ago, e quante tappe del
  * percorso sono cucite (tutte, a riposo).
  */
-export function useAgo({
-  capo,
-  pieno,
-  cucitura,
-  tappe,
+export function useNeedle({
+  garment: capo,
+  full: pieno,
+  seam: cucitura,
+  stops: tappe,
   svg,
   gsapRef,
 }: {
-  capo: Capo | null;
-  pieno: boolean;
+  garment: Garment | null;
+  full: boolean;
   /** La cucitura del capo, con le curve parziali fino a ogni tappa. */
-  cucitura: { d: string; parziali: string[] };
+  seam: { d: string; parziali: string[] };
   /** Quante tappe ha il percorso. */
-  tappe: number;
+  stops: number;
   svg: RefObject<SVGSVGElement | null>;
   gsapRef: RefObject<Gsap | null>;
 }) {
@@ -80,15 +80,15 @@ export function useAgo({
     let fatti = 1;
     const tween = gsap.to(stato, {
       q: 1,
-      duration: durataAgo(tappe),
+      duration: needleDuration(tappe),
       ease: "none",
       onUpdate: () => {
         const l = stato.q * lunghezza;
         maschera.style.strokeDashoffset = `${lunghezza - l}`;
         const p = filo.getPointAtLength(l);
-        const p2 = filo.getPointAtLength(avanti(l, lunghezza));
-        ago.setAttribute("transform", posaAgo(stato.q, p, p2));
-        const n = tappeCucite(soglie, l, fatti);
+        const p2 = filo.getPointAtLength(advance(l, lunghezza));
+        ago.setAttribute("transform", needlePose(stato.q, p, p2));
+        const n = sewnStops(soglie, l, fatti);
         if (n !== fatti) {
           fatti = n;
           setCuciti(n);

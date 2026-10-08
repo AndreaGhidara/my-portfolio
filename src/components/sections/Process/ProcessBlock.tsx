@@ -1,5 +1,5 @@
 import type { ProcessDelivery } from "@/content/process";
-import { due } from "@/lib/format";
+import { pad2 } from "@/lib/format";
 import { DeskShapeArt } from "../Services/DeskObject";
 import { ProcessSpecimen } from "./ProcessSpecimen";
 import type { ProcessDeliveryView } from "./ProcessView";
@@ -28,22 +28,22 @@ export function ProcessBlock({
   index: number;
 }) {
   return (
-    <li data-process-item data-lato={piece.lato}>
+    <li data-process-item data-lato={piece.side}>
       <div data-process-text>
         <p className="eyebrow">
-          {due(index + 1)} · {delivery.quando}
+          {pad2(index + 1)} · {delivery.when}
         </p>
-        <h3>{delivery.titolo}</h3>
+        <h3>{delivery.title}</h3>
         <p data-process-lead>{delivery.lead}</p>
 
         <ul data-process-dentro>
-          {delivery.dentro.map((voce) => (
+          {delivery.includes.map((voce) => (
             <li key={voce}>{voce}</li>
           ))}
         </ul>
 
-        <p data-process-non>{delivery.nonlo}</p>
-        <p data-process-perche>{delivery.perche}</p>
+        <p data-process-non>{delivery.excludes}</p>
+        <p data-process-perche>{delivery.why}</p>
       </div>
 
       {/* Decorazione, per intero: quello che il disegno dice lo dicono gia' il
@@ -54,7 +54,7 @@ export function ProcessBlock({
       <div data-process-art aria-hidden="true">
         <span data-desk-piece data-shape={piece.shape}>
           <DeskShapeArt drawing={piece.shape} />
-          <ProcessSpecimen sample={piece.campione} />
+          <ProcessSpecimen sample={piece.sample} />
         </span>
       </div>
     </li>

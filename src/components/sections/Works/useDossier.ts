@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { useMotionLevel } from "@/animations/motionPolicy";
-import { NESSUNA_PRATICA, pratica, type Evento, type Pratica } from "./dossier";
-import { scivola, type Cartella, type Scivolata } from "./slide";
+import { NO_DOSSIER, dossierReducer, type DossierEvent, type Dossier } from "./dossier";
+import { slide, type Folder, type Slide } from "./slide";
 
 /** Una pratica aperta ferma tutto quello che misura la pagina sotto. */
-export const praticaAperta = () => document.documentElement.hasAttribute("data-dialog-open");
+export const isDossierOpen = () => document.documentElement.hasAttribute("data-dialog-open");
 
 /**
  * Aprire e chiudere la pratica. Gli stati e le loro regole sono in pratica.ts,
@@ -25,25 +25,25 @@ export const praticaAperta = () => document.documentElement.hasAttribute("data-d
  *
  * `prepara` porta la cartella in vista prima che cada (vedi useProfondita).
  */
-export function usePratica(
+export function useDossier(
   schedario: RefObject<HTMLOListElement | null>,
-  prepara: (i: number, cartella: Cartella) => Promise<void> | null,
+  prepara: (i: number, cartella: Folder) => Promise<void> | null,
 ) {
   const [attiva, setAttiva] = useState<number | null>(null);
   const movimento = useMotionLevel();
   const dialogo = useRef<HTMLDialogElement | null>(null);
-  const stato = useRef<Pratica<Cartella>>(NESSUNA_PRATICA);
+  const stato = useRef<Dossier<Folder>>(NO_DOSSIER);
   /** La cartella che cade: un'animazione, che nello stato puro non entra. */
-  const scivolata = useRef<Scivolata | null>(null);
+  const scivolata = useRef<Slide | null>(null);
 
   const manda = useCallback(
-    function manda(evento: Evento<Cartella>) {
+    function manda(evento: DossierEvent<Folder>) {
       const prima = stato.current;
-      const dopo = pratica(prima, evento);
+      const dopo = dossierReducer(prima, evento);
       if (dopo === prima) return;
       stato.current = dopo;
-      const p = prima.corso;
-      const c = dopo.corso;
+      const p = prima.run;
+      const c = dopo.run;
       const { gen } = dopo;
 
       /* Il clic. L'archivio inerte da subito, perche' sotto la cartella caduta
@@ -56,9 +56,9 @@ export function usePratica(
         // La barra in basso resta finche' non arriva il velo (vedi sezioni/barra.css).
         document.documentElement.setAttribute("data-pratica-in-corso", "");
         setAttiva(c.i);
-        const attesa = c.moto === "quattro-tempi" ? prepara(c.i, c.cartella) : null;
-        if (attesa) void attesa.then(() => manda({ tipo: "cade", gen }));
-        else manda({ tipo: "cade", gen });
+        const attesa = c.motion === "quattro-tempi" ? prepara(c.i, c.folder) : null;
+        if (attesa) void attesa.then(() => manda({ type: "cade", gen }));
+        else manda({ type: "cade", gen });
         return;
       }
 
@@ -66,13 +66,13 @@ export function usePratica(
          esplicito su «Apri il caso»: la faccia cliccata non lo prende, e il
          ritorno nativo del dialog finirebbe su body. */
       if (!c) {
-        scivolata.current?.ferma();
+        scivolata.current?.stop();
         scivolata.current = null;
         schedario.current?.removeAttribute("inert");
         document.documentElement.removeAttribute("data-dialog-open");
         document.documentElement.removeAttribute("data-pratica-in-corso");
-        p.cartella.apri.focus({ preventScroll: true });
-        if (p.apriDopo) manda({ tipo: "apri", ...p.apriDopo });
+        p.folder.openButton.focus({ preventScroll: true });
+        if (p.openAfter) manda({ type: "apri", ...p.openAfter });
         return;
       }
 
@@ -80,45 +80,45 @@ export function usePratica(
       /* Tempo 1, con la cartella davanti e in vista. data-dialog-open da qui:
          Lenis si ferma prima che la cartella cada, e lo scroll non riscrive
          `--profondita` mentre cade. */
-      if (c.caduta && !p.caduta) {
+      if (c.fall && !p.fall) {
         document.documentElement.setAttribute("data-dialog-open", "");
-        scivolata.current = scivola(c.cartella, c.moto);
+        scivolata.current = slide(c.folder, c.motion);
       }
       // Tempi 3 e 4: il reducer li avvia quando ci sono la caduta e il contenuto.
-      if (c.avviata && !p.avviata && dialog) {
-        void scivolata.current?.apri(dialog).then(() => manda({ tipo: "aperta", gen }));
+      if (c.started && !p.started && dialog) {
+        void scivolata.current?.open(dialog).then(() => manda({ type: "aperta", gen }));
       }
-      if (c.fase === "chiude" && p.fase !== "chiude" && dialog) {
-        void scivolata.current?.chiudi(dialog);
+      if (c.phase === "chiude" && p.phase !== "chiude" && dialog) {
+        void scivolata.current?.close(dialog);
       }
       /* Il close del dialog, da qualunque parte arrivi. Il close watcher (al
          secondo Esc, o col gesto indietro di Android) chiude il dialog da solo,
          anche a chiusura orchestrata gia' partita: quello che resta del foglio
          si salta sempre, e si passa alla risalita. Chiusa da chiudi(), il
          foglio e' gia' lasciato e rifarlo non cambia niente. */
-      if (c.fase === "risale" && p.fase !== "risale") {
-        if (dialog) scivolata.current?.lasciaIlFoglio(dialog);
-        void (scivolata.current?.risali() ?? Promise.resolve()).then(() => manda({ tipo: "ferma", gen }));
+      if (c.phase === "risale" && p.phase !== "risale") {
+        if (dialog) scivolata.current?.releaseSheet(dialog);
+        void (scivolata.current?.rise() ?? Promise.resolve()).then(() => manda({ type: "ferma", gen }));
       }
     },
     [schedario, prepara],
   );
 
   const apri = useCallback(
-    (i: number, cartella: Cartella) =>
-      manda({ tipo: "apri", i, cartella, moto: movimento === "none" ? "dissolvenza" : "quattro-tempi" }),
+    (i: number, cartella: Folder) =>
+      manda({ type: "apri", i, folder: cartella, motion: movimento === "none" ? "dissolvenza" : "quattro-tempi" }),
     [manda, movimento],
   );
 
-  const chiudi = useCallback(() => manda({ tipo: "chiudi" }), [manda]);
+  const chiudi = useCallback(() => manda({ type: "chiudi" }), [manda]);
 
   const alClose = useCallback(() => {
     setAttiva(null);
-    manda({ tipo: "chiusa" });
+    manda({ type: "chiusa" });
   }, [manda]);
 
   useEffect(() => {
-    if (attiva !== null) manda({ tipo: "montata" });
+    if (attiva !== null) manda({ type: "montata" });
   }, [attiva, manda]);
 
   /* Esc fra il clic e showModal(): la cartella cade e il dialog non c'e'
@@ -126,7 +126,7 @@ export function usePratica(
   useEffect(() => {
     const alTasto = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || dialogo.current?.open) return;
-      manda({ tipo: "esc" });
+      manda({ type: "esc" });
     };
     document.addEventListener("keydown", alTasto);
     return () => document.removeEventListener("keydown", alTasto);
@@ -137,9 +137,9 @@ export function usePratica(
     const lista = schedario.current;
     const dialog = dialogo.current;
     return () => {
-      if (!stato.current.corso) return;
-      stato.current = pratica(stato.current, { tipo: "smonta" });
-      scivolata.current?.ferma();
+      if (!stato.current.run) return;
+      stato.current = dossierReducer(stato.current, { type: "smonta" });
+      scivolata.current?.stop();
       scivolata.current = null;
       if (dialog?.open) dialog.close();
       lista?.removeAttribute("inert");

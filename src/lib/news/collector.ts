@@ -1,4 +1,4 @@
-import { CATEGORIE, type CategoriaId, type Dato, type Fonte, type Notizia, type Raccolta, type Timbro } from "./types";
+import { CATEGORIES, type CategoryId, type StoryFigure, type StorySource, type Story, type NewsCollection, type StoryStamp } from "./types";
 
 /**
  * La raccolta delle notizie, senza rete: chi chiama le fonti e' la route
@@ -7,44 +7,44 @@ import { CATEGORIE, type CategoriaId, type Dato, type Fonte, type Notizia, type 
  * potesse avere qualunque forma, e una forma inattesa da' una lista vuota.
  */
 
-export type FonteSpec =
-  | { tipo: "hn"; parole: string[]; settimane: number; punti: number }
-  | { tipo: "hf" }
-  | { tipo: "dev"; tag: string; quante: number }
+export type SourceSpec =
+  | { kind: "hn"; words: string[]; weeks: number; points: number }
+  | { kind: "hf" }
+  | { kind: "dev"; tag: string; count: number }
   /* Le ultime release di piu' progetti, come una fonte sola: prese una per
      una avrebbero aperto Codice con quattro release di fila, anche vecchie. */
-  | { tipo: "rilasci"; repos: { repo: string; nome: string }[]; giorni: number; quante: number };
+  | { kind: "rilasci"; repos: { repo: string; name: string }[]; days: number; quante: number };
 
 /** Le fonti del prototipo (docs/prototipi/2026-09-28-bancone-tre-pulsanti.html), pubbliche e senza chiave. */
-export const FONTI: Record<CategoriaId, FonteSpec[]> = {
+export const SOURCES: Record<CategoryId, SourceSpec[]> = {
   ia: [
-    { tipo: "hn", parole: ["LLM", "OpenAI", "Anthropic", "Claude", "Gemini", "agents"], settimane: 1, punti: 60 },
-    { tipo: "hf" },
-    { tipo: "dev", tag: "ai", quante: 6 },
+    { kind: "hn", words: ["LLM", "OpenAI", "Anthropic", "Claude", "Gemini", "agents"], weeks: 1, points: 60 },
+    { kind: "hf" },
+    { kind: "dev", tag: "ai", count: 6 },
   ],
   design: [
-    { tipo: "hn", parole: ["design", "typography", "Figma", "UX", "CSS", "font"], settimane: 2, punti: 25 },
-    { tipo: "dev", tag: "design", quante: 6 },
-    { tipo: "dev", tag: "ux", quante: 6 },
-    { tipo: "dev", tag: "css", quante: 4 },
+    { kind: "hn", words: ["design", "typography", "Figma", "UX", "CSS", "font"], weeks: 2, points: 25 },
+    { kind: "dev", tag: "design", count: 6 },
+    { kind: "dev", tag: "ux", count: 6 },
+    { kind: "dev", tag: "css", count: 4 },
   ],
   codice: [
     {
-      tipo: "rilasci",
+      kind: "rilasci",
       repos: [
-        { repo: "vercel/next.js", nome: "Next.js" },
-        { repo: "facebook/react", nome: "React" },
-        { repo: "microsoft/TypeScript", nome: "TypeScript" },
-        { repo: "tailwindlabs/tailwindcss", nome: "Tailwind CSS" },
+        { repo: "vercel/next.js", name: "Next.js" },
+        { repo: "facebook/react", name: "React" },
+        { repo: "microsoft/TypeScript", name: "TypeScript" },
+        { repo: "tailwindlabs/tailwindcss", name: "Tailwind CSS" },
       ],
       // Le due settimane di Hacker News per Codice: sono le notizie della settimana.
-      giorni: 14,
+      days: 14,
       quante: 2,
     },
-    { tipo: "dev", tag: "nextjs", quante: 4 },
-    { tipo: "hn", parole: ["React", "Next.js", "TypeScript", "Tailwind", "Vercel", "Node.js"], settimane: 2, punti: 30 },
-    { tipo: "dev", tag: "react", quante: 4 },
-    { tipo: "dev", tag: "typescript", quante: 4 },
+    { kind: "dev", tag: "nextjs", count: 4 },
+    { kind: "hn", words: ["React", "Next.js", "TypeScript", "Tailwind", "Vercel", "Node.js"], weeks: 2, points: 30 },
+    { kind: "dev", tag: "react", count: 4 },
+    { kind: "dev", tag: "typescript", count: 4 },
   ],
 };
 
@@ -68,29 +68,29 @@ const SPINTO = /uncensored|nsfw|abliterat|erotic|porn|lewd|nude/i;
  * trovava cinque storie in una settimana. Le parole date anche come
  * `optionalWords` bastano una alla volta, che e' l'OR voluto.
  */
-export function urlDi(f: Exclude<FonteSpec, { tipo: "rilasci" }>, adesso: Date): string {
-  switch (f.tipo) {
+export function sourceUrl(f: Exclude<SourceSpec, { kind: "rilasci" }>, adesso: Date): string {
+  switch (f.kind) {
     case "hn": {
       const giorno = Math.floor(adesso.getTime() / 86_400_000) * 86400;
-      const da = giorno - f.settimane * 7 * 86400;
-      const parole = encodeURIComponent(f.parole.join(" "));
-      return `https://hn.algolia.com/api/v1/search?query=${parole}&optionalWords=${parole}&tags=story&numericFilters=created_at_i%3E${da},points%3E${f.punti}&hitsPerPage=20`;
+      const da = giorno - f.weeks * 7 * 86400;
+      const parole = encodeURIComponent(f.words.join(" "));
+      return `https://hn.algolia.com/api/v1/search?query=${parole}&optionalWords=${parole}&tags=story&numericFilters=created_at_i%3E${da},points%3E${f.points}&hitsPerPage=20`;
     }
     case "hf":
       return "https://huggingface.co/api/daily_papers?limit=10";
     case "dev":
-      return `https://dev.to/api/articles?tag=${f.tag}&top=7&per_page=${f.quante}`;
+      return `https://dev.to/api/articles?tag=${f.tag}&top=7&per_page=${f.count}`;
   }
 }
 
 /** Gli indirizzi di una fonte: uno, o uno per progetto per le release. */
-export function indirizzi(f: FonteSpec, adesso: Date): string[] {
-  if (f.tipo === "rilasci") return f.repos.map((r) => `https://api.github.com/repos/${r.repo}/releases/latest`);
-  return [urlDi(f, adesso)];
+export function sourceUrls(f: SourceSpec, adesso: Date): string[] {
+  if (f.kind === "rilasci") return f.repos.map((r) => `https://api.github.com/repos/${r.repo}/releases/latest`);
+  return [sourceUrl(f, adesso)];
 }
 
 /** Spazi normalizzati, e tagliato sull'ultima parola intera che ci sta. */
-export function taglia(s: string, n: number): string {
+export function truncate(s: string, n: number): string {
   const t = s.replace(/\s+/g, " ").trim();
   if (t.length <= n) return t;
   const spazio = t.lastIndexOf(" ", n);
@@ -117,12 +117,12 @@ type Bozza = {
   url: string;
   quando: string;
   riassunto?: string;
-  dati: Dato[];
+  dati: StoryFigure[];
 };
 
 /** Da una bozza a una notizia, o a niente se non passa i filtri. */
-function notizia(b: Bozza, fonte: Fonte, timbro: Timbro): Notizia | null {
-  const titolo = taglia(b.titolo, 200);
+function notizia(b: Bozza, fonte: StorySource, timbro: StoryStamp): Story | null {
+  const titolo = truncate(b.titolo, 200);
   const url = indirizzo(b.url);
   const quando = new Date(b.quando);
   if (!titolo || !url || Number.isNaN(quando.getTime())) return null;
@@ -130,18 +130,18 @@ function notizia(b: Bozza, fonte: Fonte, timbro: Timbro): Notizia | null {
   const riassunto = b.riassunto ? b.riassunto : undefined;
   return {
     id: url.href,
-    titolo,
+    title: titolo,
     url: url.href,
     hostname: url.hostname.replace(/^www\./, ""),
-    quando: quando.toISOString(),
-    fonte,
-    timbro,
-    ...(riassunto ? { riassunto } : {}),
-    dati: b.dati,
+    when: quando.toISOString(),
+    source: fonte,
+    stamp: timbro,
+    ...(riassunto ? { summary: riassunto } : {}),
+    figures: b.dati,
   };
 }
 
-const solo = (l: (Notizia | null)[]): Notizia[] => l.filter((n): n is Notizia => n !== null);
+const solo = (l: (Story | null)[]): Story[] => l.filter((n): n is Story => n !== null);
 
 /** Le note di rilascio sono markdown: restano le parole. */
 function note(md: string): string {
@@ -157,8 +157,8 @@ function note(md: string): string {
  * risposte, una per progetto nell'ordine di `repos` (null per chi non ha
  * risposto), e `adesso` serve a lasciare fuori quelle vecchie.
  */
-export function leggi(f: FonteSpec, corpo: unknown, adesso: Date = new Date()): Notizia[] {
-  switch (f.tipo) {
+export function parseSource(f: SourceSpec, corpo: unknown, adesso: Date = new Date()): Story[] {
+  switch (f.kind) {
     case "hn": {
       const hits = oggetto(corpo)?.hits;
       if (!Array.isArray(hits)) return [];
@@ -173,8 +173,8 @@ export function leggi(f: FonteSpec, corpo: unknown, adesso: Date = new Date()): 
               url,
               quando: testo(h.created_at),
               dati: [
-                { codice: "punti", valore: numero(h.points) },
-                { codice: "commenti", valore: numero(h.num_comments) },
+                { code: "punti", value: numero(h.points) },
+                { code: "commenti", value: numero(h.num_comments) },
               ],
             },
             { id: "hn" },
@@ -196,10 +196,10 @@ export function leggi(f: FonteSpec, corpo: unknown, adesso: Date = new Date()): 
               titolo: testo(p.title) || testo(paper.title),
               url: `https://huggingface.co/papers/${encodeURIComponent(testo(paper.id))}`,
               quando: testo(p.publishedAt) || testo(paper.publishedAt),
-              riassunto: taglia(testo(p.summary) || testo(paper.summary), 380),
+              riassunto: truncate(testo(p.summary) || testo(paper.summary), 380),
               dati: [
-                { codice: "voti", valore: numero(paper.upvotes) },
-                { codice: "autori", valore: Array.isArray(autori) ? autori.length : 0 },
+                { code: "voti", value: numero(paper.upvotes) },
+                { code: "autori", value: Array.isArray(autori) ? autori.length : 0 },
               ],
             },
             { id: "hf" },
@@ -219,10 +219,10 @@ export function leggi(f: FonteSpec, corpo: unknown, adesso: Date = new Date()): 
               titolo: testo(a.title),
               url: testo(a.url),
               quando: testo(a.published_at),
-              riassunto: taglia(testo(a.description), 300),
+              riassunto: truncate(testo(a.description), 300),
               dati: [
-                { codice: "reazioni", valore: numero(a.positive_reactions_count) },
-                { codice: "lettura", valore: numero(a.reading_time_minutes) },
+                { code: "reazioni", value: numero(a.positive_reactions_count) },
+                { code: "lettura", value: numero(a.reading_time_minutes) },
               ],
             },
             { id: "dev", tag: f.tag },
@@ -233,9 +233,9 @@ export function leggi(f: FonteSpec, corpo: unknown, adesso: Date = new Date()): 
     }
     case "rilasci": {
       if (!Array.isArray(corpo)) return [];
-      const da = adesso.getTime() - f.giorni * 86_400_000;
+      const da = adesso.getTime() - f.days * 86_400_000;
       return solo(
-        f.repos.map(({ repo, nome }, k) => {
+        f.repos.map(({ repo, name: nome }, k) => {
           const r = oggetto(corpo[k]);
           const versione = testo(r?.tag_name);
           if (!r || !versione) return null;
@@ -244,24 +244,24 @@ export function leggi(f: FonteSpec, corpo: unknown, adesso: Date = new Date()): 
               titolo: `${nome} ${versione.replace(/^v/, "")}`,
               url: testo(r.html_url),
               quando: testo(r.published_at),
-              riassunto: taglia(note(testo(r.body)), 320),
-              dati: [{ codice: "versione", valore: versione }],
+              riassunto: truncate(note(testo(r.body)), 320),
+              dati: [{ code: "versione", value: versione }],
             },
             { id: "github", repo },
             "release",
           );
         }),
       )
-        .filter((n) => Date.parse(n.quando) >= da)
-        .sort((a, b) => Date.parse(b.quando) - Date.parse(a.quando))
+        .filter((n) => Date.parse(n.when) >= da)
+        .sort((a, b) => Date.parse(b.when) - Date.parse(a.when))
         .slice(0, f.quante);
     }
   }
 }
 
 /** Una per fonte a turno, finche' ce n'e': nessuna fonte si prende la macchina. */
-function alterna(liste: Notizia[][]): Notizia[] {
-  const fuori: Notizia[] = [];
+function alterna(liste: Story[][]): Story[] {
+  const fuori: Story[] = [];
   const lunga = Math.max(0, ...liste.map((l) => l.length));
   for (let i = 0; i < lunga; i++) for (const l of liste) if (l[i]) fuori.push(l[i]);
   return fuori;
@@ -274,15 +274,15 @@ const chiaveTitolo = (t: string) => t.toLowerCase().replace(/\s+/g, " ").trim();
  * articolo sotto tag diversi: una notizia sta in una categoria sola, la prima
  * che l'ha trovata, nell'ordine ia, design, codice.
  */
-export function componi(perCategoria: Record<CategoriaId, Notizia[][]>): Record<CategoriaId, Notizia[]> {
+export function composeCategories(perCategoria: Record<CategoryId, Story[][]>): Record<CategoryId, Story[]> {
   const url = new Set<string>();
   const titoli = new Set<string>();
-  const fuori = {} as Record<CategoriaId, Notizia[]>;
-  for (const c of CATEGORIE) {
+  const fuori = {} as Record<CategoryId, Story[]>;
+  for (const c of CATEGORIES) {
     fuori[c] = [];
     for (const n of alterna(perCategoria[c])) {
       if (fuori[c].length >= PER_CATEGORIA) break;
-      const t = chiaveTitolo(n.titolo);
+      const t = chiaveTitolo(n.title);
       if (url.has(n.url) || titoli.has(t)) continue;
       url.add(n.url);
       titoli.add(t);
@@ -293,7 +293,7 @@ export function componi(perCategoria: Record<CategoriaId, Notizia[][]>): Record<
 }
 
 /** Chi va in rete: restituisce il corpo JSON e l'intestazione Date della risposta. */
-export type Chiedi = (url: string) => Promise<{ corpo: unknown; data: string | null }>;
+export type Fetcher = (url: string) => Promise<{ body: unknown; date: string | null }>;
 
 /**
  * Chiede tutte le fonti insieme. Una fonte che cade (429 di DEV, 403 di GitHub,
@@ -301,29 +301,29 @@ export type Chiedi = (url: string) => Promise<{ corpo: unknown; data: string | n
  * piu' vecchia fra le risposte arrivate: con la cache di un'ora per fonte e'
  * quella che dice da quanto le notizie sono ferme.
  */
-export async function raccogli(chiedi: Chiedi, adesso: Date): Promise<Raccolta> {
+export async function collectNews(chiedi: Fetcher, adesso: Date): Promise<NewsCollection> {
   const date: number[] = [];
-  const perCategoria = {} as Record<CategoriaId, Notizia[][]>;
+  const perCategoria = {} as Record<CategoryId, Story[][]>;
   await Promise.all(
-    CATEGORIE.map(async (c) => {
+    CATEGORIES.map(async (c) => {
       const esiti = await Promise.allSettled(
-        FONTI[c].map(async (f) => {
-          const risposte = await Promise.allSettled(indirizzi(f, adesso).map((u) => chiedi(u)));
+        SOURCES[c].map(async (f) => {
+          const risposte = await Promise.allSettled(sourceUrls(f, adesso).map((u) => chiedi(u)));
           if (risposte.every((r) => r.status === "rejected")) throw new Error("fonte giu'");
           const corpi = risposte.map((r) => {
             if (r.status === "rejected") return null;
-            const t = r.value.data ? Date.parse(r.value.data) : NaN;
+            const t = r.value.date ? Date.parse(r.value.date) : NaN;
             if (!Number.isNaN(t)) date.push(t);
-            return r.value.corpo;
+            return r.value.body;
           });
-          return leggi(f, f.tipo === "rilasci" ? corpi : corpi[0], adesso);
+          return parseSource(f, f.kind === "rilasci" ? corpi : corpi[0], adesso);
         }),
       );
       perCategoria[c] = esiti.map((e) => (e.status === "fulfilled" ? e.value : []));
     }),
   );
   return {
-    raccolteAlle: new Date(date.length ? Math.min(...date) : adesso.getTime()).toISOString(),
-    categorie: componi(perCategoria),
+    collectedAt: new Date(date.length ? Math.min(...date) : adesso.getTime()).toISOString(),
+    categories: composeCategories(perCategoria),
   };
 }

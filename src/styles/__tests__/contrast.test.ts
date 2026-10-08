@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { contrastRatio, relativeLuminance } from "../contrast";
 import { palette } from "../palette";
-import { LINGUETTA, PARAMETRI, tonoLinguetta } from "../../components/sections/Works/archive";
+import { TAB, ARCHIVE_PARAMS, tabTone } from "../../components/sections/Works/archive";
 
 describe("relativeLuminance", () => {
   it("vale 0 sul nero e 1 sul bianco", () => {
@@ -118,9 +118,9 @@ describe("l'archivio dei Lavori", () => {
   const fondoLinguetta = (dorso: string, p: number) => {
     const quota = Math.min(
       1,
-      tonoLinguetta(p) === 2
-        ? Math.max(p * PARAMETRI.scurisce, LINGUETTA.buioMinimo)
-        : p * PARAMETRI.scurisce,
+      tabTone(p) === 2
+        ? Math.max(p * ARCHIVE_PARAMS.darkens, TAB.minDark)
+        : p * ARCHIVE_PARAMS.darkens,
     );
     const canali = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
     const a = canali(dorso);
@@ -136,7 +136,7 @@ describe("l'archivio dei Lavori", () => {
       [palette.ink, tenueChiaro],
       [palette.ink, palette.ink],
       [palette.paper, palette.paper],
-    ][tonoLinguetta(p)];
+    ][tabTone(p)];
   const testiScuro = [palette.paper, palette.mutedDark];
 
   it("la linguetta si legge alle due profondita' estreme, nei due temi", () => {

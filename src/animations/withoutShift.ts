@@ -19,7 +19,7 @@
  * Sta qui e non nelle sezioni perche' le sezioni che cambiano forma sono due, e
  * ognuna deve compensare da se': l'altra non sa quando succede.
  */
-export function senzaSpostare(sezione: HTMLElement, cambia: () => void) {
+export function withoutShift(sezione: HTMLElement, cambia: () => void) {
   const prima = sezione.getBoundingClientRect().bottom;
   const sotto = prima <= 1;
   cambia();

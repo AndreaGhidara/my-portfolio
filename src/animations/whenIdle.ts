@@ -7,7 +7,7 @@
  * Serve a GSAP e Lenis, che si caricano al volo apposta per non pesare sulla
  * prima schermata: vedi useSectionAnimation e SmoothScroll.
  */
-export function quandoLibero(fn: () => void): () => void {
+export function whenIdle(fn: () => void): () => void {
   if (typeof window.requestIdleCallback === "function") {
     const id = window.requestIdleCallback(() => fn(), { timeout: 800 });
     return () => window.cancelIdleCallback(id);

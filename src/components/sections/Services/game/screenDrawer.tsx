@@ -2,35 +2,35 @@
 
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { Illustrazione } from "./screenSite";
+import { Illustration } from "./screenSite";
 import {
-  CARATTERI_FINTI,
-  IMPAGINAZIONI_FINTE,
-  ORDINE_ILLUSTRAZIONI,
-  PALETTE_FINTE,
-  SCALE_FINTE,
-  type IdIllustrazione,
-  type MiniImpaginazione,
-  type TonoMini,
+  FAKE_FONTS,
+  FAKE_LAYOUTS,
+  ILLUSTRATION_ORDER,
+  FAKE_PALETTES,
+  FAKE_SCALES,
+  type IllustrationId,
+  type MiniLayout,
+  type MiniTone,
 } from "./fakeSite";
 
 /** I sei attrezzi, nell'ordine delle linguette. Sono anche i nomi delle icone. */
-export const ATTREZZI = ["colori", "caratteri", "testi", "sezioni", "immagini", "telefono"] as const;
-export type IdAttrezzo = (typeof ATTREZZI)[number];
+export const DRAWER_TOOLS = ["colori", "caratteri", "testi", "sezioni", "immagini", "telefono"] as const;
+export type DrawerToolId = (typeof DRAWER_TOOLS)[number];
 
-export type Vista = "pc" | "cell";
+export type Viewport = "pc" | "cell";
 
 /** Quello che gli attrezzi hanno scelto: indici nelle liste di sitoFinto.ts. */
-export type Scelte = {
+export type Choices = {
   palette: number;
-  caratteri: number;
-  scala: number;
-  impaginazione: number;
-  img: IdIllustrazione;
-  vista: Vista;
+  fonts: number;
+  scale: number;
+  layout: number;
+  img: IllustrationId;
+  view: Viewport;
 };
 
-const TONI: Record<TonoMini, string> = {
+const TONI: Record<MiniTone, string> = {
   ink: "var(--ink)",
   muted: "var(--muted)",
   mutedDark: "var(--mutedDark)",
@@ -38,26 +38,26 @@ const TONI: Record<TonoMini, string> = {
 };
 
 /** Il disegnino di un'impaginazione, sul suo pulsante. */
-function Mini({ mini }: { mini: MiniImpaginazione }) {
+function Mini({ mini }: { mini: MiniLayout }) {
   return (
     <span
       className="mini-lay"
-      data-in-fondo={mini.inFondo || undefined}
+      data-in-fondo={mini.atBottom || undefined}
       style={{
-        gridTemplateColumns: mini.colonne,
-        gridTemplateRows: mini.righe,
-        background: mini.fondo && TONI[mini.fondo],
+        gridTemplateColumns: mini.columns,
+        gridTemplateRows: mini.rows,
+        background: mini.background && TONI[mini.background],
       }}
     >
-      {mini.celle.map((c, i) => (
+      {mini.cells.map((c, i) => (
         <i
           key={i}
           style={{
-            background: c.tono && TONI[c.tono],
-            gridColumn: c.colonna,
-            gridRow: c.riga,
-            inlineSize: c.larghezza,
-            blockSize: c.altezza,
+            background: c.tone && TONI[c.tone],
+            gridColumn: c.column,
+            gridRow: c.row,
+            inlineSize: c.width,
+            blockSize: c.height,
           }}
         />
       ))}
@@ -66,20 +66,20 @@ function Mini({ mini }: { mini: MiniImpaginazione }) {
 }
 
 type CassettoProps = {
-  attivo: IdAttrezzo;
-  scelte: Scelte;
-  provato: boolean;
+  active: DrawerToolId;
+  choices: Choices;
+  tried: boolean;
   /** La riga scura in fondo: le viti, o il ritorno al computer. */
-  messaggio: ReactNode;
-  onScegli: <C extends keyof Scelte>(campo: C, valore: Scelte[C]) => void;
+  message: ReactNode;
+  onChoose: <C extends keyof Choices>(campo: C, valore: Choices[C]) => void;
 };
 
 /** Il cassetto dell'attrezzo aperto: cosa fa, e le sue scelte. */
-export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: CassettoProps) {
+export function Drawer({ active: attivo, choices: scelte, tried: provato, message: messaggio, onChoose: onScegli }: CassettoProps) {
   const t = useTranslations("services.gioco.schermo");
   const titolo = t(`attrezzo.${attivo}.titolo`);
 
-  const scelta = <C extends keyof Scelte>(campo: C, valore: Scelte[C], contenuto: ReactNode, chiave: string) => (
+  const scelta = <C extends keyof Choices>(campo: C, valore: Choices[C], contenuto: ReactNode, chiave: string) => (
     <button key={chiave} type="button" aria-pressed={scelte[campo] === valore} onClick={() => onScegli(campo, valore)}>
       {contenuto}
     </button>
@@ -89,13 +89,13 @@ export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: Casse
   if (attivo === "colori") {
     corpo = (
       <div className="scelte tre" role="group" aria-label={titolo}>
-        {PALETTE_FINTE.map((p, i) =>
+        {FAKE_PALETTES.map((p, i) =>
           scelta(
             "palette",
             i,
             <>
               <span className="pal" aria-hidden="true">
-                {Object.values(p.colori).map((c, j) => (
+                {Object.values(p.colors).map((c, j) => (
                   <i key={j} style={{ background: c }} />
                 ))}
               </span>
@@ -109,15 +109,15 @@ export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: Casse
   } else if (attivo === "caratteri") {
     corpo = (
       <div className="scelte" role="group" aria-label={titolo}>
-        {CARATTERI_FINTI.map((c, i) =>
+        {FAKE_FONTS.map((c, i) =>
           scelta(
-            "caratteri",
+            "fonts",
             i,
             <>
-              <span className="aa" aria-hidden="true" style={{ fontFamily: c.titolo, fontWeight: c.peso }}>
+              <span className="aa" aria-hidden="true" style={{ fontFamily: c.heading, fontWeight: c.weight }}>
                 Aa
               </span>
-              {c.nome}
+              {c.name}
             </>,
             c.id,
           ),
@@ -125,13 +125,13 @@ export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: Casse
       </div>
     );
   } else if (attivo === "testi") {
-    const s = SCALE_FINTE[scelte.scala];
+    const s = FAKE_SCALES[scelte.scale];
     corpo = (
       <>
         <div className="scelte tre" role="group" aria-label={titolo}>
-          {SCALE_FINTE.map((x, i) =>
+          {FAKE_SCALES.map((x, i) =>
             scelta(
-              "scala",
+              "scale",
               i,
               <>
                 <span className="aa-scala" aria-hidden="true" style={{ fontSize: `${0.6 + i * 0.3}rem` }}>
@@ -166,9 +166,9 @@ export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: Casse
   } else if (attivo === "sezioni") {
     corpo = (
       <div className="scelte" role="group" aria-label={titolo}>
-        {IMPAGINAZIONI_FINTE.map((l, i) =>
+        {FAKE_LAYOUTS.map((l, i) =>
           scelta(
-            "impaginazione",
+            "layout",
             i,
             <>
               <Mini mini={l.mini} />
@@ -182,13 +182,13 @@ export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: Casse
   } else if (attivo === "immagini") {
     corpo = (
       <div className="scelte" role="group" aria-label={titolo}>
-        {ORDINE_ILLUSTRAZIONI.map((k) =>
+        {ILLUSTRATION_ORDER.map((k) =>
           scelta(
             "img",
             k,
             <>
               <span className="mini-img">
-                <Illustrazione id={k} />
+                <Illustration id={k} />
               </span>
               {t(`illustrazioni.${k}`)}
             </>,
@@ -200,7 +200,7 @@ export function Cassetto({ attivo, scelte, provato, messaggio, onScegli }: Casse
   } else {
     corpo = (
       <div className="leva-vista" role="group" aria-label={titolo}>
-        {(["pc", "cell"] as const).map((v) => scelta("vista", v, t(`vista.${v}`), v))}
+        {(["pc", "cell"] as const).map((v) => scelta("view", v, t(`vista.${v}`), v))}
       </div>
     );
   }

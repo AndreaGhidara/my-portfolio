@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
-import type { CategoriaId, Dato, Notizia } from "@/lib/news/types";
-import { nomeFonte, quantoFa, riempi, titoloDi } from "./format";
-import type { TestiNotizie } from "./types";
+import type { CategoryId, StoryFigure, Story } from "@/lib/news/types";
+import { sourceName, timeAgo, fillTemplate, storyTitle } from "./format";
+import type { NewsCopy } from "./types";
 
 /**
  * La notizia grande della prima pagina: la fonte, il timbro, il titolo, il
@@ -12,64 +12,64 @@ import type { TestiNotizie } from "./types";
  * Carta in tutti e due i temi, come la pratica dei lavori. Niente immagini: la
  * pagina non apre connessioni verso terzi, e il link si apre solo se lo premi.
  */
-export function Ritaglio({
-  notizia,
+export function NewsClipping({
+  story: notizia,
   cat,
-  storto,
-  testi,
+  tilt: storto,
+  copy: testi,
   locale,
-  adesso,
+  now: adesso,
 }: {
-  notizia: Notizia;
-  cat: CategoriaId;
+  story: Story;
+  cat: CategoryId;
   /** Di quanto e' storto, in gradi: lo sceglie chi l'ha stampato. */
-  storto: number;
-  testi: TestiNotizie;
+  tilt: number;
+  copy: NewsCopy;
   locale: string;
-  adesso: Date;
+  now: Date;
 }) {
   const numero = new Intl.NumberFormat(locale);
-  const valore = (d: Dato) =>
-    d.codice === "versione"
-      ? d.valore
-      : d.codice === "lettura"
-        ? riempi(testi.minuti, { n: numero.format(d.valore) })
-        : numero.format(d.valore);
-  const titolo = titoloDi(notizia, testi);
+  const valore = (d: StoryFigure) =>
+    d.code === "versione"
+      ? d.value
+      : d.code === "lettura"
+        ? fillTemplate(testi.minutes, { n: numero.format(d.value) })
+        : numero.format(d.value);
+  const titolo = storyTitle(notizia, testi);
 
   return (
     <article data-notizie-ritaglio data-cat={cat} style={{ "--storto": `${storto}deg` } as CSSProperties}>
       <div data-ritaglio-sotto data-ritaglio-riga>
         <span>
-          {nomeFonte(notizia.fonte)} · {quantoFa(notizia.quando, locale, adesso)}
+          {sourceName(notizia.source)} · {timeAgo(notizia.when, locale, adesso)}
         </span>
-        <span data-ritaglio-timbro>{testi.timbri[notizia.timbro]}</span>
+        <span data-ritaglio-timbro>{testi.stamps[notizia.stamp]}</span>
       </div>
       {/* La notizia resta nella sua lingua, che e' l'inglese. Il titolo di una
           release no: «e' uscito» lo scrive la pagina, nella sua. */}
-      <h3 lang={notizia.timbro === "release" ? undefined : "en"}>{titolo}</h3>
+      <h3 lang={notizia.stamp === "release" ? undefined : "en"}>{titolo}</h3>
       <div data-ritaglio-corpo>
-        {notizia.riassunto ? (
+        {notizia.summary ? (
           <p data-ritaglio-riassunto lang="en">
-            {notizia.riassunto}
+            {notizia.summary}
           </p>
         ) : (
           <div data-ritaglio-vuoto>
             <b>{notizia.hostname}</b>
-            <span>{testi.senzaRiassunto}</span>
+            <span>{testi.noSummary}</span>
           </div>
         )}
       </div>
       <div data-ritaglio-piede>
         <p data-ritaglio-dati>
-          {notizia.dati.map((d) => (
-            <span key={d.codice}>
-              <b>{valore(d)}</b> {testi.dati[d.codice]}
+          {notizia.figures.map((d) => (
+            <span key={d.code}>
+              <b>{valore(d)}</b> {testi.figures[d.code]}
             </span>
           ))}
         </p>
         <a href={notizia.url} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">
-          {riempi(testi.leggiSu, { sito: notizia.hostname })} <span aria-hidden="true">↗</span>
+          {fillTemplate(testi.readOn, { sito: notizia.hostname })} <span aria-hidden="true">↗</span>
         </a>
       </div>
     </article>

@@ -2,19 +2,19 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { ScrollTrigger as TipoScrollTrigger } from "gsap/ScrollTrigger";
-import { INIZIO_ENTRATA } from "@/animations/timing";
-import { senzaSpostare } from "@/animations/withoutShift";
+import { ENTRANCE_START } from "@/animations/timing";
+import { withoutShift } from "@/animations/withoutShift";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 import {
-  ALTEZZA_MINIMA,
-  PARAMETRI,
-  arrivata,
-  fasi,
-  lineaPiena,
-  strada,
-  tracciaOnda,
-  viaggio,
-  type Punto,
+  MIN_HEIGHT,
+  TRACK_PARAMS,
+  arrived,
+  phases,
+  filledLine,
+  trackRoute,
+  wavePath,
+  travel,
+  type TrackPoint,
 } from "./track";
 
 /**
@@ -24,19 +24,19 @@ import {
  * stringhe costanti, quindi server e client le serializzano uguali.
  */
 const MISURE = {
-  "--largo": `min(${PARAMETRI.foglio.rem}rem, ${PARAMETRI.foglio.vw}vw)`,
-  "--aria": `${PARAMETRI.aria}rem`,
-  "--arrivo": `min(${PARAMETRI.arrivo.rem}rem, ${PARAMETRI.arrivo.vw}vw)`,
-  "--coda": PARAMETRI.coda,
-  "--velocita-fine": PARAMETRI.velocita.fine,
-  "--velocita-grossolana": PARAMETRI.velocita.grossolana,
+  "--largo": `min(${TRACK_PARAMS.sheet.rem}rem, ${TRACK_PARAMS.sheet.vw}vw)`,
+  "--aria": `${TRACK_PARAMS.air}rem`,
+  "--arrivo": `min(${TRACK_PARAMS.arrival.rem}rem, ${TRACK_PARAMS.arrival.vw}vw)`,
+  "--coda": TRACK_PARAMS.tail,
+  "--velocita-fine": TRACK_PARAMS.speed.fine,
+  "--velocita-grossolana": TRACK_PARAMS.speed.coarse,
 };
 
 /** L'altezza del palco, 100svh, letta da una sonda: il palco stesso in colonna
  *  e' alto quanto il suo contenuto, e una media query `min-height` sul
  *  telefono misura il viewport grande. */
 const palcoBastante = (sonda: HTMLElement | null) =>
-  (sonda?.offsetHeight ?? 0) >= ALTEZZA_MINIMA;
+  (sonda?.offsetHeight ?? 0) >= MIN_HEIGHT;
 
 /**
  * Il percorso in orizzontale. Stesso schema del tavolo (DeskStage): un track
@@ -53,19 +53,19 @@ const palcoBastante = (sonda: HTMLElement | null) =>
  * palco abbastanza alto da contenere un foglio intero (ALTEZZA_MINIMA). Sotto,
  * la colonna con l'entrata di sempre.
  */
-export function JourneyBinario({
+export function JourneyTrack({
   n,
-  annoIniziale,
-  testata,
-  suggerimento,
+  startYear: annoIniziale,
+  header: testata,
+  hint: suggerimento,
   children,
 }: {
   /** Quante tappe, arrivo escluso: entra nella formula dell'altezza del track. */
   n: number;
   /** L'anno della prima tappa, quello che l'anno grande dice all'aggancio. */
-  annoIniziale: number;
-  testata: ReactNode;
-  suggerimento: string;
+  startYear: number;
+  header: ReactNode;
+  hint: string;
   /** Le tappe e, ultimo, il foglio dei numeri. */
   children: ReactNode;
 }) {
@@ -110,7 +110,7 @@ export function JourneyBinario({
            perche' si leggano come un gesto solo. Un trigger per tappa: una
            entrata di gruppo le farebbe partire tutte quando si affaccia la
            prima. */
-        const { daDietro, dallAlto } = presets;
+        const { fromBehind, fromAbove } = presets;
         for (const tappa of tappe) {
           const foglio = tappa.querySelector("[data-journey-sheet]");
           const tesserino = tappa.querySelector("[data-journey-badge]");
@@ -118,15 +118,15 @@ export function JourneyBinario({
           const linea = gsap.timeline({
             scrollTrigger: {
               trigger: tappa,
-              start: resolved === "full" ? INIZIO_ENTRATA.pieno : INIZIO_ENTRATA.ridotto,
+              start: resolved === "full" ? ENTRANCE_START.full : ENTRANCE_START.reduced,
               once: true,
             },
           });
           // clearProps: l'inclinazione della tappa la porta il CSS, e un
           // translate lasciato in linea ci combatterebbe contro.
-          linea.add(daDietro(foglio, { level: resolved, clearProps: true }) ?? gsap.timeline());
+          linea.add(fromBehind(foglio, { level: resolved, clearProps: true }) ?? gsap.timeline());
           linea.add(
-            dallAlto(tesserino, { level: resolved, clearProps: true }) ?? gsap.timeline(),
+            fromAbove(tesserino, { level: resolved, clearProps: true }) ?? gsap.timeline(),
             "-=0.28",
           );
         }
@@ -162,13 +162,13 @@ export function JourneyBinario({
         const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
         altezza = stageEl.offsetHeight;
         larghezza = stageEl.clientWidth;
-        viaggioPx = viaggio({ track: trackEl.offsetHeight, palco: altezza, coda: PARAMETRI.coda });
+        viaggioPx = travel({ track: trackEl.offsetHeight, stage: altezza, tail: TRACK_PARAMS.tail });
         const aria = parseFloat(getComputedStyle(listaEl).columnGap) || 0;
-        stradaPx = strada({
+        stradaPx = trackRoute({
           n: tappe.length,
-          foglio: tappe[0]?.offsetWidth ?? 0,
-          aria,
-          arrivo: arrivo.offsetWidth,
+          sheet: tappe[0]?.offsetWidth ?? 0,
+          air: aria,
+          arrival: arrivo.offsetWidth,
         });
         bordoArrivo = arrivo.offsetLeft;
         fineArrivo = arrivo.offsetLeft + arrivo.offsetWidth;
@@ -180,37 +180,37 @@ export function JourneyBinario({
         const W = listaEl.offsetWidth;
         const H = listaEl.offsetHeight;
         const y0 = H / 2;
-        const punti: Punto[] = [[0, y0]];
+        const punti: TrackPoint[] = [[0, y0]];
         for (const [i, t] of tappe.entries()) {
           punti.push([centri[i], y0 + parseFloat(t.dataset.scostamento ?? "0") * rem]);
         }
         punti.push([arrivo.offsetLeft + arrivo.offsetWidth / 2, y0]);
         svg.setAttribute("width", String(W));
         svg.setAttribute("height", String(H));
-        const d = tracciaOnda(punti, PARAMETRI.ampiezza * rem, PARAMETRI.onde);
+        const d = wavePath(punti, TRACK_PARAMS.amplitude * rem, TRACK_PARAMS.waves);
         fioca.setAttribute("d", d);
         piena.setAttribute("d", d);
       };
 
       const scrivi = (self: TipoScrollTrigger) => {
         const fatta = Math.max(0, self.scroll() - self.start);
-        const f = fasi({ fatta, viaggio: viaggioPx, coda: PARAMETRI.coda, altezza });
+        const f = phases({ done: fatta, travel: viaggioPx, tail: TRACK_PARAMS.tail, height: altezza });
         const x = f.p * stradaPx;
 
         listaEl.style.setProperty("--x", x.toFixed(2));
         fatto.setAttribute(
           "width",
-          lineaPiena({ x, larghezza, bordoArrivo, fineArrivo, q: f.q }).toFixed(1),
+          filledLine({ x, width: larghezza, arrivalEdge: bordoArrivo, arrivalEnd: fineArrivo, q: f.q }).toFixed(1),
         );
-        arrivo.style.setProperty("--luce", f.luce.toFixed(4));
-        arrivo.style.setProperty("--sussulto", f.sussulto.toFixed(4));
-        arrivo.style.setProperty("--caduta", f.caduta.toFixed(4));
+        arrivo.style.setProperty("--luce", f.light.toFixed(4));
+        arrivo.style.setProperty("--sussulto", f.jolt.toFixed(4));
+        arrivo.style.setProperty("--caduta", f.fall.toFixed(4));
         root.style.setProperty("--avanzamento", self.progress.toFixed(4));
         suggerito?.toggleAttribute("data-mosso", fatta > 20);
 
         let visto = tappe[0]?.dataset.anno ?? "";
         for (const [i, t] of tappe.entries()) {
-          const si = arrivata({ centroTappa: centri[i], x, larghezza });
+          const si = arrived({ stopCentre: centri[i], x, width: larghezza });
           if (si !== t.hasAttribute("data-arrivata")) t.toggleAttribute("data-arrivata", si);
           if (si) visto = t.dataset.anno ?? visto;
         }
@@ -240,7 +240,7 @@ export function JourneyBinario({
 
       attivo.current = trigger;
       const sezione = root.closest("section") ?? root;
-      senzaSpostare(sezione, () => {
+      withoutShift(sezione, () => {
         root.setAttribute("data-scena", "orizzontale");
         // La sezione e' appena cresciuta di migliaia di pixel: tutto quello che
         // sta sotto (il tuo turno, le entrate) va rimisurato, questo trigger
@@ -268,7 +268,7 @@ export function JourneyBinario({
         suggerito?.removeAttribute("data-mosso");
         // E' la stessa crescita al contrario: la sezione torna colonna, chi
         // sta sotto deve saperlo, e chi stava guardando sotto resta li'.
-        senzaSpostare(sezione, () => {
+        withoutShift(sezione, () => {
           root.removeAttribute("data-scena");
           ScrollTrigger.refresh();
         });

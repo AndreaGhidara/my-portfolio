@@ -6,12 +6,12 @@ import { ProcessBlock } from "./ProcessBlock";
  *  contenuto e non qui: qui arrivano solo le parole, gia' tradotte. */
 export type ProcessDeliveryView = {
   id: string;
-  quando: string;
-  titolo: string;
+  when: string;
+  title: string;
   lead: string;
-  dentro: string[];
-  nonlo: string;
-  perche: string;
+  includes: string[];
+  excludes: string;
+  why: string;
 };
 
 export type ProcessViewProps = {
@@ -25,7 +25,7 @@ export function ProcessView({ eyebrow, title, intro, deliveries }: ProcessViewPr
   return (
     <section id="process" aria-labelledby="titolo-process" className="relative px-[var(--gutter)] py-[var(--section-y)]">
       <div className="mx-auto max-w-[64rem]">
-        <Reveal data-process-testata moto="dietro" stagger={0.08}>
+        <Reveal data-process-testata motion="dietro" stagger={0.08}>
         <p className="eyebrow">{eyebrow}</p>
         {/* L'intestazione si ferma prima di meta' pagina: e' la misura con cui
             la sezione e' stata impaginata, e sotto i 1024px le regole in
@@ -41,7 +41,7 @@ export function ProcessView({ eyebrow, title, intro, deliveries }: ProcessViewPr
         {/* Ogni consegna entra dal lato in cui e' gia' impaginata: `data-lato`
             alterna destra e sinistra scendendo, e l'entrata non fa che
             rendere visibile quell'alternanza. */}
-        <Reveal as="ol" data-process-list moto="lati">
+        <Reveal as="ol" data-process-list motion="lati">
           {deliveries.map((delivery, index) => (
             <ProcessBlock
               key={delivery.id}

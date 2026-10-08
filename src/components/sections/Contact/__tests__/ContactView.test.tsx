@@ -3,7 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactView, type ContactViewProps } from "../ContactView";
 import { sendEmail } from "@/actions/sendEmail";
-import { regole } from "@/test/css";
+import { rules } from "@/test/css";
 
 /* La server action non parte davvero in una prova: qui si sta verificando
    cosa VEDE chi ha premuto invia, non se Resend consegna. */
@@ -31,12 +31,12 @@ const props: ContactViewProps = {
     title: "Raccontami cosa ti serve",
     body: "Due righe bastano.",
   },
-  dopo: {
-    etichetta: "Cosa succede dopo",
-    momenti: [
-      { id: "risposta", quando: "Entro 24 ore", titolo: "Una risposta", testo: "Anche se è no." },
-      { id: "chiamata", quando: "Se ci sentiamo", titolo: "Mezz'ora", testo: "Senza impegno." },
-      { id: "preventivo", quando: "Solo dopo", titolo: "Due pagine", testo: "E i numeri." },
+  after: {
+    label: "Cosa succede dopo",
+    moments: [
+      { id: "risposta", when: "Entro 24 ore", title: "Una risposta", text: "Anche se è no." },
+      { id: "chiamata", when: "Se ci sentiamo", title: "Mezz'ora", text: "Senza impegno." },
+      { id: "preventivo", when: "Solo dopo", title: "Due pagine", text: "E i numeri." },
     ],
   },
   recruiter: {
@@ -93,8 +93,8 @@ describe("ContactView", () => {
     // chi la pagina non la vede.
     const { container } = render(<ContactView {...props} />);
     const voci = container.querySelectorAll("ol[data-contact-tempi] > li");
-    expect(voci).toHaveLength(props.dopo.momenti.length);
-    expect(voci[0]).toHaveTextContent(props.dopo.momenti[0].quando);
+    expect(voci).toHaveLength(props.after.moments.length);
+    expect(voci[0]).toHaveTextContent(props.after.moments[0].when);
     expect(voci[voci.length - 1]).toHaveTextContent("Due pagine");
   });
 
@@ -145,24 +145,24 @@ describe("ContactView", () => {
 });
 
 describe("i campi sono righe, non riquadri", () => {
-  const campi = regole(/\[data-contact-campo\]/);
+  const campi = rules(/\[data-contact-campo\]/);
 
   it("un campo senza bordo ha comunque un fuoco che si vede", () => {
     // È il prezzo della riga al posto della scatola: tolto il contorno, il
     // fuoco della tastiera resta l'unica cosa che dice dove sei, e senza una
     // regola esplicita il browser non ne disegna nessuno su un campo così.
-    const fuoco = campi.find((r) => /:focus-visible/.test(r.selettore));
+    const fuoco = campi.find((r) => /:focus-visible/.test(r.selector));
     expect(fuoco, "manca la regola di fuoco sui campi").toBeDefined();
-    expect(fuoco!.corpo).toMatch(/outline:[^;]*var\(--accent\)/);
+    expect(fuoco!.body).toMatch(/outline:[^;]*var\(--accent\)/);
   });
 
   it("il campo resta grande abbastanza da poterlo toccare", () => {
     // Una riga e' alta quanto il testo. Su un telefono si tocca con il pollice,
     // e sotto i 44px il bersaglio e' troppo piccolo: la min-height e' quello
     // che una scatola dava gratis e una riga no.
-    const base = campi.find((r) => r.selettore === "[data-contact-campo]");
+    const base = campi.find((r) => r.selector === "[data-contact-campo]");
     expect(base, "manca la regola base dei campi").toBeDefined();
-    expect(base!.corpo).toMatch(/min-height:\s*2\.75rem/);
+    expect(base!.body).toMatch(/min-height:\s*2\.75rem/);
   });
 });
 
@@ -180,25 +180,25 @@ describe("le etichette arancioni si leggono", () => {
   ];
 
   it.each(etichette)("%s non usa l'arancio pieno come testo", (selettore) => {
-    const regola = regole(selettore)[0];
+    const regola = rules(selettore)[0];
     expect(regola, `manca la regola ${selettore}`).toBeDefined();
-    expect(regola!.corpo).toMatch(/color:\s*var\(--accento-testo\)/);
+    expect(regola!.body).toMatch(/color:\s*var\(--accento-testo\)/);
   });
 
   it("il testo del cartellino non e' spento: su quel fondo il grigio faceva 4,22:1", () => {
     // Il cartellino ha un fondo suo, piu' scuro della carta di pagina
     // (color-mix con --fg al 7%): li' --fg-muted scendeva sotto il 4,5:1
     // richiesto al testo piccolo. Il paragrafo passa a --fg.
-    const regola = regole("[data-contact-badge-testo]")[0];
+    const regola = rules("[data-contact-badge-testo]")[0];
     expect(regola, "manca la regola del testo del cartellino").toBeDefined();
-    expect(regola!.corpo).toMatch(/color:\s*var\(--fg\)/);
+    expect(regola!.body).toMatch(/color:\s*var\(--fg\)/);
   });
 
   it("l'arancio da testo esiste in tutti e due i temi", () => {
-    const radice = regole(":root")[0];
-    const scuro = regole('[data-theme="dark"]')[0];
-    expect(radice!.corpo).toMatch(/--accento-testo:/);
-    expect(scuro!.corpo).toMatch(/--accento-testo:/);
+    const radice = rules(":root")[0];
+    const scuro = rules('[data-theme="dark"]')[0];
+    expect(radice!.body).toMatch(/--accento-testo:/);
+    expect(scuro!.body).toMatch(/--accento-testo:/);
   });
 });
 

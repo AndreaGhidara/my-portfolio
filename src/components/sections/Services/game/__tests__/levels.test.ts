@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { LIVELLI, numeroLivello } from "../levels";
+import { LEVELS, levelNumber } from "../levels";
 
 describe("numeroLivello", () => {
   it("conta da uno, nell'ordine in cui si giocano", () => {
-    expect(LIVELLI.map(numeroLivello)).toEqual([1, 2, 3, 4]);
-    expect(numeroLivello("notte")).toBe(4);
+    expect(LEVELS.map(levelNumber)).toEqual([1, 2, 3, 4]);
+    expect(levelNumber("notte")).toBe(4);
   });
 });

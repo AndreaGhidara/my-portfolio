@@ -2,8 +2,8 @@
 
 import { useEffect, useReducer, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
-import { numeroLivello, type LivelloProps } from "./levels";
-import { Icona, type IconaServizio } from "./icons";
+import { levelNumber, type LevelProps } from "./levels";
+import { Icon, type ServiceIcon } from "./icons";
 
 /**
  * Livello 3, i servizi: il pannello del sito un mese dopo il lancio, in un
@@ -24,14 +24,14 @@ import { Icona, type IconaServizio } from "./icons";
  */
 
 /** I cinque moduli, nell'ordine del pannello. */
-const SERVIZI = ["assistenza", "automazioni", "numeri", "trovare", "manutenzione"] as const satisfies readonly IconaServizio[];
+const SERVIZI = ["assistenza", "automazioni", "numeri", "trovare", "manutenzione"] as const satisfies readonly ServiceIcon[];
 
 /**
  * Di chi e' ogni avviso, nell'ordine in cui arrivano. I testi stanno nei
  * messaggi (pannello.eventi), uno per voce e nello stesso ordine: la prova
  * controlla che siano tanti quanti questi.
  */
-export const SEQUENZA: readonly IconaServizio[] = [
+export const SEQUENCE: readonly ServiceIcon[] = [
   "manutenzione",
   "assistenza",
   "numeri",
@@ -63,7 +63,7 @@ type Stato = {
   /** L'ultimo avviso risolto: lo dice la coda, e la console finche' `fatto`. */
   risolto: number | null;
   fatto: boolean;
-  scelto: IconaServizio | null;
+  scelto: ServiceIcon | null;
   /** Millisecondi al prossimo avviso; null se non se ne aspetta uno. */
   attesa: number | null;
 };
@@ -71,7 +71,7 @@ type Stato = {
 type Azione =
   | { tipo: "accendi" }
   | { tipo: "batti" }
-  | { tipo: "tocca"; servizio: IconaServizio }
+  | { tipo: "tocca"; servizio: ServiceIcon }
   | { tipo: "intervieni" }
   | { tipo: "ricomincia" };
 
@@ -88,7 +88,7 @@ const INIZIO: Stato = {
 };
 
 function arriva(s: Stato): Stato {
-  if (s.prossimo >= SEQUENZA.length) return { ...s, fase: "fine", attesa: null, scelto: null, fatto: false };
+  if (s.prossimo >= SEQUENCE.length) return { ...s, fase: "fine", attesa: null, scelto: null, fatto: false };
   return { ...s, attivo: s.prossimo, prossimo: s.prossimo + 1, attesa: null, scelto: null, fatto: false };
 }
 
@@ -110,14 +110,14 @@ function avanza(s: Stato, a: Azione): Stato {
     case "tocca":
       return s.fase === "acceso" ? { ...s, scelto: a.servizio, fatto: false } : s;
     case "intervieni":
-      if (s.attivo === null || SEQUENZA[s.attivo] !== s.scelto) return s;
+      if (s.attivo === null || SEQUENCE[s.attivo] !== s.scelto) return s;
       return { ...s, risolto: s.attivo, attivo: null, fatto: true, attesa: ATTESA_DOPO };
     case "ricomincia":
       return INIZIO;
   }
 }
 
-export function Pannello({ onAvanti, visibile }: LivelloProps) {
+export function Panel({ onNext: onAvanti, visible: visibile }: LevelProps) {
   const t = useTranslations("services.gioco.pannello");
   const comune = useTranslations("services.gioco.comune");
   const eventi = t.raw("eventi") as Evento[];
@@ -130,8 +130,8 @@ export function Pannello({ onAvanti, visibile }: LivelloProps) {
     return () => clearInterval(id);
   }, [corre]);
 
-  const nome = (k: IconaServizio) => t(`servizi.${k}`);
-  const allarme = s.attivo !== null ? SEQUENZA[s.attivo] : null;
+  const nome = (k: ServiceIcon) => t(`servizi.${k}`);
+  const allarme = s.attivo !== null ? SEQUENCE[s.attivo] : null;
   const giu = s.salute < SOGLIA_GIU;
   const salute = Math.round(s.salute);
 
@@ -142,7 +142,7 @@ export function Pannello({ onAvanti, visibile }: LivelloProps) {
         ? t("conta.fine")
         : s.prossimo === 0
           ? t("conta.acceso")
-          : t("conta.avviso", { n: s.prossimo, totale: SEQUENZA.length });
+          : t("conta.avviso", { n: s.prossimo, totale: SEQUENCE.length });
 
   // La riga di coda: una chiave per testo, cosi' ogni cambio rientra.
   const coda =
@@ -150,10 +150,10 @@ export function Pannello({ onAvanti, visibile }: LivelloProps) {
       <span key="fine">{t("coda.fine")}</span>
     ) : s.attivo !== null ? (
       <span key={`avviso-${s.attivo}`}>
-        <b>{nome(SEQUENZA[s.attivo])}</b> · {eventi[s.attivo].testo}
+        <b>{nome(SEQUENCE[s.attivo])}</b> · {eventi[s.attivo].testo}
       </span>
     ) : s.risolto !== null ? (
-      <span key={`risolto-${s.risolto}`}>{t("coda.risolto", { nome: nome(SEQUENZA[s.risolto]) })}</span>
+      <span key={`risolto-${s.risolto}`}>{t("coda.risolto", { nome: nome(SEQUENCE[s.risolto]) })}</span>
     ) : (
       <span key="attesa">{t("coda.attesa")}</span>
     );
@@ -162,7 +162,7 @@ export function Pannello({ onAvanti, visibile }: LivelloProps) {
     <div className="banco" data-gioco-livello="pannello">
       <div className="sopra reticolo">
         <div className="testa">
-          <span className="livello">{comune("etichetta", { numero: numeroLivello("pannello"), nome: comune("livelli.pannello") })}</span>
+          <span className="livello">{comune("etichetta", { numero: levelNumber("pannello"), nome: comune("livelli.pannello") })}</span>
           <span className="destra">{conta}</span>
         </div>
 
@@ -192,7 +192,7 @@ export function Pannello({ onAvanti, visibile }: LivelloProps) {
             >
               <span className="led" aria-hidden="true" />
               <span className="ic">
-                <Icona nome={k} />
+                <Icon name={k} />
               </span>
               {nome(k)}
               <span className="viti" aria-hidden="true" />
@@ -231,10 +231,10 @@ export function Pannello({ onAvanti, visibile }: LivelloProps) {
                 {SERVIZI.map((k) => (
                   <li key={k}>
                     <span className="ic">
-                      <Icona nome={k} />
+                      <Icon name={k} />
                     </span>
                     <span>
-                      <b>{nome(k)}</b> · {t("fine.avvisi", { n: SEQUENZA.filter((x) => x === k).length })}
+                      <b>{nome(k)}</b> · {t("fine.avvisi", { n: SEQUENCE.filter((x) => x === k).length })}
                     </span>
                   </li>
                 ))}
@@ -305,7 +305,7 @@ function Modulo({
   eventi,
   intervieni,
 }: {
-  scelto: IconaServizio;
+  scelto: ServiceIcon;
   nome: string;
   attivo: number | null;
   risolto: number | null;
@@ -313,7 +313,7 @@ function Modulo({
   intervieni: () => void;
 }) {
   const t = useTranslations("services.gioco.pannello.modulo");
-  const avviso = attivo !== null && SEQUENZA[attivo] === scelto ? eventi[attivo] : null;
+  const avviso = attivo !== null && SEQUENCE[attivo] === scelto ? eventi[attivo] : null;
   const tocca = avviso !== null;
 
   return (

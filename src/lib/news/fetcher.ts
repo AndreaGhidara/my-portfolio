@@ -1,9 +1,9 @@
-import type { Chiedi } from "./collector";
+import type { Fetcher } from "./collector";
 
 const UN_ORA = 3600;
 const PAZIENZA_MS = 4000;
 /** Oltre questa eta' una risposta in cache non vale piu' come «della settimana». */
-export const VECCHIA_MS = 3 * 3_600_000;
+export const STALE_MS = 3 * 3_600_000;
 
 type Prendi = (url: string, init: RequestInit) => Promise<Response>;
 
@@ -16,18 +16,18 @@ type Prendi = (url: string, init: RequestInit) => Promise<Response>;
  * risposta ha piu' di tre ore, si richiede senza cache e si usa quella; se la
  * richiesta fresca non va, resta la vecchia.
  */
-export function creaChiedi(
+export function createFetcher(
   prendi: Prendi,
   intestazioni: (url: string) => Record<string, string>,
   adesso: () => number = Date.now,
-): Chiedi {
-  const leggi = async (r: Response) => ({ corpo: (await r.json()) as unknown, data: r.headers.get("date") });
+): Fetcher {
+  const leggi = async (r: Response) => ({ body: (await r.json()) as unknown, date: r.headers.get("date") });
   return async (url) => {
     const headers = intestazioni(url);
     const r = await prendi(url, { headers, next: { revalidate: UN_ORA }, signal: AbortSignal.timeout(PAZIENZA_MS) });
     if (!r.ok) throw new Error(`${r.status} ${url}`);
     const quando = Date.parse(r.headers.get("date") ?? "");
-    if (Number.isNaN(quando) || adesso() - quando <= VECCHIA_MS) return leggi(r);
+    if (Number.isNaN(quando) || adesso() - quando <= STALE_MS) return leggi(r);
     try {
       const fresca = await prendi(url, { headers, cache: "no-store", signal: AbortSignal.timeout(PAZIENZA_MS) });
       if (fresca.ok) return await leggi(fresca);

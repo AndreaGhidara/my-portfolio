@@ -15,12 +15,12 @@ export async function Process() {
   // niente: stampa solo una consegna in meno.
   const deliveries: ProcessDeliveryView[] = processDeliveries.map(({ id }) => ({
     id,
-    quando: t(`list.${id}.quando`),
-    titolo: t(`list.${id}.titolo`),
+    when: t(`list.${id}.quando`),
+    title: t(`list.${id}.titolo`),
     lead: t(`list.${id}.lead`),
-    dentro: DENTRO.map((k) => t(`list.${id}.dentro.${k}`)),
-    nonlo: t(`list.${id}.nonlo`),
-    perche: t(`list.${id}.perche`),
+    includes: DENTRO.map((k) => t(`list.${id}.dentro.${k}`)),
+    excludes: t(`list.${id}.nonlo`),
+    why: t(`list.${id}.perche`),
   }));
 
   return (

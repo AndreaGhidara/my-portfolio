@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CARTIGLIO, CORNICE, DIVISORIO, FORME, RITARDI, richiamo } from "./receipt";
+import { TITLE_BLOCK, FRAME, DIVIDER, FIGURE_SHAPES, DELAYS, callout } from "./receipt";
 
 /** Il ritardo scritto come lo scrivono server e client: due decimali, sempre uguali. */
 const ritardo = (secondi: number) => ({ transitionDelay: `${secondi.toFixed(2)}s` });
@@ -22,31 +22,31 @@ const ritardo = (secondi: number) => ({ transitionDelay: `${secondi.toFixed(2)}s
  * Per chi non vede e' un'immagine sola con il suo nome: dentro, le scritte
  * ripeterebbero lo scontrino un pezzo alla volta.
  */
-export function ScontrinoSchema({
-  forma,
-  titolo,
-  pezzi,
-  etichetta,
-  numero,
-  anima,
-  aspetta = false,
-  tavola,
-  scala,
-  firma,
+export function ReceiptSchema({
+  shape: forma,
+  title: titolo,
+  pieces: pezzi,
+  label: etichetta,
+  number: numero,
+  animate: anima,
+  wait: aspetta = false,
+  plate: tavola,
+  scale: scala,
+  signature: firma,
 }: {
   /** L'id del servizio: sceglie il disegno in FORME. */
-  forma: string;
-  titolo: string;
-  pezzi: string[];
+  shape: string;
+  title: string;
+  pieces: string[];
   /** Il nome accessibile della tavola. */
-  etichetta: string;
+  label: string;
   /** «01», gia' composto. */
-  numero: string;
-  anima: boolean;
-  aspetta?: boolean;
-  tavola: string;
-  scala: string;
-  firma: string;
+  number: string;
+  animate: boolean;
+  wait?: boolean;
+  plate: string;
+  scale: string;
+  signature: string;
 }) {
   const [traccia, setTraccia] = useState(!anima && !aspetta);
 
@@ -71,27 +71,27 @@ export function ScontrinoSchema({
         focusable="false"
         data-traccia={traccia ? "" : undefined}
       >
-        <path data-tratto="fioco" pathLength={1} d={CORNICE} />
-        <path data-tratto="fioco" pathLength={1} d={CARTIGLIO} />
-        <path data-tratto="fioco" data-divisorio pathLength={1} d={DIVISORIO} />
+        <path data-tratto="fioco" pathLength={1} d={FRAME} />
+        <path data-tratto="fioco" pathLength={1} d={TITLE_BLOCK} />
+        <path data-tratto="fioco" data-divisorio pathLength={1} d={DIVIDER} />
 
-        {(FORME[forma] ?? []).map((d, k) => (
+        {(FIGURE_SHAPES[forma] ?? []).map((d, k) => (
           <path
             key={k}
             data-tratto={k === 0 ? "pieno" : "fioco"}
             pathLength={1}
             d={d}
-            style={ritardo(RITARDI.riga(k))}
+            style={ritardo(DELAYS.line(k))}
           />
         ))}
 
         {pezzi.map((pezzo, k) => {
-          const r = richiamo(k);
+          const r = callout(k);
           return (
             <g key={k}>
-              <path data-richiamo pathLength={1} d={r.d} style={ritardo(r.ritardo)} />
-              <circle data-punto cx={r.punto[0]} cy={r.punto[1]} r={3} style={ritardo(r.ritardo)} />
-              <text data-nota x={r.x} y={r.y} textAnchor={r.ancora} style={ritardo(r.ritardoTesto)}>
+              <path data-richiamo pathLength={1} d={r.d} style={ritardo(r.delay)} />
+              <circle data-punto cx={r.point[0]} cy={r.point[1]} r={3} style={ritardo(r.delay)} />
+              <text data-nota x={r.x} y={r.y} textAnchor={r.anchor} style={ritardo(r.textDelay)}>
                 {`${k + 1} · ${pezzo.toUpperCase()}`}
               </text>
             </g>
@@ -124,19 +124,19 @@ export function ScontrinoSchema({
  * Non si traccia: esce intera, e la scopre la carta che esce dalla fessura.
  * Sta nel corpo dello scontrino, che non si legge: il contenuto e' la lista.
  */
-export function ScontrinoFigura({ forma, quanti }: { forma: string; quanti: number }) {
+export function ReceiptFigure({ shape: forma, count: quanti }: { shape: string; count: number }) {
   return (
     <svg viewBox="124 60 352 304" aria-hidden="true" focusable="false">
-      {(FORME[forma] ?? []).map((d, k) => (
+      {(FIGURE_SHAPES[forma] ?? []).map((d, k) => (
         <path key={k} data-tratto={k === 0 ? "pieno" : "fioco"} d={d} />
       ))}
       {Array.from({ length: quanti }, (_, k) => {
-        const r = richiamo(k);
+        const r = callout(k);
         return (
           <g key={k}>
             <path data-richiamo d={r.d} />
-            <circle data-punto cx={r.punto[0]} cy={r.punto[1]} r={4} />
-            <text x={r.x} y={r.y + 7} textAnchor={r.ancora}>
+            <circle data-punto cx={r.point[0]} cy={r.point[1]} r={4} />
+            <text x={r.x} y={r.y + 7} textAnchor={r.anchor}>
               {k + 1}
             </text>
           </g>

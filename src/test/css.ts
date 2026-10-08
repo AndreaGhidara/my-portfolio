@@ -12,29 +12,29 @@ import postcss, { type ChildNode } from "postcss";
  * `@import "tailwindcss"` si salta: e' il framework, non il sito.
  */
 
-export interface Regola {
+export interface Rule {
   /** I selettori della lista, uno per uno, con gli spazi ridotti a uno. */
-  selettori: string[];
+  selectors: string[];
   /** La lista intera, separata da ", ". */
-  selettore: string;
+  selector: string;
   /** Le dichiarazioni, una per riga: `proprieta: valore;`. Senza commenti. */
-  corpo: string;
+  body: string;
   /** Proprieta' e valore; se una proprieta' torna, vince l'ultima, come nel browser. */
-  dichiarazioni: Record<string, string>;
+  declarations: Record<string, string>;
   /** Le at-rule che la contengono, dalla piu' esterna: `@media (max-width: 599px)`. */
-  dentro: string[];
+  inside: string[];
   /** Il percorso assoluto del foglio da cui viene. */
   file: string;
 }
 
-export interface Opzioni {
+export interface Options {
   /** Solo le regole dentro questa media query, a qualunque profondita': `(max-width: 599px)`. */
   media?: string;
   /** Solo le regole che vengono dopo il primo commento che contiene questo testo. */
-  dopo?: string;
+  after?: string;
 }
 
-type Voce = { regola: Regola } | { commento: string };
+type Voce = { regola: Rule } | { commento: string };
 
 const spazi = (testo: string) => testo.replace(/\s+/g, " ").trim();
 
@@ -55,11 +55,11 @@ function leggiFoglio(file: string, dentro: string[], voci: Voce[]) {
         const selettori = nodo.selectors.map(spazi);
         voci.push({
           regola: {
-            selettori,
-            selettore: selettori.join(", "),
-            corpo: righe.join("\n"),
-            dichiarazioni,
-            dentro,
+            selectors: selettori,
+            selector: selettori.join(", "),
+            body: righe.join("\n"),
+            declarations: dichiarazioni,
+            inside: dentro,
             file,
           },
         });
@@ -78,8 +78,8 @@ function leggiFoglio(file: string, dentro: string[], voci: Voce[]) {
 const letti = new Map<string, Voce[]>();
 
 /** Il lettore di un CSS qualunque a partire dal suo ingresso. Il sito usa `regole`. */
-export function lettoreCss(ingresso: string) {
-  return (cerca?: string | RegExp, { media, dopo }: Opzioni = {}): Regola[] => {
+export function cssReader(ingresso: string) {
+  return (cerca?: string | RegExp, { media, after: dopo }: Options = {}): Rule[] => {
     let voci = letti.get(ingresso);
     if (!voci) {
       voci = [];
@@ -95,9 +95,9 @@ export function lettoreCss(ingresso: string) {
     return voci.flatMap((v) => {
       if (!("regola" in v)) return [];
       const r = v.regola;
-      if (typeof cercato === "string" && !r.selettori.includes(cercato)) return [];
-      if (cercato instanceof RegExp && !cercato.test(r.selettore)) return [];
-      if (query !== undefined && !r.dentro.includes(query)) return [];
+      if (typeof cercato === "string" && !r.selectors.includes(cercato)) return [];
+      if (cercato instanceof RegExp && !cercato.test(r.selector)) return [];
+      if (query !== undefined && !r.inside.includes(query)) return [];
       return [r];
     });
   };
@@ -108,4 +108,4 @@ export function lettoreCss(ingresso: string) {
  * trova le regole che hanno quel selettore nella loro lista; una RegExp si
  * prova sulla lista intera (`selettore`). Senza niente, tutte.
  */
-export const regole = lettoreCss(path.resolve(process.cwd(), "src/app/globals.css"));
+export const rules = cssReader(path.resolve(process.cwd(), "src/app/globals.css"));
