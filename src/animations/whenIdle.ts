@@ -1,12 +1,5 @@
-/**
- * Fa partire `fn` nel primo momento libero dopo la pittura, con un tetto di
- * 800ms se il browser non ne trova mai uno. Dove `requestIdleCallback` non
- * c'e' (Safari) ripiega su un timer corto. Restituisce l'annullo, da chiamare
- * nella pulizia dell'effetto che l'ha prenotato.
- *
- * Serve a GSAP e Lenis, che si caricano al volo apposta per non pesare sulla
- * prima schermata: vedi useSectionAnimation e SmoothScroll.
- */
+// Tetto di 800ms se il browser non trova mai un momento libero. Safari non ha
+// requestIdleCallback: ripiega su un timer corto.
 export function whenIdle(fn: () => void): () => void {
   if (typeof window.requestIdleCallback === "function") {
     const id = window.requestIdleCallback(() => fn(), { timeout: 800 });

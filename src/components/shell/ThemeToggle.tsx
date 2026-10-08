@@ -2,19 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/**
- * La lampadina del vecchio sito, staccata dall'interruttore a levetta e
- * rimessa dentro il bottone tondo: sfera di vetro piena e attacco a vite
- * zigrinato, non un contorno.
- *
- * Nell'originale era coricata perche' doveva scorrere lungo una guida.
- * Qui non scorre, quindi sta dritta, come una lampadina vera.
- *
- * Acceso = tema scuro, la stessa metafora di prima: e' buio, accendo la
- * luce. Il colore acceso lo decide il CSS su html[data-theme="dark"] e non
- * lo stato React: React lo saprebbe solo dopo il mount, e al primo
- * caricamento in tema scuro vedresti la lampadina spenta per un istante.
- */
+// Accesa = tema scuro. Il colore lo decide il CSS su html[data-theme="dark"] e
+// non lo stato React, che lo saprebbe solo dopo il mount: caricando in tema
+// scuro si vedrebbe la lampadina spenta per un istante.
 export function ThemeToggle({ label }: { label: string }) {
   const [isDark, setIsDark] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -26,9 +16,8 @@ export function ThemeToggle({ label }: { label: string }) {
   const toggle = () => {
     const next = !isDark;
 
-    // Deve restare sincrono: startViewTransition fotografa il prima, esegue
-    // questa funzione e fotografa il dopo. Un aggiornamento differito qui
-    // finirebbe fuori dalla transizione e il cerchio si aprirebbe sul nulla.
+    // Sincrona: startViewTransition fotografa il prima, la esegue e fotografa il
+    // dopo. Un aggiornamento differito resterebbe fuori dalla transizione.
     const applyTheme = () => {
       setIsDark(next);
       if (next) {
@@ -58,23 +47,18 @@ export function ThemeToggle({ label }: { label: string }) {
             ],
           },
           {
-            // Lento in partenza apposta. Il bottone sta a trenta pixel dal
-            // bordo alto, quindi del cerchio se ne vede solo un quarto: con
-            // una partenza rapida a nessuno resta il tempo di vedere il
-            // punto d'origine, e il buio sembra scendere dal bordo invece
-            // che uscire dalla lampadina.
+            // Lento in partenza: del cerchio si vede solo un quarto, e con una
+            // partenza rapida il buio sembra scendere dal bordo e non dalla lampadina.
             duration: 950,
             easing: "cubic-bezier(0.85, 0, 0.15, 1)",
-            // Si anima solo il fotogramma NUOVO: cresce sopra quello vecchio
-            // che resta fermo sotto. Cosi' dentro il cerchio si legge la
-            // pagina nel tema nuovo, invece di una macchia di colore pieno.
+            // Solo il fotogramma nuovo, sopra il vecchio fermo: nel cerchio si
+            // legge la pagina nel tema nuovo, non una macchia di colore.
             pseudoElement: "::view-transition-new(root)",
           },
         );
       })
       .catch(() => {
-        /* Transizione interrotta (doppio click, cambio pagina): il tema e'
-           gia' stato applicato, non c'e' niente da recuperare. */
+        // Transizione interrotta (doppio click, cambio pagina): il tema e' gia' applicato.
       });
   };
 
@@ -89,9 +73,8 @@ export function ThemeToggle({ label }: { label: string }) {
       className="grid size-9 place-items-center rounded-full border border-[var(--line)] text-[var(--fg)] transition-colors hover:bg-[var(--line)]/30"
     >
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-        {/* L'alone e' un cerchio sfumato e non un drop-shadow: il filtro SVG
-            ha una regione che si ferma poco oltre la sagoma, e la sfocatura
-            veniva tagliata in un quadrato visibile sul fondo scuro. */}
+        {/* Un cerchio sfumato e non un drop-shadow: la regione del filtro SVG
+            tagliava la sfocatura in un quadrato visibile sul fondo scuro. */}
         <defs>
           <radialGradient id="bulb-halo">
             <stop offset="0%" stopColor="var(--bulb)" stopOpacity="0.45" />
@@ -100,14 +83,11 @@ export function ThemeToggle({ label }: { label: string }) {
         </defs>
         <circle data-bulb-halo cx="12" cy="9" r="9" fill="url(#bulb-halo)" />
 
-        {/* Vetro: sfera piu' collo, due forme che si fondono nello stesso
-            riempimento: e' la sagoma del vecchio interruttore. */}
         <g data-bulb-glass>
           <circle cx="12" cy="9" r="5.6" />
           <path d="M8.9 13 h6.2 v2.4 h-6.2 z" />
         </g>
-        {/* Attacco a vite: la zigrinatura sono tagli nel colore del fondo,
-            cosi' funziona identica su tema chiaro e scuro. */}
+        {/* La zigrinatura sono tagli nel colore del fondo: vale nei due temi. */}
         <g data-bulb-cap>
           <rect x="8.6" y="15.2" width="6.8" height="4.6" rx="0.7" />
           <rect x="10.3" y="19.6" width="3.4" height="1.7" rx="0.85" />
@@ -123,12 +103,6 @@ export function ThemeToggle({ label }: { label: string }) {
   );
 }
 
-/**
- * Il cerchio si apre solo dove il browser sa fare le transizioni di vista e
- * dove l'utente non ha chiesto meno movimento. Altrove il tema cambia di
- * colpo, che e' il comportamento di sempre: l'effetto e' un di piu', mai la
- * condizione perche' il bottone funzioni.
- */
 function canAnimateThemeChange() {
   return (
     typeof document.startViewTransition === "function" &&
@@ -136,19 +110,9 @@ function canAnimateThemeChange() {
   );
 }
 
-/**
- * Cerchio d'apertura, in PERCENTUALE e mai in pixel.
- *
- * Il ritaglio si applica al fotogramma della transizione, non alla finestra,
- * e su uno schermo a densita' doppia quel fotogramma e' largo il doppio: un
- * pixel 1382 su una fotografia da 2880 cade al 48%, cioe' al centro dello
- * schermo invece che sulla lampadina. In percentuale la scala non conta piu'.
- *
- * Il raggio e' la distanza dall'angolo piu' lontano e non mezza diagonale,
- * altrimenti in un angolo resterebbe scoperta una fetta del tema vecchio.
- * La percentuale del raggio in circle() si risolve su sqrt(w²+h²)/sqrt(2)
- * del riquadro di riferimento: e' quella la conversione qui sotto.
- */
+// In percentuale e mai in pixel: il ritaglio si risolve sul fotogramma, che a
+// densita' doppia e' largo il doppio, e in pixel finiva al centro dello schermo.
+// Raggio fino all'angolo piu' lontano; il % di circle() si risolve su sqrt(w^2+h^2)/sqrt(2).
 function revealCircle(button: HTMLElement | null) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;

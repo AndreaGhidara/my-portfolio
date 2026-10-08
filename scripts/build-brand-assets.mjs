@@ -5,14 +5,8 @@ import path from "node:path";
 const SRC = "assets-source";
 const OUT = "public/brand";
 
-/**
- * Larghezza di uscita per asset. Regola: circa 3x la dimensione CSS
- * massima a cui l'elemento viene reso (copre display retina/3x senza
- * sprecare byte su pixel che nessuno schermo mostrera' mai).
- * - ink-circle: reso al massimo a `size-32 lg:size-44` -> 176px CSS.
- * - avatar: reso `w-[88%]` dentro lo stesso cerchio -> ~155px CSS.
- * Per entrambi 480px basta e avanza anche a 3x.
- */
+// Circa 3x la misura CSS massima: ink-circle arriva a 176px e l'avatar a ~155px,
+// quindi 480px bastano anche a 3x.
 const WIDTHS = {
   "letter-a": 600, "letter-n": 600, "letter-d": 600,
   "letter-r": 600, "letter-e": 600,
@@ -28,12 +22,8 @@ const targets = [
   ["ink-circle", "ink-circle.webp"], ["avatar", "avatar.webp"],
 ];
 
-/**
- * Il budget di 250 KB della spec riguarda SOLO gli asset della hero:
- * le cinque lettere, ink-circle e avatar. quote-open/quote-close vivono
- * in Services e Works, ben sotto la piega, e non contano per il budget.
- * Non sommarli di nuovo nel totale che decide l'exit code: e' apposta.
- */
+// Il budget di 250 KB vale solo per la hero: le virgolette stanno sotto la piega
+// e restano fuori apposta dal totale che decide l'exit code.
 const HERO_NAMES = new Set([
   "letter-a", "letter-n", "letter-d", "letter-r", "letter-e",
   "ink-circle", "avatar",
@@ -53,9 +43,7 @@ for (const [name, out] of targets) {
   });
 
   if (name === "ink-circle") {
-    // Usata solo come mask-image CSS: al browser serve solo il canale
-    // alpha, i canali colore sono a zero e non vale la pena pagarli.
-    // alphaQuality alto per non smussare il bordo irregolare del pennello.
+    // Solo mask-image: conta l'alpha, alto per non smussare il bordo del pennello.
     pipeline = pipeline
       .greyscale()
       .webp({ quality: 50, alphaQuality: 95, effort: 6 });

@@ -11,7 +11,6 @@ import { deskLayers } from "../desk";
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
-/** Elenco piatto di tutte le chiavi annidate, per confrontare due dizionari. */
 function flatKeys(obj: unknown, prefix = ""): string[] {
   if (typeof obj !== "object" || obj === null) return [prefix];
   return Object.entries(obj).flatMap(([k, v]) =>
@@ -19,7 +18,6 @@ function flatKeys(obj: unknown, prefix = ""): string[] {
   );
 }
 
-/** Segue un percorso puntato dentro un oggetto annidato, senza `any`. */
 function valueAt(obj: unknown, path: string): unknown {
   return path.split(".").reduce<unknown>(
     (acc, part) =>
@@ -60,8 +58,7 @@ describe("servizi", () => {
   });
 
   it("ogni servizio ha fra quattro e sei pezzi, scritti in entrambe le lingue", () => {
-    // Sono le voci dello scontrino e i richiami della tavola: la tavola ha sei
-    // posti, e sotto i quattro il disegno resta mezzo vuoto.
+    // La tavola ha sei posti, e sotto i quattro il disegno resta mezzo vuoto.
     for (const service of services) {
       expect(service.pieces.length, service.id).toBeGreaterThanOrEqual(4);
       expect(service.pieces.length, service.id).toBeLessThanOrEqual(6);
@@ -75,11 +72,6 @@ describe("servizi", () => {
 
 describe("lavori", () => {
   it("sono quattro, e uno solo e' coperto da accordo", () => {
-    // CustomerTrack e' uscito (costruita per intero e mai messa online, il
-    // dominio non risolve, e un caso senza utenti non prova niente) e al suo
-    // posto e' entrato il lavoro di adesso, che non si puo' nominare. E' anche
-    // l'unico modo di far entrare qui dentro qualcosa che non venga da D.lab,
-    // finita ad aprile: senza, la sezione racconterebbe solo un posto lasciato.
     expect(works).toHaveLength(4);
     const unnamed = works.filter((w) => !w.url && !w.screenshot);
     expect(unnamed).toHaveLength(1);
@@ -126,9 +118,6 @@ describe("lavori", () => {
   });
 
   it("ogni caso ha schermata e link, tranne quello coperto da accordo", () => {
-    // Il caso riservato non ha ne' indirizzo ne' schermata, e per lo stesso
-    // motivo: non si puo' mostrare. Gli altri devono avere tutti e due, o la
-    // cartella si apre su un dossier a meta'.
     for (const work of works) {
       if (work.id === "riservato") {
         expect(work.url).toBeUndefined();
@@ -141,9 +130,7 @@ describe("lavori", () => {
   });
 
   it("ogni schermata dichiarata esiste davvero fra quelle generate", () => {
-    // works.ts dichiara il percorso, build-works-shots.mjs genera il file e le
-    // sue misure. Se i due divergono, il dossier si apre su un riquadro rotto:
-    // meglio saperlo qui che a sito pubblicato.
+    // works.ts dichiara il percorso, build-works-shots.mjs genera file e misure.
     for (const work of works) {
       if (!work.screenshot) continue;
       expect(() => shotBySrc(work.screenshot!)).not.toThrow();
@@ -249,13 +236,8 @@ describe("il tavolo", () => {
 });
 
 describe("il dominio sta in un posto solo", () => {
-  /**
-   * Difetto vero, gia' successo: il sito era passato ad andreaghidara.dev e sei
-   * file continuavano a cablare quello di Vercel. Il canonical diceva quindi a
-   * Google che l'originale stava altrove, e tutto quello che il dominio nuovo
-   * guadagnava lo regalava al vecchio. Non e' una cosa che si vede guardando il
-   * sito: si vede solo leggendo l'HTML servito.
-   */
+  // Gia' successo: sei file cablavano il dominio di Vercel, e il canonical diceva
+  // a Google che l'originale stava altrove. Si vede solo nell'HTML servito.
   const APP = path.resolve(__dirname, "../../app");
 
   function sourceFiles(dir: string): string[] {

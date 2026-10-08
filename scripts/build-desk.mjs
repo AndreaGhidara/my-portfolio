@@ -2,17 +2,9 @@ import { writeFile, mkdir } from "node:fs/promises";
 
 const OUT = "public/brand/desk";
 
-/**
- * Le sette sagome del tavolo. Ventiquattro oggetti da sette forme: la varieta'
- * la fanno la rotazione, la misura e l'etichetta, non una sagoma nuova per ogni
- * voce. Sei sagome diverse in uno strato solo sarebbero un catalogo di icone,
- * che e' esattamente il posto dove questi disegni smettono di essere disegni.
- */
 export const SHAPES = {
   sheet:  { w: 150, h: 96,  parts: ["rect", "rules"] },
-  // La card e' piu' alta delle altre: le prime 16 unita' sono lo spazio dove
-  // vive la linguetta, cosi' che sporga davvero invece di finire tagliata dal
-  // viewBox (dove viveva prima di questa correzione).
+  // Le prime 16 unita' sono per la linguetta, che altrimenti il viewBox taglia.
   card:   { w: 152, h: 78,  parts: ["rect", "tab"] },
   postit: { w: 126, h: 126, parts: ["rect", "curl"] },
   plate:  { w: 118, h: 54,  parts: ["rect", "holes"] },
@@ -21,14 +13,9 @@ export const SHAPES = {
   laptop: { w: 360, h: 240, parts: ["rect", "screen", "hinge"] },
 };
 
-/** Spazio in cima al viewBox della card, riservato alla linguetta. */
 const CARD_TAB_MARGIN = 16;
 
-/**
- * Generatore lineare congruenziale. Serve UN SOLO numero: che il tremolio sia
- * lo stesso a ogni build. Con Math.random ogni build sporcherebbe il diff di
- * sette file, e nessuno guarderebbe piu' quei diff.
- */
+// Un generatore seminato: con Math.random ogni build sporcherebbe il diff di sette file.
 function rng(seed) {
   let s = seed >>> 0;
   return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296) * 2 - 1;
@@ -36,11 +23,6 @@ function rng(seed) {
 
 const round = (n) => +n.toFixed(2);
 
-/**
- * Un rettangolo disegnato a mano: si campiona il perimetro e si sposta ogni
- * punto di un'inezia. Il tratto non chiude mai perfettamente, ed e' voluto:
- * l'ink-circle del brand non chiude, e questo e' lo stesso gesto.
- */
 function wobblyRect(x, y, w, h, random, jitter = 1.6, step = 22) {
   const pts = [];
   const edge = (x1, y1, x2, y2) => {
@@ -68,7 +50,7 @@ function wobblyLine(x1, y1, x2, y2, random, jitter = 1.1) {
   return `M${round(x1)} ${round(y1)} Q${round(mx)} ${round(my)} ${round(x2)} ${round(y2)}`;
 }
 
-/** Ogni sagoma ha il proprio seme, cosi' aggiungerne una non cambia le altre. */
+// Un seme per sagoma: aggiungerne una non cambia le altre.
 const SEEDS = { sheet: 11, card: 23, postit: 37, plate: 51, rack: 67, phone: 83, laptop: 97 };
 
 function inner(name, spec, random) {
@@ -81,14 +63,9 @@ function inner(name, spec, random) {
     }
   }
   if (spec.parts.includes("tab")) {
-    // Sporge sopra il bordo del corpo (che qui parte piu' in basso, a
-    // CARD_TAB_MARGIN), ma resta dentro il viewBox: sporgere e uscire dal
-    // disegno non sono la stessa cosa.
     paths.push(wobblyRect(12, 2, 44, CARD_TAB_MARGIN + 2, random, 1.1, 14));
   }
   if (spec.parts.includes("curl")) {
-    // La piega dell'angolo che si solleva: una diagonale corta, appena
-    // dentro il bordo, non una linea che lo attraversa e lo supera.
     paths.push(wobblyLine(w - 34, h - 8, w - 8, h - 34, random, 2.2));
   }
   if (spec.parts.includes("holes")) {
@@ -109,16 +86,9 @@ function inner(name, spec, random) {
   return paths;
 }
 
-/**
- * Il contorno esterno: il corpo dell'oggetto, e nient'altro. E' il PRIMO
- * sorteggio che ogni sagoma fa, ed e' l'unico punto in cui viene disegnato:
- * il contorno e il pieno chiamano questa, cosi' l'uno e' per costruzione il
- * tracciato dell'altro. Ridisegnarlo a parte darebbe due tremolii diversi e
- * ogni oggetto del tavolo avrebbe un alone.
- */
+// Il primo sorteggio di ogni sagoma, chiamato sia dal contorno sia dal pieno:
+// cosi' i due tracciati coincidono. Ridisegnato a parte farebbe un alone.
 function outerPath(name, spec, random) {
-  // Solo la card lascia margine in cima, per la linguetta: per tutte le altre
-  // il corpo occupa il viewBox intero, come sempre.
   const top = name === "card" ? 2 + CARD_TAB_MARGIN : 2;
   return wobblyRect(2, top, spec.w - 4, spec.h - 2 - top, random);
 }
@@ -139,18 +109,9 @@ export function buildShape(name) {
   ].join("");
 }
 
-/**
- * Il pieno: lo stesso contorno esterno, chiuso e riempito, che nel DOM sta
- * SOTTO il tracciato. Serve perche' una maschera CSS dipinge un colore solo:
- * con un file solo un foglio, una scheda e un telefono restavano lo stesso
- * grigio identico, e i quattro strati si leggevano come quattro contorni della
- * stessa famiglia invece che come quattro tipi di cosa. Due superfici da
- * colorare, e il colore continua a metterlo il CSS: il tema regge.
- *
- * Il seme e' quello della sagoma e il sorteggio e' il primo, lo stesso che fa
- * buildShape: i due tracciati escono identici carattere per carattere, e per
- * questo combaciano. Niente tratto: il tratto e' l'altro strato.
- */
+// Una maschera CSS dipinge un colore solo: il pieno sotto il contorno da' una
+// seconda superficie da colorare. Stesso seme e stesso primo sorteggio di
+// buildShape, quindi i tracciati combaciano carattere per carattere.
 export function buildFill(name) {
   const spec = SHAPES[name];
   const d = outerPath(name, spec, rng(SEEDS[name]));

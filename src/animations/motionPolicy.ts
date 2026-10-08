@@ -10,21 +10,14 @@ export const MEDIA = {
   wideScreen: "(min-width: 1024px)",
 } as const;
 
-/**
- * Pura, quindi testabile senza un browser.
- * La preferenza dell'utente vince su tutto. In assenza di informazioni il
- * default è "reduced": il pieno va guadagnato, non presunto.
- */
+// Senza informazioni il default e' "reduced": il pieno va guadagnato, non presunto.
 export function resolveMotionLevel(match: (query: string) => boolean): MotionLevel {
   if (match(MEDIA.reduced)) return "none";
   if (match(MEDIA.finePointer) && match(MEDIA.wideScreen)) return "full";
   return "reduced";
 }
 
-/**
- * In SSR e al primo render restituisce "none": nessuna animazione parte
- * prima che il browser abbia detto la sua, e il contenuto resta visibile.
- */
+// "none" in SSR e al primo render: niente parte prima che il browser abbia risposto.
 export function useMotionLevel(): MotionLevel {
   const [level, setLevel] = useState<MotionLevel>("none");
 

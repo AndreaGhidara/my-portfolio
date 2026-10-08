@@ -3,14 +3,8 @@
 import { useRef } from "react";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 
-/**
- * La ragnatela è la parola "web" presa alla lettera, e va sempre DISEGNATA
- * in ingresso, mai lasciata statica: statica si legge come trascuratezza,
- * in tessitura si legge come lavoro in corso.
- * L'SVG è in linea, non via <img>, perché servono i singoli <path> per
- * animarli uno a uno, e perché a ~1 KB una richiesta di rete in più sul
- * percorso critico dell'hero non si giustifica.
- */
+// SVG in linea e non <img>: servono i singoli <path> da animare, e a ~1 KB una
+// richiesta in piu' sul percorso critico dell'hero non si giustifica.
 export function WebCorner({ className }: { className?: string }) {
   const scope = useRef<HTMLElement | null>(null);
 
@@ -32,10 +26,7 @@ export function WebCorner({ className }: { className?: string }) {
   );
 }
 
-/**
- * Contenuto di public/brand/web-corner.svg, incorporato.
- * Se rigeneri con `npm run assets`, aggiorna anche questa costante.
- */
+// Copia di public/brand/web-corner.svg: dopo `npm run assets` va aggiornata a mano.
 const WEB_CORNER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
   <path d="M0 0 L420 0" />
   <path d="M0 0 L399.44 129.79" />

@@ -2,20 +2,14 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
-/**
- * Il trattino lungo non si usa: ne' nei testi, ne' nei commenti, ne' nelle
- * traduzioni, ne' nel README. Scritto qui come escape, cosi' questo file non
- * fa cadere se stesso.
- */
+// Come escape, cosi' questo file non fa cadere se stesso.
 const EM_DASH = "\u2014";
 
 const root = path.resolve(__dirname, "../../..");
 
-/** Le cartelle lette per intero. docs/ e public/ restano fuori apposta. */
+// docs/ e public/ restano fuori apposta.
 const FOLDERS = ["src", "scripts", "messages"];
-/** In radice solo questi: config, setup dei test, README. */
 const AT_ROOT = /\.(ts|mjs|md)$/;
-/** Font, immagini e documenti: byte, non testo. */
 const BINARY = /\.(ico|woff2?|ttf|otf|png|jpe?g|gif|webp|avif|pdf)$/i;
 const NEVER = new Set(["node_modules", ".next"]);
 
@@ -50,7 +44,7 @@ describe("il trattino lungo", () => {
   });
 
   it("legge davvero tutti i posti che dice di leggere", () => {
-    // Una cartella sbagliata darebbe zero colpevoli anche col trattino dentro.
+    // Una cartella sbagliata darebbe zero risultati anche col trattino dentro.
     const checked = filesToCheck().map((p) => path.relative(root, p));
     expect(checked).toContain("README.md");
     expect(checked).toContain("vitest.setup.ts");

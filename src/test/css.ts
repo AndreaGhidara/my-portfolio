@@ -2,35 +2,28 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import postcss, { type ChildNode } from "postcss";
 
-/**
- * Il CSS del sito come lo vede il browser, per i test che in jsdom non possono
- * misurare niente e allora leggono le regole che tengono ferma una cosa.
- *
- * Si parte da globals.css e si seguono gli @import locali nell'ordine in cui
- * stanno, come fa la build: le prove cercano una regola nel sito, non in un
- * file, e spostare un blocco da un foglio all'altro non deve romperne nessuna.
- * `@import "tailwindcss"` si salta: e' il framework, non il sito.
- */
+// Da globals.css seguendo gli @import locali in ordine, come la build: le prove
+// cercano una regola nel sito, non in un file, e spostare un blocco da un foglio
+// all'altro non deve romperne nessuna. `@import "tailwindcss"` si salta.
 
 export interface Rule {
-  /** I selettori della lista, uno per uno, con gli spazi ridotti a uno. */
+  // Uno per uno, con gli spazi ridotti a uno.
   selectors: string[];
-  /** La lista intera, separata da ", ". */
+  // La lista intera, separata da ", ".
   selector: string;
-  /** Le dichiarazioni, una per riga: `proprieta: valore;`. Senza commenti. */
+  // Una dichiarazione per riga, senza commenti.
   body: string;
-  /** Proprieta' e valore; se una proprieta' torna, vince l'ultima, come nel browser. */
+  // Se una proprieta' torna vince l'ultima, come nel browser.
   declarations: Record<string, string>;
-  /** Le at-rule che la contengono, dalla piu' esterna: `@media (max-width: 599px)`. */
+  // Le at-rule che la contengono, dalla piu' esterna.
   inside: string[];
-  /** Il percorso assoluto del foglio da cui viene. */
   file: string;
 }
 
 export interface Options {
-  /** Solo le regole dentro questa media query, a qualunque profondita': `(max-width: 599px)`. */
+  // A qualunque profondita'.
   media?: string;
-  /** Solo le regole che vengono dopo il primo commento che contiene questo testo. */
+  // Le regole dopo il primo commento che contiene questo testo.
   after?: string;
 }
 
@@ -77,7 +70,6 @@ function readSheet(file: string, inside: string[], entries: Entry[]) {
 
 const cache = new Map<string, Entry[]>();
 
-/** Il lettore di un CSS qualunque a partire dal suo ingresso. Il sito usa `regole`. */
 export function cssReader(entryFile: string) {
   return (match?: string | RegExp, { media, after }: Options = {}): Rule[] => {
     let entries = cache.get(entryFile);
@@ -103,9 +95,6 @@ export function cssReader(entryFile: string) {
   };
 }
 
-/**
- * Le regole del sito, nell'ordine in cui il browser le legge. Una stringa
- * trova le regole che hanno quel selettore nella loro lista; una RegExp si
- * prova sulla lista intera (`selettore`). Senza niente, tutte.
- */
+// Una stringa cerca un selettore nella lista, una RegExp prova la lista intera
+// (`selector`). Senza niente, tutte.
 export const rules = cssReader(path.resolve(process.cwd(), "src/app/globals.css"));

@@ -1,11 +1,8 @@
 import type { ReactNode } from "react";
 import { brandAssets } from "@/content/brand-assets";
 
-/**
- * Il cerchio è una maschera, non un'immagine colorata: un solo file serve
- * sia in tema chiaro sia in tema scuro, e `paint()` può farlo avanzare
- * animando la custom property --paint.
- */
+// Una maschera e non un'immagine colorata: un file solo per i due temi, e
+// `paint()` lo fa avanzare animando --paint.
 export function InkCircle({ children, className }: { children?: ReactNode; className?: string }) {
   const mask = `url(${brandAssets.inkCircle.src}) center / contain no-repeat`;
 

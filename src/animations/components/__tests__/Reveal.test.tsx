@@ -25,9 +25,6 @@ describe("Reveal", () => {
     expect(container.firstElementChild).toHaveClass("mia-classe");
   });
 
-  // Reveal e' un involucro di presentazione: se mangia gli attributi che non
-  // conosce, chi lo usa e' costretto ad aggiungere un <div> attorno solo per
-  // poterli scrivere, e l'elemento che conta smette di essere quello reso.
   it("inoltra anche gli attributi che non conosce", () => {
     const { container } = render(
       <Reveal as="ol" data-list id="lista">

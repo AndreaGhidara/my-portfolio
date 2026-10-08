@@ -1,14 +1,8 @@
 import { act } from "@testing-library/react";
 import { vi } from "vitest";
 
-/**
- * jsdom non ha IntersectionObserver. Questo lo sostituisce con uno che non
- * osserva niente da solo: e' la prova a dire quando un elemento entra o esce,
- * con `entra(el)` ed `esce(el)`. Senza argomento vale per tutti quelli
- * osservati.
- *
- * Si toglie con vi.unstubAllGlobals(), come ogni altro stub globale.
- */
+// jsdom non ha IntersectionObserver: qui e' la prova a dire chi entra o esce,
+// con `enter(el)` ed `exit(el)`, o tutti senza argomento. Si toglie con vi.unstubAllGlobals().
 export function installIntersectionObserver() {
   const live = new Set<FakeObserver>();
 
@@ -50,12 +44,10 @@ export function installIntersectionObserver() {
   return {
     enter: (el?: Element) => notify(true, el),
     exit: (el?: Element) => notify(false, el),
-    /** Quanti osservatori sono ancora attaccati: zero dopo lo smontaggio. */
     active: () => live.size,
   };
 }
 
-/** Il browser vecchio, o l'ambiente senza: IntersectionObserver non c'e'. */
 export function removeIntersectionObserver() {
   vi.stubGlobal("IntersectionObserver", undefined);
 }

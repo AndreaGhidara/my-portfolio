@@ -14,13 +14,11 @@ const pointAt = (angle, radius) => [
 
 const paths = [];
 
-// Fili radiali: dall'origine verso il bordo.
 for (let i = 0; i < RADIALS; i++) {
   const [x, y] = pointAt(angleAt(i), SIZE * 1.05);
   paths.push(`M0 0 L${x} ${y}`);
 }
 
-// Archi concentrici: fra due radiali adiacenti, con la corda che cede.
 for (let r = 1; r <= RINGS; r++) {
   const radius = (r / RINGS) * SIZE;
   const segments = [];

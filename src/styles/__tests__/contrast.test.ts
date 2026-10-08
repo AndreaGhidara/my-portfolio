@@ -49,18 +49,12 @@ describe("vincoli di accessibilità della spec", () => {
   });
 
   it("il verde si legge sul fondo VERO del riquadro, nei due temi", () => {
-    // Il fondo del riquadro non e' un token: e' il verde tinto al 9% dentro la
-    // superficie, cioe' una color-mix che sa risolvere solo il browser. I due
-    // valori qui sotto sono quelli letti da li', disegnando il colore su una
-    // tela e leggendo il pixel: a mente non si ricavano.
+    // Il fondo e' una color-mix (verde al 9% nella superficie): valori letti dal pixel nel browser.
     const lightBg = "#E3E5D9";
     const darkBg = "#292B24";
-    // 3:1 e' la soglia WCAG per gli elementi non testuali, e la spunta con la
-    // barra di bordo stanno li' dentro.
     expect(contrastRatio(palette.green, lightBg)).toBeGreaterThanOrEqual(3);
     expect(contrastRatio(palette.greenDark, darkBg)).toBeGreaterThanOrEqual(3);
-    // Ed ecco perche' i verdi sono due: quello di carta, sul fondo scuro, fa
-    // 2,39:1. Un "e' andata bene" che in tema scuro non si vede.
+    // Per questo i verdi sono due.
     expect(contrastRatio(palette.green, darkBg)).toBeLessThan(3);
   });
 });
@@ -88,8 +82,7 @@ describe("tema scuro", () => {
 });
 
 describe("l'archivio dei Lavori", () => {
-  // Anche qui i fondi e i testi sono color-mix: i valori sono quelli risolti da
-  // Chrome (disegnati su una tela e letti dal pixel), non ricavati a mente.
+  // Fondi e testi sono color-mix: valori risolti da Chrome e letti dal pixel.
   const lightSpine = "#DBD7CF"; // inchiostro al 10% nella carta
   const lightMuted = "#5A5449"; // --fg-muted all'80% verso --fg
   const darkFace = "#262420"; // inchiostro al 90% con la carta
@@ -98,7 +91,6 @@ describe("l'archivio dei Lavori", () => {
   const darkAccent = "#E86944"; // arancio al 90% verso la carta
 
   it("sul chiaro l'anno della linguetta e la scritta del riservato superano AA", () => {
-    // Col tenue globale erano 3,90:1: il dorso e' piu' scuro della carta.
     expect(contrastRatio(palette.muted, lightSpine)).toBeLessThan(4.5);
     expect(contrastRatio(lightMuted, lightSpine)).toBeGreaterThanOrEqual(4.5);
     expect(contrastRatio(lightMuted, palette.paper)).toBeGreaterThanOrEqual(4.5);
@@ -109,12 +101,8 @@ describe("l'archivio dei Lavori", () => {
     expect(contrastRatio(palette.mutedDark, darkPanel)).toBeGreaterThanOrEqual(4.5);
   });
 
-  /**
-   * Il fondo della linguetta a profondita' p: il dorso mischiato con
-   * l'inchiostro in sRGB, come fa il CSS (color-mix in srgb), che e' la stessa
-   * cosa di un velo d'inchiostro sopra. Nel tono chiaro il velo non scende
-   * sotto LINGUETTA.buioMinimo.
-   */
+  // Il dorso mischiato con l'inchiostro in sRGB come fa il CSS; nel tono chiaro
+  // il velo non scende sotto TAB.minDark.
   const tabBg = (spine: string, p: number) => {
     const share = Math.min(
       1,
@@ -130,7 +118,6 @@ describe("l'archivio dei Lavori", () => {
       a.map((v, i) => Math.round(v * (1 - share) + b[i] * share).toString(16).padStart(2, "0")).join("")
     );
   };
-  /** Nome e anno nei tre toni: sul chiaro cambiano, sullo scuro no. */
   const lightTexts = (p: number) =>
     [
       [palette.ink, lightMuted],
@@ -168,17 +155,14 @@ describe("l'archivio dei Lavori", () => {
   });
 
   it("«Apri il caso» sullo scuro supera AA solo con l'arancio schiarito", () => {
-    // Pieno faceva 4,21:1 sulla faccia, che e' un gradino sopra l'inchiostro.
     expect(contrastRatio(palette.orange, darkFace)).toBeLessThan(4.5);
     expect(contrastRatio(darkAccent, darkFace)).toBeGreaterThanOrEqual(4.5);
   });
 });
 
 describe("la pratica dei Lavori, carta in tutti e due i temi", () => {
-  // Il foglio non segue il tema: --carta, --tenue e --arancio valgono uguali
-  // sul chiaro e sullo scuro, e le coppie qui sotto valgono per tutti e due.
-  // Valori risolti da Chrome (disegnati su una tela e letti dal pixel).
-  const orange = "#A44428"; // --accento-su-carta: arancio al 72% nell'inchiostro
+  // --sheet-paper, --sheet-muted e --sheet-orange non seguono il tema. Valori letti dal pixel in Chrome.
+  const orange = "#A44428"; // --accent-on-paper: arancio al 72% nell'inchiostro
   const attachment = "#EBE7DE"; // il fondo dell'allegato: inchiostro al 4% nella carta
 
   it("il tenue supera AA sulla carta e sul fondo dell'allegato", () => {
@@ -193,15 +177,12 @@ describe("la pratica dei Lavori, carta in tutti e due i temi", () => {
 });
 
 describe("l'editor della cassetta, scuro in tutti e due i temi", () => {
-  // I fondi sono quelli risolti da Chrome (disegnati su una tela e letti dal
-  // pixel): la riga nuova e' l'arancio al 10% nell'inchiostro, le barre la
-  // carta al 6%. Il codice sta sull'inchiostro pieno.
+  // Letti dal pixel in Chrome: la riga nuova e' l'arancio al 10% nell'inchiostro,
+  // le barre la carta al 6%.
   const newLine = "#261913";
   const statusBar = "#1F1D19";
 
   it("i commenti che portano contenuto sono mutedDark, e superano AA sui tre fondi", () => {
-    // Il perche' di un capo e le alternative sono commenti: in muted sul fondo
-    // scuro farebbero 3,34:1, sotto AA per un testo di dodici pixel.
     for (const bg of [palette.ink, newLine, statusBar]) {
       expect(contrastRatio(palette.mutedDark, bg)).toBeGreaterThanOrEqual(4.5);
     }
@@ -222,10 +203,7 @@ describe("l'editor della cassetta, scuro in tutti e due i temi", () => {
 });
 
 describe("la mappa della cassetta: i conti degli scomparti", () => {
-  // Il conto («5 attrezzi») e' --fg all'80% nel fondo, e le pezze sono toni
-  // della famiglia: tutti valori risolti da Chrome, letti dal pixel. Con
-  // --fg-muted le pezze piu' cariche del chiaro (front-end, back-end, dati,
-  // nel mezzo) scendevano sotto il 4,5:1.
+  // Il conto e' --fg all'80% nel fondo; valori letti dal pixel in Chrome.
   const lightPatches = ["#F6D1C1", "#F6E1D4", "#E3DFD7", "#D4D0C8", "#F6DED1", "#DEDAD2", "#EBE7DE", "#F6E8DD", "#F5F1E8"];
   const darkPatches = ["#3C2218", "#281A14", "#211E1B", "#2C2A26", "#2B1B14", "#24221E", "#1B1916", "#1F1612", "#14120F"];
 
@@ -244,9 +222,7 @@ describe("la mappa della cassetta: i conti degli scomparti", () => {
 });
 
 describe("il bancone delle notizie: le tre categorie, fisse nei due temi", () => {
-  // Il corpo della macchina prende il colore della categoria scelta, e sopra
-  // ci sono le scritte dei pulsanti (0,62rem) e l'anello di fuoco della
-  // manopola e dei pulsanti: tutti nel colore --on-… della categoria.
+  // Scritte (0,62rem) e anello di fuoco stanno sul corpo, nel colore --on-* della categoria.
   const categories = [
     { name: "I.A.", bg: palette.orange, text: palette.ink },
     { name: "Design", bg: palette.bulb, text: palette.ink },
@@ -278,8 +254,7 @@ describe("il bancone delle notizie: le tre categorie, fisse nei due temi", () =>
 });
 
 describe("il ritaglio delle notizie, carta in tutti e due i temi", () => {
-  // Come la pratica dei Lavori: --carta, --tenue e --arancio non seguono il tema.
-  const orange = "#A44428"; // --accento-su-carta: arancio al 72% nell'inchiostro
+  const orange = "#A44428"; // --accent-on-paper
 
   it("la riga della fonte, i dati e il timbro superano AA sulla carta", () => {
     expect(contrastRatio(palette.muted, palette.paper)).toBeGreaterThanOrEqual(4.5);

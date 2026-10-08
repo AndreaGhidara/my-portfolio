@@ -22,9 +22,7 @@ describe("whenIdle", () => {
   });
 
   it("senza requestIdleCallback ripiega su un timer, e l'annullo lo ferma", () => {
-    // Safari non ce l'ha: il lavoro deve partire lo stesso, solo un po' dopo.
-    // Solo i timer: i fake timers di default porterebbero anche un loro
-    // requestIdleCallback, e jsdom non ne ha uno.
+    // Solo i timer: i fake timers di default porterebbero un loro requestIdleCallback.
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
     const fn = vi.fn();
     whenIdle(fn);

@@ -4,11 +4,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { cssReader, rules, type Rule } from "../css";
 
-/**
- * Un sito finto in una cartella temporanea: un ingresso che importa tailwind
- * (da saltare), un foglio vicino e uno in una sottocartella che ne importa un
- * altro a sua volta. I percorsi relativi si risolvono da chi importa.
- */
+// Un sito finto: tailwind da saltare, un foglio vicino e uno in una sottocartella
+// che ne importa un altro. I percorsi relativi si risolvono da chi importa.
 let dir: string;
 let read: ReturnType<typeof cssReader>;
 

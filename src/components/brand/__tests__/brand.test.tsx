@@ -47,11 +47,7 @@ describe("elementi decorativi", () => {
   });
 
   it("il segno e' una maschera e non un'immagine: cosi' esiste anche sul tema scuro", () => {
-    // Il file e' inchiostro su trasparente. Messo come <img> resta inchiostro
-    // anche quando la pagina diventa inchiostro, e le virgolette spariscono.
-    // Da maschera prende --fg, che e' carta sul tema scuro e inchiostro sul
-    // chiaro: un file solo, giusto in tutti e due. E' la stessa strada del
-    // cerchio d'inchiostro.
+    // Come <img> l'inchiostro su trasparente spariva sul tema scuro.
     const { container } = render(<QuoteFrame variant="open" />);
     const mark = container.querySelector("[data-quote-fill]") as HTMLElement | null;
     expect(mark, "manca il segno mascherato").not.toBeNull();

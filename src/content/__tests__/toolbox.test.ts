@@ -6,7 +6,7 @@ import { garmentStops, pathTo } from "../../components/sections/Services/toolbox
 
 type Tree = Record<string, unknown>;
 
-/** La foglia a un percorso puntato, o undefined. Le chiavi degli attrezzi hanno trattini, non punti. */
+// Un percorso a pezzi e non puntato: le chiavi degli attrezzi hanno trattini, non punti.
 function leaf(obj: unknown, keyPath: string[]): unknown {
   return keyPath.reduce<unknown>(
     (acc, part) => (typeof acc === "object" && acc !== null ? (acc as Tree)[part] : undefined),
@@ -33,8 +33,7 @@ describe("la cassetta: i dati", () => {
   });
 
   it("gli id sono slug senza punto, e unici", () => {
-    // Un punto nell'id diventa un livello in piu' nelle chiavi di traduzione:
-    // cassetta.attrezzi.next.js non e' la chiave di Next.js.
+    // cassetta.attrezzi.next.js non sarebbe la chiave di Next.js.
     const ids = [...nodeIds];
     expect(new Set(ids).size).toBe(1 + JUNCTIONS.length + TOOLS.length);
     for (const id of ids) expect(id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
@@ -60,14 +59,11 @@ describe("la cassetta: i dati", () => {
   });
 
   it("nessun nodo e' isolato dall'albero, tranne quelli dichiarati sciolti", () => {
-    // Ogni nodo sale fino al cartellino, o a uno scomparto dichiarato sciolto.
-    // Un nodo che non ci arriva e' un'etichetta cucita nel vuoto.
     const tops = new Set([ROOT.id, ...LOOSE]);
     for (const id of nodeIds) {
       const s = pathTo(id);
       expect(tops.has(s[s.length - 1]), `${id} non arriva ne' al cartellino ne' a uno sciolto`).toBe(true);
     }
-    // E gli sciolti si attaccano al resto almeno con un incrocio.
     for (const id of LOOSE) {
       expect(CROSSINGS.some(([a, b]) => a === id || b === id), id).toBe(true);
     }
@@ -140,7 +136,7 @@ describe("la cassetta: i testi", () => {
       for (const c of GARMENTS) {
         expect(text(lang, "capi", c.id, "nome"), c.id).toEqual(expect.any(String));
         expect(text(lang, "capi", c.id, "perche"), c.id).toEqual(expect.any(String));
-        // Lo slug finisce nel codice finto dell'editor: una stringa da identificatore.
+        // Lo slug finisce nel codice finto dell'editor.
         expect(text(lang, "capi", c.id, "slug"), c.id).toMatch(/^[a-z][a-z-]*$/);
         for (const { from } of c.alt) {
           expect(text(lang, "capi", c.id, "alt", from), `${c.id}.alt.${from}`).toEqual(expect.any(String));

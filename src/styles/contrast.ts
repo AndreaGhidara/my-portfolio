@@ -1,4 +1,4 @@
-/** Formula di luminanza relativa WCAG 2.1. */
+// WCAG 2.1.
 export function relativeLuminance(hex: string): number {
   const clean = hex.replace("#", "");
   if (clean.length !== 6) {
@@ -12,7 +12,6 @@ export function relativeLuminance(hex: string): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-/** Rapporto di contrasto WCAG, da 1:1 a 21:1. Simmetrico. */
 export function contrastRatio(a: string, b: string): number {
   const la = relativeLuminance(a);
   const lb = relativeLuminance(b);

@@ -53,9 +53,7 @@ describe("ThemeScript", () => {
 
 describe("TopStateScript", () => {
   it("segna la cima con la stessa soglia che usa l'header mentre si scorre", () => {
-    // Lo script e' una stringa: se la soglia ci arrivasse undefined, il
-    // confronto darebbe sempre false e l'header nascerebbe opaco. Qui lo si
-    // esegue davvero, ai due lati della soglia.
+    // Con la soglia a undefined il confronto darebbe sempre false: lo si esegue davvero.
     const { container } = render(<TopStateScript />);
     const code = container.querySelector("script")?.innerHTML ?? "";
     const root = document.documentElement;

@@ -5,7 +5,6 @@ import { useMotionLevel, type MotionLevel } from "./motionPolicy";
 import { whenIdle } from "./whenIdle";
 import type * as Presets from "./presets";
 
-/** Quello che una sezione riceve per costruire le sue animazioni. */
 export type SectionScene = {
   level: MotionLevel;
   gsap: typeof import("./gsap").gsap;
@@ -13,48 +12,22 @@ export type SectionScene = {
   presets: typeof Presets;
 };
 
-/**
- * Ogni sezione costruisce le proprie animazioni qui dentro.
- *
- * GSAP NON si importa in cima a questo file, e nemmeno nei componenti che lo
- * usano: arriva dentro `scena`, caricato al volo dopo la prima pittura. Non è
- * un vezzo, è la voce di costo più grossa che la pagina aveva. Misurato su
- * Lighthouse mobile con la CPU rallentata quattro volte: bloccando i pezzi di
- * GSAP e Lenis il tempo di blocco passava da 267ms a zero e i quattro task
- * lunghi sparivano. Importarli in cima vuol dire pagarli mentre il browser
- * dovrebbe disegnare; caricarli dopo vuol dire non pagarli affatto, perché a
- * quel punto lo schermo è già a posto.
- *
- * L'attesa è `requestIdleCallback` con un tetto: se il browser non trova mai un
- * momento libero, dopo 800ms si parte lo stesso. Nessuna animazione qui è
- * immediata: la più presta è quella dell'apertura, e mezzo secondo di ritardo
- * su una cosa che dura mezzo secondo non la nota nessuno.
- *
- * La pulizia la fa `gsap.context`: revert allo smontaggio e a ogni cambio di
- * livello, che è quello che prima faceva `useGSAP`.
- */
-/**
- * In fase di layout e non dopo, e non e' un dettaglio: React stacca i `ref`
- * DOPO le pulizie di layout e PRIMA di quelle passive. Chi smonta leggendo
- * `scope.current` (il palco del tavolo toglie due custom property da li')
- * con un `useEffect` trovava null e non puliva niente. Sul server il layout
- * effect non esiste, quindi si ripiega su useEffect: tanto li' non gira.
- * Qui dentro non si fa lavoro pesante: si prenota soltanto il momento libero
- * in cui caricare GSAP.
- */
+// Layout effect perche' React stacca i `ref` dopo le pulizie di layout e prima di
+// quelle passive: con useEffect chi pulisce leggendo `scope.current` trova null.
+// Sul server si ripiega su useEffect, che li' non gira.
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
+// GSAP non si importa in cima: arriva in `scene`, caricato nel primo momento
+// libero. Su Lighthouse mobile con CPU 4x il tempo di blocco passava da 267ms a
+// zero. Il revert di `gsap.context` pulisce allo smontaggio e a ogni cambio di livello.
 export function useSectionAnimation(
   build: (scene: SectionScene) => void | (() => void),
   scope: RefObject<HTMLElement | null>,
-  /** Dipendenze aggiuntive oltre al livello di movimento. */
   deps: unknown[] = [],
 ): void {
   const level = useMotionLevel();
 
-  // La funzione cambia a ogni render (è una closure sulle props): tenerla in un
-  // ref evita di rifare tutto l'effetto quando l'unica cosa cambiata è la sua
-  // identità.
+  // Nel ref, cosi' l'effetto non riparte quando cambia solo l'identita' della closure.
   const buildRef = useRef(build);
   buildRef.current = build;
 
@@ -83,9 +56,8 @@ export function useSectionAnimation(
     return () => {
       alive = false;
       cancel();
-      // Prima quello che ha registrato `build` (ascoltatori, guide), poi il
-      // contesto: al contrario, il revert toglierebbe di mezzo gli elementi su
-      // cui la pulizia deve ancora lavorare.
+      // Prima la pulizia di `build`, poi il revert: al contrario toglierebbe gli
+      // elementi su cui la pulizia deve ancora lavorare.
       if (typeof teardown === "function") teardown();
       context?.revert();
     };

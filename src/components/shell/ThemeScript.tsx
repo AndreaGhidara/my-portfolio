@@ -1,9 +1,5 @@
-/**
- * Va reso dentro <head>, prima di qualsiasi contenuto: applica il tema
- * salvato in modo sincrono, così la pagina non lampeggia di bianco prima
- * di diventare scura. È l'unico caso in cui uno script bloccante si
- * giustifica: sono poche decine di byte.
- */
+// Dentro <head> e sincrono, cosi' la pagina non lampeggia di bianco prima di
+// diventare scura: poche decine di byte, l'unico script bloccante giustificato.
 export function ThemeScript() {
   const code = `(function(){try{
     var saved = localStorage.getItem('theme');
