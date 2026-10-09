@@ -2,7 +2,7 @@ export type BrandAsset = {
   src: string;
   width: number;
   height: number;
-  /** Vuoto per gli elementi decorativi: il significato è già nel testo accanto. */
+  // Vuoto per gli elementi decorativi.
   alt: string;
 };
 
@@ -35,7 +35,6 @@ export const brandAssets = {
 
 export type LetterKey = keyof typeof brandAssets.letters;
 
-/** Risolve un carattere nella sua lettera timbrata. Solleva se non esiste. */
 export function letterFor(char: string): BrandAsset {
   const key = char.toLowerCase() as LetterKey;
   const asset = brandAssets.letters[key];

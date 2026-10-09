@@ -3,18 +3,16 @@ import { deskLayers } from "@/content/desk";
 import { metricById } from "@/content/metrics";
 import { ServicesView } from "./ServicesView";
 import type { DeskLayerData } from "./DeskTable";
-import { testiCassetta } from "./cassetta/testi";
+import { toolboxCopy } from "./toolbox/copy";
 
 export async function Services() {
   const t = await getTranslations("services");
   const tMetrics = await getTranslations("metrics");
   const tc = await getTranslations("cassetta");
 
-  // Il numero sta in content/metrics.ts come tutti gli altri numeri inventati
-  // del sito, l'unita' nelle traduzioni come tutte le altre etichette di
-  // metrica: "caffe'" in inglese e' "coffees", e un campione scritto a mano nel
-  // componente sarebbe l'unico del tavolo che non sa girare lingua.
-  const caffe = metricById("coffees");
+  // Numero inventato da content/metrics.ts, unita' dalle traduzioni: scritto
+  // qui sarebbe l'unico testo del tavolo che non cambia lingua.
+  const coffees = metricById("coffees");
 
   const layers: DeskLayerData[] = deskLayers.map((layer) => ({
     id: layer.id,
@@ -24,13 +22,12 @@ export async function Services() {
       id: object.id,
       shape: object.shape,
       sample: object.sample,
-      // Il post-it bianco e' muto: nessuna chiave da cercare, e cercarla
-      // solleverebbe. Il buco nelle traduzioni e' voluto.
+      // Il post-it bianco non ha chiave: cercarla solleverebbe.
       label: object.mute ? null : t(`layers.${layer.id}.objects.${object.id}`),
     })),
   }));
 
-  const cassetta = testiCassetta(tc);
+  const copy = toolboxCopy(tc);
 
   return (
     <ServicesView
@@ -39,14 +36,14 @@ export async function Services() {
       stageLead={t("stageLead")}
       centre={t("centre")}
       blank={t("blank")}
-      note={`${caffe.value} ${tMetrics(caffe.id)}`}
+      note={`${coffees.value} ${tMetrics(coffees.id)}`}
       punch={t("punch")}
       layers={layers}
-      cassetta={{
+      toolbox={{
         eyebrow: tc("eyebrow"),
         title: tc("title"),
         lead: tc("lead"),
-        testi: cassetta,
+        copy,
       }}
     />
   );

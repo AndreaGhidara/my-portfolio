@@ -1,0 +1,701 @@
+/* Sotto i 960px la macchina sopra e il foglio sotto. 960 e non 860: fra i due
+   la notizia aveva meno spazio che su un telefono. La stessa soglia e' in
+   NewsStand.tsx (PHONE_QUERY). */
+
+/* I colori delle categorie sono fissi nei due temi (contrast.test.ts); il giallo
+   di Design ha sempre un contorno d'inchiostro, e il verde di Codice e'
+   palette.green perche' --theme-green si schiarisce di notte. */
+:root {
+  --news-ia: var(--orange);
+  --on-news-ia: var(--ink);
+  --news-design: var(--bulb);
+  --on-news-design: var(--ink);
+  --news-codice: #2F6F4E; /* palette.green, fisso: --theme-green cambia col tema */
+  --on-news-codice: var(--paper);
+  --news-iron: color-mix(in oklab, var(--ink) 88%, var(--paper));
+  --news-steel: color-mix(in oklab, var(--ink) 38%, var(--paper));
+  --news-dark-steel: color-mix(in oklab, var(--ink) 50%, var(--paper));
+}
+
+/* `--c` e' il colore di chi porta data-cat, `--on-c` il testo e l'anello sopra.
+   La pallina che vola vive in <body>, fuori dalla sezione. */
+[data-news] [data-cat="ia"],
+[data-news-flying][data-cat="ia"] { --c: var(--news-ia); --on-c: var(--on-news-ia); }
+[data-news] [data-cat="design"],
+[data-news-flying][data-cat="design"] { --c: var(--news-design); --on-c: var(--on-news-design); }
+[data-news] [data-cat="codice"],
+[data-news-flying][data-cat="codice"] { --c: var(--news-codice); --on-c: var(--on-news-codice); }
+
+[data-news-head] { max-width: 76rem; margin-inline: auto; }
+[data-news-head] h2 { text-wrap: balance; }
+[data-news-head] p:not(.eyebrow) { margin-top: 1.1rem; max-width: 40rem; line-height: 1.6; color: var(--fg-muted); }
+
+[data-news-scene] {
+  max-width: 76rem;
+  margin: 3rem auto 0;
+  display: grid;
+  grid-template-columns: 19rem minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+
+@media (max-width: 959px) {
+  [data-news-scene] { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+}
+
+/* --theme e --on-theme sono quelli della categoria scelta, risolti qui: i
+   pulsanti dentro ridefiniscono --c e --on-c per se', non per il corpo. */
+[data-news-machine] {
+  --theme: var(--c);
+  --on-theme: var(--on-c);
+  position: relative;
+  width: 17rem;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+[data-news-cap] {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 4.4rem;
+  height: 1.4rem;
+  margin: 0 auto -0.3rem;
+  border-radius: 8px 8px 2px 2px;
+  background: var(--news-iron);
+  box-shadow: inset 0 -3px 0 color-mix(in oklab, var(--ink) 25%, transparent);
+}
+
+[data-news-globe] {
+  position: relative;
+  width: 15rem;
+  height: 15rem;
+  margin: 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(
+    circle at 30% 22%,
+    color-mix(in oklab, var(--paper) 95%, transparent) 0 6%,
+    color-mix(in oklab, var(--paper) 35%, transparent) 18%,
+    color-mix(in oklab, var(--paper) 8%, transparent) 45%,
+    color-mix(in oklab, var(--ink) 6%, transparent) 80%
+  );
+  box-shadow:
+    inset 0 0 0 3px color-mix(in oklab, var(--ink) 12%, transparent),
+    inset -10px -14px 30px color-mix(in oklab, var(--ink) 12%, transparent);
+}
+
+[data-theme="dark"] [data-news-globe] {
+  background: radial-gradient(
+    circle at 30% 22%,
+    color-mix(in oklab, var(--paper) 55%, transparent) 0 6%,
+    color-mix(in oklab, var(--paper) 14%, transparent) 20%,
+    color-mix(in oklab, var(--paper) 4%, transparent) 50%
+  );
+  box-shadow: inset 0 0 0 3px color-mix(in oklab, var(--paper) 20%, transparent);
+}
+
+[data-news-globe] > span {
+  position: absolute;
+  width: 16.5%;
+  height: 16.5%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, color-mix(in oklab, var(--paper) 75%, transparent) 0 12%, transparent 13%),
+    var(--c);
+  box-shadow: inset 0 -3px 5px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+[data-news-globe] > [data-cat="design"] {
+  box-shadow:
+    inset 0 0 0 1.5px var(--ink),
+    inset 0 -3px 5px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+[data-news-globe] > [data-off] { opacity: 0.38; filter: saturate(0.4); }
+[data-news-globe] > [data-gone] { opacity: 0; scale: 0.2; }
+
+[data-news-neck] {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 11rem;
+  height: 1.3rem;
+  margin: -0.6rem auto 0;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--graph), var(--news-steel));
+}
+
+[data-news-body] {
+  position: relative;
+  width: 13.5rem;
+  margin: 0 auto;
+  padding: 0.8rem 0.9rem 1rem;
+  border-radius: 14px 14px 4px 4px;
+  /* Le ombre dei fianchi finiscono al 10%: le scritte dei pulsanti stanno sul
+     colore pieno, dove il contrasto e' quello misurato. */
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--ink) 14%, transparent),
+      transparent 10%,
+      transparent 90%,
+      color-mix(in oklab, var(--ink) 16%, transparent)
+    ),
+    var(--theme);
+  box-shadow: 0 18px 26px -14px color-mix(in oklab, var(--ink) 55%, transparent);
+}
+[data-news-machine][data-cat="design"] [data-news-body] {
+  box-shadow:
+    inset 0 0 0 2px var(--ink),
+    0 18px 26px -14px color-mix(in oklab, var(--ink) 55%, transparent);
+}
+
+[data-news-nameplate] {
+  width: max-content;
+  margin: 0 auto;
+  padding: 0.15rem 0.55rem;
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+[data-news-buttons] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+  padding: 0.5rem 0.45rem 0.45rem;
+  border-radius: 10px;
+  box-shadow: inset 0 2px 5px color-mix(in oklab, var(--ink) 30%, transparent);
+}
+[data-news-buttons] button {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0 0.15rem;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  color: var(--on-theme);
+}
+[data-news-buttons] i {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, color-mix(in oklab, var(--paper) 70%, transparent) 0 14%, transparent 15%),
+    var(--c);
+  box-shadow:
+    0 5px 0 color-mix(in oklab, var(--c) 55%, var(--ink)),
+    0 6px 8px color-mix(in oklab, var(--ink) 35%, transparent);
+}
+[data-news-buttons] [data-cat="design"] i {
+  box-shadow:
+    inset 0 0 0 1.5px var(--ink),
+    0 5px 0 var(--ink),
+    0 6px 8px color-mix(in oklab, var(--ink) 35%, transparent);
+}
+[data-news-buttons] span {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+[data-news-buttons] [aria-pressed="true"] i {
+  translate: 0 4px;
+  box-shadow:
+    0 1px 0 color-mix(in oklab, var(--c) 55%, var(--ink)),
+    0 0 14px 2px color-mix(in oklab, var(--c) 70%, var(--paper));
+}
+[data-news-buttons] [data-cat="design"][aria-pressed="true"] i {
+  box-shadow:
+    inset 0 0 0 1.5px var(--ink),
+    0 1px 0 var(--ink),
+    0 0 14px 2px color-mix(in oklab, var(--c) 70%, var(--paper));
+}
+
+/* L'anello di fuoco globale e' arancio, e sull'arancio sparisce: qui e' il
+   testo della categoria scelta, cioe' il colore che su quel corpo si legge. */
+[data-news-buttons] button:focus-visible,
+[data-news-knob]:focus-visible {
+  outline: 3px solid var(--on-theme);
+  outline-offset: 2px;
+}
+
+[data-news-controls] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.8rem;
+}
+
+[data-news-knob] {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  border: 0;
+  border-radius: 50%;
+  cursor: grab;
+  /* Il dito che la gira non deve far scorrere la pagina. */
+  touch-action: none;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--paper) 0 10%,
+    var(--graph) 30%,
+    var(--news-dark-steel) 75%
+  );
+  box-shadow: 0 3px 0 color-mix(in oklab, var(--ink) 30%, transparent);
+  rotate: calc(var(--turns, 0) * 1turn + var(--angle, 0deg));
+}
+[data-news-knob]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 76%;
+  height: 22%;
+  border-radius: 99px;
+  background: var(--ink);
+  transform: translate(-50%, -50%);
+}
+[data-news-knob][data-drag] { cursor: grabbing; }
+
+[data-news-hatch] {
+  width: 4.2rem;
+  height: 2.3rem;
+  margin: 0.8rem auto 0;
+  border-radius: 6px 6px 14px 14px;
+  background: var(--ink);
+  box-shadow: inset 0 4px 6px color-mix(in oklab, var(--ink) 60%, var(--news-iron));
+}
+
+[data-news-foot] {
+  display: block;
+  width: 15rem;
+  height: 0.9rem;
+  margin: 0 auto;
+  border-radius: 0 0 8px 8px;
+  background: var(--news-iron);
+}
+
+[data-news-help] {
+  max-width: 17rem;
+  margin: 1.1rem auto 0;
+  text-align: center;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-news-scene]:not([data-motion="none"]) [data-news-globe] > span {
+    transition: opacity 0.35s, filter 0.35s, scale 0.35s;
+  }
+  [data-news-scene]:not([data-motion="none"]) [data-news-machine][data-turn] [data-news-globe] > span {
+    animation: news-shuffle 0.42s ease-in-out 2;
+  }
+  [data-news-scene][data-motion="reduced"] [data-news-machine][data-turn] [data-news-globe] > span {
+    animation-iteration-count: 1;
+  }
+  [data-news-scene]:not([data-motion="none"]) [data-news-knob] {
+    transition: rotate 0.8s cubic-bezier(0.3, 1.3, 0.5, 1);
+  }
+  [data-news-scene]:not([data-motion="none"]) [data-news-knob][data-drag] { transition: none; }
+  [data-news-scene]:not([data-motion="none"]) [data-news-buttons] i { transition: translate 0.12s, box-shadow 0.12s; }
+  [data-news-scene]:not([data-motion="none"]) [data-news-clipping] {
+    animation: news-settle 0.6s cubic-bezier(0.2, 0.9, 0.25, 1.12) both;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  [data-news-scene]:not([data-motion="none"]) [data-news-knob]:not([data-drag]):hover {
+    rotate: calc(var(--turns, 0) * 1turn + 25deg);
+  }
+}
+
+@keyframes news-shuffle {
+  50% { translate: 7px -14px; rotate: 60deg; }
+}
+
+@keyframes news-settle {
+  from { transform: translate(-30px, 20px) rotate(-4deg) scale(0.94); opacity: 0; }
+}
+
+[data-news-flying] {
+  position: fixed;
+  z-index: 40;
+  width: 1.8rem;
+  height: 1.8rem;
+  margin: -0.9rem 0 0 -0.9rem;
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 32% 28%, color-mix(in oklab, var(--paper) 80%, transparent) 0 12%, transparent 13%),
+    var(--c);
+  box-shadow:
+    inset 0 -3px 5px color-mix(in oklab, var(--ink) 25%, transparent),
+    0 6px 10px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+[data-news-flying][data-cat="design"] {
+  box-shadow:
+    inset 0 0 0 1.5px var(--ink),
+    0 6px 10px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+
+/* Foglio a misura fissa: qualunque cosa esca l'altezza non cambia, e il testo
+   che non ci sta si ferma coi puntini. Carta nei due temi: dentro niente di
+   quello che si ribalta col tema. */
+[data-news-sheet] {
+  --sheet-paper: var(--paper);
+  --sheet-ink: var(--ink);
+  --sheet-muted: var(--muted);
+  --accent-on-paper: color-mix(in oklab, var(--accent) 72%, var(--ink));
+  --sheet-orange: var(--accent-on-paper);
+  --sheet-border: color-mix(in oklab, var(--sheet-ink) 22%, var(--sheet-paper));
+  --sheet-shadow: color-mix(in oklab, var(--ink) 65%, transparent);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 100%;
+  height: 33rem;
+  padding: 1.2rem clamp(1rem, 2vw, 1.4rem) 1.4rem;
+  background: var(--sheet-paper);
+  color: var(--sheet-ink);
+  box-shadow: 0 26px 50px -30px var(--sheet-shadow);
+  /* La barra alta del sito, quando il telefono lo porta in vista. */
+  scroll-margin-top: 4.5rem;
+}
+
+/* La testata non va mai a capo: un titolo lungo si ferma coi puntini. */
+[data-sheet-head] {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  min-width: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 4px double var(--sheet-ink);
+}
+[data-sheet-head] b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.15rem, 1.9vw, 1.5rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+[data-news-sheet] [data-sheet-head] i {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-right: 0.45rem;
+  border: 1.5px solid var(--sheet-ink);
+  border-radius: 50%;
+  background: var(--c);
+  translate: 0 -0.1rem;
+}
+[data-news-sheet] [data-sheet-head] span,
+[data-news-sheet] [data-sheet-label] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sheet-muted);
+  white-space: nowrap;
+}
+[data-sheet-head] span { flex: none; }
+
+[data-sheet-body] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(11rem, 30%, 15rem);
+  gap: 1.4rem;
+  min-height: 0;
+  margin-top: 1rem;
+}
+
+/* La notizia, il pannello vuoto e quello della categoria finita si
+   sovrappongono nella stessa cella: la scatola e' una, della stessa misura. */
+[data-sheet-story] {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  min-height: 0;
+  container-type: inline-size;
+}
+[data-sheet-story] > * { grid-area: 1 / 1; min-width: 0; min-height: 0; }
+
+[data-news-sheet] [data-news-message],
+[data-news-sheet] [data-news-notice] {
+  display: grid;
+  place-content: center;
+  padding: 2rem 1.4rem;
+  border: 1.5px dashed color-mix(in oklab, var(--sheet-ink) 35%, var(--sheet-paper));
+  text-align: center;
+  line-height: 1.6;
+  color: var(--sheet-muted);
+}
+[data-news-sheet] [data-news-notice] {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 1.15rem;
+  line-height: 1.4;
+  color: var(--sheet-ink);
+}
+/* Vuoto resta nel documento (e' la regione che annuncia), ma senza scatola e
+   senza altezza, sopra la notizia. */
+[data-news-sheet] [data-news-notice]:empty {
+  align-self: start;
+  padding: 0;
+  border: 0;
+}
+
+[data-news-clipping] {
+  --sheet-paper: var(--paper);
+  --sheet-ink: var(--ink);
+  --sheet-muted: var(--muted);
+  --accent-on-paper: color-mix(in oklab, var(--accent) 72%, var(--ink));
+  --sheet-orange: var(--accent-on-paper);
+  --sheet-border: color-mix(in oklab, var(--sheet-ink) 22%, var(--sheet-paper));
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  background: var(--sheet-paper);
+  color: var(--sheet-ink);
+  rotate: var(--tilt, 0deg);
+}
+[data-news-sheet] [data-news-clipping] {
+  height: 100%;
+  min-height: 0;
+}
+
+[data-news-clipping] [data-clipping-line] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sheet-muted);
+}
+[data-news-clipping] [data-clipping-under] {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--sheet-ink);
+}
+[data-news-clipping] [data-clipping-under] > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-news-clipping] [data-clipping-stamp] {
+  margin-left: auto;
+  padding: 0.15rem 0.5rem;
+  border: 2px solid var(--sheet-orange);
+  border-radius: 4px;
+  color: var(--sheet-orange);
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  rotate: 4deg;
+}
+[data-news-sheet] [data-news-clipping] h3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  margin-top: 0.9rem;
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+[data-news-clipping] [data-clipping-body] {
+  min-height: 0;
+  margin-top: 0.8rem;
+  overflow: hidden;
+}
+/* Sei righe ci stanno anche col titolo a tre righe e il piede a due, alla
+   misura del telefono: il corpo non taglia mai una riga a meta'. */
+[data-news-clipping] [data-clipping-summary] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+[data-news-clipping] [data-clipping-summary]::first-letter {
+  float: left;
+  margin: 0.15rem 0.4rem 0 0;
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 2.6rem;
+  line-height: 0.85;
+  color: var(--sheet-orange);
+}
+/* Senza riassunto il posto non si chiude: il dominio in grande e una riga. */
+[data-news-clipping] [data-clipping-empty] {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  padding-top: 0.2rem;
+  color: var(--sheet-muted);
+}
+[data-news-clipping] [data-clipping-empty] b {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-weight: 400;
+  font-size: 1.2rem;
+  overflow-wrap: anywhere;
+}
+[data-news-clipping] [data-clipping-empty] span { font-size: 0.9rem; line-height: 1.5; }
+[data-news-clipping] [data-clipping-foot] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px dashed var(--sheet-border);
+}
+/* Con il testo molto ingrandito i dati non ci stanno: l'ultimo si chiude coi
+   puntini invece di tagliarsi a meta' lettera. */
+[data-news-clipping] [data-clipping-figures] > :last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+[data-news-clipping] [data-clipping-figures] {
+  display: flex;
+  gap: 1rem;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  color: var(--sheet-muted);
+}
+[data-news-clipping] [data-clipping-figures] b { color: var(--sheet-ink); font-weight: 500; }
+[data-news-clipping] a {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sheet-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+[data-news-clipping] a:focus-visible {
+  outline: 2px solid var(--sheet-orange);
+  outline-offset: -2px;
+}
+/* Quando la colonna della notizia e' stretta (il telefono, ma anche fra 960 e
+   1200px, dove il foglio divide lo spazio con la macchina) numeri e link non
+   stanno su una riga: vanno sempre su due, e la misura resta quella. */
+@container (max-width: 32rem) {
+  [data-news-clipping] [data-clipping-foot] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+  [data-news-clipping] [data-clipping-figures],
+  [data-news-clipping] a { max-width: 100%; }
+}
+
+[data-sheet-column] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 0;
+  padding-left: 1.2rem;
+  border-left: 1px solid var(--sheet-border);
+}
+/* Alta quanto la colonna, e scorre dentro: la fila si allunga, il foglio no. */
+[data-sheet-drawn] {
+  min-height: 0;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+}
+[data-news-sheet] [data-sheet-drawn] li + li {
+  border-top: 1px solid color-mix(in oklab, var(--sheet-ink) 18%, var(--sheet-paper));
+}
+[data-news-sheet] [data-sheet-drawn] button {
+  display: grid;
+  grid-template-columns: 0.7rem minmax(0, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.55rem 0.2rem 0.55rem 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--sheet-ink);
+}
+[data-news-sheet] [data-sheet-drawn] button:focus-visible {
+  outline: 2px solid var(--sheet-orange);
+  outline-offset: -2px;
+}
+[data-news-sheet] [data-sheet-drawn] i {
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-top: 0.25rem;
+  border: 1.2px solid var(--sheet-ink);
+  border-radius: 50%;
+  background: var(--c);
+}
+[data-sheet-drawn] button span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+[data-sheet-drawn] button[aria-current="true"] span { font-weight: 700; }
+[data-news-sheet] [data-sheet-none] {
+  padding-top: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--sheet-muted);
+}
+[data-news-sheet] [data-news-collected] {
+  margin-top: 0.6rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.64rem;
+  line-height: 1.6;
+  color: var(--sheet-muted);
+}
+
+/* Telefono: le misure fisse restano fisse, e la testata va sopra la data perche'
+   non vada a capo a caso. */
+@media (max-width: 959px) {
+  /* «Notizie raccolte alle…» va su due righe sul telefono: riservate da subito,
+     o la sezione cresceva di una riga all'arrivo delle notizie. */
+  [data-news-sheet] [data-news-collected] { min-height: calc(2 * 1.6em); }
+  [data-news-sheet] { height: auto; }
+  [data-sheet-body] { grid-template-columns: minmax(0, 1fr); }
+  [data-sheet-story] { height: 25rem; }
+  [data-sheet-head] { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+  [data-sheet-head] b { max-width: 100%; font-size: clamp(1rem, 5vw, 1.25rem); }
+  [data-sheet-column] {
+    padding: 0.8rem 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--sheet-border);
+  }
+  [data-sheet-drawn] { height: 11rem; }
+}

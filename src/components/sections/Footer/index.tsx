@@ -8,11 +8,11 @@ export async function Footer() {
   return (
     <FooterView
       tagline={t("tagline")}
-      rispondiA={t("rispondiA")}
-      ancheQui={t("ancheQui")}
-      citta={t("citta")}
-      ufficio={t("ufficio")}
-      paese={t("paese")}
+      replyTo={t("rispondiA")}
+      alsoHere={t("ancheQui")}
+      city={t("citta")}
+      office={t("ufficio")}
+      country={t("paese")}
       rights={t("rights")}
       name={site.name}
       email={site.email}

@@ -5,15 +5,9 @@
   --graph: #D9D3C4;
   --muted: #6E6759;
   --bulb: #FDEA7B;
-  /* Il settimo colore, ed e' entrato per una ragione sola: l'esito positivo
-     del modulo era arancione (il colore del sito) e a colpo d'occhio si
-     leggeva come un errore. Lo ha detto chi il sito ce l'ha, guardandolo, e
-     davanti a una convenzione che il mondo intero ha imparato (verde = e'
-     andata) tenere la tavolozza chiusa costava piu' di quanto valesse.
-     Smorzato verso l'oliva per stare sulla carta senza sembrare un semaforo:
-     5,32:1 sulla carta e 4,70:1 sul fondo tinto del riquadro, cioe' buono
-     anche se un giorno porta del testo. */
-  --verde: #2F6F4E;
+  /* L'esito positivo del modulo: in arancio si leggeva come un errore. 5,32:1
+     sulla carta e 4,70:1 sul fondo tinto del riquadro. */
+  --theme-green: #2F6F4E;
 
   --bg: var(--paper);
   --fg: var(--ink);
@@ -22,18 +16,13 @@
   --accent: var(--orange);
   --on-accent: var(--ink);
 
-  /* Il fondo delle cose appoggiate sulla pagina: le cartelle dello schedario.
-     Sul chiaro e' il fondo di pagina e non cambia niente, perche' li' il bordo
-     basta a staccarle. Vedi la variante scura sotto. */
-  --superficie: var(--bg);
+  /* Il fondo delle cartelle dello schedario: sul chiaro basta il bordo a staccarle. */
+  --surface: var(--bg);
 
-  /* L'arancio quando fa da TESTO sul fondo di pagina, e non da fondo lui.
-     Pieno su carta fa 3,27:1, e quasi tutte le etichette che lo usano stanno
-     sotto i 12px: sotto il 4,5:1 che WCAG chiede al testo piccolo. Scurito
-     con l'inchiostro fa 5,42:1 e resta arancio. Non e' --accento-su-carta,
-     che vive dentro i fogli chiari appoggiati sull'arancio e resta carta in
-     tutti e due i temi: questo invece segue il fondo della pagina. */
-  --accento-testo: color-mix(in oklab, var(--accent) 72%, var(--ink));
+  /* L'arancio come testo sul fondo di pagina: pieno fa 3,27:1, sotto il 4,5:1
+     del testo piccolo; scurito 5,42:1. Segue il tema, a differenza di
+     --accent-on-paper che vive sui fogli chiari. */
+  --accent-text: color-mix(in oklab, var(--accent) 72%, var(--ink));
 
   --radius: 10px;
   --section-y: 4.5rem;
@@ -50,38 +39,26 @@
 [data-theme="dark"] {
   --bg: var(--ink);
   --fg: var(--paper);
-  /* Su inchiostro l'arancio pieno fa gia' 5,08:1: scurirlo qui lo
-     spegnerebbe e basta. */
-  --accento-testo: var(--accent);
-  /* Su inchiostro una cartella col fondo della pagina non ha corpo: restano
-     quattro rettangoli di bordo, e l'accostamento che fa lo schedario non si
-     legge piu'. Un gradino di carta dentro l'inchiostro basta a rimetterle
-     sopra il piano. Non entra un colore nuovo in tavolozza: e' una miscela
-     dei due che ci sono gia'. */
-  --superficie: color-mix(in oklab, var(--paper) 7%, var(--ink));
-  --fg-muted: #A79E8C; /* from palette.mutedDark */
-  /* Sul fondo scuro del riquadro il verde di carta sprofonda (2,39:1, sotto
-     la soglia 3:1 che WCAG chiede a un elemento non testuale): qui serve la
-     versione schiarita, che li' fa 6,68:1. */
-  --verde: #7FBF95;
-  --line: var(--muted); /* il vecchio lineDark era a 1.52:1 su --ink, sotto la soglia 3:1 WCAG per elementi non testuali */
+  /* Su inchiostro l'arancio pieno fa gia' 5,08:1. */
+  --accent-text: var(--accent);
+  /* Su inchiostro una cartella col fondo della pagina resta solo bordo: un
+     gradino di carta la rimette sopra il piano, senza un colore nuovo. */
+  --surface: color-mix(in oklab, var(--paper) 7%, var(--ink));
+  --fg-muted: #A79E8C; /* palette.mutedDark */
+  /* Il verde di carta qui fa 2,39:1, sotto il 3:1 di WCAG; questo fa 6,68:1. */
+  --theme-green: #7FBF95;
+  --line: var(--muted); /* 3,34:1 su --ink: supera il 3:1 di WCAG per elementi non testuali */
 }
 
 body {
   font-family: var(--font-body), system-ui, sans-serif;
-  /* --font-mono-light e --font-mono-full sono le custom property iniettate da
-     next/font sulla classe di <body> (layout.tsx): --font-mono va quindi
-     risolto qui, non su :root, perche' su <html> quelle variabili non sono
-     ancora visibili e var(--font-mono) risulterebbe invalido. */
+  /* Su body e non su :root: next/font inietta --font-mono-light e
+     --font-mono-full sulla classe di <body>, e su <html> non si vedono. */
   --font-mono: var(--font-mono-light);
 }
 
-/* Cascadia (--font-mono-full) e' riservato al desktop: sotto i 1024px --font-mono
-   resta sul monospace Google leggero per non far scaricare i 201 KB di Cascadia
-   ai dispositivi mobile. Entrambi i font DEVONO restare "preload: false" in
-   layout.tsx: se anche uno solo dei due torna a fare preload, next/font forza
-   il download indipendentemente da quale variabile viene effettivamente usata
-   nel CSS, e questa ottimizzazione smette silenziosamente di funzionare. */
+/* Cascadia (201 KB) solo da 1024px in su. I due font devono restare
+   "preload: false" in layout.tsx: con il preload next/font li scarica comunque. */
 @media (min-width: 1024px) {
   body {
     --font-mono: var(--font-mono-full);
@@ -102,23 +79,16 @@ h1, h2, h3, h4, .display {
   color: var(--fg-muted);
 }
 
-/* Il titolo di ogni sezione, sotto il suo occhiello: una misura sola per
-   tutta la pagina, cosi' nessuna sezione sembra piu' importante delle altre
-   solo perche' qualcuno le ha dato un rem in piu'. L'interlinea resta quella
-   di h2. Le regole delle sezioni scritte come `[data-x] h2` (0,1,1) battono
-   questa classe (0,1,0): li' si mette il colore o l'a capo, mai font-size o
-   margin-top, o la sezione torna ad avere la sua misura. */
-.titolo-sezione {
+/* Una misura sola per tutte le sezioni. `[data-x] h2` (0,1,1) batte questa
+   classe (0,1,0): li' si mette il colore o l'a capo, mai font-size o margin-top. */
+.section-title {
   margin-top: 0.75rem;
   font-size: clamp(1.9rem, 4.2vw, 3rem);
 }
 
-/* L'header ha fondo pieno per default: e' lo stato sicuro, quello che vale
-   anche senza JavaScript, quando la nav ha del contenuto che le scorre sotto.
-   In cima alla pagina non ha niente sotto tranne la ragnatela, e il fondo
-   semitrasparente la taglierebbe di netto all'altezza della barra: li' resta
-   trasparente. data-at-top e' scritto da TopStateScript prima del paint e
-   tenuto aggiornato da HeaderScrollState. */
+/* Fondo pieno per default, lo stato sicuro senza JavaScript. In cima e'
+   trasparente per non tagliare la ragnatela: data-at-top lo scrivono
+   TopStateScript prima del paint e poi HeaderScrollState. */
 [data-site-header] {
   background-color: color-mix(in srgb, var(--bg) 85%, transparent);
   backdrop-filter: blur(8px);
@@ -134,14 +104,8 @@ h1, h2, h3, h4, .display {
   [data-site-header] { transition: none; }
 }
 
-/* La lampadina del bottone tema. Il vetro e' spento (grigio) su tema chiaro
-   e acceso su tema scuro: e' buio, si accende la luce: la stessa metafora
-   del vecchio interruttore. Lo stato viene da html[data-theme] e non da
-   React, che lo saprebbe solo dopo il mount: caricando in tema scuro si
-   vedrebbe la lampadina spenta per un fotogramma.
-   Il giallo acceso e' --bulb, il settimo colore della palette: esiste solo
-   per questa lampadina e non va usato altrove. Su carta avrebbe 1,08:1, cioe'
-   sarebbe invisibile, ma si accende solo in tema scuro, dove fa 15,3:1. */
+/* Lo stato da html[data-theme] e non da React, che lo saprebbe dopo il mount.
+   --bulb su carta fa 1,08:1, ma si accende solo sul tema scuro (15,3:1). */
 [data-bulb-glass] { fill: var(--line); transition: fill 240ms ease; }
 [data-bulb-cap] { fill: var(--fg-muted); }
 
@@ -155,18 +119,8 @@ h1, h2, h3, h4, .display {
   [data-bulb-halo] { transition: none; }
 }
 
-/* Cambio tema: il fotogramma NUOVO cresce in un cerchio sopra quello vecchio,
-   che resta fermo sotto. Dentro il cerchio si legge la pagina gia' nel tema
-   nuovo, testo compreso: e' il motivo per cui qui servono le view transition
-   e non basta un disco di colore pieno, che il testo lo coprirebbe.
-
-   La dissolvenza incrociata predefinita del browser va spenta, altrimenti si
-   sovrappone al cerchio e il tema vecchio sbiadisce mentre il nuovo si apre:
-   due effetti che si annullano a vicenda.
-
-   Il cerchio e' animato da ThemeToggle, l'unico a sapere dov'e' il bottone,
-   e in percentuale: in pixel finirebbe al centro sugli schermi a densita'
-   doppia, perche' il ritaglio si risolve sul fotogramma e non sulla finestra. */
+/* Il cerchio del cambio tema lo anima ThemeToggle. La dissolvenza incrociata
+   del browser va spenta, o si sovrappone al cerchio e i due effetti si annullano. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -176,15 +130,7 @@ h1, h2, h3, h4, .display {
 ::view-transition-old(root) { z-index: 0; }
 ::view-transition-new(root) { z-index: 1; }
 
-/* Provato e scartato: un drop-shadow caldo sul fronte d'onda, per far leggere
-   il cerchio come luce. Verso il tema scuro il giallo cade su carta e sparisce,
-   verso il chiaro il fronte e' gia' oltre lo schermo quando conterebbe. Restava
-   solo il costo: una sfocatura a tutto schermo per quasi un secondo. */
-
-/* Le due frecce sotto l'hero. Scendono e si riaccendono a turno, sfalsate:
-   la seconda insegue la prima, cosi' il movimento ha una direzione e non e'
-   un rimbalzo sul posto. transform-box: fill-box perche' senza, la traslazione
-   su un <path> si calcola sul sistema di riferimento dell'SVG intero. */
+/* fill-box: senza, la traslazione di un <path> si calcola sull'SVG intero. */
 [data-scroll-chevron] {
   transform-box: fill-box;
   animation: scroll-cue 1900ms ease-in-out infinite;
@@ -197,14 +143,10 @@ h1, h2, h3, h4, .display {
   45% { opacity: 1; transform: translateY(1.5px); }
 }
 
-/* Un invito a scorrere che pulsa all'infinito e' esattamente il tipo di
-   movimento che chi ha chiesto meno animazioni vuole spento. Le frecce
-   restano, ferme e leggibili. */
 @media (prefers-reduced-motion: reduce) {
   [data-scroll-chevron] {
     animation: none;
-    /* Ferme sono l'unico stato che si vede: a piena opacita' fanno 4,97:1 su
-       carta, mentre il minimo della pulsazione sarebbe illeggibile da fermo. */
+    /* A piena opacita' fanno 4,97:1; il minimo della pulsazione da fermo non si legge. */
     opacity: 1;
     transform: none;
   }

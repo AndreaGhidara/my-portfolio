@@ -1,0 +1,779 @@
+
+/* La geometria arriva da layers.ts in percentuale. Finche' nessuno scrive --p,
+   vale 1 e il tavolo e' completo: e' il patto del fallback. */
+
+[data-desk-track] { position: relative; }
+
+[data-desk-stage] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  padding-block: var(--section-y);
+  padding-inline: var(--gutter);
+  /* clip e non hidden: hidden crea un contenitore di scorrimento e romperebbe
+     lo sticky del palco. */
+  overflow-x: clip;
+}
+
+[data-desk-title] { max-width: 34rem; text-align: center; }
+[data-desk-title] p:last-child { margin-top: 1rem; color: var(--fg-muted); }
+
+[data-desk-punch] {
+  max-width: 40rem;
+  text-align: center;
+  /* min() sull'altezza: con la sola 2.8vw su un 1280x800 la frase restava al
+     massimo e finiva sui disegni. */
+  font-size: clamp(1.05rem, min(2.8vw, 2.4vh), 1.85rem);
+  line-height: 1.3;
+  text-wrap: balance;
+  margin-block-start: 1.5rem;
+  padding-block-start: 2.75rem;
+  border-block-start: 1px solid var(--line);
+}
+
+/* Le <ul> degli oggetti ricalcano il piano e non il blocco intero: una riga
+   in piu' in una didascalia non sposta il tavolo. */
+[data-desk-world] {
+  position: relative;
+  width: min(94vw, 62rem);
+  /* Le etichette si misurano sul mondo, non sulla finestra. */
+  container-type: inline-size;
+}
+
+[data-desk-surface],
+[data-desk-layer] > ul {
+  aspect-ratio: var(--world-w) / var(--world-h);
+}
+
+[data-desk-surface] { position: relative; }
+
+[data-desk-layer] > ul {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+/* La larghezza arriva inline da CENTRE.width: e' quella che i test verificano. */
+[data-desk-centre] {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--fg);
+}
+
+/* Percentuali della scatola del laptop: lo schermo disegnato va da 2,5% a
+   97,5% in orizzontale e da 3,75% a 87% in verticale. */
+[data-desk-screen] {
+  /* --paper fisso come fissa e' la scocca: con currentColor, a tema chiaro,
+     sarebbe inchiostro su inchiostro. */
+  color: var(--paper);
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 9%;
+  height: 73%;
+  display: flex;
+  flex-direction: column;
+  gap: 6%;
+}
+
+[data-desk-screen] > * {
+  display: block;
+  border-radius: 0.5px;
+  background-color: color-mix(in oklab, currentColor 38%, transparent);
+}
+
+[data-desk-screen-bar] {
+  height: 12%;
+  background-color: color-mix(in oklab, currentColor 20%, transparent);
+}
+[data-desk-screen-head] {
+  height: 15%;
+  width: 62%;
+  margin-top: 2%;
+  background-color: color-mix(in oklab, currentColor 62%, transparent);
+}
+[data-desk-screen-line] { height: 6%; }
+[data-desk-screen-line]:nth-of-type(3) { width: 88%; }
+[data-desk-screen-line]:nth-of-type(4) { width: 80%; }
+[data-desk-screen-line]:nth-of-type(5) { width: 64%; }
+[data-desk-screen-cta] {
+  height: 13%;
+  width: 34%;
+  margin-top: auto;
+  background-color: var(--accent);
+}
+
+[data-desk-centre-label] {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  margin-top: 0.4em;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(0.5rem, 2.3cqw, 0.7rem);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+[data-desk-layers], [data-desk-layer] > ul { list-style: none; margin: 0; padding: 0; }
+
+[data-desk-layers] {
+  display: grid;
+  gap: 1.75rem;
+  margin-top: 3.5rem;
+}
+
+@media (min-width: 1024px) {
+  [data-desk-layers] { grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+}
+
+[data-desk-caption] h3 { font-size: 1.125rem; }
+[data-desk-caption] p {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
+[data-desk-object] {
+  position: absolute;
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  /* Niente `color`: i due strati hanno le loro tinte e l'anello di fuoco e'
+     var(--accent). Posizione, larghezza e opacita' arrivano inline. */
+}
+
+/* Sotto i 1024px la sezione e' il gioco (Services/game, styles/game/): fuori
+   dall'impaginato davvero, sono piu' di trecento elementi da non ricalcolare. */
+@media (max-width: 1023px) {
+  [data-desk-world][data-layout="wide"] { display: none; }
+}
+
+/* Una maschera dipinge un colore solo: ogni sagoma e' due strati e due
+   maschere a registro. Ogni tinta nasce da un token: la carta in scuro sale,
+   l'apparecchio resta scuro, il post-it e' fisso. Per questo due tavole. */
+
+[data-desk-shape] {
+  display: block;
+  position: relative;
+  width: 100%;
+  /* L'ombra sta sul contenitore: su un elemento mascherato la maschera la
+     ritaglierebbe. Uguale per tutti, e sotto i 3px: il modello geometrico non
+     la conta, e il pavimento d'aria vale circa 6,3px a 1440. */
+  --desk-shadow: color-mix(in oklab, var(--ink) 26%, transparent);
+  filter: drop-shadow(0 0.07em 0.11em var(--desk-shadow));
+}
+
+/* In scuro --bg e' --ink: l'ombra diventa un contatto che schiarisce, sotto
+   il pieno della scocca per non confondersi col bordo. */
+[data-theme="dark"] [data-desk-shape] {
+  --desk-shadow: color-mix(in oklab, var(--fg-muted) 14%, transparent);
+}
+
+/* Nessuno z-index: l'ordine e' quello del DOM, il pieno e' scritto per primo. */
+[data-desk-shape] > * {
+  position: absolute;
+  inset: 0;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: 100% 100%;
+}
+
+/* Senza materiale dichiarato resta il contorno, e non sparisce. */
+[data-desk-fill] { background-color: var(--desk-full, transparent); }
+[data-desk-line] { background-color: var(--desk-stroke, currentColor); }
+
+/* Le maschere pendono dalla sagoma e non dall'oggetto: i disegni fuori dal
+   tavolo le usano senza data-desk-object. */
+[data-desk-shape][data-shape="sheet"]  [data-desk-fill] { mask-image: url("/brand/desk/sheet-fill.svg"); }
+[data-desk-shape][data-shape="sheet"]  [data-desk-line] { mask-image: url("/brand/desk/sheet.svg"); }
+[data-desk-shape][data-shape="card"]   [data-desk-fill] { mask-image: url("/brand/desk/card-fill.svg"); }
+[data-desk-shape][data-shape="card"]   [data-desk-line] { mask-image: url("/brand/desk/card.svg"); }
+[data-desk-shape][data-shape="postit"] [data-desk-fill] { mask-image: url("/brand/desk/postit-fill.svg"); }
+[data-desk-shape][data-shape="postit"] [data-desk-line] { mask-image: url("/brand/desk/postit.svg"); }
+[data-desk-shape][data-shape="plate"]  [data-desk-fill] { mask-image: url("/brand/desk/plate-fill.svg"); }
+[data-desk-shape][data-shape="plate"]  [data-desk-line] { mask-image: url("/brand/desk/plate.svg"); }
+[data-desk-shape][data-shape="rack"]   [data-desk-fill] { mask-image: url("/brand/desk/rack-fill.svg"); }
+[data-desk-shape][data-shape="rack"]   [data-desk-line] { mask-image: url("/brand/desk/rack.svg"); }
+[data-desk-shape][data-shape="phone"]  [data-desk-fill] { mask-image: url("/brand/desk/phone-fill.svg"); }
+[data-desk-shape][data-shape="phone"]  [data-desk-line] { mask-image: url("/brand/desk/phone.svg"); }
+[data-desk-shape][data-shape="laptop"] [data-desk-fill] { mask-image: url("/brand/desk/laptop-fill.svg"); }
+[data-desk-shape][data-shape="laptop"] [data-desk-line] { mask-image: url("/brand/desk/laptop.svg"); }
+
+/* La tavola dei materiali pende da [data-desk-piece]: i disegni fuori dal
+   tavolo non hanno data-desk-object. Si dichiara due volte, una per tema, e
+   materials.ts ne tiene la copia che le prove misurano. */
+
+[data-desk-piece][data-shape="sheet"] {
+  --desk-full: color-mix(in oklab, var(--fg) 9%, var(--bg));
+  --desk-stroke: var(--fg-muted);
+}
+
+[data-desk-piece][data-shape="card"] {
+  --desk-full: color-mix(in oklab, var(--fg) 20%, var(--bg));
+  --desk-stroke: color-mix(in oklab, var(--fg) 80%, var(--bg));
+}
+
+[data-desk-piece][data-shape="plate"] {
+  --desk-full: color-mix(in oklab, var(--fg-muted) 55%, var(--bg));
+  --desk-stroke: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
+}
+
+/* Rack, telefono e laptop: --ink e non --fg, un apparecchio non si inverte. */
+[data-desk-piece][data-shape="rack"],
+[data-desk-piece][data-shape="phone"],
+[data-desk-centre] {
+  --desk-full: color-mix(in oklab, var(--ink) 78%, var(--fg-muted));
+  --desk-stroke: color-mix(in oklab, var(--ink) 42%, var(--fg-muted));
+}
+
+/* Fisso: --bulb e' giallo su qualunque tavolo. L'unica superficie che non
+   si ridichiara in tema scuro. */
+[data-desk-piece][data-shape="postit"] {
+  --desk-full: var(--bulb);
+  --desk-stroke: color-mix(in oklab, var(--bulb) 55%, var(--ink));
+}
+
+/* Il pieno della carta piu' chiara, lo stesso del foglio. Il tratto non lo
+   ridichiara: eredita il giallo spento degli altri post-it. */
+[data-desk-piece][data-shape="postit"] [data-desk-blank] {
+  --desk-full: color-mix(in oklab, var(--fg) 9%, var(--bg));
+}
+
+[data-theme="dark"] [data-desk-piece][data-shape="sheet"] {
+  --desk-full: color-mix(in oklab, var(--fg) 68%, var(--bg));
+  --desk-stroke: color-mix(in oklab, var(--ink) 60%, var(--fg-muted));
+}
+
+[data-theme="dark"] [data-desk-piece][data-shape="card"] {
+  --desk-full: color-mix(in oklab, var(--fg) 58%, var(--bg));
+  --desk-stroke: color-mix(in oklab, var(--ink) 85%, var(--fg-muted));
+}
+
+[data-theme="dark"] [data-desk-piece][data-shape="plate"] {
+  --desk-full: color-mix(in oklab, var(--fg-muted) 75%, var(--bg));
+  --desk-stroke: color-mix(in oklab, var(--ink) 62%, var(--fg-muted));
+}
+
+[data-theme="dark"] [data-desk-piece][data-shape="rack"],
+[data-theme="dark"] [data-desk-piece][data-shape="phone"],
+[data-theme="dark"] [data-desk-centre] {
+  --desk-full: color-mix(in oklab, var(--ink) 82%, var(--fg-muted));
+  --desk-stroke: color-mix(in oklab, var(--ink) 30%, var(--fg-muted));
+}
+
+[data-theme="dark"] [data-desk-piece][data-shape="postit"] [data-desk-blank] {
+  --desk-full: color-mix(in oklab, var(--fg) 68%, var(--bg));
+}
+
+/* Tre accesi e uno spento. Ellissi in percentuale per restare punti di luce
+   quando la camera arretra. Le quote sono i centri delle quattro unita' nel
+   viewBox 132x104: 17,5, 39,5, 61,5 e 83,5. */
+[data-desk-leds] {
+  /* mask-image esplicita: senza, i gradienti stavano nella sagoma solo per
+     caso delle percentuali. */
+  mask-image: url("/brand/desk/rack-fill.svg");
+  background-image:
+    radial-gradient(ellipse 4% 5% at 85% 17%, var(--bulb) 45%, transparent 100%),
+    radial-gradient(ellipse 4% 5% at 85% 38%, var(--bulb) 45%, transparent 100%),
+    radial-gradient(
+      ellipse 4% 5% at 85% 59%,
+      color-mix(in oklab, var(--bulb) 20%, var(--ink)) 45%,
+      transparent 100%
+    ),
+    radial-gradient(ellipse 4% 5% at 85% 80%, var(--bulb) 45%, transparent 100%);
+}
+
+/* La domanda sta dentro la sagoma: per layers.ts questo oggetto e' muto, e
+   una parola appesa sotto mangerebbe l'aria dichiarata. */
+[data-desk-blank] {
+  display: block;
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+}
+
+[data-desk-ask] {
+  position: absolute;
+  /* Dentro il foglio: il post-it e' disegnato a mano e i lati non sono dritti. */
+  inset: 12%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: var(--font-mono), monospace;
+  /* Undici caratteri per riga, e la domanda ne conta diciassette. */
+  font-size: clamp(0.42rem, 1cqw, 0.68rem);
+  line-height: 1.25;
+  /* Inchiostro fisso: in tema scuro --fg e' carta, e sparirebbe nel giallo. */
+  color: var(--ink);
+  opacity: 0;
+}
+
+/* Stesso posto della domanda: si danno il cambio. */
+[data-desk-note] {
+  position: absolute;
+  inset: 12%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(0.42rem, 1cqw, 0.68rem);
+  line-height: 1.25;
+  color: var(--ink);
+  opacity: 0.75;
+}
+
+/* A tavolo fermo l'hover non arriva (col dito non c'e'): la domanda resta
+   scritta. */
+[data-desk-blank]:hover [data-desk-ask],
+[data-desk-blank]:focus-visible [data-desk-ask],
+[data-desk]:not([data-motion="full"]) [data-desk-ask] {
+  opacity: 1;
+}
+
+[data-desk-blank]:hover [data-desk-note],
+[data-desk-blank]:focus-visible [data-desk-note],
+/* Solo nel mondo dove la domanda esiste: nel gemello aria-hidden la nota
+   spenta lasciava un post-it muto. */
+[data-desk]:not([data-motion="full"])
+  [data-desk-world]:not([aria-hidden="true"])
+  [data-desk-note] {
+  opacity: 0;
+}
+
+[data-desk][data-motion="full"] [data-desk-note] {
+  transition: opacity 0.25s;
+}
+
+/* Niente media query in piu': data-motion="full" lo scrive
+   resolveMotionLevel, che con reduce dice "none". */
+[data-desk][data-motion="full"] [data-desk-ask] {
+  transition: opacity 0.25s;
+}
+
+/* Il Tab non aspetta --p, e un anello di fuoco su una cosa trasparente non
+   si vede. !important perche' l'opacita' arriva inline. */
+[data-desk-object]:focus-within {
+  opacity: 1 !important;
+}
+
+[data-desk-object] [data-desk-label] {
+  position: absolute;
+  left: 50%;
+  top: 104%;
+  transform: translateX(-50%);
+  /* Le misure sono quelle di LABEL in layers.ts, e un test le rilegge da qui:
+     due righe da 1.2 piu' 0.2 di respiro fanno LABEL.height, top: 104% e'
+     LABEL.gap. Niente letter-spacing: su dodici caratteri e' mezzo em. */
+  width: max-content;
+  text-align: center;
+  line-height: 1.2;
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(0.5rem, 2.6cqw, 0.72rem);
+  color: var(--fg);
+  /* Rete di sicurezza se il pavimento d'aria fra gli ingombri si abbassasse. */
+  background-color: var(--bg);
+  padding: 0.1em 0.2em;
+}
+
+/* Le marche nascono da --desk-stroke, il contorno del materiale: nessun
+   colore a mano, e una prova cade se ci compare un esadecimale. */
+
+/* Pende da [data-desk-piece] come i materiali: senza, nei disegni fuori dal
+   tavolo il campione si impaginava dopo la sagoma invece che dentro. */
+[data-desk-piece] [data-desk-sample] {
+  position: absolute;
+  /* Inset sui margini interni del disegno: il pezzo e' alto quanto la sagoma,
+     perche' l'etichetta e' assoluta. */
+  inset: 9% 8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7%;
+  overflow: hidden;
+  /* Nessun filtro: a 98px un'ombra sulle marche impasterebbe. */
+}
+
+/* La linguetta della scheda occupa le prime 16 unita' del viewBox. */
+[data-desk-piece][data-shape="card"] [data-desk-sample] { inset: 28% 9% 11%; }
+/* Lo schermo, non il corpo: 9 unita' di scocca su 74x148. */
+[data-desk-piece][data-shape="phone"] [data-desk-sample] { inset: 8% 14%; gap: 6%; }
+[data-desk-piece][data-shape="rack"] [data-desk-sample] { inset: 11% 9%; gap: 5%; }
+[data-desk-piece][data-shape="plate"] [data-desk-sample] { inset: 20%; }
+/* Libero l'angolo che si solleva, in basso a destra. */
+[data-desk-piece][data-shape="postit"] [data-desk-sample] { inset: 14% 16% 22% 14%; }
+
+[data-desk-sample] i { display: block; }
+
+[data-desk-sample] [data-m="line"] {
+  width: var(--w, 100%);
+  height: 0.42em;
+  border-radius: 1px;
+  background-color: color-mix(in oklab, var(--desk-stroke) 34%, transparent);
+}
+[data-desk-sample] [data-m="line"][data-title] {
+  background-color: var(--accent);
+  height: 0.5em;
+}
+[data-desk-sample] [data-m="line"][data-url],
+[data-desk-sample] [data-m="line"][data-head] {
+  background-color: color-mix(in oklab, var(--desk-stroke) 62%, transparent);
+}
+
+[data-desk-sample] [data-m="block"] {
+  width: 100%;
+  border-radius: 1px;
+  background-color: color-mix(in oklab, var(--desk-stroke) 40%, transparent);
+}
+[data-desk-sample] [data-m="block"][data-b="header"] { height: 18%; min-height: 0.5em; }
+[data-desk-sample] [data-m="block"][data-b="foot"] { height: 12%; min-height: 0.35em; }
+[data-desk-sample] [data-m="columns"] { display: flex; gap: 6%; flex: 1; }
+[data-desk-sample] [data-m="block"][data-b="wide"] { flex: 1.7; height: 100%; }
+[data-desk-sample] [data-m="block"][data-b="narrow"] {
+  flex: 1;
+  height: 100%;
+  background-color: color-mix(in oklab, var(--desk-stroke) 22%, transparent);
+}
+
+[data-desk-sample] [data-m="field"] {
+  width: 100%;
+  height: 22%;
+  min-height: 0.55em;
+  border-radius: 1px;
+  border: 1px solid color-mix(in oklab, var(--desk-stroke) 45%, transparent);
+}
+[data-desk-sample] [data-m="cta"] {
+  width: 52%;
+  height: 22%;
+  min-height: 0.55em;
+  border-radius: 1px;
+  background-color: var(--accent);
+}
+[data-desk-sample] [data-m="cta"][data-small] { width: 38%; height: 18%; }
+
+[data-desk-sample] [data-m="dots"] { display: flex; gap: 5%; align-items: center; height: 22%; }
+[data-desk-sample] [data-m="dot"] {
+  width: 0.3em;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: color-mix(in oklab, var(--desk-stroke) 62%, transparent);
+}
+
+[data-desk-sample] [data-m="card"] { display: flex; gap: 8%; flex: 1; }
+[data-desk-sample] [data-m="tile"] {
+  border-radius: 1px;
+  background-color: color-mix(in oklab, var(--desk-stroke) 30%, transparent);
+}
+[data-desk-sample] [data-m="tile"][data-large] { flex: 1; height: 100%; }
+[data-desk-sample] [data-m="detail"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14%;
+  flex: 1.1;
+}
+[data-desk-sample] [data-m="price"] {
+  width: 44%;
+  height: 0.44em;
+  border-radius: 1px;
+  background-color: var(--accent);
+}
+
+[data-desk-sample] [data-m="qty"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6%;
+}
+[data-desk-sample] [data-m="mono"][data-small] { font-size: 0.62cqw; }
+
+[data-desk-sample] [data-m="result"] {
+  display: flex;
+  flex-direction: column;
+  gap: 22%;
+  flex: 1;
+  justify-content: center;
+}
+[data-desk-sample] [data-m="result"][data-first] [data-m="line"]:first-child {
+  background-color: var(--accent);
+  height: 0.5em;
+}
+
+[data-desk-sample] [data-m="receipt"] {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 11%;
+  flex: 1;
+}
+[data-desk-sample] [data-m="tear"] {
+  width: 100%;
+  height: 1px;
+  flex: none;
+  background-image: repeating-linear-gradient(
+    to right,
+    color-mix(in oklab, var(--desk-stroke) 60%, transparent) 0 3px,
+    transparent 3px 6px
+  );
+}
+[data-desk-sample] [data-m="item"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8%;
+}
+[data-desk-sample] [data-m="amount"] {
+  width: 22%;
+  height: 0.36em;
+  border-radius: 1px;
+  flex: none;
+  background-color: color-mix(in oklab, var(--desk-stroke) 55%, transparent);
+}
+[data-desk-sample] [data-m="item"][data-total] [data-m="amount"] {
+  background-color: var(--accent);
+  height: 0.44em;
+}
+
+[data-desk-sample] [data-m="month"] {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6%;
+  flex: 1;
+}
+[data-desk-sample] [data-m="day"] {
+  border-radius: 1px;
+  background-color: color-mix(in oklab, var(--desk-stroke) 22%, transparent);
+}
+[data-desk-sample] [data-m="day"][data-grabbed] { background-color: var(--accent); }
+
+[data-desk-sample] [data-m="table"] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8% 6%;
+  flex: 1;
+}
+[data-desk-sample] [data-m="table"][data-dense] { grid-template-columns: repeat(3, 1fr); gap: 6% 5%; }
+[data-desk-sample] [data-m="cell"] {
+  border-radius: 1px;
+  background-color: color-mix(in oklab, var(--desk-stroke) 26%, transparent);
+}
+
+[data-desk-piece] [data-desk-sample="copie"] { display: block; }
+[data-desk-sample] [data-m="copy"] {
+  position: absolute;
+  inset: 0 22% 22% 0;
+  border-radius: 1px;
+  border: 1px solid color-mix(in oklab, var(--desk-stroke) 55%, transparent);
+  background-color: color-mix(in oklab, var(--desk-stroke) 12%, transparent);
+}
+[data-desk-sample] [data-m="copy"][data-i="2"] { transform: translate(11%, 11%); }
+[data-desk-sample] [data-m="copy"][data-i="3"] { transform: translate(22%, 22%); }
+
+[data-desk-sample] [data-m="bubble"] {
+  width: 68%;
+  height: 30%;
+  min-height: 0.7em;
+  border-radius: 0.35em;
+  background-color: color-mix(in oklab, var(--desk-stroke) 30%, transparent);
+}
+[data-desk-sample] [data-m="bubble"][data-side="there"] {
+  align-self: flex-end;
+  background-color: color-mix(in oklab, var(--desk-stroke) 62%, transparent);
+}
+
+[data-desk-sample] [data-m="flow"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  background-image: linear-gradient(
+    to right,
+    color-mix(in oklab, var(--desk-stroke) 45%, transparent) 0 100%
+  );
+  background-size: 100% 1px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+[data-desk-sample] [data-m="node"] {
+  width: 0.55em;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: color-mix(in oklab, var(--desk-stroke) 72%, transparent);
+}
+
+[data-desk-sample] [data-m="histogram"] {
+  display: flex;
+  align-items: flex-end;
+  gap: 8%;
+  flex: 1;
+}
+[data-desk-sample] [data-m="bar"] {
+  flex: 1;
+  height: var(--h, 50%);
+  border-radius: 1px 1px 0 0;
+  background-color: color-mix(in oklab, var(--desk-stroke) 48%, transparent);
+}
+[data-desk-sample] [data-m="bar"]:last-child { background-color: var(--accent); }
+
+[data-desk-piece] [data-desk-sample="immagini"] { display: block; }
+[data-desk-sample] [data-m="sky"] {
+  position: absolute;
+  inset: 0;
+  background-color: color-mix(in oklab, var(--desk-stroke) 16%, transparent);
+}
+[data-desk-sample] [data-m="sun"] {
+  position: absolute;
+  right: 18%;
+  top: 16%;
+  width: 22%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: var(--accent);
+}
+[data-desk-sample] [data-m="mountain"] {
+  position: absolute;
+  inset: 34% 0 0;
+  background-color: color-mix(in oklab, var(--desk-stroke) 52%, transparent);
+  clip-path: polygon(0 100%, 34% 12%, 62% 62%, 78% 40%, 100% 100%);
+}
+
+/* Token crudi e non --fg/--bg: i colori del brand non si invertono col tema. */
+[data-desk-sample] [data-m="swatch"] {
+  flex: 1;
+  width: 100%;
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--desk-stroke) 30%, transparent);
+}
+[data-desk-piece] [data-desk-sample="colori"] { flex-direction: row; gap: 8%; }
+[data-desk-sample] [data-m="swatch"][data-t="paper"] { background-color: var(--paper); }
+[data-desk-sample] [data-m="swatch"][data-t="accent"] { background-color: var(--orange); }
+[data-desk-sample] [data-m="swatch"][data-t="ink"] { background-color: var(--ink); }
+
+[data-desk-sample] [data-m="aa"] {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-weight: 400;
+  font-size: 2.1cqw;
+  line-height: 1;
+  text-align: center;
+  color: color-mix(in oklab, var(--desk-stroke) 88%, transparent);
+}
+
+[data-desk-sample] [data-m="mono"] {
+  font-family: var(--font-mono), monospace;
+  font-weight: 400;
+  /* Tarato sul piu' lungo: "v2.4 → v2.5" a 0,6em per carattere occupa 51px
+     dei 57 che un post-it lascia liberi. */
+  font-size: 0.78cqw;
+  line-height: 1.2;
+  text-align: center;
+  letter-spacing: -0.02em;
+  /* Mai a capo: se un giorno non ci sta, deve sbordare e farsi vedere. */
+  white-space: nowrap;
+  color: color-mix(in oklab, var(--desk-stroke) 82%, transparent);
+}
+[data-desk-piece] [data-desk-sample="dominio"],
+[data-desk-piece] [data-desk-sample="sicurezza"],
+[data-desk-piece] [data-desk-sample="velocita"],
+[data-desk-piece] [data-desk-sample="manutenzione"],
+[data-desk-piece] [data-desk-sample="caratteri"] { justify-content: center; }
+
+/* Due chiavi per la stessa porta: la media query e [data-motion="full"].
+   A "none" (anche in SSR e al primo render) non si applica una regola. */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-desk][data-motion="full"] [data-desk-track] { height: 380vh; }
+
+  /* Sticky dentro il track, niente pin di ScrollTrigger contro Lenis. I tre
+     blocchi vanno nella stessa cella: in colonna il solo mondo e' alto 824px. */
+  [data-desk][data-motion="full"] [data-desk-stage] {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding-block: 0;
+    display: grid;
+    place-items: center;
+    /* clip e non hidden, per lo sticky: al primo fotogramma il piano e' quattro
+       volte lo schermo e sborderebbe sulle sezioni vicine. */
+    overflow: clip;
+  }
+
+  [data-desk][data-motion="full"] [data-desk-stage] > * { grid-area: 1 / 1; }
+
+  /* Piano e oggetti si ingrandiscono insieme o il disegno si strappa. Senza
+     JavaScript --s vale 1 e la riga non fa niente. */
+  [data-desk][data-motion="full"] [data-desk-surface],
+  [data-desk][data-motion="full"] [data-desk-layer] > ul {
+    transform: scale(var(--s, 1));
+  }
+
+  /* Finestra = TITLE_BEAT di layers.ts, riletta da un test. Fondo pieno su tutta
+     la cella: sul laptop scuro il titolo a tema chiaro aveva contrasto 1,00:1.
+     z-index: nella stessa cella vince chi e' scritto dopo. */
+  [data-desk][data-motion="full"] [data-desk-title] {
+    z-index: 1;
+    opacity: clamp(0, 1 - (var(--p, 1) - 0.02) / 0.08, 1);
+    background-color: var(--bg);
+    place-self: stretch;
+    max-width: none;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    padding: 1.75rem var(--gutter) 1.9rem;
+    border-radius: 0;
+  }
+
+  /* Il fondo si allarga, la misura di lettura no. */
+  [data-desk][data-motion="full"] [data-desk-title] > * {
+    max-width: 34rem;
+  }
+
+  /* Qui il palco azzera il suo padding-block: i 9vh sotto sono tutto lo
+     spazio fra la tesi e la sezione dopo. */
+  [data-desk][data-motion="full"] [data-desk-punch] {
+    align-self: end;
+    margin-bottom: 9vh;
+    margin-block-start: 0;
+    padding-block-start: 0;
+    border-block-start: 0;
+    opacity: clamp(0, (var(--p, 1) - 0.9) / 0.07, 1);
+  }
+
+  /* Non si posiziona [data-desk-layers]: le <ul> degli oggetti si
+     aggancerebbero a lui invece che al mondo. */
+  [data-desk][data-motion="full"] [data-desk-layers] {
+    display: block;
+    margin-top: 0;
+  }
+
+  /* Il mondo e' centrato col margine: sotto il piano resta la fascia dove la
+     didascalia non copre etichette. */
+  [data-desk][data-motion="full"] [data-desk-world] { margin-bottom: 6.5rem; }
+
+  /* Il fondo pagina dietro la parola, come per le etichette: la camera
+     arretrata ci passa sotto. */
+  [data-desk][data-motion="full"] [data-desk-caption] {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    margin-top: 0.75rem;
+    z-index: 1;
+    max-width: 32rem;
+    /* --fg/--bg e non --ink/--paper come i tesserini: qui il fondo si ribalta
+       col tema, e con --ink il cartellino sarebbe nero di notte. */
+    padding: 0.85rem 1.1rem 0.95rem;
+    background-color: var(--bg);
+    border: 1.5px solid color-mix(in oklab, var(--fg) 45%, transparent);
+    border-radius: 4px;
+    box-shadow: 0 2px 0 color-mix(in oklab, var(--fg) 20%, transparent);
+    opacity: clamp(
+      0,
+      min((var(--p, 1) - var(--from)) / 0.05, (var(--until) - var(--p, 1)) / 0.05),
+      1
+    );
+  }
+}

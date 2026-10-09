@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { resolveMotionLevel } from "../motionPolicy";
 
-/** Finto matchMedia: risponde true solo alle query elencate. */
 const matcher = (...trueQueries: string[]) => (query: string) =>
   trueQueries.includes(query);
 

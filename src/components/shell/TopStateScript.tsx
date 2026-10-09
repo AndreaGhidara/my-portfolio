@@ -1,17 +1,10 @@
-import { SOGLIA_IN_CIMA } from "./inCima";
+import { AT_TOP_THRESHOLD } from "./atTop";
 
-/**
- * Va reso dentro <head>, come ThemeScript: segna se la pagina è ancora in
- * cima PRIMA del primo paint, così l'header nasce già trasparente e non si
- * vede la barra opaca lampeggiare sopra la ragnatela all'angolo.
- *
- * La polarità è scelta apposta: senza JavaScript l'attributo non compare
- * mai e l'header tiene il suo fondo pieno. Il caso peggiore è una barra
- * sempre opaca, non una nav illeggibile sopra il contenuto che scorre.
- */
+// Dentro <head>, prima del paint: l'header nasce gia' trasparente in cima. Senza
+// JavaScript l'attributo non compare mai e la barra resta opaca, non illeggibile.
 export function TopStateScript() {
   const code = `(function(){try{
-    if (window.scrollY < ${SOGLIA_IN_CIMA}) document.documentElement.setAttribute('data-at-top','');
+    if (window.scrollY < ${AT_TOP_THRESHOLD}) document.documentElement.setAttribute('data-at-top','');
   }catch(e){}})();`;
 
   return <script dangerouslySetInnerHTML={{ __html: code }} />;

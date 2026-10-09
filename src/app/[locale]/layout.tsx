@@ -53,44 +53,35 @@ const monoLight = JetBrains_Mono({
   preload: false,
 });
 
-/* I tre caratteri del sito finto del gioco del metodo (Services/gioco): li
-   usano solo l'attrezzo «caratteri» del livello 1 e la schermata del Forno
-   Aurora al livello 2, cioe' testo che sta sotto i 1024px e dentro un banco
-   che compare solo a chi gioca. Senza preload il file si scarica quando quel
-   testo compare, non con la pagina; e i pesi sono solo quelli che il sito
+/* I caratteri del sito finto del gioco (Services/game), che compaiono solo a chi
+   gioca: senza preload si scaricano quando servono. Solo i pesi che il sito
    finto chiede, perche' un peso mancante il browser lo finge. */
-const fintoFraunces = Fraunces({
+const fakeFraunces = Fraunces({
   subsets: ["latin"],
   weight: "600",
   style: ["normal", "italic"],
-  variable: "--font-finto-fraunces",
+  variable: "--font-fake-fraunces",
   display: "swap",
   preload: false,
 });
-const fintoGrotesk = Space_Grotesk({
+const fakeGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: ["500", "700"],
-  variable: "--font-finto-grotesk",
+  variable: "--font-fake-grotesk",
   display: "swap",
   preload: false,
 });
-const fintoPlayfair = Playfair_Display({
+const fakePlayfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["700", "800"],
-  variable: "--font-finto-playfair",
+  variable: "--font-fake-playfair",
   display: "swap",
   preload: false,
 });
 
-/**
- * Il testo che compare sotto il titolo nei risultati di ricerca, e la stessa
- * frase che finisce nei dati strutturati: e' uno dei pochi posti in cui le
- * parole con cui qualcuno cerca ci stanno tutte senza forzare niente.
- *
- * Quella di prima ("progetti, competenze e contatti") descriveva la STRUTTURA
- * del sito invece del mestiere, e nessuno cerca "progetti competenze contatti".
- */
-function descrizione(locale: string): string {
+// La frase dei risultati di ricerca e dei dati strutturati: dice il mestiere,
+// non la struttura del sito, perche' e' il mestiere che si cerca.
+function siteDescription(locale: string): string {
   return locale === "en"
     ? "Andrea Ghidara, full stack web developer in Italy. Custom websites, online stores and platforms, built with React, Next.js and TypeScript."
     : "Andrea Ghidara, sviluppatore e programmatore web full stack in Italia. Siti, e-commerce e piattaforme su misura, in React, Next.js e TypeScript.";
@@ -109,7 +100,7 @@ export async function generateMetadata({
   );
 
   const title = "Andrea Ghidara";
-  const description = descrizione(locale);
+  const description = siteDescription(locale);
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -153,12 +144,8 @@ export async function generateMetadata({
   };
 }
 
-/**
- * Le due lingue sono due, e si sanno prima: senza questo Next tratta la pagina
- * come dinamica e la ricostruisce a ogni richiesta. Misurato con Lighthouse
- * mobile: 453ms di attesa per il primo byte, cioe' il 15% dell'LCP speso a
- * rifare un lavoro il cui risultato non cambia mai.
- */
+// Senza, Next ricostruisce la pagina a ogni richiesta: 453ms di primo byte su
+// Lighthouse mobile, il 15% dell'LCP.
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
@@ -175,27 +162,19 @@ export default async function RootLayout({
     notFound();
   }
 
-  /* Dice a next-intl quale lingua sta costruendo. Senza, ogni `getTranslations`
-     piu' in basso chiede la lingua alla richiesta in corso, e una richiesta in
-     corso durante il build non c'e': la pagina ricade su dinamica. */
+  // Senza, `getTranslations` chiede la lingua alla richiesta, che nel build non
+  // c'e', e la pagina ricade su dinamica.
   setRequestLocale(locale);
 
-  /* I dati strutturati sono il posto legittimo dei metadati: nessuno li vede,
-     e non sono testo nascosto per posizionarsi. Sono anche la fonte che gli
-     assistenti leggono piu' volentieri, ed e' per questo che qui ci stanno le
-     tecnologie: nel testo della pagina React e Next.js compaiono una volta
-     sola, dentro il racconto di un lavoro.
-
-     `knowsAbout` dice solo cose che il sito dimostra altrove. Se un giorno ci
-     si aggiunge qualcosa che in pagina non c'e', questo smette di essere un
-     dato e diventa una dichiarazione. */
+  // `knowsAbout` dice solo cose che il sito dimostra altrove: aggiungerci qualcosa
+  // che in pagina non c'e' lo trasforma da dato in dichiarazione.
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
     name: site.name,
     url: `${SITE_URL}/${locale}`,
     jobTitle: locale === "en" ? "Full Stack Web Developer" : "Sviluppatore web full stack",
-    description: descrizione(locale),
+    description: siteDescription(locale),
     image: `${SITE_URL}/brand/avatar.webp`,
     email: site.email,
     knowsAbout: [
@@ -225,7 +204,7 @@ export default async function RootLayout({
         <ThemeScript />
         <TopStateScript />
       </head>
-      <body className={`${archivo.variable} ${archivoBlack.variable} ${monoFull.variable} ${monoLight.variable} ${fintoFraunces.variable} ${fintoGrotesk.variable} ${fintoPlayfair.variable} relative min-h-dvh`}>
+      <body className={`${archivo.variable} ${archivoBlack.variable} ${monoFull.variable} ${monoLight.variable} ${fakeFraunces.variable} ${fakeGrotesk.variable} ${fakePlayfair.variable} relative min-h-dvh`}>
         <Script
           id="ld-person"
           type="application/ld+json"
@@ -243,13 +222,9 @@ export default async function RootLayout({
 
           <HeaderScrollState />
 
-          {/* Ancorata all'angolo vero della pagina, non a quello dell'hero:
-              dentro <section id="hero"> (overflow-hidden) veniva tagliata e si
-              riduceva a un arco casuale sul bordo sinistro.
-              A -z-10 le lettere di ANDREA le passano davanti, mentre il fondo
-              di <body> resta comunque dietro perche' si propaga al canvas.
-              Sopra c'e' solo l'header, che in cima alla pagina e' trasparente
-              apposta per non tagliarla. Decorativa: pointer-events-none. */}
+          {/* Qui e non nell'hero, che e' overflow-hidden e la tagliava. A -z-10
+              le lettere di ANDREA le passano davanti, e il fondo di <body> resta
+              dietro perche' si propaga al canvas. */}
           <WebCorner className="pointer-events-none absolute left-0 top-0 -z-10 block w-36 lg:w-72" />
 
           <header id="top" data-site-header className="sticky top-0 z-50">
@@ -257,28 +232,13 @@ export default async function RootLayout({
           </header>
           <main id="main">{children}</main>
         </NextIntlClientProvider>
-        {/* Fuori da <main>: e' chrome di sito come la Navbar, e un <footer>
-            dentro <main> perde il ruolo implicito contentinfo (HTML-AAM). */}
+        {/* Fuori da <main>: dentro, un <footer> perde il ruolo contentinfo (HTML-AAM). */}
         <Footer />
-        {/* Ultima nel DOM come si conviene a una barra fissa: chi naviga da
-            tastiera la trova dopo il contenuto, non prima. */}
+        {/* Ultima nel DOM: da tastiera si trova dopo il contenuto, non prima. */}
         <BottomNav />
-        {/* Le due misure di Vercel, in fondo a tutto perche' non disegnano
-            niente: sono due script differiti serviti dal nostro stesso
-            dominio (/_vercel/insights/*), quindi niente terza connessione da
-            aprire mentre il browser dovrebbe dipingere.
-
-            Nessun cookie e nessun identificatore che segue la persona da un
-            sito all'altro: e' la ragione per cui questo sito puo' misurarsi
-            senza chiedere un consenso che nessuno legge.
-
-            SpeedInsights e' quella che conta qui: dice se i numeri che ci
-            siamo misurati con la rete finta tengono sui telefoni veri di chi
-            apre la pagina. Analytics conta le visite.
-
-            Funzionano solo in produzione e solo se le due levette sono accese
-            nel pannello del progetto: in locale lo script non esiste e la
-            richiesta muore, ed e' normale. */}
+        {/* Script differiti dallo stesso dominio, senza cookie: niente consenso da
+            chiedere. Funzionano solo in produzione con le levette accese nel
+            pannello di Vercel: in locale la richiesta fallisce, ed e' normale. */}
         <Analytics />
         <SpeedInsights />
       </body>

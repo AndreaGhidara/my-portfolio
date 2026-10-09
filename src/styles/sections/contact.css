@@ -1,0 +1,263 @@
+/* Il tuo turno: il foglio dei contatti, i tempi e il tesserino. */
+
+/* Qui i token del tema vanno bene, a differenza del percorso: sotto non c'e'
+   un fondo arancione, e carta e inchiostro si ribaltano col resto. */
+
+[data-contact-columns] {
+  margin-block-start: 3rem;
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: 1fr 0.85fr;
+  align-items: start;
+}
+@media (max-width: 860px) { [data-contact-columns] { grid-template-columns: 1fr; } }
+
+[data-contact-sheet] {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background-color: color-mix(in oklab, var(--fg) 3%, var(--bg));
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+[data-contact-sheet-label] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+[data-contact-sheet] h3 { margin-block-start: 0.5rem; font-size: 1.6rem; }
+[data-contact-sheet-text] {
+  margin-block-start: 0.6rem;
+  color: var(--fg-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+[data-contact-sheet] form { margin-block-start: 1.75rem; display: grid; gap: 1.4rem; }
+
+[data-contact-label] {
+  display: block;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+[data-contact-field] {
+  display: block;
+  width: 100%;
+  margin-block-start: 0.35rem;
+  border: 0;
+  border-block-end: 1.5px solid color-mix(in oklab, var(--fg) 30%, transparent);
+  border-radius: 0;
+  background-color: transparent;
+  padding: 0.5rem 0;
+  /* Quello che la scatola dava gratis: una riga e' alta quanto il testo, e
+     sotto i 44px il pollice sbaglia. Una prova la verifica. */
+  min-height: 2.75rem;
+  color: var(--fg);
+  font: inherit;
+}
+[data-contact-field]::placeholder { color: color-mix(in oklab, var(--fg-muted) 70%, transparent); }
+
+/* Tolto il contorno, senza questa regola il browser non disegna nessun fuoco
+   su un campo cosi'. Una prova esige che ci sia. */
+[data-contact-field]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* `background-attachment: local` fa scorrere le righe col testo invece di
+   lasciarle incollate alla scatola. */
+textarea[data-contact-field] {
+  border-block-end: 0;
+  line-height: 2rem;
+  padding-block: 0.25rem 0;
+  min-height: 8rem;
+  resize: vertical;
+  background-attachment: local;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(2rem - 1.5px),
+    color-mix(in oklab, var(--fg) 30%, transparent) calc(2rem - 1.5px) 2rem
+  );
+}
+
+[data-contact-error] {
+  margin-block-start: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+[data-contact-send] {
+  margin-block-start: 0.5rem;
+  justify-self: start;
+  border-radius: 99px;
+  background-color: var(--fg);
+  color: var(--bg);
+  padding: 0.95rem 1.75rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+[data-contact-send]:disabled { opacity: 0.6; }
+
+/* Colore, segno e testo: chi non distingue l'arancio dall'inchiostro deve
+   capirlo lo stesso. Il si' e' verde perche' il riquadro arancione si leggeva
+   come un allarme. Da fermo tiene il posto (1,5rem), cosi' l'arrivo del
+   riquadro non fa saltare quello che sta sotto. */
+[data-contact-outcome] {
+  min-height: 1.5rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--fg-muted);
+}
+
+[data-contact-outcome][data-outcome="success"],
+[data-contact-outcome][data-outcome="error"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-block-start: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius);
+  border-inline-start: 3px solid var(--outcome-mark);
+  background-color: color-mix(in oklab, var(--outcome-mark) 9%, var(--surface));
+  color: var(--fg);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+[data-contact-outcome][data-outcome="success"] { --outcome-mark: var(--theme-green); }
+[data-contact-outcome][data-outcome="error"] { --outcome-mark: var(--fg); }
+
+[data-contact-outcome] svg {
+  flex: none;
+  /* Allineato alla prima riga: con due righe il segno finirebbe a meta' frase. */
+  margin-block-start: 0.12rem;
+  color: var(--outcome-mark);
+}
+
+/* L'unica via d'uscita di chi non e' riuscito a mandare: si vede che e' un
+   link e si puo' toccare. */
+[data-contact-outcome-mail] {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-contact-outcome][data-outcome="success"],
+  [data-contact-outcome][data-outcome="error"] {
+    animation: outcome-arrive 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+@keyframes outcome-arrive {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+[data-contact-after-label] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-block-end: 1.2rem;
+}
+[data-contact-times] { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.5rem; }
+/* Colonna contata e non `auto`: ogni <li> e' una griglia sua, e con `auto` i
+   titoli partirebbero da tre x diverse. */
+[data-contact-times] > li {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+[data-contact-when] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  white-space: nowrap;
+  padding-block-start: 0.15rem;
+}
+[data-contact-times] b { display: block; font-size: 1rem; }
+[data-contact-times] p {
+  margin-block-start: 0.3rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--fg-muted);
+}
+@media (max-width: 480px) {
+  [data-contact-times] > li { grid-template-columns: 1fr; gap: 0.35rem; }
+}
+
+/* 0,3 gradi e non 1 come nel percorso: a 56rem un grado si legge come una
+   riga storta. */
+[data-contact-badge] { margin-block-start: 3rem; position: relative; transform: rotate(-0.3deg); }
+
+/* La clip in mezzo: su un cartellino largo l'angolo si legge come un
+   dettaglio dimenticato. */
+[data-contact-clip] {
+  display: block;
+  width: 2.6rem;
+  height: 0.85rem;
+  margin: 0 auto -0.45rem;
+  border: 1.5px solid color-mix(in oklab, var(--fg) 45%, transparent);
+  border-block-end: 0;
+  border-radius: 3px 3px 0 0;
+  background-color: var(--bg);
+  position: relative;
+  z-index: 2;
+}
+[data-contact-badge-body] {
+  border: 1.5px solid color-mix(in oklab, var(--fg) 45%, transparent);
+  border-radius: 6px;
+  background-color: color-mix(in oklab, var(--fg) 7%, var(--bg));
+  box-shadow: 0 2px 0 color-mix(in oklab, var(--fg) 20%, transparent);
+  padding: clamp(1.4rem, 3vw, 2rem) clamp(1.4rem, 3vw, 2.25rem);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem 2.5rem;
+  align-items: center;
+}
+[data-contact-badge-label] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+[data-contact-badge] h3 { margin-block-start: 0.45rem; font-size: 1.35rem; }
+[data-contact-badge-text] {
+  margin-block-start: 0.5rem;
+  /* Non --fg-muted: sul fondo del cartellino scendeva a 4,22:1, sotto il 4,5:1
+     del testo piccolo. */
+  color: var(--fg);
+  line-height: 1.6;
+  font-size: 0.92rem;
+  max-width: 30rem;
+}
+[data-contact-badge-drawn] { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: flex-end; }
+[data-contact-cta] {
+  border-radius: 99px;
+  padding: 0.85rem 1.4rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 2px solid transparent;
+}
+[data-contact-cta="solid"] { background-color: var(--accent); color: var(--on-accent); }
+[data-contact-cta="outline"] { border-color: var(--fg); color: var(--fg); }
+
+@media (max-width: 760px) {
+  [data-contact-badge] { transform: none; }
+  [data-contact-badge-body] { grid-template-columns: 1fr; }
+  [data-contact-badge-drawn] { justify-content: flex-start; }
+}

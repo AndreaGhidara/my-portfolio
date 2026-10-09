@@ -1,16 +1,16 @@
 import { Reveal } from "@/animations/components/Reveal";
-import { Oggi } from "./Oggi";
+import { Today } from "./Today";
 export type FooterViewProps = {
   tagline: string;
   /** L'etichetta sopra l'indirizzo: «Rispondi a». */
-  rispondiA: string;
-  /** L'etichetta sopra i profili. NON e' «Mittente»: vedi sotto. */
-  ancheQui: string;
-  citta: string;
+  replyTo: string;
+  /** Non «Mittente»: su una busta indirizzata ad Andrea il mittente e' il visitatore. */
+  alsoHere: string;
+  city: string;
   /** L'ufficio sull'annullo postale. */
-  ufficio: string;
+  office: string;
   /** Il paese sul francobollo. */
-  paese: string;
+  country: string;
   rights: string;
   name: string;
   email: string;
@@ -18,43 +18,16 @@ export type FooterViewProps = {
   ariaLabels: { linkedin: string; github: string };
 };
 
-/**
- * Il piede e' la busta per rispondere.
- *
- * La seconda sezione della pagina e' una casella di posta: cinque email in
- * arrivo e le loro risposte. Questa e' l'altro capo, ed e' l'unico cerchio che
- * questa pagina puo' chiudere: si apre ricevendo posta e finisce dando di che
- * rispondere. La mail smette di essere un link in fondo e diventa la riga di un
- * indirizzo, che e' l'unico posto in cui un indirizzo ha senso.
- *
- * La busta occupa tutto il piede: non e' un foglio appoggiato su un blocco
- * scuro, e' il piede stesso. Da qui discendono due cose che non sono scelte di
- * gusto ma conseguenze:
- *
- * - Il copyright non ha piu' un fuori in cui stare, e va DENTRO la busta.
- * - La pagina perde la fine che le dava il blocco d'inchiostro. Il taglio in
- *   fondo ([data-busta]::after) la restituisce: e' lo stesso rimedio scritto
- *   per la proposta A nel prototipo del 14 settembre, dove il problema era
- *   identico e per lo stesso motivo.
- *
- * Due cose che il prototipo sbagliava, e che si sono viste solo scrivendole:
- *
- * 1. Il blocco dei profili era etichettato «Mittente». Su una busta indirizzata
- *    ad Andrea il mittente e' chi scrive, cioe' il visitatore: mettere li' i
- *    profili di Andrea e' una didascalia falsa su un oggetto che vive di
- *    verosimiglianza. L'etichetta dice quello che quel blocco e' davvero.
- * 2. La busta perdeva la tagline, che e' la sola frase del sito che dice cosa
- *    fa e da dove, e non esiste in nessun'altra sezione. Adesso sta in basso a
- *    sinistra, piccola: e' esattamente dove le buste commerciali stampano la
- *    loro riga, quindi non e' un ripiego ma il posto giusto.
- */
+// La busta occupa tutto il piede: il copyright va dentro, e il taglio in fondo
+// ([data-envelope]::after) restituisce alla pagina la fine che le dava il blocco
+// d'inchiostro.
 export function FooterView({
   tagline,
-  rispondiA,
-  ancheQui,
-  citta,
-  ufficio,
-  paese,
+  replyTo,
+  alsoHere,
+  city,
+  office,
+  country,
   rights,
   name,
   email,
@@ -64,27 +37,18 @@ export function FooterView({
   const urlFor = (id: string) =>
     socials.find((social) => social.id === id)?.url ?? "#";
 
-  /**
-   * Le barre di smistamento in fondo alla busta.
-   *
-   * NON e' un codice a barre e nessuno scanner lo legge: e' la stringa
-   * dell'indirizzo resa come ritmo, una barra per carattere, alta o bassa
-   * secondo il codice del carattere. Deterministico apposta, cosi' non cambia a
-   * ogni render e non ha bisogno di un valore casuale che il server e il
-   * browser calcolerebbero diverso. Se un giorno deve essere scansionabile va
-   * generato da una libreria, non da questa riga.
-   */
-  const barre = Array.from(email, (char) => char.charCodeAt(0) % 2 === 0);
+  // Non e' un codice a barre: l'indirizzo reso come ritmo, una barra per carattere.
+  // Deterministico, perche' server e browser lo calcolino uguale.
+  const bars = Array.from(email, (char) => char.charCodeAt(0) % 2 === 0);
 
   return (
     <footer data-footer>
-      {/* I tre blocchi della busta entrano uno dopo l'altro. L'attributo resta
-          qui: [data-busta] porta il fondo, la patta e il taglio in fondo alla
-          pagina, e un involucro in mezzo li staccherebbe dal contenuto. */}
-      <Reveal data-busta data-testid="busta" moto="dietro" stagger={0.12}>
-        <div data-busta-alto>
-          <p data-busta-profili data-testid="busta-profili">
-            <span data-busta-et>{ancheQui}</span>
+      {/* L'attributo resta qui: [data-envelope] porta il fondo, la patta e il
+          taglio, e un involucro in mezzo li staccherebbe dal contenuto. */}
+      <Reveal data-envelope data-testid="envelope" motion="behind" stagger={0.12}>
+        <div data-envelope-top>
+          <p data-envelope-profiles data-testid="envelope-profiles">
+            <span data-envelope-label>{alsoHere}</span>
             <a
               href={urlFor("linkedin")}
               target="_blank"
@@ -103,31 +67,26 @@ export function FooterView({
             </a>
           </p>
 
-          {/* Francobollo e annullo non aggiungono niente a chi ascolta la
-              pagina: la citta' sta gia' nella riga dell'indirizzo, e il resto
-              e' disegno. Un nome accessibile qui sarebbe la stessa cosa letta
-              due volte. */}
-          {/* Il francobollo e l'annullo cadono sulla busta dopo che la busta
-              c'e': e' il gesto di affrancare, e succede per ultimo anche nella
-              vita. `as="span"` perche' qui dentro sta in una riga di testo. */}
+          {/* Decorativi: la citta' sta gia' nell'indirizzo. Cadono per ultimi, come
+              quando si affranca. `as="span"` perche' sta in una riga di testo. */}
           <Reveal
             as="span"
-            moto="alto"
+            motion="above"
             delay={0.25}
-            data-busta-affrancatura
-            data-testid="busta-affrancatura"
+            data-envelope-postage
+            data-testid="envelope-postage"
             aria-hidden="true"
           >
-            <span data-francobollo>
+            <span data-stamp>
               {/* Il monogramma e' testo grande, quindi carta su arancio (3,27:1)
                   e' ammessa. «ITALIA» e' a mezzo rem e sotto AA: sta in
                   --on-accent, che fa 5,08:1. Vedi contrast.test.ts. */}
-              <b data-francobollo-sigla>AG</b>
-              <span data-francobollo-paese data-testid="francobollo-paese">
-                {paese}
+              <b data-stamp-code>AG</b>
+              <span data-stamp-country data-testid="stamp-country">
+                {country}
               </span>
             </span>
-            <svg data-busta-annullo viewBox="0 0 100 100">
+            <svg data-envelope-postmark viewBox="0 0 100 100">
               <g fill="none" stroke="currentColor" strokeWidth="2.4">
                 <circle cx="50" cy="50" r="36" />
                 <circle cx="50" cy="50" r="29" strokeWidth="1.2" />
@@ -152,7 +111,7 @@ export function FooterView({
                 fontSize="11"
                 letterSpacing=".5"
               >
-                {ufficio}
+                {office}
               </text>
               <text
                 x="50"
@@ -160,37 +119,34 @@ export function FooterView({
                 textAnchor="middle"
                 fontSize="9.5"
                 letterSpacing=".3"
-                data-testid="busta-annullo-data"
+                data-testid="envelope-postmark-date"
               >
-                <Oggi formato="annullo" />
+                <Today format="postmark" />
               </text>
             </svg>
           </Reveal>
         </div>
 
-        <div data-busta-indirizzo data-testid="busta-indirizzo">
-          <p data-busta-et>{rispondiA}</p>
-          <p data-busta-nome>{name}</p>
-          <a data-busta-mail href={`mailto:${email}`}>
+        <div data-envelope-address data-testid="envelope-address">
+          <p data-envelope-label>{replyTo}</p>
+          <p data-envelope-name>{name}</p>
+          <a data-envelope-mail href={`mailto:${email}`}>
             {email}
           </a>
-          <p data-busta-citta>{citta}</p>
+          <p data-envelope-city>{city}</p>
         </div>
 
-        <div data-busta-basso>
-          <p data-busta-tagline>{tagline}</p>
-          <div data-busta-basso-dx>
-            <span data-busta-codice aria-hidden="true">
-              {barre.map((alta, i) => (
-                <i key={i} data-alta={alta ? "" : undefined} />
+        <div data-envelope-bottom>
+          <p data-envelope-tagline>{tagline}</p>
+          <div data-envelope-bottom-right>
+            <span data-envelope-code aria-hidden="true">
+              {bars.map((high, i) => (
+                <i key={i} data-high={high ? "" : undefined} />
               ))}
             </span>
-            {/* Niente opacita' sul testo: l'opacita' comporrebbe il colore
-                contro lo sfondo prima che il contrasto venga misurato. La
-                distinzione arriva da dimensione e posizione, non da un colore
-                piu' debole. */}
-            <p data-footer-diritti>
-              © <Oggi formato="anno" /> {name}. {rights}
+            {/* Niente opacita': comporrebbe il colore prima che il contrasto si misuri. */}
+            <p data-footer-rights>
+              © <Today format="year" /> {name}. {rights}
             </p>
           </div>
         </div>

@@ -1,0 +1,900 @@
+/* I lavori: l'archivio di cartelle, la pratica aperta, e le regole di pagina che la pratica si porta dietro (scorrimento sotto il dialogo, ritaglio di #services e #process). */
+
+/* L'archivio lo accende solo `data-archive-lit`, scritto da useDepth: senza
+   resta la colonna, che e' il markup del server. Passo, distanza e le altre
+   misure arrivano in linea da archive.ts: qui si usano, non si scrivono. */
+[data-work-shelf] {
+  --folder-face: var(--surface);
+  --folder-spine: color-mix(in oklab, var(--ink) 10%, var(--paper));
+  --folder-border: color-mix(in oklab, var(--ink) 24%, var(--paper));
+  --folder-sheet: var(--paper);
+  --folder-shadow: color-mix(in oklab, var(--ink) 35%, transparent);
+  /* Il tenue globale sul dorso fa 3,90:1, sotto l'AA; spinto verso
+     l'inchiostro 5,23:1 (misure in contrast.test.ts). */
+  --folder-muted: color-mix(in oklab, var(--fg-muted) 80%, var(--fg));
+  /* La barra alta del sito, 60px misurati come nel percorso. */
+  --header: 3.75rem;
+  --margin-top: 1.5rem;
+  --margin-bottom: 1.25rem;
+  --tab-h: 2.2rem;
+  /* Di quanto la faccia scende sotto la linguetta: lo spazio del foglio. */
+  --face-offset: 1.35rem;
+  --bottom-bar: 0px;
+  list-style: none;
+  margin: 2.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+[data-theme="dark"] [data-work-shelf] {
+  --folder-face: color-mix(in oklab, var(--ink) 90%, var(--paper));
+  --folder-spine: color-mix(in oklab, var(--ink) 94%, var(--paper));
+  --folder-border: color-mix(in oklab, var(--paper) 22%, var(--ink));
+  --folder-sheet: color-mix(in oklab, var(--paper) 92%, var(--ink));
+  --folder-shadow: color-mix(in oklab, var(--ink) 90%, transparent);
+  /* Sullo scuro il tenue globale basta: 6,34:1 sul dorso, 4,60:1 nel
+     riquadro del riservato. */
+  --folder-muted: var(--fg-muted);
+  /* L'arancio pieno sulla faccia fa 4,21:1, e «Apri il caso» e' testo
+     piccolo. Schiarito di un decimo fa 4,82:1. */
+  --accent-text: color-mix(in oklab, var(--accent) 90%, var(--paper));
+}
+
+/* Le cartelle archiviate stanno una sopra l'altra: la scatola di quella
+   davanti coprirebbe le linguette di quelle dietro. */
+[data-folder] {
+  position: relative;
+  padding-top: var(--tab-h);
+  pointer-events: none;
+}
+
+/* La linguetta scende di 12px dietro il dorso, che la copre: e' quello che
+   salda le due forme in una cartella sola. */
+[data-tab] {
+  position: absolute;
+  top: 0;
+  left: calc(var(--i) * var(--tab-width) + 0.5rem);
+  width: var(--tab-width);
+  min-width: 9.5rem;
+  height: calc(var(--tab-h) + 12px);
+  padding: 0.6rem 0.9rem 0;
+  background-color: var(--folder-spine);
+  border: 1px solid var(--folder-border);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--folder-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+[data-tab] b { color: var(--fg); font-weight: 700; }
+
+[data-spine] {
+  position: absolute;
+  inset: var(--tab-h) 0 0;
+  background-color: var(--folder-spine);
+  border: 1px solid var(--folder-border);
+  border-radius: 0 10px 12px 12px;
+  pointer-events: none;
+}
+
+[data-sheet] {
+  position: absolute;
+  left: 6%;
+  right: 9%;
+  top: calc(var(--tab-h) + 0.55rem);
+  height: 3rem;
+  background-color: var(--folder-sheet);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0 11px,
+    color-mix(in oklab, var(--ink) 9%, transparent) 11px 12px
+  );
+  border-radius: 3px;
+  rotate: -0.6deg;
+  box-shadow: 0 -1px 0 color-mix(in oklab, var(--ink) 8%, transparent);
+  pointer-events: none;
+}
+
+[data-face] {
+  position: relative;
+  margin-top: var(--face-offset);
+  padding: clamp(1.6rem, 4vw, 3.5rem) clamp(1.3rem, 4vw, 3.5rem) clamp(1.3rem, 3vw, 2.5rem);
+  background-color: var(--folder-face);
+  border: 1px solid var(--folder-border);
+  border-radius: 12px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+  box-shadow: 0 -14px 30px -18px var(--folder-shadow);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: border-color 200ms ease;
+}
+
+@media (hover: hover) {
+  [data-face]:hover {
+    border-color: color-mix(in oklab, var(--accent) 60%, var(--folder-border));
+  }
+}
+
+[data-face-number] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  letter-spacing: 0.15em;
+  color: var(--folder-muted);
+}
+
+/* E' l'h3 della cartella: l'interlinea torna quella del testo, non quella
+   stretta dei titoli. */
+/* E' l'h3 della cartella: l'interlinea torna quella del testo, non quella
+   stretta dei titoli. Famiglia e spaziatura le riscrive gia' questa regola. */
+[data-face-who] {
+  margin-top: 0.5rem;
+  line-height: inherit;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--folder-muted);
+}
+
+/* Niente `min-height: 0`: il centro stretto sotto il contenuto lo fa finire
+   sopra il piede invece di far debordare la faccia, e la soglia non se ne
+   accorge. A stringersi e' il riquadro. */
+[data-face-centre] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: start;
+}
+
+[data-face-line] {
+  max-width: 22ch;
+  font-size: clamp(1.45rem, 3.6vw, 3.1rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+/* Senza schermata il riquadro resterebbe alto quanto la sua scritta. */
+[data-face-screenshot] {
+  align-self: stretch;
+  min-height: 8rem;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--folder-border);
+  border-radius: 8px;
+  background-color: color-mix(in oklab, var(--fg) 10%, var(--folder-face));
+  rotate: 0.6deg;
+}
+
+[data-face-confidential] {
+  margin: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px dashed var(--folder-border);
+  border-radius: 6px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--folder-muted);
+}
+
+[data-face-foot] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+}
+
+[data-face-tech] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-face-tech] li {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--folder-border);
+  border-radius: 999px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  color: var(--folder-muted);
+}
+
+[data-open-button] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--accent-text);
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  [data-face-centre] { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Sul telefono quattro linguette con l'anno non stanno: resta il nome, un
+   quarto di cartella l'una, finche' RISERVATO e VISUALBOOST ci stanno interi
+   a 360px. Le tecnologie restano nel dossier. */
+@media (max-width: 599px) {
+  [data-folder] { --tab-width: 25%; }
+  [data-tab] {
+    left: calc(var(--i) * var(--tab-width));
+    min-width: 0;
+    /* 0,35rem lasciava a VISUALBOOST 66,80px per 66,84 di testo. */
+    padding-inline: 0.3rem;
+    font-size: 0.56rem;
+    letter-spacing: 0.01em;
+  }
+  [data-tab-year] { display: none; }
+  [data-face-line] { max-width: none; }
+  [data-face-tech] { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-face] { transition: none; }
+}
+
+[data-work-shelf][data-archive-lit] { gap: 0; }
+
+[data-work-shelf][data-archive-lit] > [data-folder] {
+  position: sticky;
+  top: calc(var(--header) + var(--margin-top) + var(--i) * var(--step));
+  margin-top: var(--distance);
+}
+
+[data-work-shelf][data-archive-lit] > [data-folder]:first-child { margin-top: 0; }
+
+/* L'ultima non finisce mai sotto. La scala e' sulla cartella intera, cosi' le
+   linguette restano attaccate al dorso; il filtro salta la linguetta, perche'
+   scurirebbe anche il testo (l'anno in fondo scendeva a 1,74:1). */
+[data-work-shelf][data-archive-lit] > [data-folder]:not(:last-child) {
+  transform-origin: 50% 0;
+  scale: calc(1 - var(--depth, 0) * var(--narrows));
+  will-change: scale;
+}
+
+[data-work-shelf][data-archive-lit] > [data-folder]:not(:last-child) > :not([data-tab]) {
+  filter: brightness(calc(1 - var(--depth, 0) * var(--darkens)));
+  will-change: filter;
+}
+
+/* La linguetta si scurisce col fondo, in srgb come il velo del filtro, e il
+   testo cambia tono con `data-tab-tone` (vedi TAB in archive.ts). Dietro
+   @supports: un color-mix con calc che il browser non sa fare diventa
+   trasparente, non torna al fondo di prima. */
+@supports (background-color: color-mix(in srgb, red calc(1 * 10%), blue)) {
+  [data-work-shelf][data-archive-lit] > [data-folder]:not(:last-child) > [data-tab] {
+    background-color: color-mix(in srgb, var(--folder-spine), var(--ink) calc(var(--depth, 0) * var(--darkens) * 100%));
+    border-color: color-mix(in srgb, var(--folder-border), var(--ink) calc(var(--depth, 0) * var(--darkens) * 100%));
+  }
+
+  [data-work-shelf][data-archive-lit] > [data-tab-tone="2"]:not(:last-child) > [data-tab] {
+    background-color: color-mix(in srgb, var(--folder-spine), var(--ink) max(calc(var(--depth, 0) * var(--darkens) * 100%), var(--min-dark)));
+  }
+}
+
+/* I toni: 1 l'anno pieno come il nome, 2 tutto carta. */
+[data-work-shelf][data-archive-lit] > [data-tab-tone="1"] > [data-tab] { color: var(--fg); }
+
+[data-work-shelf][data-archive-lit] > [data-tab-tone="2"] > [data-tab],
+[data-work-shelf][data-archive-lit] > [data-tab-tone="2"] > [data-tab] b { color: var(--paper); }
+
+/* Sullo scuro il fondo che si scurisce aiuta il testo: i toni non cambiano
+   niente. Dopo le regole dei toni, a parita' di peso. */
+[data-theme="dark"] [data-work-shelf] > [data-tab-tone] > [data-tab] { color: var(--folder-muted); }
+
+[data-theme="dark"] [data-work-shelf] > [data-tab-tone] > [data-tab] b { color: var(--fg); }
+
+/* Cresce anche con l'altezza: a 1366x768 la riga del riservato a 3,6vw
+   chiedeva cento pixel piu' della faccia. `vh` davanti, per chi `svh` non lo
+   conosce. */
+[data-work-shelf][data-archive-lit] [data-face-line] {
+  font-size: clamp(1.45rem, min(3.6vw, 5.5vh), 3.1rem);
+  font-size: clamp(1.45rem, min(3.6vw, 5.5svh), 3.1rem);
+}
+
+/* Il dorso davanti e' opaco e deve fermare il puntatore, o un click li'
+   arriva alla faccia di una cartella coperta e ne apre il dossier. */
+[data-work-shelf][data-archive-lit] [data-spine] { pointer-events: auto; }
+
+/* Tutte alte uguali, cosi' l'archivio finale ha i bordi bassi allineati.
+   `svh`: la barra del browser non deve cambiare la cartella; `vh` davanti per
+   chi `svh` non lo conosce. */
+[data-work-shelf][data-archive-lit] [data-face] {
+  height: calc(100vh - var(--header) - var(--margin-top) - (var(--n) - 1) * var(--step) - var(--tab-h) - var(--face-offset) - var(--margin-bottom) - var(--bottom-bar));
+  height: calc(100svh - var(--header) - var(--margin-top) - (var(--n) - 1) * var(--step) - var(--tab-h) - var(--face-offset) - var(--margin-bottom) - var(--bottom-bar));
+}
+
+/* Qui il riquadro prende quello che resta e si stringe per primo. */
+[data-work-shelf][data-archive-lit] [data-face-screenshot] { min-height: 0; }
+
+/* Il minimo perche' la faccia si riconosca come il sito che e'. Se non ci
+   sta, l'archivio resta spento. */
+@media (max-width: 760px) {
+  [data-work-shelf][data-archive-lit] [data-face-centre] {
+    grid-template-rows: auto minmax(6rem, 1fr);
+  }
+}
+
+/* Sotto i 768px la faccia si toglie la barra in basso, o «Apri il caso» ci
+   finisce sotto, e stringe i respiri: il riservato deve stare anche a
+   390x664 (chiedeva 18px in piu') e a 375x640. */
+@media (max-width: 767px) {
+  [data-work-shelf][data-archive-lit] {
+    --bottom-bar: calc(3.25rem + env(safe-area-inset-bottom, 0px));
+    --margin-top: 1rem;
+    --margin-bottom: 0.75rem;
+    --face-offset: 0.95rem;
+  }
+  [data-work-shelf][data-archive-lit] [data-face] {
+    padding: 0.95rem 1.1rem 0.9rem;
+    gap: 0.5rem;
+  }
+  [data-work-shelf][data-archive-lit] [data-face-who] { margin-top: 0.25rem; }
+  [data-work-shelf][data-archive-lit] [data-face-centre] { gap: 0.75rem; }
+}
+
+/* La copia con cui useArchiveLight misura se le facce ci stanno. */
+[data-archive-probe] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* La pratica e' carta nei due temi: dentro non entra niente di quello che si
+   ribalta col tema (--fg, --bg, --line, --folder-*, .eyebrow), e
+   WorksView.test.tsx lo verifica. Tutto sotto [open]: un display non
+   qualificato sovrascrive il `display: none` del dialog chiuso. */
+[data-work-dialog] {
+  --sheet-paper: var(--paper);
+  --sheet-ink: var(--ink);
+  /* Il tenue della carta, non quello del tema: 5,03:1 sulla carta. */
+  --sheet-muted: var(--muted);
+  /* L'arancio pieno su carta fa 3,27:1; scurito con l'inchiostro 5,42:1. */
+  --accent-on-paper: color-mix(in oklab, var(--accent) 72%, var(--ink));
+  --sheet-orange: var(--accent-on-paper);
+  --sheet-border: color-mix(in oklab, var(--sheet-ink) 24%, var(--sheet-paper));
+  --sheet-graphite: color-mix(in oklab, var(--sheet-ink) 45%, var(--sheet-paper));
+  --sheet-shadow: color-mix(in oklab, var(--ink) 55%, transparent);
+}
+
+[data-work-dialog]:not([open]) { display: none; }
+
+[data-work-dialog][open] {
+  display: block;
+  /* 100% e non 100vw: con la corsia della barra di scorrimento riservata
+     (scrollbar-gutter, sotto) 100vw ci finirebbe sotto, × compreso. */
+  width: 100%;
+  max-width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  border: 0;
+  padding: 4.25rem var(--gutter) 5rem;
+  background: transparent;
+  color: var(--sheet-ink);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Il velo arriva mentre il foglio si allarga e se ne va mentre si stringe:
+   `data-veil` lo scrive slide.ts. */
+[data-work-dialog]::backdrop {
+  background-color: transparent;
+  transition: background-color 420ms ease;
+}
+
+[data-work-dialog][data-veil]::backdrop {
+  background-color: color-mix(in srgb, var(--ink) 58%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-work-dialog]::backdrop { transition-duration: 160ms; }
+}
+
+[data-work-dialog] [data-dossier-close] {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--sheet-border);
+  border-radius: 999px;
+  background-color: var(--sheet-paper);
+  color: var(--sheet-ink);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 8px 20px -10px var(--sheet-shadow);
+}
+
+[data-work-dialog] [data-dossier-close]:focus-visible,
+[data-work-dialog] [data-dossier-link]:focus-visible {
+  outline: 2px solid var(--sheet-orange);
+  outline-offset: 3px;
+}
+
+[data-work-dialog] [data-dossier] {
+  position: relative;
+  margin: 2.3rem auto 0;
+  width: min(52rem, 100%);
+  background-color: var(--sheet-paper);
+  border-radius: 0 4px 4px 4px;
+  box-shadow: 0 40px 90px -35px var(--sheet-shadow);
+}
+
+/* Il fondo lo eredita: mentre il foglio si allarga passa dal tono del foglio
+   della cartella alla carta, e la linguetta con lui. */
+[data-work-dialog] [data-dossier-tab] {
+  position: absolute;
+  top: -2.3rem;
+  left: 0;
+  height: 2.35rem;
+  min-width: 13rem;
+  margin: 0;
+  padding: 0.7rem 1rem 0;
+  background-color: inherit;
+  border-radius: 10px 10px 0 0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sheet-muted);
+}
+
+[data-work-dialog] [data-dossier-tab] b { color: var(--sheet-ink); }
+
+[data-work-dialog] [data-dossier-sheet] {
+  padding: 2.6rem clamp(1.25rem, 5vw, 3.5rem) 2.5rem;
+}
+
+[data-work-dialog] [data-dossier-head] p,
+[data-work-dialog] [data-dossier-fields],
+[data-work-dialog] [data-dossier-subject] p:first-child,
+[data-work-dialog] [data-dossier-attachment] figcaption,
+[data-work-dialog] [data-dossier-confidential],
+[data-work-dialog] [data-dossier-figures] h3,
+[data-work-dialog] [data-dossier-items] h3,
+[data-work-dialog] [data-dossier-link],
+[data-work-dialog] [data-dossier-no-link],
+[data-work-dialog] [data-dossier-signature] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+[data-work-dialog] [data-dossier-head] {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid var(--sheet-ink);
+}
+
+[data-work-dialog] [data-dossier-head] p { color: var(--sheet-muted); }
+
+[data-work-dialog] [data-dossier-head] b,
+[data-work-dialog] [data-dossier-number] strong {
+  display: block;
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-weight: 400;
+  text-transform: none;
+  color: var(--sheet-ink);
+}
+
+[data-work-dialog] [data-dossier-head] b { font-size: 1rem; letter-spacing: -0.01em; }
+
+[data-work-dialog] [data-dossier-number] { text-align: right; }
+
+[data-work-dialog] [data-dossier-number] strong {
+  margin-top: 0.2rem;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+[data-work-dialog] [data-dossier-fields] {
+  margin: 1.6rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--sheet-border);
+}
+
+[data-work-dialog] [data-dossier-fields] div {
+  padding: 0.65rem 0.8rem;
+  border-left: 1px solid var(--sheet-border);
+}
+
+[data-work-dialog] [data-dossier-fields] div:first-child { border-left: 0; }
+
+[data-work-dialog] [data-dossier-fields] dt { color: var(--sheet-muted); }
+
+[data-work-dialog] [data-dossier-fields] dd {
+  margin: 0.3rem 0 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+[data-work-dialog] [data-dossier-subject] { margin-top: 1.6rem; }
+
+[data-work-dialog] [data-dossier-subject] p:first-child { color: var(--sheet-muted); }
+
+[data-work-dialog] [data-dossier-subject] p + p {
+  margin-top: 0.5rem;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+[data-work-dialog] [data-dossier-attachment] {
+  position: relative;
+  margin: 2.2rem 0 0;
+  padding: 0.55rem 0.55rem 0;
+  background-color: color-mix(in oklab, var(--sheet-ink) 4%, var(--sheet-paper));
+  border: 1px solid var(--sheet-border);
+  rotate: -0.8deg;
+  box-shadow: 0 10px 24px -16px var(--sheet-shadow);
+}
+
+[data-work-dialog] [data-dossier-attachment]::before {
+  content: "";
+  position: absolute;
+  top: -1.1rem;
+  left: 2.2rem;
+  width: 0.9rem;
+  height: 3.2rem;
+  border: 2px solid var(--sheet-graphite);
+  border-radius: 999px;
+  rotate: 6deg;
+}
+
+[data-work-dialog] [data-dossier-screenshot] {
+  aspect-ratio: 16 / 8.5;
+  overflow: hidden;
+  background-color: color-mix(in oklab, var(--sheet-ink) 10%, var(--sheet-paper));
+}
+
+[data-work-dialog] [data-dossier-attachment] figcaption {
+  padding: 0.55rem 0.1rem 0.6rem;
+  color: var(--sheet-muted);
+}
+
+[data-work-dialog] [data-dossier-confidential] {
+  margin: 2.2rem 0 0;
+  min-height: 8rem;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  border: 1px dashed var(--sheet-border);
+  text-align: center;
+  color: var(--sheet-muted);
+}
+
+[data-work-dialog] [data-dossier-figures] {
+  margin-top: 2.2rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--sheet-border);
+}
+
+[data-work-dialog] [data-dossier-figures] h3 { color: var(--sheet-muted); }
+
+[data-work-dialog] [data-dossier-figures] dl { margin: 0; }
+
+[data-work-dialog] [data-dossier-figures] dl > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+[data-work-dialog] [data-dossier-figures] dt {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+[data-work-dialog] [data-dossier-figures] dt::after {
+  content: "";
+  flex: 1;
+  min-width: 1.5rem;
+  border-bottom: 1px dotted var(--sheet-border);
+  translate: 0 -0.3rem;
+}
+
+[data-work-dialog] [data-dossier-figures] dd {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+[data-work-dialog] [data-dossier-figures] dd b {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-weight: 400;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+[data-work-dialog] [data-dossier-figures] dd small {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.65rem;
+  color: var(--sheet-muted);
+}
+
+[data-work-dialog] [data-dossier-items] {
+  margin: 2.4rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1.6rem;
+}
+
+[data-work-dialog] [data-dossier-items] li {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr);
+  gap: 0.6rem;
+  padding-top: 1.1rem;
+  border-top: 1px dashed var(--sheet-border);
+}
+
+[data-work-dialog] [data-dossier-items] li > span {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--sheet-orange);
+}
+
+[data-work-dialog] [data-dossier-items] h3 { color: var(--sheet-muted); }
+
+[data-work-dialog] [data-dossier-items] p {
+  margin-top: 0.45rem;
+  line-height: 1.65;
+}
+
+[data-work-dialog] [data-dossier-foot] {
+  margin-top: 2.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1.5rem;
+}
+
+[data-work-dialog] [data-dossier-tech] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-work-dialog] [data-dossier-tech] li {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--sheet-border);
+  border-radius: 999px;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  color: var(--sheet-muted);
+}
+
+[data-work-dialog] [data-dossier-link] {
+  display: inline-block;
+  margin-top: 0.9rem;
+  color: var(--sheet-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+[data-work-dialog] [data-dossier-no-link] {
+  display: inline-block;
+  margin-top: 0.9rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px dashed var(--sheet-border);
+  border-radius: 999px;
+  color: var(--sheet-muted);
+}
+
+/* Niente mix-blend-mode: il colore del timbro deve essere quello misurato in
+   contrast.test.ts, non una miscela con la carta. */
+[data-work-dialog] [data-dossier-stamp] {
+  margin: 0;
+  padding: 0.5rem 0.9rem;
+  rotate: -7deg;
+  border: 3px double var(--sheet-orange);
+  border-radius: 6px;
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sheet-orange);
+}
+
+[data-work-dialog] [data-dossier-signature] {
+  margin: 0;
+  min-width: 11rem;
+  text-align: center;
+  color: var(--sheet-muted);
+}
+
+[data-work-dialog] [data-dossier-signature] em {
+  display: block;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--sheet-ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--sheet-ink);
+}
+
+@media (max-width: 640px) {
+  [data-work-dialog] [data-dossier-fields] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  [data-work-dialog] [data-dossier-fields] div:nth-child(3) { border-left: 0; }
+  [data-work-dialog] [data-dossier-fields] div:nth-child(n + 3) { border-top: 1px solid var(--sheet-border); }
+}
+
+/* Sul computer il foglio e' grande quanto lo schermo e in orizzontale. La
+   schermata non scende sotto i 14rem: a 1280x720 il foglio si scorre di poco
+   invece di schiacciarla. Si scorre, mai si taglia: coi testi lunghi la
+   colonna di sinistra traboccava. */
+@media (min-width: 1024px) and (min-height: 700px) {
+  [data-work-dialog][open] { padding: 0.9rem; overflow: hidden; }
+
+  [data-work-dialog] [data-dossier-close] { top: 1.6rem; right: 1.6rem; }
+
+  [data-work-dialog] [data-dossier] {
+    width: 100%;
+    max-width: 110rem;
+    height: calc(100dvh - 1.8rem - 2.3rem);
+  }
+
+  [data-work-dialog] [data-dossier-sheet] {
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+    row-gap: 1.1rem;
+    padding: 1.6rem 2.6rem 1.4rem;
+  }
+
+  [data-work-dialog] [data-dossier-head] { padding-right: 3.5rem; }
+
+  [data-work-dialog] [data-dossier-number] strong { font-size: 1.35rem; }
+
+  [data-work-dialog] [data-dossier-fields] { margin-top: 0; }
+
+  [data-work-dialog] [data-dossier-fields] div { padding: 0.5rem 0.8rem; }
+
+  [data-work-dialog] [data-dossier-body] {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 2.6rem;
+  }
+
+  [data-work-dialog] [data-dossier-subject] { margin-top: 0; }
+
+  [data-work-dialog] [data-dossier-subject] p + p {
+    max-width: 30ch;
+    font-size: clamp(1.15rem, min(1.75vw, 2.9vh), 1.75rem);
+  }
+
+  [data-work-dialog] [data-dossier-right] {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  [data-work-dialog] [data-dossier-attachment],
+  [data-work-dialog] [data-dossier-confidential] {
+    margin: 0.4rem 0 0;
+    flex: 1;
+  }
+
+  [data-work-dialog] [data-dossier-attachment] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* contain: size, o l'altezza naturale della schermata diventa il minimo
+     della riga e il piede finisce sotto il foglio. */
+  [data-work-dialog] [data-dossier-screenshot] {
+    flex: 1;
+    min-height: 14rem;
+    aspect-ratio: auto;
+    contain: size;
+  }
+
+  [data-work-dialog] [data-dossier-figures] {
+    margin-top: 0;
+    padding: 0.7rem 1rem;
+  }
+
+  [data-work-dialog] [data-dossier-figures] dl > div { margin-top: 0.35rem; }
+
+  [data-work-dialog] [data-dossier-items] {
+    margin-top: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+  }
+
+  [data-work-dialog] [data-dossier-items] li { grid-template-columns: 2rem minmax(0, 1fr); }
+
+  [data-work-dialog] [data-dossier-items] p {
+    font-size: 0.93rem;
+    line-height: 1.55;
+  }
+
+  [data-work-dialog] [data-dossier-foot] {
+    margin-top: 0;
+    align-items: center;
+    padding-top: 0.9rem;
+    border-top: 2px solid var(--sheet-ink);
+  }
+
+  [data-work-dialog] [data-dossier-foot-left] {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  [data-work-dialog] [data-dossier-link],
+  [data-work-dialog] [data-dossier-no-link] { margin-top: 0; }
+
+  [data-work-dialog] [data-dossier-stamp] { rotate: -4deg; }
+}
+
+/* `clip` e non `hidden` sul body: con hidden le cartelle sticky si
+   riattaccano al body e saltano al loro posto nel flusso (284px al clic). */
+html[data-dialog-open] { overflow: hidden; }
+html[data-dialog-open] body { overflow: clip; }
+
+/* Dove la barra di scorrimento occupa posto, overflow hidden la toglie al
+   clic e la pagina si allargava di 17px sotto la pratica: la corsia resta
+   riservata sempre. */
+html { scrollbar-gutter: stable; }
+
+/* Un blocco che entrava di lato rendeva la pagina trascinabile in
+   orizzontale (429px su 390). `clip` e non `hidden`, che farebbe un
+   contenitore di scorrimento e romperebbe l'intestazione appiccicata. Sotto
+   Safari 16 si torna a prima: brutto, non rotto. */
+#services,
+#process {
+  overflow-x: clip;
+}

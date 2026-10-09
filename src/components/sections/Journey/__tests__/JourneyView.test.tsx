@@ -2,28 +2,27 @@ import { describe, it, expect } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import { JourneyView, type JourneyViewProps } from "../JourneyView";
 import { journey } from "@/content/journey";
-import { regole } from "@/test/css";
+import { rules } from "@/test/css";
 
 const props: JourneyViewProps = {
   eyebrow: "Percorso",
   title: "Dove ho imparato",
   present: "a oggi",
-  senzaTesserino: "Nessun tesserino",
-  etichettaLezione: "Cosa mi ha insegnato",
-  nota: "Da freelance il tesserino non te lo dà nessuno.",
-  suggerimento: "continua a scorrere",
-  // Come le prepara index.tsx: «a oggi» sulla piu' recente, calcolato sul dato
-  // (che e' dal piu' recente), poi la lista girata per raccontarla dal 2023.
+  noBadge: "Nessun tesserino",
+  lessonLabel: "Cosa mi ha insegnato",
+  note: "Da freelance il tesserino non te lo dà nessuno.",
+  hint: "continua a scorrere",
+  // Come le prepara index.tsx: «a oggi» calcolato sul dato, poi la lista girata.
   entries: journey
     .map((e, index) => ({
       id: e.id,
       company: e.company,
       year: e.year,
-      tesserino: e.tesserino,
+      badge: e.badge,
       present: index === 0,
       role: `Ruolo ${e.id}`,
       body: `Corpo ${e.id}`,
-      lezione: `Lezione ${e.id}`,
+      lesson: `Lezione ${e.id}`,
     }))
     .reverse(),
   stats: [
@@ -36,27 +35,25 @@ describe("JourneyView", () => {
 
   it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
     render(<JourneyView {...props} />);
-    const sezione = screen.getByRole("region", { name: props.title });
-    const titolo = within(sezione).getByRole("heading", { level: 2, name: props.title });
-    expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
-    expect(titolo).toHaveClass("titolo-sezione");
+    const section = screen.getByRole("region", { name: props.title });
+    const heading = within(section).getByRole("heading", { level: 2, name: props.title });
+    expect(section).toHaveAttribute("aria-labelledby", heading.id);
+    expect(heading).toHaveClass("section-title");
   });
   it("presenta il percorso come lista ordinata dal 2023 a oggi", () => {
     render(<JourneyView {...props} />);
-    // L'onda e' un <li> aria-hidden e non conta: la prima voce che si legge
-    // e' la prima tappa. La prova dell'ordine sta sull'anno, perche' la prima
-    // e l'ultima sono tutte e due da freelance.
-    const voci = screen.getAllByRole("listitem");
-    expect(voci[0]).toHaveTextContent("2023");
-    expect(voci[journey.length - 1]).toHaveTextContent("2026");
+    // L'onda e' un <li> aria-hidden; l'ordine si prova sull'anno, prima e ultima sono da freelance.
+    const items = screen.getAllByRole("listitem");
+    expect(items[0]).toHaveTextContent("2023");
+    expect(items[journey.length - 1]).toHaveTextContent("2026");
   });
 
   it("«a oggi» sta sul 2026, non sulla prima tappa della lista", () => {
     const { container } = render(<JourneyView {...props} />);
-    const occhielli = [...container.querySelectorAll("[data-journey-item] .eyebrow")];
-    const conOggi = occhielli.filter((p) => p.textContent?.includes(props.present));
-    expect(conOggi).toHaveLength(1);
-    expect(conOggi[0]).toHaveTextContent("2026");
+    const eyebrows = [...container.querySelectorAll("[data-journey-item] .eyebrow")];
+    const withPresent = eyebrows.filter((p) => p.textContent?.includes(props.present));
+    expect(withPresent).toHaveLength(1);
+    expect(withPresent[0]).toHaveTextContent("2026");
   });
 
   it("ogni tappa è un tesserino appuntato sul suo foglio", () => {
@@ -66,18 +63,15 @@ describe("JourneyView", () => {
   });
 
   it("il tesserino che non esiste è dichiarato, e sono i due periodi da freelance", () => {
-    // Da freelance il tesserino non te lo dà nessuno: al posto del nome
-    // dell'azienda c'è quella riga, e il cartellino si disegna tratteggiato.
-    // Il gancio sta sul <li> perché è di lì che pende la regola dello stile.
+    // Il gancio sta sul <li> perche' e' di li' che pende la regola dello stile.
     const { container } = render(<JourneyView {...props} />);
-    const senza = container.querySelectorAll('[data-journey-item][data-tesserino="no"]');
-    expect(senza).toHaveLength(journey.filter((e) => !e.tesserino).length);
-    expect(senza[0]).toHaveTextContent(props.senzaTesserino);
+    const withoutBadge = container.querySelectorAll('[data-journey-item][data-badge="no"]');
+    expect(withoutBadge).toHaveLength(journey.filter((e) => !e.badge).length);
+    expect(withoutBadge[0]).toHaveTextContent(props.noBadge);
     expect(screen.queryByText("Freelance")).toBeNull();
   });
 
   it("ogni tappa dice cosa quel posto ha insegnato", () => {
-    // È la cosa nuova della sezione: senza, tornano voci di curriculum.
     const { container } = render(<JourneyView {...props} />);
     expect(container.querySelectorAll("[data-journey-lesson]")).toHaveLength(journey.length);
   });
@@ -102,63 +96,50 @@ describe("JourneyView", () => {
 
   it("i numeri sono l'ultima fermata: la <dl> sta nell'ultimo <li>, con la nota", () => {
     render(<JourneyView {...props} />);
-    const voci = screen.getAllByRole("listitem");
-    const ultima = voci[voci.length - 1];
-    expect(ultima).toHaveAttribute("data-journey-arrivo");
-    expect(ultima.querySelectorAll("dl dd")).toHaveLength(2);
-    expect(ultima).toHaveTextContent(props.nota);
+    const items = screen.getAllByRole("listitem");
+    const last = items[items.length - 1];
+    expect(last).toHaveAttribute("data-journey-arrival");
+    expect(last.querySelectorAll("dl dd")).toHaveLength(2);
+    expect(last).toHaveTextContent(props.note);
   });
 
   it("onda, anno grande e barra non si leggono: sono disegno", () => {
     const { container } = render(<JourneyView {...props} />);
-    for (const sel of ["[data-journey-onda]", "[data-journey-anno]", "[data-journey-avanzamento]"]) {
+    for (const sel of ["[data-journey-wave]", "[data-journey-year]", "[data-journey-progress]"]) {
       expect(container.querySelector(sel)).toHaveAttribute("aria-hidden", "true");
     }
   });
 
   it("parte in colonna: la scena orizzontale la accende il componente, non il markup", () => {
-    // Il server e il primo render non sanno se c'e' GSAP ne' quanto e' alto lo
-    // schermo: la colonna si legge sempre, l'orizzontale va guadagnata.
     const { container } = render(<JourneyView {...props} />);
-    expect(container.querySelector("[data-scena]")).toBeNull();
+    expect(container.querySelector("[data-scene]")).toBeNull();
   });
 });
 
-/** Le regole del foglio di stile che riguardano il percorso, corpo compreso. */
-const regoleDelPercorso = regole(/\[data-journey-/);
+const journeyRules = rules(/\[data-journey-/);
 
 describe("i colori del percorso", () => {
   it("non chiedono niente ai token che cambiano col tema", () => {
-    // Il percorso e' carta e inchiostro SEMPRE: sta dentro una sezione arancio
-    // che di notte resta arancio. Con --fg, --line, --bg o --fg-muted il tema
-    // scuro si ribalterebbe addosso ai tesserini e ai fogli, e diventerebbero
-    // carta su carta: sparirebbero. E' la stessa guardia della casella di
-    // posta, e vale per la stessa ragione. Nel DOM non si vede.
-    expect(regoleDelPercorso.length).toBeGreaterThan(10);
-    const colpevoli = regoleDelPercorso.filter((r) =>
-      /var\(\s*--(fg|line|bg)\b/.test(r.corpo),
+    // La sezione resta arancio di notte: col tema scuro tesserini e fogli diventerebbero carta su carta.
+    expect(journeyRules.length).toBeGreaterThan(10);
+    const offenders = journeyRules.filter((r) =>
+      /var\(\s*--(fg|line|bg)\b/.test(r.body),
     );
-    expect(colpevoli.map((r) => r.selettore)).toEqual([]);
+    expect(offenders.map((r) => r.selector)).toEqual([]);
   });
 
   it("nemmeno le classi scritte nel componente li chiedono", () => {
-    // La prova qui sopra legge il foglio di stile e non vede le classi di
-    // utilita' col valore fra parentesi quadre: i due numeri portavano
-    // `text-[var(--fg)]` e `text-[var(--fg-muted)]` nel JSX, e sull'arancio
-    // sarebbero spariti di notte senza che nessuna regola di percorso.css lo
-    // dicesse. Qui si guarda l'altra meta' del problema.
+    // La prova sopra non vede le classi di utilita' col valore fra parentesi quadre.
     const { container } = render(<JourneyView {...props} />);
-    const classi = [...container.querySelectorAll<HTMLElement>("[class]")].map(
+    const classes = [...container.querySelectorAll<HTMLElement>("[class]")].map(
       (el) => el.className,
     );
-    const colpevoli = classi.filter((c) => /var\(\s*--(fg|line|bg)\b/.test(c));
-    expect(colpevoli).toEqual([]);
+    const offenders = classes.filter((c) => /var\(\s*--(fg|line|bg)\b/.test(c));
+    expect(offenders).toEqual([]);
   });
 
   it("l'occhiello dentro il tesserino non resta quello globale", () => {
-    // `.eyebrow` porta --fg-muted, e la prova qui sopra non lo vede: quella
-    // regola non nomina il percorso. Dentro un tesserino di carta va
-    // ridichiarato, o di notte l'anno sparisce.
-    expect(regoleDelPercorso.some((r) => /\.eyebrow/.test(r.selettore))).toBe(true);
+    // `.eyebrow` porta --fg-muted: dentro un tesserino va ridichiarato, o di notte l'anno sparisce.
+    expect(journeyRules.some((r) => /\.eyebrow/.test(r.selector))).toBe(true);
   });
 });

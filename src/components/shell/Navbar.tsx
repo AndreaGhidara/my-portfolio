@@ -3,17 +3,8 @@ import { ThemeToggle } from "./ThemeToggle";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { site } from "@/content/site";
 
-/**
- * A tutta larghezza, non incolonnata in un contenitore centrato: cosi' il
- * nome in alto a sinistra cade sulla stessa verticale della "A" di ANDREA
- * nell'hero, e il tema in alto a destra sull'ultima "A". Il portfolio non
- * ha una colonna di testo da rispettare: ha due bordi.
- *
- * Sobria per scelta: il nome grande sta nell'hero, qui basta l'ancora.
- * Il link "salta al contenuto" è il primo elemento focalizzabile della
- * pagina: senza, chi naviga da tastiera deve attraversare la navbar a
- * ogni visita.
- */
+// A tutta larghezza e non in un contenitore centrato: il nome e il tema cadono
+// sulle verticali della prima e dell'ultima "A" di ANDREA nell'hero.
 export async function Navbar() {
   const t = await getTranslations("nav");
 
@@ -32,9 +23,8 @@ export async function Navbar() {
         {t("skipToContent")}
       </a>
 
-      {/* py: il nome e' alto 17px, e un bersaglio da 17px sta sotto i 24 di
-          WCAG 2.2. La barra non si alza: la sua altezza la detta il bottone
-          del tema, che resta il pezzo piu' alto. */}
+      {/* py: il nome e' alto 17px, sotto i 24 di WCAG 2.2. La barra non si alza:
+          la sua altezza la detta il bottone del tema. */}
       <a href="#top" className="py-2 text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-[var(--fg)]">
         {site.name}
       </a>

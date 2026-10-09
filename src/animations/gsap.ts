@@ -5,7 +5,6 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 let registered = false;
 
-/** Idempotente: chiamabile da qualsiasi componente senza effetti doppi. */
 export function registerGsap(): void {
   if (registered) return;
   gsap.registerPlugin(ScrollTrigger);

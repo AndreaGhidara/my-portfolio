@@ -1,0 +1,396 @@
+/* L'unico file con selettori comuni, sotto [data-game]: ogni livello scrive solo
+   sotto [data-game-level="<id>"], perche' una classe comune ridefinita in un
+   livello cambierebbe gli altri tre. Solo token fissi, mai del tema: il banco ha
+   lo stesso aspetto di giorno e di notte. */
+
+[data-game] {
+  --game-dark: color-mix(in oklab, var(--ink) 94%, var(--paper));
+  --game-dark-2: color-mix(in oklab, var(--ink) 88%, var(--paper));
+  --game-grid: color-mix(in oklab, var(--ink) 85%, var(--paper));
+  --game-dark-border: color-mix(in oklab, var(--ink) 72%, var(--paper));
+  --game-cream: color-mix(in oklab, var(--bulb) 18%, var(--paper));
+  --game-green-shadow: color-mix(in oklab, var(--green) 62%, var(--ink));
+  --game-orange-shadow: color-mix(in oklab, var(--orange) 58%, var(--ink));
+
+  /* Barrette e riga stanno sul fondo della pagina, non sul banco: li' il
+     fondo cambia col tema, e un inchiostro fisso sparirebbe sul fondo scuro.
+     Restano token fissi, scelti per tema. */
+  --game-out-text: var(--muted);
+  --game-out-strong: var(--ink);
+  --game-out-off: var(--mutedDark);
+  --game-out-track: var(--graph);
+
+  inline-size: min(100%, 30rem);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+[data-theme="dark"] [data-game] {
+  --game-out-text: var(--mutedDark);
+  --game-out-strong: var(--paper);
+  --game-out-off: var(--muted);
+  --game-out-track: color-mix(in oklab, var(--paper) 22%, var(--ink));
+}
+
+/* display:none toglie il gioco anche dall'albero di accessibilita': i suoi
+   pulsanti non sono fermate del Tab che nessuno vede. desk.css fa il contrario
+   sotto i 1024px. */
+@media (min-width: 1024px) {
+  [data-game] { display: none; }
+}
+
+[data-game-bars] {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.3rem;
+}
+
+[data-game-bars] button {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: start;
+  cursor: pointer;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--game-out-off);
+}
+
+[data-game-bars] button i {
+  display: block;
+  block-size: 0.3rem;
+  border-radius: 999px;
+  background: var(--game-out-track);
+  transition: background-color 0.3s;
+}
+
+[data-game-bars] button[data-state="done"] { color: var(--game-out-text); }
+[data-game-bars] button[data-state="done"] i { background: var(--game-out-strong); }
+[data-game-bars] button[data-state="current"] { color: var(--game-out-strong); }
+[data-game-bars] button[data-state="current"] i { background: var(--orange); }
+[data-game-bars] button:is(:disabled, [aria-disabled="true"]) { cursor: default; }
+
+/* Alta sempre tre righe: cambia il testo, non l'altezza della pagina. */
+[data-game-line] {
+  margin-block-start: 0.8rem;
+  block-size: 4.65em;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--game-out-text);
+}
+
+[data-game-line] > p { animation: game-enter 0.35s ease backwards; }
+
+[data-game] .bench {
+  position: relative;
+  block-size: 38rem;
+  margin-block-start: 0.6rem;
+  display: grid;
+  grid-template-rows: 14.2rem 1fr;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--game-dark);
+  color: var(--ink);
+  animation: game-enter 0.35s ease backwards;
+}
+
+[data-game] .above {
+  position: relative;
+  overflow: hidden;
+  background: var(--game-dark);
+  color: var(--paper);
+}
+
+[data-game] .above.lattice::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(var(--game-grid) 1px, transparent 1px) 0 0 / 15px 15px,
+    linear-gradient(90deg, var(--game-grid) 1px, transparent 1px) 0 0 / 15px 15px;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+[data-game] .head {
+  position: absolute;
+  z-index: 4;
+  inset-inline: 0.6rem;
+  inset-block-start: 0.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+[data-game] .head .level {
+  padding: 0.22rem 0.5rem;
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+[data-game] .head .right {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  color: var(--bulb);
+}
+
+/* Il fuoco arriva sul banco via codice (Game.tsx): l'anello attorno al banco
+   non dice niente a chi usa il dito, da tastiera invece resta. */
+[data-game] [data-game-level]:focus:not(:focus-visible) { outline: none; }
+
+[data-game] .console {
+  position: relative;
+  min-block-size: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  padding: 0.75rem 0.85rem;
+  border-block-start: 2px solid var(--ink);
+  background: var(--paper);
+}
+
+[data-game] .console .mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+/* Archivo pieno e non il carattere dei titoli del sito: e' l'etichetta di
+   una console, non il titolo di una sezione. */
+[data-game] .console h3 {
+  margin-block-start: 0.1rem;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: normal;
+}
+
+/* Senza taglio a tre righe: un testo che non ci sta si accorcia, non si
+   nasconde. */
+[data-game] .console .explain {
+  font-size: 0.76rem;
+  line-height: 1.42;
+  color: var(--muted);
+}
+
+[data-game] .garment {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+[data-game] .garment .chip {
+  flex: none;
+  inline-size: 2.2rem;
+  block-size: 2.2rem;
+  padding: 0.25rem;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--ink);
+  border-radius: 8px;
+  background: var(--paper);
+  font-size: 1.1rem;
+}
+
+[data-game] .garment .chip svg { inline-size: 100%; block-size: 100%; }
+
+/* Quello che non ci sta non deve scivolare sotto i pulsanti. */
+[data-game] .stage {
+  position: relative;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+[data-game] .actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.45rem;
+}
+
+[data-game] .actions.two { grid-template-columns: 1fr 1fr; }
+
+[data-game] .actions :is(button, a) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.62rem 0.5rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 3px 0 var(--ink);
+  cursor: pointer;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+[data-game] .actions :is(button, a):active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+[data-game] .actions :is(button, a) b { font-size: 0.8rem; line-height: 1; }
+
+[data-game] .actions :is(.yellow, .break) {
+  background: var(--bulb);
+  color: var(--ink);
+}
+
+[data-game] .actions :is(.green, .only) {
+  border-color: var(--green);
+  background: var(--green);
+  color: var(--paper);
+  box-shadow: 0 3px 0 var(--game-green-shadow);
+}
+
+/* L'inchiostro e non la carta, sull'arancio: la carta ci fa 3,27:1, sotto
+   quello che serve a un testo di mezzo rem. */
+[data-game] .actions .orange {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: var(--ink);
+  box-shadow: 0 3px 0 var(--game-orange-shadow);
+}
+
+[data-game] .actions .only { grid-column: 1 / -1; }
+
+[data-game] .actions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+[data-game] .ic { display: block; }
+[data-game] .ic svg { display: block; inline-size: 100%; block-size: 100%; }
+
+[data-game] .list {
+  display: grid;
+  align-content: start;
+  gap: 0.22rem;
+}
+
+[data-game] .line {
+  display: grid;
+  grid-template-columns: 1.4rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.2rem 0.5rem 0.2rem 0.35rem;
+  border: 1.5px solid var(--graph);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: start;
+  font-size: 0.68rem;
+  line-height: 1.3;
+  animation: game-enter 0.3s ease backwards;
+}
+
+[data-game] .line .ic { inline-size: 1.4rem; block-size: 1.4rem; }
+[data-game] .line b { display: block; font-size: 0.72rem; }
+[data-game] .line small {
+  display: block;
+  font-size: 0.6rem;
+  line-height: 1.25;
+  color: var(--muted);
+}
+
+/* La riga corta: nome e spiegazione sulla stessa linea, per farne stare sei. */
+[data-game] .line.short > span:nth-child(2) {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-inline-size: 0;
+}
+[data-game] .line.short b { flex: none; }
+[data-game] .line.short small {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-game] .line .yes { color: var(--green); font-weight: 800; }
+[data-game] .line .no { color: var(--orange); font-weight: 800; }
+
+[data-game] button.line { cursor: pointer; }
+[data-game] .line[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--game-cream);
+}
+
+[data-game] .line .switch {
+  position: relative;
+  inline-size: 2.1rem;
+  block-size: 1.2rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--graph);
+  transition: background-color 0.25s;
+}
+
+[data-game] .line .switch::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 1px;
+  inset-inline-start: 1px;
+  inline-size: 0.85rem;
+  block-size: 0.85rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+  transition: transform 0.25s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+[data-game] .line[aria-pressed="true"] .switch { background: var(--green); }
+[data-game] .line[aria-pressed="true"] .switch::after { transform: translateX(0.88rem); }
+
+[data-game] :where([data-game-level="notte"], [data-game-level="finale"]) .stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --star: color-mix(in oklab, var(--paper) 55%, transparent);
+  background-image:
+    radial-gradient(1px 1px at 12% 20%, var(--star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 34% 12%, var(--star) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 58% 26%, var(--star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 76% 10%, var(--star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 34%, var(--star) 50%, transparent 51%),
+    radial-gradient(1px 1px at 22% 44%, var(--star) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 66% 48%, var(--star) 50%, transparent 51%);
+}
+
+/* Con prefers-reduced-motion le azzera la regola globale di globals.css. */
+@keyframes game-enter {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes game-shake {
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+@keyframes game-blink {
+  50% { box-shadow: 0 0 0 5px color-mix(in oklab, var(--orange) 35%, transparent); }
+}
+
+@keyframes game-stamp {
+  from { transform: scale(1.12) rotate(-2deg); opacity: 0; }
+}

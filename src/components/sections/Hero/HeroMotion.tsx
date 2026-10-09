@@ -3,55 +3,33 @@
 import { useRef, type ReactNode } from "react";
 import { useSectionAnimation } from "@/animations/useSectionAnimation";
 
-/**
- * L'unica animazione davvero su misura del sito: le lettere del nome
- * battono una a una come timbri, il cerchio arancione si dipinge, e su
- * desktop lettere e avatar rispondono al mouse su due piani diversi.
- */
 export function HeroMotion({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement | null>(null);
 
   useSectionAnimation(({ level, gsap, presets }) => {
-    const { cresce, paint, reveal, stamp } = presets;
+    const { grow, paint, reveal, stamp } = presets;
     const root = scope.current;
     if (!root) return;
 
-    const lettere = root.querySelectorAll(".wordmark-letter");
-    const cerchio = root.querySelector("[data-ink-circle-fill]");
-    const ritratto = root.querySelector("[data-hero-avatar] img");
+    const letters = root.querySelectorAll(".wordmark-letter");
+    const circle = root.querySelector("[data-ink-circle-fill]");
+    const portrait = root.querySelector("[data-hero-avatar] img");
 
     const intro = gsap.timeline();
-    intro.add(stamp(lettere, { level, stagger: 0.09 }) ?? gsap.timeline());
-    intro.add(paint(cerchio, { level }) ?? gsap.timeline(), "-=0.35");
-    /* La testa cresce DENTRO il cerchio che si sta ancora dipingendo: entra a
-       un terzo di quella pennellata, cosi' le due cose si leggono come un
-       gesto solo invece che come due animazioni in fila.
-
-       L'origine e' il centro del cerchio, non quello dell'immagine: il
-       ritratto e' alzato del 16% della propria altezza per far uscire la testa
-       dal bordo, e quell'alzata sposta il suo centro sopra il centro del
-       cerchio. I conti: l'immagine e' l'88% del cerchio e sta alzata di
-       0,16 x 0,88 = 14,08% del cerchio, quindi il centro del cerchio cade al
-       66% dell'altezza dell'immagine. Crescendo dal 50% la testa si aprirebbe
-       a cavallo del bordo. */
+    intro.add(stamp(letters, { level, stagger: 0.09 }) ?? gsap.timeline());
+    intro.add(paint(circle, { level }) ?? gsap.timeline(), "-=0.35");
+    // La testa cresce dal centro del cerchio, non dell'immagine: il ritratto e'
+    // l'88% del cerchio e alzato del 16%, cioe' del 14,08% del cerchio, quindi quel
+    // centro cade al 66% dell'immagine. Dal 50% si aprirebbe a cavallo del bordo.
     intro.add(
-      cresce(ritratto, { level, origine: "50% 66%" }) ?? gsap.timeline(),
+      grow(portrait, { level, origin: "50% 66%" }) ?? gsap.timeline(),
       "-=0.55",
     );
-    /* Il claim e il resto della copia entrano insieme, ma in due modi diversi,
-       e la ragione e' una metrica.
-       Il claim e' l'elemento piu' grande della prima schermata: e' lui che il
-       browser cronometra come Largest Contentful Paint. Portandolo a opacita'
-       zero (come fa `reveal`) se l'animazione parte PRIMA che il browser
-       l'abbia dipinto, quel cronometro non parte al primo disegno ma quando la
-       frase ricompare. Misurato con Lighthouse mobile: LCP a 3,0s con 2,5s di
-       sola attesa, su una frase che nel documento c'e' dall'inizio.
-       Quindi il claim si muove e basta, senza dissolvenza: sale di qualche
-       pixel, resta sempre visibile, e l'LCP e' il primo disegno. Il resto della
-       copia (sottotitolo e bottoni) non e' l'elemento piu' grande e puo'
-       continuare a comparire. */
+    // Il claim e' l'elemento LCP: portato a opacita' zero (come fa `reveal`) l'LCP
+    // conterebbe da quando ricompare (3,0s misurati con Lighthouse mobile). Quindi
+    // sale senza dissolvenza; il resto della copia puo' comparire.
     const claim = root.querySelector<HTMLElement>("[data-hero-claim]");
-    const resto = [...root.querySelectorAll<HTMLElement>("[data-hero-copy] > *")].filter(
+    const rest = [...root.querySelectorAll<HTMLElement>("[data-hero-copy] > *")].filter(
       (el) => el !== claim,
     );
 
@@ -66,8 +44,8 @@ export function HeroMotion({ children }: { children: ReactNode }) {
         "-=0.4",
       );
     }
-    if (resto.length) {
-      intro.add(reveal(resto, { level, stagger: 0.08 }) ?? gsap.timeline(), "-=0.5");
+    if (rest.length) {
+      intro.add(reveal(rest, { level, stagger: 0.08 }) ?? gsap.timeline(), "-=0.5");
     }
     // Le frecce per ultime, e senza sovrapposizione: invitano a scorrere, e
     // ha senso invitare solo quando c'e' gia' qualcosa da guardare.
@@ -75,12 +53,11 @@ export function HeroMotion({ children }: { children: ReactNode }) {
 
     if (level !== "full") return;
 
-    // Parallasse del puntatore: due piani, quantità piccole.
-    // Sopra i 6px si passa da "profondità" a "roba che balla".
+    // Sopra i 6px la parallasse passa da "profondita'" a "roba che balla".
     const move = (event: PointerEvent) => {
       const x = (event.clientX / window.innerWidth - 0.5) * 2;
       const y = (event.clientY / window.innerHeight - 0.5) * 2;
-      gsap.to(lettere, { x: x * 6, y: y * 3, duration: 0.8, overwrite: "auto" });
+      gsap.to(letters, { x: x * 6, y: y * 3, duration: 0.8, overwrite: "auto" });
       gsap.to(root.querySelectorAll("[data-hero-avatar]"), {
         x: x * -10, y: y * -5, duration: 0.8, overwrite: "auto",
       });
@@ -90,13 +67,11 @@ export function HeroMotion({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("pointermove", move);
   }, scope);
 
-  /* data-hero-strato: e' lo strato che si stringe e sale quando la stampante
-     passa sopra (SottoIlFoglio, regole in sezioni/sopra.css). Contiene solo il contenuto:
-     una trasformazione sulla sezione diventerebbe il riferimento dello strato
-     fisso della carta, che smetterebbe di coprire lo schermo. La carta sta
-     fuori, in HeroView. */
+  // Si stringe e sale sotto il foglio (UnderSheet, sections/under-sheet.css). Solo
+  // il contenuto: una trasformazione sulla sezione diventerebbe il riferimento dello
+  // strato fisso della carta, che smetterebbe di coprire lo schermo.
   return (
-    <div ref={scope} data-hero-strato>
+    <div ref={scope} data-hero-layer>
       {children}
     </div>
   );

@@ -1,0 +1,108 @@
+/* Tutto sotto [data-game-level="notte"]; i pezzi comuni stanno in base.css. */
+
+/* Lo stesso inchiostro scaldato del finale, che parte da questo cielo e lo fa
+   giorno. Non un blu: non e' in tavolozza. */
+[data-game-level="notte"] .above {
+  background: linear-gradient(var(--ink), color-mix(in oklab, var(--ink) 80%, var(--muted)));
+}
+
+[data-game-level="notte"] .clock {
+  position: absolute;
+  inset-inline-start: 0.7rem;
+  inset-block-start: 2.2rem;
+  display: grid;
+}
+
+[data-game-level="notte"] .clock b {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  font-size: 2rem;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-game-level="notte"] .clock span {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  color: var(--mutedDark);
+}
+
+/* La posizione la scrive Night.tsx a ogni passo: la transizione la ammorbidisce. */
+[data-game-level="notte"] .moon {
+  position: absolute;
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  border-radius: 50%;
+  box-shadow: inset -6px -3px 0 color-mix(in oklab, var(--bulb) 30%, var(--paper));
+  transition: left 0.3s linear, top 0.3s linear;
+}
+
+[data-game-level="notte"] .trace {
+  position: absolute;
+  inset-inline: 0.7rem;
+  inset-block-start: 5.9rem;
+  block-size: 0.9rem;
+  display: flex;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--game-dark-border);
+}
+
+[data-game-level="notte"] .trace i { display: block; block-size: 100%; }
+[data-game-level="notte"] .trace i.up { background: color-mix(in oklab, var(--green) 60%, var(--paper)); }
+[data-game-level="notte"] .trace i.down { background: var(--orange); }
+
+[data-game-level="notte"] .hours {
+  position: absolute;
+  inset-inline: 0.7rem;
+  inset-block-start: 6.95rem;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.46rem;
+  color: var(--mutedDark);
+}
+
+[data-game-level="notte"] .log {
+  position: absolute;
+  inset: 7.9rem 0.7rem 0.55rem;
+  display: grid;
+  align-content: end;
+  gap: 0.12rem;
+  overflow: hidden;
+}
+
+[data-game-level="notte"] .log p {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  color: color-mix(in oklab, var(--paper) 80%, var(--mutedDark));
+  animation: game-enter 0.3s ease backwards;
+}
+
+[data-game-level="notte"] .log p span:nth-child(2) {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-game-level="notte"] .log p b {
+  flex: none;
+  font-weight: 500;
+  color: var(--bulb);
+}
+
+[data-game-level="notte"] .log .shield {
+  flex: none;
+  padding: 0 0.3rem;
+  border-radius: 3px;
+  font-size: 0.48rem;
+}
+
+[data-game-level="notte"] .log .shield.yes { background: var(--green); color: var(--paper); }
+/* L'inchiostro sull'arancio, come nei pulsanti: la carta non ci si legge. */
+[data-game-level="notte"] .log .shield.no { background: var(--orange); color: var(--ink); }

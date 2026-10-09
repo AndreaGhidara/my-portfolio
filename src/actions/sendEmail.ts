@@ -13,7 +13,7 @@ const contactFormSchema = z.object({
 });
 
 export async function sendEmail(formData: FormData) {
-  // estrai SEMPRE come stringhe
+  // Sempre stringhe: un campo assente arriva null, un file arriva File.
   const rawFormData = {
     name: String(formData.get("name") ?? ""),
     email: String(formData.get("email") ?? ""),
@@ -33,7 +33,6 @@ export async function sendEmail(formData: FormData) {
   try {
     const { error } = await resend.emails.send({
       from: "Portfolio <onboarding@resend.dev>",
-      // L'indirizzo sta in site.ts e non qui: e' la stessa regola del dominio.
       to: [site.email],
       subject: `New message from ${name} via Portfolio`,
       html: `

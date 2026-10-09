@@ -1,0 +1,382 @@
+/* Dove ho imparato: il percorso, i tesserini, l'arrivo e la scena orizzontale. */
+
+/* La sezione resta arancio di notte: qui dentro --fg, --bg, --line e
+   --fg-muted si ribalterebbero e tesserini e fogli diventerebbero carta su
+   carta. Carta e inchiostro sempre, da --ink e --paper; una prova lo verifica.
+   La scena orizzontale la accende solo `data-scene`, scritto da JourneyTrack. */
+
+[data-journey-stage] {
+  padding: var(--section-y) var(--gutter);
+}
+
+/* Alta quanto il palco della scena (100svh) in qualunque forma sia la
+   sezione; fixed e larga zero, cosi' non occupa niente. */
+[data-journey-probe] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100vh;
+  height: 100svh;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+[data-journey-header] { max-width: 34rem; margin-inline: auto; }
+[data-journey-header] h2 { color: var(--paper); }
+
+/* L'anno in cui ci si trova: il contachilometri del viaggio, quindi in
+   colonna non c'e'. */
+[data-journey-year] { display: none; }
+
+[data-journey-list] {
+  list-style: none;
+  /* 6rem e non 4: il tesserino sborda di 1,25 sopra il foglio, e a 4rem il
+     cartellino della prima tappa finiva sopra la «p» di «imparato». */
+  margin: 6rem auto 0;
+  padding: 0;
+  max-width: 34rem;
+  display: grid;
+  gap: 4rem;
+
+  color: var(--ink);
+  --rule-line: color-mix(in oklab, var(--ink) 16%, var(--paper));
+  --faint: color-mix(in oklab, var(--ink) 62%, var(--paper));
+  /* L'arancio pieno su carta fa 3,27:1 e l'etichetta e' 0,6rem. Scurito con
+     l'inchiostro fa 5,42:1. */
+  --accent-on-paper: color-mix(in oklab, var(--accent) 72%, var(--ink));
+}
+
+[data-journey-wave],
+[data-journey-hint],
+[data-journey-progress] { display: none; }
+
+/* Il <li> e' largo quanto il foglio perche' e' il contenitore del tesserino:
+   uno piu' largo lo appenderebbe lontano dal foglio. In colonna solo la
+   rotazione: lo scostamento verticale li' apre solo buchi. */
+[data-journey-item] {
+  position: relative;
+  transform: rotate(var(--r, 0deg));
+}
+
+[data-journey-badge] {
+  position: absolute;
+  top: -1.25rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 2;
+}
+
+[data-journey-clip] {
+  display: block;
+  width: 2.4rem;
+  height: 0.8rem;
+  margin: 0 auto -0.4rem;
+  border: 1.5px solid color-mix(in oklab, var(--ink) 45%, transparent);
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+  background-color: var(--paper);
+  position: relative;
+  z-index: 2;
+}
+
+/* Appena piu' scuro del foglio: due carte identiche sovrapposte non si
+   leggono come due cose. */
+[data-journey-badge-body] {
+  border: 1.5px solid color-mix(in oklab, var(--ink) 45%, transparent);
+  border-radius: 4px;
+  background-color: color-mix(in oklab, var(--ink) 7%, var(--paper));
+  padding: 0.9rem 0.85rem;
+  box-shadow: 0 2px 0 color-mix(in oklab, var(--ink) 20%, transparent);
+}
+[data-journey-badge-body] h3 {
+  margin-block-start: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.15;
+}
+/* `.eyebrow` porta --fg-muted, che qui si ribalterebbe: di notte l'anno
+   sparirebbe, e la prova sopra non lo vede perche' la regola non nomina il
+   percorso. */
+[data-journey-badge-body] .eyebrow { color: var(--faint); }
+[data-journey-company] {
+  margin-block-start: 0.25rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  color: var(--faint);
+}
+
+[data-journey-item][data-badge="no"] [data-journey-badge-body] {
+  background-color: transparent;
+  border-style: dashed;
+  box-shadow: none;
+}
+[data-journey-item][data-badge="no"] [data-journey-clip] { border-style: dashed; }
+
+/* Il respiro in cima e' il posto del tesserino: senza, il cartellino
+   coprirebbe l'occhiello della lezione. */
+[data-journey-sheet] {
+  border: 1px solid var(--rule-line);
+  border-radius: 4px;
+  background-color: var(--paper);
+  padding: 5.25rem 1.5rem 1.75rem;
+  box-shadow: 0 10px 24px -14px color-mix(in oklab, var(--ink) 55%, transparent);
+}
+[data-journey-label] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-on-paper);
+}
+[data-journey-lesson] { margin-block-start: 0.6rem; font-size: 0.92rem; line-height: 1.55; }
+[data-journey-body] {
+  margin-block-start: 0.9rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--faint);
+}
+
+/* --light va da 0 a 1 quando il filo arriva (la scrive JourneyTrack). Senza
+   nessuno che la scriva vale 1: in colonna il foglio e' acceso e fermo. */
+[data-journey-arrival] {
+  position: relative;
+  display: grid;
+  gap: 1.1rem;
+  max-width: 20rem;
+  padding: 1.4rem 1.5rem 1.25rem;
+  border: 1px solid var(--rule-line);
+  border-radius: 4px;
+  background-color: var(--paper);
+  rotate: var(--r, 0deg);
+  box-shadow:
+    0 10px 24px -14px color-mix(in oklab, var(--ink) 55%, transparent),
+    0 0 calc(var(--light, 1) * 70px) calc(var(--light, 1) * 14px)
+      color-mix(in oklab, var(--paper) calc(var(--light, 1) * 85%), transparent),
+    0 0 0 calc(var(--light, 1) * 2px) var(--ink);
+}
+[data-journey-arrival]::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 4px;
+  background-color: var(--accent);
+  opacity: calc(0.6 * (1 - var(--light, 1)));
+  pointer-events: none;
+}
+[data-journey-arrival] dl { display: flex; gap: 2.5rem; }
+/* flex-col-reverse: il numero sopra, con l'ordine dt -> dd intatto nel DOM. */
+[data-journey-arrival] dl > div { display: flex; flex-direction: column-reverse; }
+[data-journey-arrival] dd {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--ink);
+}
+[data-journey-arrival] dt { margin-top: 0.4rem; font-size: 0.72rem; color: var(--faint); }
+[data-journey-note] {
+  padding-top: 0.9rem;
+  border-top: 1px dashed var(--rule-line);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  line-height: 1.5;
+  color: var(--faint);
+}
+
+/* L'altezza del track e' CSS e non JavaScript: scritta da script andrebbe
+   ordinata a mano coi refresh di ScrollTrigger, e in SSR nascerebbe
+   sbagliata. E' la stessa formula di trackRoute() in track.ts. `svh` perche'
+   la barra del browser non cambi la corsa, `vh` davanti per chi non lo conosce. */
+
+[data-journey][data-scene="horizontal"] [data-journey-track] {
+  --speed: var(--speed-fine);
+  --route: calc((var(--n) - 0.5) * var(--wide) + var(--n) * var(--air) + var(--arrival) / 2);
+  height: calc(100vh + var(--route) * var(--speed) + var(--tail) * 100vh);
+  height: calc(100svh + var(--route) * var(--speed) + var(--tail) * 100svh);
+}
+/* Il pollice spinge molto piu' di una rotellina: con la stessa velocita' la
+   fila scapperebbe via. */
+@media (pointer: coarse) {
+  [data-journey][data-scene="horizontal"] [data-journey-track] {
+    --speed: var(--speed-coarse);
+  }
+}
+
+/* La barra alta del sito e' sticky e ci passa sopra: il primo termine del
+   padding e' la sua altezza (3,75rem: 60px misurati). */
+[data-journey][data-scene="horizontal"] [data-journey-stage] {
+  --bottom-bar: 0px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  /* Senza, la colonna si allarga quanto la fila (migliaia di px) e l'anno
+     grande finisce fuori dallo schermo. */
+  grid-template-columns: minmax(0, 1fr);
+  padding: calc(3.75rem + clamp(0.75rem, 3vh, 2.5rem)) 0
+    calc(var(--bottom-bar) + clamp(3rem, 7vh, 4.5rem));
+}
+/* Sotto i 768px c'e' la barra in basso (52px piu' la tacca): il palco se la
+   toglie. */
+@media (max-width: 767px) {
+  [data-journey][data-scene="horizontal"] [data-journey-stage] {
+    --bottom-bar: calc(3.25rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+[data-journey][data-scene="horizontal"] [data-journey-header] {
+  max-width: none;
+  margin: 0;
+  padding-inline: var(--gutter);
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+[data-journey][data-scene="horizontal"] [data-journey-year] {
+  display: block;
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  line-height: 0.8;
+  color: color-mix(in oklab, var(--ink) 85%, var(--accent));
+  font-variant-numeric: tabular-nums;
+}
+
+/* I due margini sono mezzo palco meno mezzo oggetto. In percentuale e non in
+   vw: la percentuale e' del palco, che non conta la barra di scorrimento. */
+[data-journey][data-scene="horizontal"] [data-journey-list] {
+  position: relative;
+  align-self: center;
+  justify-self: start;
+  width: max-content;
+  max-width: none;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--air);
+  padding-inline: calc(50% - var(--wide) / 2) calc(50% - var(--arrival) / 2);
+  transform: translate3d(calc(var(--x, 0) * -1px), 0, 0);
+  will-change: transform;
+}
+
+/* Il tracciato lo disegna JourneyTrack, perche' dipende da dove finiscono i
+   fogli. --ink, cosi' l'onda sta dentro la regola dei colori. */
+[data-journey][data-scene="horizontal"] [data-journey-wave] {
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+[data-journey-wave] svg { display: block; overflow: visible; }
+[data-journey-wave] path { fill: none; stroke-width: 2; stroke-linecap: round; }
+[data-journey-wave-faint] {
+  stroke: color-mix(in oklab, var(--ink) 40%, transparent);
+  stroke-dasharray: 8 6;
+}
+[data-journey-wave-full] { stroke: var(--ink); }
+
+[data-journey][data-scene="horizontal"] [data-journey-item] {
+  flex: 0 0 auto;
+  width: var(--wide);
+  transform: translateY(var(--dy, 0rem)) rotate(var(--r, 0deg));
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+[data-journey][data-scene="horizontal"] [data-journey-item]:not([data-arrived]) {
+  transform: translateY(calc(var(--dy, 0rem) + 2.5rem)) rotate(calc(var(--r, 0deg) * 3));
+}
+/* Un velo arancione e non l'opacita': un foglio trasparente lascerebbe vedere
+   l'onda che gli passa dietro, attraverso il testo. */
+[data-journey][data-scene="horizontal"] [data-journey-item]::after {
+  content: "";
+  position: absolute;
+  inset: -2rem -0.5rem -0.5rem;
+  z-index: 3;
+  background-color: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+[data-journey][data-scene="horizontal"] [data-journey-item]:not([data-arrived])::after {
+  opacity: 0.6;
+}
+
+/* --fall va da 0 a 1: il foglio si stacca dal filo e scende fuori dallo
+   schermo. Lo ritaglia la sezione, non il palco. */
+[data-journey][data-scene="horizontal"] [data-journey-arrival] {
+  flex: 0 0 auto;
+  width: var(--arrival);
+  max-width: none;
+  --light: 0;
+  scale: calc(1 + 0.05 * var(--jolt, 0));
+  translate: 0 calc(var(--fall, 0) * var(--fall, 0) * 110vh);
+  rotate: calc(var(--r, 0deg) + var(--fall, 0) * 14deg);
+}
+
+/* I telefoni bassi: il 2026 deve stare intero nel palco con la testata. 880px
+   e' dove la versione larga smette di starci (a 390 il 2026 chiede circa 860px
+   di palco, stesso conto di MIN_HEIGHT in track.ts); sotto MIN_HEIGHT neanche
+   questo basta, e resta la colonna. */
+@media (max-height: 879px) {
+  [data-journey][data-scene="horizontal"] [data-journey-stage] {
+    padding-top: calc(3.75rem + 0.5rem);
+    padding-bottom: calc(var(--bottom-bar) + 2.75rem);
+  }
+  /* In cima il respiro pieno: a 4,5rem l'occhiello della lezione finiva sotto
+     il bordo del tesserino. */
+  [data-journey][data-scene="horizontal"] [data-journey-sheet] { padding: 5.25rem 1.1rem 1.1rem; }
+  [data-journey][data-scene="horizontal"] [data-journey-lesson] { font-size: 0.84rem; line-height: 1.45; }
+  [data-journey][data-scene="horizontal"] [data-journey-body] { margin-block-start: 0.6rem; font-size: 0.72rem; line-height: 1.4; }
+}
+
+/* Sul telefono le tappe in attesa non scendono ne' si storcono di piu': erano
+   la voce piu' grossa dell'altezza chiesta al palco. Il corpo piccolo si toglie
+   alla vista ma non alla lettura, e sta nell'ordine in cui lo leggerebbe chi
+   vede. */
+@media (max-width: 767px) {
+  [data-journey][data-scene="horizontal"] [data-journey-item]:not([data-arrived]) {
+    transform: translateY(var(--dy, 0rem)) rotate(var(--r, 0deg));
+  }
+  [data-journey][data-scene="horizontal"] [data-journey-body] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+[data-journey][data-scene="horizontal"] [data-journey-hint] {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: absolute;
+  left: var(--gutter);
+  bottom: calc(var(--bottom-bar) + 1.25rem);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-accent);
+  transition: opacity 0.3s;
+}
+[data-journey][data-scene="horizontal"] [data-journey-hint][data-moved] { opacity: 0; }
+[data-journey][data-scene="horizontal"] [data-journey-progress] {
+  display: block;
+  position: absolute;
+  right: var(--gutter);
+  bottom: calc(var(--bottom-bar) + 1.4rem);
+  width: 8rem;
+  height: 3px;
+  background-color: color-mix(in oklab, var(--ink) 20%, transparent);
+}
+[data-journey-progress] i {
+  display: block;
+  height: 100%;
+  background-color: var(--ink);
+  transform-origin: left;
+  transform: scaleX(var(--progress, 0));
+}

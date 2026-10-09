@@ -1,29 +1,21 @@
 export type Metric = {
   id: string;
-  /** Già formattato per la resa: può contenere +, k, h. */
+  /** Gia' formattato per la resa: puo' contenere +, k, h. */
   value: string;
-  /** true finché il numero non è stato misurato davvero. */
+  /** true finche' il numero non e' stato misurato davvero. */
   estimated: boolean;
-  /** Come si otterrebbe il dato reale. Obbligatorio se estimated. */
+  /** Obbligatorio se estimated. */
   howToVerify: string;
 };
 
-/**
- * ATTENZIONE: decisione presa consapevolmente dall'utente.
- * Tutti i numeri qui sotto sono PLAUSIBILI MA INVENTATI: non sono stati
- * misurati. Sono di scala (componenti, volumi, durate) e non commerciali
- * (conversioni, fatturato), perché sono meno contestabili.
- * Non citarli in una call senza averli prima verificati.
- * Quando arriva il dato reale: sostituisci `value` e metti `estimated: false`.
- */
+// ATTENZIONE, scelta consapevole: i numeri stimati sono PLAUSIBILI MA
+// INVENTATI, di scala e non commerciali. Non citarli in una call senza averli
+// verificati; col dato reale si sostituisce `value` e si mette
+// `estimated: false`.
 export const metrics: Metric[] = [
   {
-    /**
-     * Il caso riservato non aveva numeri, ed era l'unico: senza, il dossier
-     * del lavoro di adesso raccontava una scelta senza dire cosa ha prodotto.
-     * Il numero arriva dal CV. Il 2026-09-29 l'utente l'ha confermato come
-     * vero («convertito in meno di 15 minuti»): non e' piu' una stima.
-     */
+    /** Il numero arriva dal CV, confermato vero dall'utente il 2026-09-29: non e'
+     *  piu' una stima. */
     id: "riservatoCycleTime",
     value: "< 15 min",
     estimated: false,
@@ -61,12 +53,8 @@ export const metrics: Metric[] = [
     howToVerify: "Contare le righe della tabella immagini nel database di VisualBoost.",
   },
   {
-    /**
-     * Il numero si misura da solo, ma non piu' su visual-boost.com: la landing
-     * pubblica e' stata rifatta da altri dopo, quindi Lighthouse oggi da' il
-     * voto al lavoro di qualcun altro. Per questo resta stimato: il 90+ e' un
-     * ricordo di una misura vera, e un ricordo non e' una misura.
-     */
+    /** Resta stimato: la landing e' stata rifatta da altri, e Lighthouse oggi da'
+     *  il voto al lavoro di qualcun altro. */
     id: "visualboostLighthouse",
     value: "90+",
     estimated: true,
@@ -74,12 +62,9 @@ export const metrics: Metric[] = [
       "Recuperare il report Lighthouse salvato all'epoca, o rilanciarlo su una copia del progetto di allora. La pagina online oggi non vale: l'ha rifatta qualcun altro.",
   },
   {
-    // Il post-it grigio del tavolo. E' l'unico numero del sito che non e' una
-    // metrica di lavoro: e' una battuta, e va letta come tale. Sta qui lo stesso
-    // (e con estimated: true come gli altri) perche' la regola di questo file
-    // e' "ogni numero inventato sta in un posto solo e si dichiara inventato",
-    // e un numero che si autorizza l'eccezione perche' e' simpatico e' esatta-
-    // mente il modo in cui quella regola smette di valere.
+    // Il post-it del tavolo: una battuta, non una metrica. Sta qui e stimato
+    // perche' ogni numero inventato sta in un posto solo e si dichiara inventato,
+    // senza eccezioni.
     id: "coffees",
     value: "23.777",
     estimated: true,

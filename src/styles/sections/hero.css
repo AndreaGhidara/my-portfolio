@@ -1,0 +1,27 @@
+/* Anello INTERNO: il fuoco da tastiera del sito e' gia' un anello arancione
+   esterno (globals.css), e i due segnali devono restare distinti. Di suo sta su
+   «Parliamone», e passa sull'altro bottone col puntatore. */
+[data-hero-cta] > a {
+  box-shadow: inset 0 0 0 0 transparent;
+  transition: box-shadow 220ms ease;
+}
+
+[data-hero-cta] > a:first-child {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+/* Solo col puntatore vero: su touch l'hover resta appiccicato dopo il tocco, e
+   l'anello resterebbe sul bottone sbagliato. */
+@media (hover: hover) {
+  [data-hero-cta]:has(> a:last-child:hover) > a:first-child {
+    box-shadow: inset 0 0 0 0 transparent;
+  }
+
+  [data-hero-cta]:has(> a:last-child:hover) > a:last-child {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-hero-cta] > a { transition: none; }
+}

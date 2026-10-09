@@ -1,0 +1,8 @@
+[data-ink-circle] { position: relative; display: grid; }
+[data-ink-circle-fill] {
+  position: absolute;
+  inset: 0;
+  /* --paint la anima paint() in presets.ts. */
+  --paint: 100%;
+  clip-path: inset(0 calc(100% - var(--paint)) 0 0);
+}

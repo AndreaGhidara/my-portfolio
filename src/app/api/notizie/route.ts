@@ -1,20 +1,14 @@
 import { NextResponse } from "next/server";
 import { site } from "@/content/site";
-import { creaChiedi } from "@/lib/notizie/chiedi";
-import { raccogli } from "@/lib/notizie/raccolta";
+import { createFetcher } from "@/lib/news/fetcher";
+import { collectNews } from "@/lib/news/collector";
 
-/**
- * Le notizie della sezione «Le notizie della settimana». Si chiamano da qui e
- * non dal browser: nei prototipi DEV rispondeva 429 e GitHub 403 dopo poche
- * chiamate, e la pagina non apre connessioni verso terzi.
- *
- * La route e' dinamica, cosi' il build non va in rete. La cache sta sulle
- * singole chiamate (vedi creaChiedi): ogni fonte ha la sua ora, e una fonte
- * che fallisce non entra in cache e si ritenta alla richiesta dopo.
- */
+// Le fonti si chiamano da qui e non dal browser: DEV rispondeva 429 e GitHub 403
+// dopo poche chiamate, e la pagina non apre connessioni verso terzi. Dinamica
+// perche' il build non vada in rete: la cache sta sulle chiamate (createFetcher).
 export const dynamic = "force-dynamic";
 
-const chiedi = creaChiedi(
+const fetcher = createFetcher(
   (url, init) => fetch(url, init),
   (url) => {
     const headers: Record<string, string> = {
@@ -30,5 +24,5 @@ const chiedi = creaChiedi(
 );
 
 export async function GET() {
-  return NextResponse.json(await raccogli(chiedi, new Date()));
+  return NextResponse.json(await collectNews(fetcher, new Date()));
 }

@@ -11,7 +11,6 @@ import { deskLayers } from "../desk";
 import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 
-/** Elenco piatto di tutte le chiavi annidate, per confrontare due dizionari. */
 function flatKeys(obj: unknown, prefix = ""): string[] {
   if (typeof obj !== "object" || obj === null) return [prefix];
   return Object.entries(obj).flatMap(([k, v]) =>
@@ -19,7 +18,6 @@ function flatKeys(obj: unknown, prefix = ""): string[] {
   );
 }
 
-/** Segue un percorso puntato dentro un oggetto annidato, senza `any`. */
 function valueAt(obj: unknown, path: string): unknown {
   return path.split(".").reduce<unknown>(
     (acc, part) =>
@@ -60,14 +58,13 @@ describe("servizi", () => {
   });
 
   it("ogni servizio ha fra quattro e sei pezzi, scritti in entrambe le lingue", () => {
-    // Sono le voci dello scontrino e i richiami della tavola: la tavola ha sei
-    // posti, e sotto i quattro il disegno resta mezzo vuoto.
+    // La tavola ha sei posti, e sotto i quattro il disegno resta mezzo vuoto.
     for (const service of services) {
-      expect(service.pezzi.length, service.id).toBeGreaterThanOrEqual(4);
-      expect(service.pezzi.length, service.id).toBeLessThanOrEqual(6);
-      for (const pezzo of service.pezzi) {
-        expect(itKeys).toContain(`services.list.${service.id}.pezzi.${pezzo}`);
-        expect(enKeys).toContain(`services.list.${service.id}.pezzi.${pezzo}`);
+      expect(service.pieces.length, service.id).toBeGreaterThanOrEqual(4);
+      expect(service.pieces.length, service.id).toBeLessThanOrEqual(6);
+      for (const piece of service.pieces) {
+        expect(itKeys).toContain(`services.list.${service.id}.pezzi.${piece}`);
+        expect(enKeys).toContain(`services.list.${service.id}.pezzi.${piece}`);
       }
     }
   });
@@ -75,36 +72,31 @@ describe("servizi", () => {
 
 describe("lavori", () => {
   it("sono quattro, e uno solo e' coperto da accordo", () => {
-    // CustomerTrack e' uscito (costruita per intero e mai messa online, il
-    // dominio non risolve, e un caso senza utenti non prova niente) e al suo
-    // posto e' entrato il lavoro di adesso, che non si puo' nominare. E' anche
-    // l'unico modo di far entrare qui dentro qualcosa che non venga da D.lab,
-    // finita ad aprile: senza, la sezione racconterebbe solo un posto lasciato.
     expect(works).toHaveLength(4);
-    const senzaNome = works.filter((w) => !w.url && !w.screenshot);
-    expect(senzaNome).toHaveLength(1);
-    expect(senzaNome[0].id).toBe("riservato");
+    const unnamed = works.filter((w) => !w.url && !w.screenshot);
+    expect(unnamed).toHaveLength(1);
+    expect(unnamed[0].id).toBe("riservato");
   });
 
   it("lo stato e' scritto, non ricavato dall'anno: in corso solo il lavoro di adesso", () => {
-    expect(Object.fromEntries(works.map((w) => [w.id, w.stato]))).toEqual({
-      riservato: "in-corso",
-      bdroppy: "consegnato",
-      aidify: "consegnato",
-      visualboost: "consegnato",
+    expect(Object.fromEntries(works.map((w) => [w.id, w.status]))).toEqual({
+      riservato: "in-progress",
+      bdroppy: "delivered",
+      aidify: "delivered",
+      visualboost: "delivered",
     });
   });
 
   it("la pratica ha le sue etichette in entrambe le lingue", () => {
-    const chiavi = [
+    const keys = [
       "archivio", "pratica", "comEra", "cliente", "anno", "stato", "online", "allegato",
       "rilevato", "rilevatoFinora", "stima", "consegnato", "inCorso", "firmaNome", "firmaRuolo",
     ];
-    for (const dizionario of [it_, en_]) {
-      for (const chiave of chiavi) {
-        const valore = valueAt(dizionario, `works.labels.${chiave}`);
-        expect(typeof valore, `works.labels.${chiave}`).toBe("string");
-        expect(valore).not.toBe("");
+    for (const dict of [it_, en_]) {
+      for (const key of keys) {
+        const value = valueAt(dict, `works.labels.${key}`);
+        expect(typeof value, `works.labels.${key}`).toBe("string");
+        expect(value).not.toBe("");
       }
     }
   });
@@ -126,9 +118,6 @@ describe("lavori", () => {
   });
 
   it("ogni caso ha schermata e link, tranne quello coperto da accordo", () => {
-    // Il caso riservato non ha ne' indirizzo ne' schermata, e per lo stesso
-    // motivo: non si puo' mostrare. Gli altri devono avere tutti e due, o la
-    // cartella si apre su un dossier a meta'.
     for (const work of works) {
       if (work.id === "riservato") {
         expect(work.url).toBeUndefined();
@@ -141,9 +130,7 @@ describe("lavori", () => {
   });
 
   it("ogni schermata dichiarata esiste davvero fra quelle generate", () => {
-    // works.ts dichiara il percorso, build-works-shots.mjs genera il file e le
-    // sue misure. Se i due divergono, il dossier si apre su un riquadro rotto:
-    // meglio saperlo qui che a sito pubblicato.
+    // works.ts dichiara il percorso, build-works-shots.mjs genera file e misure.
     for (const work of works) {
       if (!work.screenshot) continue;
       expect(() => shotBySrc(work.screenshot!)).not.toThrow();
@@ -232,9 +219,9 @@ describe("il tavolo", () => {
   });
 
   it("c'e' un oggetto muto e uno solo: il post-it bianco", () => {
-    const muti = deskLayers.flatMap((l) => l.objects.filter((o) => o.mute));
-    expect(muti).toHaveLength(1);
-    expect(muti[0].id).toBe("blank");
+    const mute = deskLayers.flatMap((l) => l.objects.filter((o) => o.mute));
+    expect(mute).toHaveLength(1);
+    expect(mute[0].id).toBe("blank");
   });
 
   it("l'oggetto muto non ha un'etichetta appesa da nessuna parte", () => {
@@ -249,21 +236,16 @@ describe("il tavolo", () => {
 });
 
 describe("il dominio sta in un posto solo", () => {
-  /**
-   * Difetto vero, gia' successo: il sito era passato ad andreaghidara.dev e sei
-   * file continuavano a cablare quello di Vercel. Il canonical diceva quindi a
-   * Google che l'originale stava altrove, e tutto quello che il dominio nuovo
-   * guadagnava lo regalava al vecchio. Non e' una cosa che si vede guardando il
-   * sito: si vede solo leggendo l'HTML servito.
-   */
+  // Gia' successo: sei file cablavano il dominio di Vercel, e il canonical diceva
+  // a Google che l'originale stava altrove. Si vede solo nell'HTML servito.
   const APP = path.resolve(__dirname, "../../app");
 
-  function file(dir: string): string[] {
-    return readdirSync(dir, { withFileTypes: true }).flatMap((voce) =>
-      voce.isDirectory()
-        ? file(path.join(dir, voce.name))
-        : /\.tsx?$/.test(voce.name)
-          ? [path.join(dir, voce.name)]
+  function sourceFiles(dir: string): string[] {
+    return readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? sourceFiles(path.join(dir, entry.name))
+        : /\.tsx?$/.test(entry.name)
+          ? [path.join(dir, entry.name)]
           : [],
     );
   }
@@ -274,13 +256,13 @@ describe("il dominio sta in un posto solo", () => {
   });
 
   it("nessuna pagina si scrive un dominio suo", () => {
-    for (const percorso of file(APP)) {
-      const codice = readFileSync(percorso, "utf8");
-      const domini = [...codice.matchAll(/https?:\/\/[a-z0-9.-]+/gi)]
+    for (const filePath of sourceFiles(APP)) {
+      const code = readFileSync(filePath, "utf8");
+      const domains = [...code.matchAll(/https?:\/\/[a-z0-9.-]+/gi)]
         .map((m) => m[0])
         // schema.org non e' il sito: e' il vocabolario dei dati strutturati.
         .filter((u) => !u.startsWith("https://schema.org"));
-      expect(domini, `${path.basename(percorso)} caccia un dominio a mano`).toEqual([]);
+      expect(domains, `${path.basename(filePath)} caccia un dominio a mano`).toEqual([]);
     }
   });
 });

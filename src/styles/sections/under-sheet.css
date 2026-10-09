@@ -1,0 +1,66 @@
+/* Tutto sotto [data-lit] e proporzionale a --coverage, scritti da UnderSheet.
+   Sticky, Hero apre un contesto suo: lo strato della carta va in <body>
+   (CrumpledPaper), e quello dichiarato del contenuto separa il ritratto dal
+   velo. La stampante sta a 2: sopra Hero, sotto le due barre. */
+[data-under-sheet] {
+  position: relative;
+  /* Quanto inchiostro scende su Hero a copertura piena. */
+  --dark: 0.55;
+  /* Di quanto si stringe: 0.06 e' al 94%. */
+  --shrink: 0.06;
+  /* Di quanto sale mentre va sotto, della sua altezza. */
+  --rise: 4%;
+  --corner-radius: 18px;
+}
+
+/* Il palco visibile: 100svh, il viewport piccolo, come la sonda del percorso. */
+[data-sheet-probe] {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100vh;
+  height: 100svh;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+[data-under-sheet][data-lit] #hero {
+  position: sticky;
+  /* 3,75rem e' la testata (60px misurati), per il fotogramma prima della misura. */
+  top: var(--stick, 3.75rem);
+}
+
+/* Il velo sta sulla sezione intera, gutter compreso: e' Hero che va
+   sotto, non solo il suo contenuto. Uno pseudo-elemento non e' una
+   trasformazione, e lo strato fisso della carta non se ne accorge. */
+[data-under-sheet][data-lit] #hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--ink);
+  opacity: calc(var(--coverage, 0) * var(--dark));
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* translate prima di scale: la salita non si stringe con il resto. L'origine al
+   30% tiene il nome quasi fermo: a stringersi verso l'alto e' il fondo, che il
+   foglio sta coprendo. */
+[data-under-sheet][data-lit] [data-hero-layer] {
+  /* A mano: la trasformazione apre gia' un contesto, ma e' un effetto
+     collaterale e non ci si appoggia. */
+  isolation: isolate;
+  transform-origin: 50% 30%;
+  transform: translateY(calc(var(--coverage, 0) * var(--rise) * -1))
+    scale(calc(1 - var(--coverage, 0) * var(--shrink)));
+  will-change: transform;
+}
+
+/* L'ombra sulla sezione stessa: `overflow: hidden` ritaglia il contenuto, non
+   la box-shadow esterna. */
+[data-under-sheet][data-lit] #scontrino {
+  z-index: 2;
+  border-radius: var(--corner-radius) var(--corner-radius) 0 0;
+  box-shadow: 0 -18px 40px -12px color-mix(in oklab, var(--ink) 55%, transparent);
+}

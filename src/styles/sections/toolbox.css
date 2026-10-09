@@ -1,0 +1,556 @@
+/* Mappa ed editor sono tutti e due nel markup del server: li sceglie questo
+   foglio, con la stessa condizione di MAP_QUERY in Toolbox.tsx. Le nove zone
+   si distinguono per tono, trama e passo dell'orlo, senza il verde e il
+   giallo della tavolozza. */
+[data-toolbox-section] {
+  position: relative;
+  max-width: 90rem;
+  margin-inline: auto;
+  /* Niente sopra: il tavolo chiude gia' con il suo --section-y, e sommarne un
+     altro faceva sedici rem di vuoto. A "full" ne aggiunge meta', sotto. */
+  padding: 0 var(--gutter) var(--section-y);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-desk][data-motion="full"] + [data-toolbox-section] {
+    padding-block-start: calc(var(--section-y) / 2);
+  }
+}
+
+/* La testa sta a sinistra, sul filo di «cuci per» e della mappa, larga quanto
+   la colonna dei Lavori e dei Contatti (56rem). */
+[data-toolbox-head] { max-width: 56rem; }
+[data-toolbox-head] h2 { text-wrap: balance; }
+[data-toolbox-head] p:not(.eyebrow) { margin-top: 1rem; line-height: 1.6; color: var(--fg-muted); }
+
+/* La barra alta del sito, 60px misurati come nel percorso e nell'archivio. */
+[data-toolbox] { --header: 3.75rem; margin-top: 1.75rem; }
+
+/* `--c` colore della zona, `--f` fondo della pezza, `--on-c` testo sopra lo
+   snodo pieno, `--hem` passo dell'orlo. Tutto misto con --bg e --fg, cosi' nel
+   tema scuro le pezze restano pezze e non macchie. */
+[data-toolbox] [data-zone="front"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 22%, var(--bg)); --on-c: var(--on-accent); --hem: 7 5; }
+[data-toolbox] [data-zone="stili"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 11%, var(--bg)); --on-c: var(--on-accent); --hem: 3 3; }
+[data-toolbox] [data-zone="mezzo"] { --c: var(--fg-muted); --f: color-mix(in oklab, var(--fg) 7%, var(--bg)); --on-c: var(--bg); --hem: 7 5; }
+[data-toolbox] [data-zone="back"] { --c: var(--fg); --f: color-mix(in oklab, var(--fg) 13%, var(--bg)); --on-c: var(--bg); --hem: 10 4; }
+[data-toolbox] [data-zone="auth"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 13%, var(--bg)); --on-c: var(--on-accent); --hem: 7 5; }
+[data-toolbox] [data-zone="dati"] { --c: var(--fg); --f: color-mix(in oklab, var(--fg) 9%, var(--bg)); --on-c: var(--bg); --hem: 2 4; }
+[data-toolbox] [data-zone="casa"] { --c: var(--fg-muted); --f: color-mix(in oklab, var(--fg) 4%, var(--bg)); --on-c: var(--bg); --hem: 7 5; }
+[data-toolbox] [data-zone="ai"] { --c: var(--accent); --f: color-mix(in oklab, var(--accent) 6%, var(--bg)); --on-c: var(--on-accent); --hem: 12 4; }
+[data-toolbox] [data-zone="ovunque"] { --c: var(--fg-muted); --f: var(--bg); --on-c: var(--bg); --hem: 4 3; }
+
+[data-toolbox-sew] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+[data-toolbox-sew] > span {
+  flex: none;
+  margin-right: 0.3rem;
+  white-space: nowrap;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+[data-toolbox-sew] button {
+  flex: none;
+  min-height: 2.75rem;
+  padding: 0.55rem 1rem;
+  border: 1.5px dashed color-mix(in oklab, var(--fg) 40%, transparent);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+[data-toolbox-sew] button:hover { border-color: var(--accent); }
+[data-toolbox-sew] button[aria-pressed="true"] {
+  border-style: solid;
+  border-color: var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+[data-toolbox-sew] [data-whole] { font-family: var(--font-mono), ui-monospace, monospace; font-size: 0.7rem; font-weight: 500; }
+
+[data-toolbox-start] {
+  margin-top: 0.75rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
+/* Una riga che scorre di lato: a capo diventavano tre righe di bottoni sopra
+   la cosa che comandano. */
+@media (max-width: 767px) {
+  [data-toolbox-sew] {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    padding-block-end: 0.2rem;
+    scrollbar-width: none;
+  }
+  [data-toolbox-sew]::-webkit-scrollbar { display: none; }
+}
+
+[data-toolbox-scene] { margin-top: 1.5rem; }
+[data-toolbox-map] { display: none; }
+
+@media (pointer: fine) and (min-width: 1280px) {
+  [data-toolbox-map] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    gap: 1rem;
+  }
+  [data-toolbox-view-editor] { display: none; }
+}
+
+[data-toolbox-bench] {
+  position: relative;
+  aspect-ratio: 1200 / 820;
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--bg) 92%, var(--graph));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--fg) 15%, transparent),
+    0 20px 40px -26px color-mix(in oklab, var(--ink) 40%, transparent);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+[data-toolbox-bench] svg { display: block; width: 100%; height: 100%; }
+
+[data-patch] [data-fabric] { fill: var(--f); }
+[data-patch] [data-hem] {
+  fill: none;
+  stroke: color-mix(in oklab, var(--c) 70%, transparent);
+  stroke-width: 1.4;
+  stroke-dasharray: var(--hem);
+}
+[data-patch] [data-count] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  /* Non --fg-muted: sulle pezze piu' cariche (front-end, back-end) scendeva
+     sotto il 4,5:1. Le misure stanno in contrast.test.ts. */
+  fill: color-mix(in oklab, var(--fg) 80%, var(--bg));
+}
+[data-toolbox-bench] [data-texture] { fill: none; stroke: color-mix(in oklab, var(--fg) 12%, transparent); stroke-width: 1.2; }
+[data-toolbox-bench] [data-texture-point] { fill: color-mix(in oklab, var(--fg) 28%, transparent); }
+
+[data-thread] {
+  fill: none;
+  stroke: color-mix(in oklab, var(--fg) 30%, transparent);
+  stroke-width: 1.2;
+}
+[data-thread="crossing"] { stroke-dasharray: 2 5; }
+[data-thread][data-lit] { stroke: var(--accent); stroke-width: 2; }
+
+[data-seam] {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-dasharray: 9 6;
+}
+[data-needle] { pointer-events: none; }
+[data-needle] path { fill: var(--fg-muted); stroke: var(--fg); stroke-width: 0.6; }
+[data-needle] ellipse { fill: var(--bg); }
+
+[data-node] { cursor: pointer; }
+[data-toolbox][data-motion="full"] [data-node] { cursor: grab; }
+[data-node] [data-backdrop] {
+  fill: var(--bg);
+  stroke: color-mix(in oklab, var(--fg) 35%, transparent);
+  stroke-width: 1;
+}
+[data-node] [data-points] {
+  fill: none;
+  stroke: color-mix(in oklab, var(--c, var(--fg)) 70%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+[data-node] text {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  fill: var(--fg);
+  pointer-events: none;
+}
+[data-node="junction"] [data-backdrop] { fill: var(--c); stroke: none; }
+[data-node="junction"] [data-points] { stroke: var(--on-c); }
+[data-node="junction"] text {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  fill: var(--on-c);
+}
+[data-node="root"] [data-backdrop] { fill: var(--fg); stroke: none; }
+[data-node="root"] [data-points] { stroke: var(--bg); }
+[data-node="root"] text {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  fill: var(--bg);
+}
+[data-node][data-lit] [data-backdrop] { stroke: var(--accent); stroke-width: 2; }
+[data-node][data-chosen] [data-backdrop] { fill: var(--accent); stroke: var(--accent); }
+[data-node][data-chosen] [data-points] { stroke: var(--on-accent); }
+[data-node][data-chosen] text { fill: var(--on-accent); }
+[data-node][data-sewn] [data-backdrop] {
+  fill: color-mix(in oklab, var(--accent) 10%, var(--bg));
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+[data-node][data-sewn] [data-points] { stroke: var(--accent); }
+[data-node="root"][data-sewn] [data-backdrop] { fill: var(--fg); }
+[data-node="root"][data-sewn] text { fill: var(--bg); }
+
+/* Con un capo scelto la cassetta sbiadisce e resta quello che si cuce; col
+   mouse sopra un attrezzo resta la sua strada. */
+svg[data-state="chosen"] [data-patch]:not([data-used]) :is([data-fabric], [data-texture-bg]) { opacity: 0.35; }
+svg[data-state="chosen"] [data-thread],
+svg[data-state="off"] [data-thread]:not([data-lit]) { opacity: 0.18; }
+svg[data-state="off"] [data-node]:not([data-lit]):not([data-chosen]):not([data-node="root"]) { opacity: 0.3; }
+svg[data-state="chosen"] [data-node="tool"]:not([data-sewn]) { opacity: 0.3; }
+svg[data-state="chosen"] [data-node="junction"] { opacity: 0.45; }
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-patch] :is([data-fabric], [data-texture-bg]),
+  [data-node] { transition: opacity 0.3s; }
+  [data-thread] { transition: opacity 0.3s, stroke 0.2s; }
+
+  /* Ogni etichetta parte dal punto del padre (--dx, --dy), in ordine di rami (--i). */
+  svg[data-entrance="waiting"] [data-body] { opacity: 0; }
+  svg[data-entrance="entering"] [data-body] {
+    animation: toolbox-bloom 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+    animation-delay: calc(var(--i) * 35ms);
+  }
+}
+@keyframes toolbox-bloom {
+  from { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); }
+}
+
+/* La colonna non conta nell'altezza della riga, che resta quella del banco:
+   un capo con quattordici fibre non allunga la sezione. */
+[data-toolbox-column] { contain: size; }
+[data-toolbox-panel] {
+  position: sticky;
+  top: calc(var(--header) + 1rem);
+  max-height: min(100%, calc(100vh - var(--header) - 2rem));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+[data-label] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 2.4rem 1.3rem 1.2rem;
+  border-radius: 2px;
+  text-align: center;
+  background-color: var(--surface);
+  background-image: repeating-linear-gradient(90deg, color-mix(in oklab, var(--fg) 3%, transparent) 0 1px, transparent 1px 2px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--fg) 8%, transparent),
+    0 10px 22px -14px color-mix(in oklab, var(--ink) 50%, transparent);
+}
+[data-label-hem] {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 0.35rem;
+  background: color-mix(in oklab, var(--bg) 80%, var(--graph));
+  border-bottom: 1.5px dashed color-mix(in oklab, var(--fg) 35%, transparent);
+}
+[data-label-hem] button {
+  padding: 0.2rem 0.35rem;
+  border: 0;
+  background: transparent;
+  color: var(--fg-muted);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+[data-label-hem] button:hover { color: var(--fg); }
+[data-label-close] { margin-inline-start: auto; }
+[data-label-brand] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--fg-muted);
+}
+[data-label] h3 { font-size: 1.25rem; line-height: 1.1; }
+[data-label-line] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+[data-label-line][data-experience="known"] { color: var(--fg-muted); }
+[data-label-item] {
+  margin-top: 0.5rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid color-mix(in oklab, var(--fg) 15%, transparent);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+}
+[data-label-estimate] { font-weight: 500; letter-spacing: 0.1em; color: var(--fg-muted); }
+[data-label-chips] { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+[data-toolbox-chip] {
+  padding: 0.3rem 0.5rem;
+  border: 1px dashed color-mix(in oklab, var(--c, var(--fg)) 55%, transparent);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+[data-toolbox-chip]:hover { border-color: var(--accent); border-style: solid; }
+[data-label-comp] { display: grid; gap: 0.3rem; margin: 0; padding: 0; list-style: none; text-align: left; }
+[data-label-comp] li { display: flex; align-items: center; gap: 0.5rem; }
+[data-label-comp] span {
+  display: block;
+  flex: none;
+  height: 6px;
+  min-width: 6px;
+  max-width: 55%;
+  border-radius: 3px;
+  background: var(--c);
+}
+[data-label-comp] em {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-style: normal;
+  text-transform: lowercase;
+}
+[data-label-care] {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.66rem;
+  line-height: 1.5;
+  text-align: left;
+}
+[data-label-care] i { font-style: normal; color: var(--accent-text); }
+[data-label-size] {
+  margin-top: 0.6rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--fg-muted);
+}
+
+/* Scuro in tutti e due i temi: le variabili del tema si ridichiarano qui,
+   cosi' i toni delle zone si risolvono sul fondo scuro. Il foglio sta fuori
+   e segue la pagina. Testo secondario in mutedDark: muted sull'inchiostro fa
+   3,34:1. */
+[data-toolbox-editor] {
+  --bg: var(--ink);
+  --fg: var(--paper);
+  --fg-muted: #A79E8C; /* from palette.mutedDark */
+  --accent-text: var(--accent);
+  --editor-bar: color-mix(in oklab, var(--paper) 6%, var(--ink));
+  display: flex;
+  flex-direction: column;
+  max-width: 46rem;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--graph);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--paper) 14%, var(--ink)),
+    0 14px 26px -14px color-mix(in oklab, var(--ink) 60%, transparent);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.74rem;
+  line-height: 1.6;
+}
+[data-editor-title] {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.5rem 0.7rem;
+  background: var(--editor-bar);
+  color: var(--fg-muted);
+  font-size: 0.66rem;
+}
+[data-editor-title] i { width: 8px; height: 8px; border-radius: 50%; background: color-mix(in oklab, var(--paper) 25%, var(--ink)); }
+[data-editor-title] i:first-child { background: var(--accent); }
+[data-editor-title] span { margin-left: 0.5rem; }
+[data-editor-tree] {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  padding: 0.3rem 0.4rem;
+  background: var(--editor-bar);
+  border-bottom: 1px solid color-mix(in oklab, var(--paper) 12%, var(--ink));
+  scrollbar-width: none;
+}
+[data-editor-tree]::-webkit-scrollbar { display: none; }
+[data-editor-tree] button {
+  flex: none;
+  min-height: 2.5rem;
+  padding: 0.3rem 0.6rem;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--fg-muted);
+  font: inherit;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+[data-editor-tree] button::before { content: "▸ "; color: var(--c); }
+[data-editor-tree] [data-file]::before { content: "◆ "; color: var(--accent); }
+[data-editor-tree] button[aria-pressed="true"] { background: color-mix(in oklab, var(--paper) 14%, var(--ink)); color: var(--paper); }
+[data-toolbox-editor][data-garment] [data-editor-tree] button[data-zone]:not([data-needed]) { opacity: 0.45; }
+[data-editor-code] {
+  height: 21rem;
+  padding: 0.5rem 0;
+  overflow-y: auto;
+  counter-reset: riga;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+[data-code-line] {
+  position: relative;
+  display: block;
+  min-height: 1.6em;
+  padding: 0 0.8rem 0 2.9rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+[data-code-line]::before {
+  counter-increment: riga;
+  content: counter(riga);
+  position: absolute;
+  left: 0;
+  width: 2rem;
+  text-align: right;
+  color: var(--fg-muted); /* mutedDark qui dentro: muted sull'inchiostro fa 3,34:1 */
+}
+[data-code-line][data-new] { background: color-mix(in oklab, var(--accent) 10%, var(--ink)); }
+[data-code-line][data-new]::after { content: "+"; position: absolute; left: 2.25rem; color: var(--accent); }
+[data-syntax="t"] { color: #A79E8C; /* from palette.mutedDark */ }
+[data-syntax="k"] { color: var(--accent); }
+[data-syntax="p"] { color: var(--graph); font-weight: 700; }
+[data-syntax="s"] { color: var(--paper); }
+[data-syntax="c"] { color: #A79E8C; /* from palette.mutedDark */ font-style: italic; }
+[data-syntax="n"] { color: var(--accent); }
+[data-editor-code] button[data-tool] {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+[data-editor-state] {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.7rem;
+  background: var(--editor-bar);
+  border-top: 1px solid color-mix(in oklab, var(--paper) 12%, var(--ink));
+  color: var(--graph);
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+[data-editor-mix] {
+  flex: 1;
+  display: flex;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: color-mix(in oklab, var(--paper) 10%, var(--ink));
+}
+[data-editor-mix] i { height: 100%; background: var(--c); box-shadow: inset -1px 0 0 var(--ink); }
+
+/* Niente `display` sul selettore nudo: toglierebbe al <dialog> chiuso il suo
+   display:none, come e' successo al dossier dei Lavori. */
+[data-toolbox-sheet]:not([open]) { display: none; }
+[data-toolbox-sheet] {
+  position: fixed;
+  inset: auto 0 0;
+  width: 100%;
+  max-width: 34rem;
+  max-height: 82vh;
+  max-height: 82svh;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 14px 14px 0 0;
+  background: transparent;
+  color: var(--fg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+[data-toolbox-sheet]::backdrop { background: color-mix(in oklab, var(--ink) 40%, transparent); }
+[data-toolbox-sheet] [data-label] {
+  min-height: 100%;
+  padding: 3.6rem 1.2rem 1.6rem;
+  border-radius: 14px 14px 0 0;
+}
+[data-toolbox-sheet] [data-label-hem] { height: 3rem; border-radius: 14px 14px 0 0; }
+[data-toolbox-sheet] [data-label-hem] button { min-height: 2.75rem; padding: 0 0.8rem; font-size: 0.72rem; }
+@media (prefers-reduced-motion: no-preference) {
+  [data-toolbox]:not([data-motion="none"]) [data-toolbox-sheet][open] {
+    animation: toolbox-rise 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+@keyframes toolbox-rise {
+  from { transform: translateY(100%); }
+}
+
+/* L'elenco e' per gli screen reader, e si vede solo senza JavaScript. */
+[data-toolbox-list] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (scripting: none) {
+  [data-toolbox-scene],
+  [data-toolbox-sew],
+  [data-toolbox-start] { display: none; }
+  [data-toolbox-list] {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: 1.5rem;
+    width: auto;
+    height: auto;
+    margin: 2rem 0 0;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+  }
+  [data-toolbox-list] h3 { grid-column: 1 / -1; font-size: 1.2rem; }
+  [data-toolbox-list] h4 { font-size: 1rem; }
+  [data-toolbox-list] p,
+  [data-toolbox-list] li { margin-top: 0.35rem; font-size: 0.85rem; line-height: 1.5; color: var(--fg-muted); }
+  [data-toolbox-list] ul { margin: 0.5rem 0 0; padding-left: 1rem; }
+  [data-toolbox-list] b { color: var(--fg); }
+}

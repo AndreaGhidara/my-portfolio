@@ -2,33 +2,30 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { lettoreCss, regole, type Regola } from "../css";
+import { cssReader, rules, type Rule } from "../css";
 
-/**
- * Un sito finto in una cartella temporanea: un ingresso che importa tailwind
- * (da saltare), un foglio vicino e uno in una sottocartella che ne importa un
- * altro a sua volta. I percorsi relativi si risolvono da chi importa.
- */
-let cartella: string;
-let leggi: ReturnType<typeof lettoreCss>;
+// Un sito finto: tailwind da saltare, un foglio vicino e uno in una sottocartella
+// che ne importa un altro. I percorsi relativi si risolvono da chi importa.
+let dir: string;
+let read: ReturnType<typeof cssReader>;
 
 beforeAll(() => {
-  cartella = mkdtempSync(path.join(tmpdir(), "css-"));
-  mkdirSync(path.join(cartella, "parti"));
+  dir = mkdtempSync(path.join(tmpdir(), "css-"));
+  mkdirSync(path.join(dir, "parts"));
   writeFileSync(
-    path.join(cartella, "ingresso.css"),
+    path.join(dir, "entry.css"),
     [
       '@import "tailwindcss";',
-      '@import "./primo.css";',
-      '@import "./parti/secondo.css";',
+      '@import "./first.css";',
+      '@import "./parts/second.css";',
       "body { margin: 0; }",
     ].join("\n"),
   );
   writeFileSync(
-    path.join(cartella, "primo.css"),
+    path.join(dir, "first.css"),
     [
       "/* LA TESTA */",
-      ":root { --carta: white; --carta: ivory; }",
+      ":root { --sheet-paper: white; --sheet-paper: ivory; }",
       "[data-a],",
       "[data-b] > i { color: red; padding: 1rem  2rem; }",
       "@media (max-width: 599px) {",
@@ -39,56 +36,56 @@ beforeAll(() => {
     ].join("\n"),
   );
   writeFileSync(
-    path.join(cartella, "parti", "secondo.css"),
+    path.join(dir, "parts", "second.css"),
     [
-      '@import "../terzo.css";',
+      '@import "../third.css";',
       "/* IL PIEDE */",
       "@media (max-width: 599px) { [data-c] { display: none; } }",
       "@supports (display: grid) { [data-c] { display: grid !important; } }",
       "@media (min-width: 600px) { [data-c] { display: block; } }",
     ].join("\n"),
   );
-  writeFileSync(path.join(cartella, "terzo.css"), "[data-d] { opacity: 0; }");
-  leggi = lettoreCss(path.join(cartella, "ingresso.css"));
+  writeFileSync(path.join(dir, "third.css"), "[data-d] { opacity: 0; }");
+  read = cssReader(path.join(dir, "entry.css"));
 });
 
-afterAll(() => rmSync(cartella, { recursive: true, force: true }));
+afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
-const da = (regola: Regola | undefined) => regola && path.relative(cartella, regola.file);
+const fileOf = (rule: Rule | undefined) => rule && path.relative(dir, rule.file);
 
 describe("il lettore del CSS", () => {
   it("legge i fogli nell'ordine degli import, risolti da chi importa, e salta tailwind", () => {
-    expect(leggi().map((r) => [r.selettore, da(r)])).toEqual([
-      [":root", "primo.css"],
-      ["[data-a], [data-b] > i", "primo.css"],
-      ["[data-a]", "primo.css"],
-      ["[data-d]", "terzo.css"],
-      ["[data-c]", path.join("parti", "secondo.css")],
-      ["[data-c]", path.join("parti", "secondo.css")],
-      ["[data-c]", path.join("parti", "secondo.css")],
-      ["body", "ingresso.css"],
+    expect(read().map((r) => [r.selector, fileOf(r)])).toEqual([
+      [":root", "first.css"],
+      ["[data-a], [data-b] > i", "first.css"],
+      ["[data-a]", "first.css"],
+      ["[data-d]", "third.css"],
+      ["[data-c]", path.join("parts", "second.css")],
+      ["[data-c]", path.join("parts", "second.css")],
+      ["[data-c]", path.join("parts", "second.css")],
+      ["body", "entry.css"],
     ]);
   });
 
   it("un selettore in una lista si trova da solo, una RegExp guarda la lista intera", () => {
-    expect(leggi("[data-b] > i").map((r) => r.selettori)).toEqual([["[data-a]", "[data-b] > i"]]);
-    expect(leggi("[data-a]")).toHaveLength(2);
-    expect(leggi(/^\[data-a\]$/)).toHaveLength(1);
-    expect(leggi(/i$/)).toHaveLength(1);
+    expect(read("[data-b] > i").map((r) => r.selectors)).toEqual([["[data-a]", "[data-b] > i"]]);
+    expect(read("[data-a]")).toHaveLength(2);
+    expect(read(/^\[data-a\]$/)).toHaveLength(1);
+    expect(read(/i$/)).toHaveLength(1);
   });
 
   it("le media annidate restano tutte e due, dalla piu' esterna", () => {
-    const [annidata] = leggi("[data-a]", { media: "(hover: hover)" });
-    expect(annidata.dentro).toEqual(["@media (max-width: 599px)", "@media (hover: hover)"]);
-    expect(leggi("[data-a]", { media: "(max-width: 599px)" })).toEqual([annidata]);
+    const [nested] = read("[data-a]", { media: "(hover: hover)" });
+    expect(nested.inside).toEqual(["@media (max-width: 599px)", "@media (hover: hover)"]);
+    expect(read("[data-a]", { media: "(max-width: 599px)" })).toEqual([nested]);
   });
 
   it("la stessa regola in due media diverse sono due regole, ognuna con la sua", () => {
-    const [stretta] = leggi("[data-c]", { media: "(max-width: 599px)" });
-    const [larga] = leggi("[data-c]", { media: "(min-width: 600px)" });
-    expect(stretta.dichiarazioni.display).toBe("none");
-    expect(larga.dichiarazioni.display).toBe("block");
-    expect(leggi("[data-c]").map((r) => r.dentro)).toEqual([
+    const [narrow] = read("[data-c]", { media: "(max-width: 599px)" });
+    const [wide] = read("[data-c]", { media: "(min-width: 600px)" });
+    expect(narrow.declarations.display).toBe("none");
+    expect(wide.declarations.display).toBe("block");
+    expect(read("[data-c]").map((r) => r.inside)).toEqual([
       ["@media (max-width: 599px)"],
       ["@supports (display: grid)"],
       ["@media (min-width: 600px)"],
@@ -96,24 +93,24 @@ describe("il lettore del CSS", () => {
   });
 
   it("il corpo e' una dichiarazione per riga, e fra le dichiarazioni vince l'ultima", () => {
-    const [radice] = leggi(":root");
-    expect(radice.corpo).toBe("--carta: white;\n--carta: ivory;");
-    expect(radice.dichiarazioni).toEqual({ "--carta": "ivory" });
-    expect(leggi("[data-c]")[1].corpo).toBe("display: grid !important;");
+    const [root] = read(":root");
+    expect(root.body).toBe("--sheet-paper: white;\n--sheet-paper: ivory;");
+    expect(root.declarations).toEqual({ "--sheet-paper": "ivory" });
+    expect(read("[data-c]")[1].body).toBe("display: grid !important;");
   });
 
   it("dopo un commento: le regole che vengono dopo, fino in fondo al sito", () => {
-    expect(leggi(undefined, { dopo: "IL PIEDE" }).map((r) => r.selettore)).toEqual([
+    expect(read(undefined, { after: "IL PIEDE" }).map((r) => r.selector)).toEqual([
       "[data-c]",
       "[data-c]",
       "[data-c]",
       "body",
     ]);
-    expect(leggi(undefined, { dopo: "NON C'E'" })).toEqual([]);
+    expect(read(undefined, { after: "NON C'E'" })).toEqual([]);
   });
 
   it("senza ingresso legge il sito vero, da globals.css", () => {
-    expect(regole().length).toBeGreaterThan(100);
-    expect(regole(":root").some((r) => r.file.endsWith(path.join("src", "styles", "tokens.css")))).toBe(true);
+    expect(rules().length).toBeGreaterThan(100);
+    expect(rules(":root").some((r) => r.file.endsWith(path.join("src", "styles", "tokens.css")))).toBe(true);
   });
 });

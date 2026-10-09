@@ -1,0 +1,122 @@
+/* Come lavoro: le quattro consegne e il loro disegno. */
+
+/* Testo e disegno si alternano scendendo: quattro voci dallo stesso lato
+   lasciano mezza pagina bianca. */
+
+/* Stessa ragione della lista del percorso: la spaziatura sta qui, o la
+   azzererebbe il `margin` di questa stessa regola. */
+[data-process-list] { list-style: none; margin: 3.5rem 0 0; padding: 0; }
+
+[data-process-item] {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+  padding-block: 3rem;
+  border-block-start: 1px solid var(--line);
+}
+/* Sopra la prima c'e' gia' l'introduzione: due filetti cosi' vicini sembrano
+   un errore di impaginazione. */
+[data-process-item]:first-child { border-block-start: 0; padding-block-start: 1rem; }
+
+[data-process-text] { max-width: 34rem; }
+
+/* Sotto i 900px testo e titolo appoggiati a sinistra lasciavano un terzo di
+   riga vuoto (248px a 768). Si centra il BLOCCO, non le righe. */
+@media (max-width: 899px) {
+  [data-process-text] { margin-inline: auto; }
+}
+
+/* Fino a 1023px e non 899: fra 900 e 1023 le consegne sono gia' a due
+   colonne, ma la testata resterebbe appoggiata a sinistra. */
+@media (max-width: 1023px) {
+  [data-process-header] h2,
+  [data-process-header] p {
+    margin-inline: auto;
+  }
+}
+[data-process-text] h3 {
+  margin-block-start: 0.35rem;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  line-height: 1.15;
+}
+[data-process-lead] { margin-block-start: 0.75rem; line-height: 1.6; }
+
+/* Il segno disegnato e non quello della lista, che cambia da un browser
+   all'altro. */
+[data-process-includes] {
+  list-style: none;
+  margin: 1.15rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+[data-process-includes] li {
+  position: relative;
+  padding-inline-start: 1.2rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+[data-process-includes] li::before {
+  content: "\0000B7";
+  position: absolute;
+  inset-inline-start: 0;
+  color: var(--accent-text);
+}
+
+[data-process-excludes] {
+  margin-block-start: 1.15rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+  border-inline-start: 2px solid var(--line);
+  padding-inline-start: 0.9rem;
+}
+[data-process-why] { margin-block-start: 1.15rem; line-height: 1.6; }
+
+[data-process-art] { display: flex; justify-content: center; }
+
+/* Contenitore di interrogazione, non solo di posizionamento: «Il numero» e'
+   un campione di testo, e senza container-type i suoi cqw si risolverebbero
+   sul viewport. */
+[data-process-art] [data-desk-piece] {
+  position: relative;
+  display: block;
+  width: 100%;
+  /* Non di piu': le righe stampate dentro la sagoma del foglio, ingrandite,
+     sembrerebbero graffi sopra il campione. */
+  max-width: 18rem;
+  container-type: inline-size;
+}
+/* Il telefono e' alto il doppio: il viewBox e' 74x148 contro i 150x96 del
+   foglio. */
+[data-process-art] [data-desk-piece][data-shape="phone"] { max-width: 8.5rem; }
+[data-process-art] [data-desk-piece][data-shape="card"] { max-width: 16rem; }
+
+/* Le marche sono in `em`: senza una misura qui erediterebbero il corpo del
+   testo. In cqw scalano col disegno. */
+[data-process-art] [data-desk-sample] { font-size: clamp(0.5rem, 4.6cqw, 1.05rem); }
+/* 0,78cqw e' tarato sul tavolo, venti volte piu' largo del pezzo: qui
+   darebbe due pixel. */
+[data-process-art] [data-desk-sample] [data-m="mono"] { font-size: 5.4cqw; }
+
+/* Sulla scocca scura del telefono le marche al 34% non si leggono: si
+   ribaltano sulla carta. L'accento resta com'e'. */
+/* `:not([data-title])` serve: senza, questa regola vince per specificita'
+   sulla riga in accento, e la barra dell'indirizzo diventa carta. */
+[data-process-art] [data-desk-piece][data-shape="phone"] [data-m="line"]:not([data-title]),
+[data-process-art] [data-desk-piece][data-shape="phone"] [data-m="block"] {
+  background-color: color-mix(in oklab, var(--paper) 58%, transparent);
+}
+
+@media (min-width: 900px) {
+  [data-process-item] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 4rem;
+    padding-block: 4.5rem;
+  }
+  /* `data-side` dice dove sta il DISEGNO: il testo va dall'altra parte. */
+  [data-process-item][data-side="left"] [data-process-text] { order: 2; }
+  [data-process-item][data-side="left"] [data-process-art] { order: 1; }
+}

@@ -1,15 +1,7 @@
 import { brandAssets } from "@/content/brand-assets";
 
-/**
- * Le virgolette aprono e chiudono davvero il blocco: non sono un adesivo
- * accanto al titolo. Puramente decorative, il significato è nel testo.
- *
- * Il segno è una maschera e non un'immagine, come il cerchio d'inchiostro: il
- * file è inchiostro su trasparente, e da <img> restava inchiostro anche quando
- * la pagina diventa inchiostro, cioè spariva proprio sul tema scuro. Mascherato
- * prende --fg, che è la carta di là e l'inchiostro di qua: un file solo, giusto
- * in tutti e due.
- */
+// Una maschera e non un <img>: il file e' inchiostro su trasparente, e come
+// immagine spariva sul tema scuro. Mascherato prende --fg, giusto nei due temi.
 export function QuoteFrame({
   variant,
   className,
@@ -28,9 +20,7 @@ export function QuoteFrame({
           WebkitMask: mask,
           mask,
           backgroundColor: "var(--fg)",
-          // La proporzione la dava l'immagine. Senza di lei il riquadro
-          // resterebbe alto zero: chi chiama gli da' la larghezza, l'altezza
-          // esce da qui.
+          // Senza immagine il riquadro sarebbe alto zero: la larghezza la da' chi chiama.
           aspectRatio: `${asset.width} / ${asset.height}`,
           display: "block",
           width: "100%",

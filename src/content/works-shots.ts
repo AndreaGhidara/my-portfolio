@@ -1,18 +1,9 @@
-/**
- * GENERATO da scripts/build-works-shots.mjs. Non si modifica a mano:
- * `npm run assets` lo riscrive.
- *
- * Misure e anteprima sfocata delle schermate. Stanno qui e non in works.ts
- * perche' non sono contenuto: works.ts dichiara SE un caso ha una schermata,
- * che e' una decisione editoriale; quanto e' alta e di che colore e' sfocata
- * lo decide il file PNG, e va riscritto ogni volta che il file cambia.
- */
+// GENERATO da scripts/build-works-shots.mjs con `npm run assets`: non si modifica a mano.
+// Fuori da works.ts perche' misure e anteprima le decide il PNG, non la redazione.
 export type WorkShot = {
   src: string;
   width: number;
   height: number;
-  /** LQIP a 20px in base64: l'anteprima che riempie il riquadro
-   *  prima che la schermata vera arrivi. */
   blurDataURL: string;
 };
 
@@ -40,11 +31,7 @@ export const workShots: Record<string, WorkShot> = {
   },
 };
 
-/**
- * Lancia se la schermata non e' nel manifesto: vuol dire che works.ts punta a
- * un file che non e' mai stato generato, e in quel caso il dossier si aprirebbe
- * su un riquadro rotto. Meglio che non compili.
- */
+// Meglio un errore che un dossier aperto su un riquadro rotto.
 export function shotBySrc(src: string): WorkShot {
   const shot = workShots[src];
   if (!shot) {

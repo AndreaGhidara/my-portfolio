@@ -1,61 +1,53 @@
 import { act } from "@testing-library/react";
 import { vi } from "vitest";
 
-/**
- * jsdom non ha IntersectionObserver. Questo lo sostituisce con uno che non
- * osserva niente da solo: e' la prova a dire quando un elemento entra o esce,
- * con `entra(el)` ed `esce(el)`. Senza argomento vale per tutti quelli
- * osservati.
- *
- * Si toglie con vi.unstubAllGlobals(), come ogni altro stub globale.
- */
-export function installaIntersectionObserver() {
-  const vivi = new Set<Osservatore>();
+// jsdom non ha IntersectionObserver: qui e' la prova a dire chi entra o esce,
+// con `enter(el)` ed `exit(el)`, o tutti senza argomento. Si toglie con vi.unstubAllGlobals().
+export function installIntersectionObserver() {
+  const live = new Set<FakeObserver>();
 
-  class Osservatore {
-    readonly osservati = new Set<Element>();
-    constructor(private readonly richiamo: IntersectionObserverCallback) {
-      vivi.add(this);
+  class FakeObserver {
+    readonly observed = new Set<Element>();
+    constructor(private readonly callback: IntersectionObserverCallback) {
+      live.add(this);
     }
     observe(el: Element) {
-      this.osservati.add(el);
+      this.observed.add(el);
     }
     unobserve(el: Element) {
-      this.osservati.delete(el);
+      this.observed.delete(el);
     }
     disconnect() {
-      this.osservati.clear();
-      vivi.delete(this);
+      this.observed.clear();
+      live.delete(this);
     }
     takeRecords(): IntersectionObserverEntry[] {
       return [];
     }
-    avvisa(dentro: boolean, el?: Element) {
-      const bersagli = [...this.osservati].filter((o) => !el || o === el);
-      if (!bersagli.length) return;
-      const voci = bersagli.map(
-        (target) => ({ target, isIntersecting: dentro, intersectionRatio: dentro ? 1 : 0 }) as IntersectionObserverEntry,
+    notify(intersecting: boolean, el?: Element) {
+      const targets = [...this.observed].filter((o) => !el || o === el);
+      if (!targets.length) return;
+      const entries = targets.map(
+        (target) => ({ target, isIntersecting: intersecting, intersectionRatio: intersecting ? 1 : 0 }) as IntersectionObserverEntry,
       );
-      this.richiamo(voci, this as unknown as IntersectionObserver);
+      this.callback(entries, this as unknown as IntersectionObserver);
     }
   }
 
-  vi.stubGlobal("IntersectionObserver", Osservatore);
+  vi.stubGlobal("IntersectionObserver", FakeObserver);
 
-  const avvisa = (dentro: boolean, el?: Element) =>
+  const notify = (intersecting: boolean, el?: Element) =>
     act(() => {
-      for (const o of [...vivi]) o.avvisa(dentro, el);
+      for (const o of [...live]) o.notify(intersecting, el);
     });
 
   return {
-    entra: (el?: Element) => avvisa(true, el),
-    esce: (el?: Element) => avvisa(false, el),
-    /** Quanti osservatori sono ancora attaccati: zero dopo lo smontaggio. */
-    attivi: () => vivi.size,
+    enter: (el?: Element) => notify(true, el),
+    exit: (el?: Element) => notify(false, el),
+    active: () => live.size,
   };
 }
 
-/** Il browser vecchio, o l'ambiente senza: IntersectionObserver non c'e'. */
-export function togliIntersectionObserver() {
+export function removeIntersectionObserver() {
   vi.stubGlobal("IntersectionObserver", undefined);
 }

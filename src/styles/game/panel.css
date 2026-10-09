@@ -1,0 +1,253 @@
+/* Tutto sotto [data-game-level="pannello"]; i pezzi comuni stanno in base.css. */
+
+[data-game-level="pannello"] {
+  /* Il bordo dei moduli e il fondo del tubo, poi le viti: gradini piu'
+     chiari dello scuro del banco. */
+  --panel-border: color-mix(in oklab, var(--ink) 82%, var(--paper));
+  --panel-screw: color-mix(in oklab, var(--ink) 76%, var(--paper));
+  --panel-deep-red: color-mix(in oklab, var(--orange) 65%, var(--ink));
+  /* L'arancio come testo sulla carta: pieno ci fa 3,27:1, poco per
+     un'etichetta di mezzo rem. */
+  --panel-orange-text: color-mix(in oklab, var(--orange) 72%, var(--ink));
+  --panel-problem: color-mix(in oklab, var(--orange) 6%, var(--paper));
+  --panel-solved: color-mix(in oklab, var(--green) 10%, var(--paper));
+}
+
+[data-game-level="pannello"] .health {
+  position: absolute;
+  inset-inline: 0.7rem;
+  inset-block-start: 2.35rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  /* Fra le due righe poco spazio, e il numero senza interlinea: con quella
+     del sito la nota finiva sotto la coda. */
+  gap: 0.3rem 0.6rem;
+}
+
+[data-game-level="pannello"] .health b {
+  min-inline-size: 3.6rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--greenDark);
+  transition: color 0.3s;
+}
+
+[data-game-level="pannello"] .health b.down { color: var(--orange); }
+
+[data-game-level="pannello"] .health .tube {
+  block-size: 0.5rem;
+  border-radius: 999px;
+  background: var(--panel-border);
+  overflow: hidden;
+}
+
+[data-game-level="pannello"] .health .tube i {
+  display: block;
+  block-size: 100%;
+  inline-size: var(--p);
+  background: linear-gradient(90deg, var(--green), var(--greenDark));
+  transition: inline-size 0.4s linear;
+}
+
+[data-game-level="pannello"] .health .tube i.down {
+  background: linear-gradient(90deg, var(--panel-deep-red), var(--orange));
+}
+
+[data-game-level="pannello"] .health small {
+  grid-column: 1 / 3;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+  /* Senza spaziatura fra le lettere: a 360px la nota sta su una riga, e
+     sotto c'e' subito la coda. */
+  line-height: 1.3;
+  color: var(--mutedDark);
+}
+
+/* Va a capo invece di tagliarsi coi puntini: e' la prima cosa che si legge, e
+   due righe ci stanno. */
+[data-game-level="pannello"] .tail {
+  position: absolute;
+  inset-inline: 0.7rem;
+  inset-block-start: 5.2rem;
+  block-size: 2.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding-inline: 0.6rem;
+  border: 1px dashed var(--panel-border);
+  border-radius: 8px;
+  background: var(--ink);
+  overflow: hidden;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  line-height: 1.3;
+  color: var(--mutedDark);
+}
+
+[data-game-level="pannello"] .tail > span:last-child { animation: game-enter 0.3s ease; }
+[data-game-level="pannello"] .tail b { font-weight: 500; color: var(--bulb); }
+
+[data-game-level="pannello"] .modules {
+  position: absolute;
+  inset-inline: 0.7rem;
+  inset-block-end: 0.7rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.25rem;
+}
+
+[data-game-level="pannello"] [data-form] {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.3rem;
+  min-inline-size: 0;
+  /* Di lato quasi niente, e senza spaziatura fra le lettere: a 360px
+     «MANUTENZIONE» e' largo quanto il modulo. Piu' stretto ancora va a
+     capo con il trattino, non esce. */
+  padding: 0.5rem 0.05rem 0.4rem;
+  border: 1.5px solid var(--panel-border);
+  border-radius: 10px;
+  background: var(--game-dark-2);
+  color: var(--mutedDark);
+  cursor: pointer;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.44rem;
+  line-height: 1.15;
+  text-align: center;
+  hyphens: auto;
+  text-transform: uppercase;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+/* Spento, il pannello non risponde ma resta com'e': un oggetto spento, non
+   un pulsante sbiadito. */
+[data-game-level="pannello"] [data-form]:disabled { cursor: default; }
+
+[data-game-level="pannello"] [data-form] .ic {
+  inline-size: 2.1rem;
+  block-size: 2.1rem;
+  padding: 0.2rem;
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+[data-game-level="pannello"] [data-form] .led {
+  position: absolute;
+  inset-block-start: 0.3rem;
+  inset-inline-end: 0.3rem;
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  border-radius: 50%;
+  background: var(--greenDark);
+  box-shadow: 0 0 6px var(--greenDark);
+}
+
+[data-game-level="pannello"] [data-form].alarm {
+  border-color: var(--orange);
+  color: var(--paper);
+  animation: game-blink 1s infinite;
+}
+
+[data-game-level="pannello"] [data-form].alarm .led {
+  background: var(--orange);
+  box-shadow: 0 0 8px var(--orange);
+}
+
+[data-game-level="pannello"] [data-form].chosen {
+  border-color: var(--bulb);
+  background: var(--panel-border);
+  color: var(--paper);
+}
+
+[data-game-level="pannello"] [data-form] .screws::before,
+[data-game-level="pannello"] [data-form] .screws::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 0.25rem;
+  inline-size: 0.22rem;
+  block-size: 0.22rem;
+  border-radius: 50%;
+  background: var(--panel-screw);
+}
+
+[data-game-level="pannello"] [data-form] .screws::before { inset-inline-start: 0.3rem; }
+[data-game-level="pannello"] [data-form] .screws::after { inset-inline-end: 0.3rem; }
+
+[data-game-level="pannello"] .calm {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  text-align: center;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+[data-game-level="pannello"] .calm span {
+  display: block;
+  margin-block-end: 0.2rem;
+  font-size: 1.4rem;
+}
+
+[data-game-level="pannello"] .problem {
+  padding: 0.55rem 0.65rem;
+  border: 1.5px solid var(--orange);
+  border-radius: 10px;
+  background: var(--panel-problem);
+  animation: game-enter 0.3s ease;
+}
+
+[data-game-level="pannello"] .problem small {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--panel-orange-text);
+}
+
+[data-game-level="pannello"] .problem p {
+  margin-block-start: 0.15rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+[data-game-level="pannello"] .problem.solved {
+  border-color: var(--green);
+  background: var(--panel-solved);
+}
+
+[data-game-level="pannello"] .problem.solved small { color: var(--green); }
+
+/* Righe basse: con la salute sotto 90 il titolo va su due righe, e cinque
+   righe alte uscivano dal palco. */
+[data-game-level="pannello"] .report {
+  display: grid;
+  gap: 0.22rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  animation: game-enter 0.4s ease;
+}
+
+[data-game-level="pannello"] .report li {
+  display: grid;
+  grid-template-columns: 1.35rem 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.18rem 0.45rem;
+  border: 1px solid var(--graph);
+  border-radius: 8px;
+  background: var(--paper);
+  font-size: 0.68rem;
+  line-height: 1.3;
+}
+
+[data-game-level="pannello"] .report .ic {
+  inline-size: 1.35rem;
+  block-size: 1.35rem;
+}

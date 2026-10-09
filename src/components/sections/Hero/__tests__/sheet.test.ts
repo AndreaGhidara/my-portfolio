@@ -1,0 +1,46 @@
+import { describe, it, expect } from "vitest";
+import { sheetCoverage, stickyTop } from "../sheet";
+
+// Un Hero da 700px e una testata da 60: contano i rapporti, non i numeri.
+const HERO = { top: 60, bottom: 760, height: 700 };
+
+describe("copertura", () => {
+  it("e' zero finche' la seconda sezione sta sotto il fondo della prima", () => {
+    expect(sheetCoverage(HERO, { top: 760 })).toBe(0);
+    // Non negativa: la seconda che sta ancora piu' giu' non «scopre» niente.
+    expect(sheetCoverage(HERO, { top: 900 })).toBe(0);
+  });
+
+  it("cresce con quanto la seconda e' salita sopra la prima", () => {
+    expect(sheetCoverage(HERO, { top: 410 })).toBeCloseTo(0.5);
+    expect(sheetCoverage(HERO, { top: 585 })).toBeCloseTo(0.25);
+  });
+
+  it("e' uno quando la seconda ne raggiunge la cima, e non va oltre", () => {
+    expect(sheetCoverage(HERO, { top: 60 })).toBe(1);
+    // Dopo, Hero se ne va con il resto della pagina: resta coperto e basta.
+    expect(sheetCoverage(HERO, { top: -300 })).toBe(1);
+  });
+
+  it("una prima sezione senza altezza non e' coperta: niente divisioni per zero", () => {
+    expect(sheetCoverage({ top: 0, bottom: 0, height: 0 }, { top: -10 })).toBe(0);
+  });
+});
+
+describe("attacco", () => {
+  it("se la prima sta nello spazio visibile si ferma sotto la testata", () => {
+    expect(stickyTop({ header: 60, stage: 900, bottomBar: 0, height: 700 })).toBe(60);
+  });
+
+  it("se e' piu' alta si ferma quando il suo fondo tocca il fondo visibile", () => {
+    // Spazio 840, Hero 1000: il fondo tocca il fondo dello schermo con la cima 160px sopra la testata.
+    expect(stickyTop({ header: 60, stage: 900, bottomBar: 0, height: 1000 })).toBe(-100);
+  });
+
+  it("sul telefono il fondo visibile e' sopra la barra in basso", () => {
+    // 548 - 60 - 52 = 436 di spazio, Hero da 600: fondo sul bordo della barra.
+    const top = stickyTop({ header: 60, stage: 548, bottomBar: 52, height: 600 });
+    expect(top).toBe(60 + 436 - 600);
+    expect(top + 600).toBe(548 - 52);
+  });
+});

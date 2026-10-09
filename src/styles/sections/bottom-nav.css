@@ -1,0 +1,54 @@
+[data-nav-bottom] {
+  display: none;
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 40;
+  /* Pieno sembrerebbe il bordo dello schermo, non una cosa appoggiata sulla pagina. */
+  background-color: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-block-start: 1px solid var(--line);
+  /* Senza, le voci finiscono sotto la barra di sistema dei telefoni senza tasto. */
+  padding-block-end: env(safe-area-inset-bottom, 0px);
+}
+
+/* 3,25rem = 52px: sopra i 24 di WCAG 2.2 e i 44 consigliati per il pollice. */
+[data-nav-bottom] a {
+  flex: 1 1 0;
+  min-block-size: 3.25rem;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+/* Il dossier sta a tutto schermo e ha la sua uscita: la barra lo coprirebbe. */
+html[data-dialog-open]:not([data-dossier-in-progress]) [data-nav-bottom] { display: none; }
+
+/* Con data-dossier-in-progress (useDossier) la barra resta finche' non arriva il
+   velo: sparire al tocco, prima che la cartella si muova, sembrava un salto. */
+html[data-dossier-in-progress]:has([data-work-dialog][data-veil]) [data-nav-bottom] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Fuori da un blocco `no-preference`: la guardia di layers.test.ts cerca il
+   primo `no-preference` per posizione, ed e' quello della camera del tavolo. */
+[data-nav-bottom] { transition: opacity 200ms ease, visibility 0s; }
+
+html[data-dossier-in-progress]:has([data-work-dialog][data-veil]) [data-nav-bottom] {
+  transition: opacity 200ms ease, visibility 0s linear 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-nav-bottom],
+  html[data-dossier-in-progress]:has([data-work-dialog][data-veil]) [data-nav-bottom] { transition: none; }
+}
+
+@media (max-width: 767px) {
+  [data-nav-bottom] { display: flex; }
+}

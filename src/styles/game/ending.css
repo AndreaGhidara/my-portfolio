@@ -1,0 +1,101 @@
+/* Tutto sotto [data-game-level="finale"]. Il blu non e' in tavolozza: la notte
+   e' inchiostro scaldato verso il grigio. Il giorno e' uno strato che sale di
+   opacita', perche' due gradienti non si dissolvono l'uno nell'altro. */
+
+[data-game-level="finale"] .above {
+  background: linear-gradient(var(--ink), color-mix(in oklab, var(--ink) 80%, var(--muted)));
+  animation: game-ending-text 1.4s 0.3s ease both;
+}
+
+[data-game-level="finale"] .above::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(color-mix(in oklab, var(--bulb) 38%, var(--paper)), var(--paper));
+  animation: game-ending-day 1.4s 0.3s ease both;
+}
+
+[data-game-level="finale"] .head .right { color: inherit; }
+
+[data-game-level="finale"] .stars {
+  animation: game-ending-stars 0.8s 0.3s ease both;
+}
+
+[data-game-level="finale"] .dawn {
+  position: absolute;
+  z-index: 2;
+  inset: 2.2rem 0.7rem 0.7rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+[data-game-level="finale"] .dawn b {
+  display: block;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  /* L'a capo sta nel testo, dopo «tutto»: e' li' che la frase respira. */
+  white-space: pre-line;
+}
+
+[data-game-level="finale"] .dawn small {
+  display: block;
+  margin-block-start: 0.4rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+}
+
+[data-game-level="finale"] .layers {
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-game-level="finale"] .layers li {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--graph);
+  border-radius: 8px;
+  background: var(--paper);
+  font-size: 0.7rem;
+  animation: game-enter 0.35s ease backwards;
+}
+
+[data-game-level="finale"] .layers li:nth-child(2) { animation-delay: 0.1s; }
+[data-game-level="finale"] .layers li:nth-child(3) { animation-delay: 0.2s; }
+[data-game-level="finale"] .layers li:nth-child(4) { animation-delay: 0.3s; }
+
+[data-game-level="finale"] .layers li > span:first-child {
+  inline-size: 1.6rem;
+  block-size: 1.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--bulb);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+}
+
+@keyframes game-ending-day {
+  from { opacity: 0; }
+}
+
+@keyframes game-ending-stars {
+  to { opacity: 0; }
+}
+
+@keyframes game-ending-text {
+  from { color: var(--paper); }
+  to { color: var(--ink); }
+}

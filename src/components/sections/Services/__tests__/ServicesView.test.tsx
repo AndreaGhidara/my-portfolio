@@ -1,13 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { screen, within } from "@testing-library/react";
-import { renderConTesti as render } from "@/test/renderConTesti";
+import { renderWithMessages as render } from "@/test/renderWithMessages";
 import { ServicesView } from "../ServicesView";
 import type { ServicesViewProps } from "../ServicesView";
 import { LABEL, drawWidth } from "../layers";
-import { testi } from "../cassetta/__tests__/fixture";
+import { copyFor } from "../toolbox/__tests__/fixture";
 
-/** Il quarto, come nel tavolo vero. */
-const MUTO = 3;
+const MUTE_INDEX = 3;
 
 const layer = (id: string, n: number, mute = false) => ({
   id,
@@ -16,12 +15,11 @@ const layer = (id: string, n: number, mute = false) => ({
   objects: Array.from({ length: n }, (_, i) => ({
     id: `${id}-${i}`,
     shape: "sheet" as const,
-    label: mute && i === MUTO ? null : `${id} oggetto ${i}`,
+    label: mute && i === MUTE_INDEX ? null : `${id} oggetto ${i}`,
   })),
 });
 
-/** Gli oggetti del tavolo. */
-const SOLI_VERI = "[data-desk-object]";
+const OBJECTS = "[data-desk-object]";
 
 const props: ServicesViewProps = {
   eyebrow: "Il metodo",
@@ -32,22 +30,21 @@ const props: ServicesViewProps = {
   blank: "E la tua, qual è?",
   note: "23.777 caffè",
   layers: [layer("site", 6), layer("logic", 6), layer("infra", 6), layer("growth", 6, true)],
-  cassetta: {
+  toolbox: {
     eyebrow: "Gli attrezzi",
     title: "Tutto quello che so usare.",
     lead: "La mia cassetta.",
-    testi: testi("it"),
+    copy: copyFor("it"),
   },
 };
 
 describe("la sezione del tavolo", () => {
-
   it("la sezione si chiama come il suo titolo, e il titolo ha la scala di tutte le sezioni", () => {
     render(<ServicesView {...props} />);
-    const sezione = screen.getByRole("region", { name: props.stageTitle });
-    const titolo = within(sezione).getByRole("heading", { level: 2, name: props.stageTitle });
-    expect(sezione).toHaveAttribute("aria-labelledby", titolo.id);
-    expect(titolo).toHaveClass("titolo-sezione");
+    const section = screen.getByRole("region", { name: props.stageTitle });
+    const title = within(section).getByRole("heading", { level: 2, name: props.stageTitle });
+    expect(section).toHaveAttribute("aria-labelledby", title.id);
+    expect(title).toHaveClass("section-title");
   });
   it("è ancorabile dalla navbar", () => {
     const { container } = render(<ServicesView {...props} />);
@@ -61,12 +58,12 @@ describe("la sezione del tavolo", () => {
 
   it("dopo il tavolo viene la cassetta degli attrezzi, dentro la stessa sezione", () => {
     const { container } = render(<ServicesView {...props} />);
-    const sezione = container.querySelector("section#services") as HTMLElement;
-    const figli = [...sezione.children];
-    expect(figli[0]).toHaveAttribute("data-desk");
-    expect(figli[1]).toHaveAttribute("data-cassetta-sezione");
-    expect(within(figli[1] as HTMLElement).getByRole("heading", { level: 2 })).toHaveTextContent(
-      props.cassetta.title,
+    const section = container.querySelector("section#services") as HTMLElement;
+    const children = [...section.children];
+    expect(children[0]).toHaveAttribute("data-desk");
+    expect(children[1]).toHaveAttribute("data-toolbox-section");
+    expect(within(children[1] as HTMLElement).getByRole("heading", { level: 2 })).toHaveTextContent(
+      props.toolbox.title,
     );
   });
 
@@ -86,33 +83,29 @@ describe("il tavolo è la lista", () => {
 
   it("ogni strato ha il suo titolo e la sua riga", () => {
     const { container } = render(<ServicesView {...props} />);
-    const vero = container.querySelector("[data-desk-world]:not([aria-hidden])") as HTMLElement;
+    const world = container.querySelector("[data-desk-world]:not([aria-hidden])") as HTMLElement;
     for (const l of props.layers) {
       expect(screen.getByRole("heading", { level: 3, name: l.title })).toBeInTheDocument();
-      expect(within(vero).getByText(l.lead)).toBeInTheDocument();
+      expect(within(world).getByText(l.lead)).toBeInTheDocument();
     }
   });
 
   it("legge tutte le etichette, in ordine: uno screen reader sente il tavolo per intero", () => {
     const { container } = render(<ServicesView {...props} />);
-    const attese = props.layers.flatMap((l) => l.objects.map((o) => o.label).filter(Boolean));
-    const lette = [...container.querySelectorAll(SOLI_VERI + " [data-desk-label]")].map(
+    const expected = props.layers.flatMap((l) => l.objects.map((o) => o.label).filter(Boolean));
+    const read = [...container.querySelectorAll(OBJECTS + " [data-desk-label]")].map(
       (el) => el.textContent,
     );
-    expect(lette).toEqual(attese);
+    expect(read).toEqual(expected);
   });
 
   it("il post-it bianco non porta un'etichetta: il suo nome è quello di un comando", () => {
     const { container } = render(<ServicesView {...props} />);
-    const oggetti = container.querySelectorAll(SOLI_VERI);
-    expect(oggetti).toHaveLength(24);
-    // Ventitre' etichette e un post-it. Quella che manca non e' una traduzione
-    // dimenticata: e' l'unico oggetto che non si legge, si preme, e il nome
-    // che uno screen reader annuncia e' il nome del comando, non una voce
-    // dell'elenco. Per questo il conteggio delle etichette resta ventitre'.
-    const senzaEtichetta = [...oggetti].filter((el) => !el.querySelector("[data-desk-label]"));
-    expect(senzaEtichetta).toHaveLength(1);
-    expect(within(senzaEtichetta[0] as HTMLElement).getByRole("link")).toHaveAccessibleName(
+    const objects = container.querySelectorAll(OBJECTS);
+    expect(objects).toHaveLength(24);
+    const unlabelled = [...objects].filter((el) => !el.querySelector("[data-desk-label]"));
+    expect(unlabelled).toHaveLength(1);
+    expect(within(unlabelled[0] as HTMLElement).getByRole("link")).toHaveAccessibleName(
       props.blank,
     );
   });
@@ -124,120 +117,96 @@ describe("il tavolo è la lista", () => {
 
   it("non ci sono altri comandi sul tavolo: il resto è un disegno da guardare", () => {
     const { container } = render(<ServicesView {...props} />);
-    const vero = container.querySelector("[data-desk-world]:not([aria-hidden])") as HTMLElement;
-    expect(within(vero).getAllByRole("link")).toHaveLength(1);
+    const world = container.querySelector("[data-desk-world]:not([aria-hidden])") as HTMLElement;
+    expect(within(world).getAllByRole("link")).toHaveLength(1);
   });
 
   it("le sagome sono decorative: il significato sta nell'etichetta, non nel disegno", () => {
     const { container } = render(<ServicesView {...props} />);
-    for (const oggetto of container.querySelectorAll(SOLI_VERI)) {
-      // La sagoma e' una maschera CSS: dentro un oggetto non c'e' niente che
-      // uno screen reader possa annunciare oltre alla sua etichetta.
-      const annunciabile = oggetto.querySelectorAll("img, svg, [alt], [role], [aria-label], [title]");
-      expect(annunciabile).toHaveLength(0);
+    for (const object of container.querySelectorAll(OBJECTS)) {
+      const announceable = object.querySelectorAll("img, svg, [alt], [role], [aria-label], [title]");
+      expect(announceable).toHaveLength(0);
     }
   });
 
   it("il disegno e' quello che la geometria dice: la larghezza arriva da layers.ts", () => {
-    // Senza questa, si potrebbe togliere la larghezza inline e ogni prova di
-    // layers.test.ts continuerebbe a passare, dimostrando cose su un mondo che
-    // nessuno disegna piu'.
     const { container } = render(<ServicesView {...props} />);
-    const primo = container.querySelector(SOLI_VERI) as HTMLElement;
-    expect(primo.style.width).toBe(`${drawWidth("sheet")}%`);
-    const etichetta = primo.querySelector("[data-desk-label]") as HTMLElement;
-    expect(etichetta.style.maxWidth).toBe(`${LABEL.width}em`);
+    const first = container.querySelector(OBJECTS) as HTMLElement;
+    expect(first.style.width).toBe(`${drawWidth("sheet")}%`);
+    const label = first.querySelector("[data-desk-label]") as HTMLElement;
+    expect(label.style.maxWidth).toBe(`${LABEL.width}em`);
   });
 
   it("il mondo e' uno solo: il gemello verticale ha lasciato il posto al gioco", () => {
     const { container } = render(<ServicesView {...props} />);
     expect(container.querySelectorAll("[data-desk-world]")).toHaveLength(1);
     expect(container.querySelector("[data-desk-world][aria-hidden]")).toBeNull();
-    expect(container.querySelector("section#services [data-desk-stage] [data-gioco]")).not.toBeNull();
+    expect(container.querySelector("section#services [data-desk-stage] [data-game]")).not.toBeNull();
   });
 });
 
 describe("lo schermo al centro", () => {
   it("porta un sito finito, non una cornice vuota: e' la cosa che la tesi indica", () => {
     const { container } = render(<ServicesView {...props} />);
-    const centro = container.querySelector(
+    const centre = container.querySelector(
       "[data-desk-world]:not([aria-hidden]) [data-desk-centre]",
     ) as HTMLElement;
-    const schermo = centro.querySelector("[data-desk-screen]") as HTMLElement;
-    expect(schermo).not.toBeNull();
-    // La barra in cima, il titolo, le righe di testo e il bottone: e' quello che
-    // fa leggere un rettangolo come un sito e non come un foglio.
-    expect(schermo.querySelector("[data-desk-screen-bar]")).not.toBeNull();
-    expect(schermo.querySelector("[data-desk-screen-head]")).not.toBeNull();
-    expect(schermo.querySelectorAll("[data-desk-screen-line]").length).toBeGreaterThanOrEqual(2);
-    expect(schermo.querySelector("[data-desk-screen-cta]")).not.toBeNull();
+    const laptopScreen = centre.querySelector("[data-desk-screen]") as HTMLElement;
+    expect(laptopScreen).not.toBeNull();
+    expect(laptopScreen.querySelector("[data-desk-screen-bar]")).not.toBeNull();
+    expect(laptopScreen.querySelector("[data-desk-screen-head]")).not.toBeNull();
+    expect(laptopScreen.querySelectorAll("[data-desk-screen-line]").length).toBeGreaterThanOrEqual(2);
+    expect(laptopScreen.querySelector("[data-desk-screen-cta]")).not.toBeNull();
   });
 
   it("lo schermo e' muto: il nome del centro e' gia' la sua didascalia", () => {
     const { container } = render(<ServicesView {...props} />);
-    const centro = container.querySelector(
+    const centre = container.querySelector(
       "[data-desk-world]:not([aria-hidden]) [data-desk-centre]",
     ) as HTMLElement;
-    expect(centro).toHaveTextContent(props.centre);
-    const schermo = centro.querySelector("[data-desk-screen]") as HTMLElement;
-    expect(schermo).toHaveAttribute("aria-hidden", "true");
-    expect(schermo.textContent).toBe("");
+    expect(centre).toHaveTextContent(props.centre);
+    const laptopScreen = centre.querySelector("[data-desk-screen]") as HTMLElement;
+    expect(laptopScreen).toHaveAttribute("aria-hidden", "true");
+    expect(laptopScreen.textContent).toBe("");
   });
 });
 
-/**
- * I materiali. Una maschera CSS dipinge un colore solo: finche' la sagoma era
- * un file solo, foglio, scheda e telefono erano lo stesso grigio identico e i
- * quattro strati si leggevano come quattro contorni della stessa famiglia. Due
- * strati sono due superfici da colorare, ed e' il DOM a doverli portare,
- * perche' nel CSS un pieno che non ha dove appoggiarsi non esiste.
- */
 describe("i materiali", () => {
   it("ogni oggetto e' due strati: la superficie sotto, il tracciato sopra", () => {
     const { container } = render(<ServicesView {...props} />);
-    const oggetti = container.querySelectorAll(SOLI_VERI);
-    expect(oggetti.length).toBeGreaterThan(0);
-    for (const oggetto of oggetti) {
-      const sagoma = oggetto.querySelector("[data-desk-shape]") as HTMLElement;
-      expect(sagoma, "un oggetto senza sagoma").not.toBeNull();
-      expect(sagoma.querySelector("[data-desk-fill]")).not.toBeNull();
-      expect(sagoma.querySelector("[data-desk-line]")).not.toBeNull();
-      // L'ordine e' il disegno: il pieno viene PRIMA, o coprirebbe il tracciato
-      // che dovrebbe stargli sopra. Nessuno z-index: l'ordine e' quello del DOM.
-      expect(sagoma.children[0]).toHaveAttribute("data-desk-fill");
-      expect(sagoma.children[1]).toHaveAttribute("data-desk-line");
+    const objects = container.querySelectorAll(OBJECTS);
+    expect(objects.length).toBeGreaterThan(0);
+    for (const object of objects) {
+      const shape = object.querySelector("[data-desk-shape]") as HTMLElement;
+      expect(shape, "un oggetto senza sagoma").not.toBeNull();
+      expect(shape.querySelector("[data-desk-fill]")).not.toBeNull();
+      expect(shape.querySelector("[data-desk-line]")).not.toBeNull();
+      expect(shape.children[0]).toHaveAttribute("data-desk-fill");
+      expect(shape.children[1]).toHaveAttribute("data-desk-line");
     }
   });
 
   it("anche il laptop al centro: e' il pieno scuro che fa leggere acceso lo schermo", () => {
     const { container } = render(<ServicesView {...props} />);
-    const centro = container.querySelector(
+    const centre = container.querySelector(
       "[data-desk-world]:not([aria-hidden]) [data-desk-centre] [data-desk-shape]",
     ) as HTMLElement;
-    expect(centro.querySelector("[data-desk-fill]")).not.toBeNull();
-    expect(centro.querySelector("[data-desk-line]")).not.toBeNull();
+    expect(centre.querySelector("[data-desk-fill]")).not.toBeNull();
+    expect(centre.querySelector("[data-desk-line]")).not.toBeNull();
   });
 
   it("l'etichetta non e' dentro la sagoma: e' li' che l'ombra non la prende", () => {
-    // L'unico divieto esplicito di §4.4 bis: «un'ombra portata sulle sole
-    // superfici, MAI sull'etichetta». Il filtro sta su [data-desk-shape] (lo
-    // verifica il contratto in materials.test.ts) e non tocca l'etichetta
-    // soltanto perche' questa e' una SORELLA della sagoma, non una figlia.
-    // Portarla dentro (per esempio per farla ruotare insieme al disegno)
-    // lascerebbe verde tutto il resto e metterebbe un'ombra sotto ogni parola
-    // del tavolo, che non e' un tavolo: e' un banner.
+    // L'ombra sta su [data-desk-shape]: l'etichetta ne e' sorella e non figlia, o
+    // prenderebbe l'ombra anche lei.
     const { container } = render(<ServicesView {...props} />);
-    const etichette = container.querySelectorAll("[data-desk-label]");
-    expect(etichette.length).toBeGreaterThan(0);
-    for (const etichetta of etichette) {
-      expect(etichetta.closest("[data-desk-shape]")).toBeNull();
+    const labels = container.querySelectorAll("[data-desk-label]");
+    expect(labels.length).toBeGreaterThan(0);
+    for (const label of labels) {
+      expect(label.closest("[data-desk-shape]")).toBeNull();
     }
   });
 
   it("i led stanno sul rack e su nient'altro: sono colore vero, non una maschera", () => {
-    // Il colore non puo' venire dal file: una maschera porta una forma, non un
-    // colore. I led sono l'unico posto del tavolo dove serve dipingere qualcosa
-    // dentro un oggetto, e quindi l'unico che ha uno strato in piu'.
     const { container } = render(
       <ServicesView
         {...props}
@@ -249,23 +218,19 @@ describe("i materiali", () => {
         ]}
       />,
     );
-    const oggetti = [...container.querySelectorAll(SOLI_VERI)];
-    const rack = oggetti.find((el) => el.getAttribute("data-shape") === "rack") as HTMLElement;
-    const foglio = oggetti.find((el) => el.getAttribute("data-shape") === "sheet") as HTMLElement;
+    const objects = [...container.querySelectorAll(OBJECTS)];
+    const rack = objects.find((el) => el.getAttribute("data-shape") === "rack") as HTMLElement;
+    const sheet = objects.find((el) => el.getAttribute("data-shape") === "sheet") as HTMLElement;
     expect(rack.querySelector("[data-desk-leds]")).not.toBeNull();
-    expect(foglio.querySelector("[data-desk-leds]")).toBeNull();
+    expect(sheet.querySelector("[data-desk-leds]")).toBeNull();
   });
 
   it("la sagoma sa che disegno e': la maschera pende da lei, non dall'oggetto", () => {
-    // Perche' questa prova esiste: le stesse sagome si usano fuori dal tavolo
-    // (le consegne di «Come lavoro», e prima «E in pratica?»). Finche' le
-    // maschere pendevano da [data-desk-object], un disegno la' non le
-    // prendeva, e dargli data-desk-object avrebbe rotto il conteggio dei
-    // ventiquattro, che e' una prova giusta. La sagoma sa gia' che disegno e':
-    // glielo si chiede.
+    // Le sagome si usano anche fuori dal tavolo, senza data-desk-object: la
+    // maschera deve pendere dalla sagoma.
     const { container } = render(<ServicesView {...props} />);
-    const sagoma = container.querySelector(`${SOLI_VERI} [data-desk-shape]`) as HTMLElement;
-    expect(sagoma).toHaveAttribute("data-shape", "sheet");
+    const shape = container.querySelector(`${OBJECTS} [data-desk-shape]`) as HTMLElement;
+    expect(shape).toHaveAttribute("data-shape", "sheet");
     const laptop = container.querySelector(
       "[data-desk-world]:not([aria-hidden]) [data-desk-centre] [data-desk-shape]",
     ) as HTMLElement;
@@ -276,7 +241,7 @@ describe("i materiali", () => {
 describe("il patto del fallback", () => {
   it("senza movimento si vede il tavolo completo: --p non scritta vale 1", () => {
     const { container } = render(<ServicesView {...props} />);
-    for (const el of container.querySelectorAll(SOLI_VERI)) {
+    for (const el of container.querySelectorAll(OBJECTS)) {
       const opacity = (el as HTMLElement).style.opacity;
       expect(opacity).toContain("var(--p, 1)");
     }
@@ -284,8 +249,8 @@ describe("il patto del fallback", () => {
 
   it("ogni oggetto porta la sua finestra: le opacità le calcola il CSS, non React", () => {
     const { container } = render(<ServicesView {...props} />);
-    const primo = container.querySelector(SOLI_VERI) as HTMLElement;
-    expect(primo.style.getPropertyValue("--from")).not.toBe("");
-    expect(primo.style.getPropertyValue("--span")).not.toBe("");
+    const first = container.querySelector(OBJECTS) as HTMLElement;
+    expect(first.style.getPropertyValue("--from")).not.toBe("");
+    expect(first.style.getPropertyValue("--span")).not.toBe("");
   });
 });

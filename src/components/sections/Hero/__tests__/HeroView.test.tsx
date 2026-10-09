@@ -17,11 +17,7 @@ const props = {
 
 describe("HeroView", () => {
   it("ha un solo h1, ed è testo vero: il nome col cognome e il mestiere", () => {
-    // Il nome e' disegnato, cioe' sei immagini con alt vuoto piu' un
-    // aria-label. Un motore di ricerca legge i nodi di testo e gli alt, non
-    // aria-label: l'h1 di questo sito era una stringa VUOTA, e il cognome non
-    // compariva in nessun titolo della pagina. Chi usa uno screen reader
-    // sentiva "Andrea" e basta. Adesso il testo c'e', e serve a tutti e due.
+    // Il nome e' fatto di immagini: l'h1 era vuoto per i motori di ricerca.
     const { container } = render(<HeroView {...props} />);
     const headings = screen.getAllByRole("heading", { level: 1 });
     expect(headings).toHaveLength(1);
@@ -35,22 +31,19 @@ describe("HeroView", () => {
   });
 
   it("le lettere del nome non aspettano il loro turno", () => {
-    // Sono l'elemento LCP della pagina, e uscivano con loading="lazy": il
-    // browser le metteva in coda proprio mentre le sta aspettando. Wordmark
-    // documentava gia' che `priority` e' "da attivare solo nell'hero", e
-    // nell'hero non era attivato.
+    // Sono l'elemento LCP, e uscivano con loading="lazy".
     const { container } = render(<HeroView {...props} />);
-    const lettere = container.querySelectorAll("img.wordmark-letter");
-    expect(lettere.length).toBeGreaterThan(0);
-    for (const lettera of lettere) {
-      expect(lettera, "una lettera del nome e' ancora in coda").not.toHaveAttribute(
+    const letters = container.querySelectorAll("img.wordmark-letter");
+    expect(letters.length).toBeGreaterThan(0);
+    for (const letter of letters) {
+      expect(letter, "una lettera del nome e' ancora in coda").not.toHaveAttribute(
         "loading",
         "lazy",
       );
     }
   });
 
-  it("dice cosa fa e per chi: è ciò che nel prototipo mancava", () => {
+  it("dice cosa fa e per chi", () => {
     render(<HeroView {...props} />);
     expect(screen.getByText(props.claim)).toBeVisible();
     expect(screen.getByText(props.subclaim)).toBeVisible();
@@ -68,39 +61,27 @@ describe("HeroView", () => {
   });
 });
 
-/**
- * La carta del nome. Qui si prova quello che si puo' provare senza un browser:
- * che a riposo l'hero sia ESATTAMENTE quello di prima. Il gesto (la piega, la
- * pallina, il volo) vive solo a livello "full", e nei test il livello e'
- * sempre "none": una prova che fingesse di esercitarlo certificherebbe il
- * nulla. Quello che si puo' provare sta in carta/__tests__, dove la geometria
- * e la fisica sono pure.
- */
+// Il gesto vive solo a "full" e qui il livello e' "none": geometria e fisica si provano in paper/__tests__.
 describe("la carta del nome", () => {
   it("lo strato c'e', ed e' muto", () => {
     const { container } = render(<HeroView {...props} />);
-    const strato = container.querySelector("[data-carta]");
-    expect(strato).not.toBeNull();
-    expect(strato).toHaveAttribute("aria-hidden", "true");
+    const layer = container.querySelector("[data-paper]");
+    expect(layer).not.toBeNull();
+    expect(layer).toHaveAttribute("aria-hidden", "true");
   });
 
   it("senza movimento non tocca una sola lettera", () => {
-    // Il patto: a "none" (cioe' in SSR, al primo render, senza JavaScript e
-    // con la riduzione del movimento accesa) l'hero e' quello di sempre.
-    // Nessuna tela, nessuno stile appiccicato alle immagini.
+    // A "none" (SSR, primo render, movimento ridotto) nessuna tela e nessuno stile sulle immagini.
     const { container } = render(<HeroView {...props} />);
-    expect(container.querySelectorAll("[data-carta-lettera], [data-carta-pezzo]")).toHaveLength(0);
+    expect(container.querySelectorAll("[data-paper-letter], [data-paper-piece]")).toHaveLength(0);
     for (const img of container.querySelectorAll(".wordmark-letter")) {
       expect((img as HTMLElement).style.opacity).toBe("");
     }
-    expect(document.body).not.toHaveAttribute("data-carta-presa");
+    expect(document.body).not.toHaveAttribute("data-paper-grabbed");
   });
 
   it("il nome resta leggibile a chi non vede lo schermo", () => {
-    // Le lettere sono immagini, e la carta che si appallottola gioca con
-    // quelle: il nome deve sopravvivere a qualunque cosa faccia. Adesso lo
-    // porta il testo dell'h1 e non piu' l'aria-label del wordmark, che dentro
-    // un titolo che ha gia' il suo testo sarebbe una ripetizione.
+    // La carta gioca con le immagini: il nome lo porta il testo dell'h1.
     render(<HeroView {...props} />);
     expect(
       screen.getByRole("heading", { level: 1, name: props.heading }),
