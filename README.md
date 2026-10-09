@@ -1,45 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# andreaghidara.dev
 
-## Getting Started
+Il portfolio di Andrea Ghidara, sviluppatore web. È online su
+[www.andreaghidara.dev](https://www.andreaghidara.dev), in italiano e in inglese.
 
-First, run the development server:
+È una pagina sola, fatta di sezioni:
+
+- l'apertura, con il foglio che le scivola sopra;
+- lo scontrino dei servizi;
+- il tavolo degli attrezzi, che sul telefono diventa un gioco in quattro livelli;
+- l'archivio dei lavori;
+- il percorso dal 2023 a oggi;
+- il bancone delle notizie;
+- i contatti.
+
+## Stack
+
+- [Next.js 15](https://nextjs.org) (App Router, Turbopack), React 19 e TypeScript.
+- [next-intl](https://next-intl.dev) per l'italiano e l'inglese: i testi stanno in `messages/it.json` e `messages/en.json`.
+- [GSAP](https://gsap.com) e [Lenis](https://lenis.darkroom.engineering) per le animazioni e lo scorrimento.
+- Tailwind CSS 4 e fogli CSS globali, uno per sezione.
+- [Resend](https://resend.com) per il modulo dei contatti; react-hook-form e zod per la validazione.
+- [Vitest](https://vitest.dev) e Testing Library per i test.
+- Pubblicato su Vercel.
+
+## Avvio
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3777](http://localhost:3777) with your browser to see the result.
+Il sito risponde su [http://localhost:3777](http://localhost:3777) e reindirizza a `/it`.
 
-The dev server runs on **3777** and `npm start` on **3778**, not on the usual 3000:
-so the project can sit next to another one without fighting for the port. The
-number is the `23.777` written on the grey post-it of the desk section, which is
-easier to remember than a random one. Both are overridable:
+Il server di sviluppo usa la porta **3777** e `npm start` la **3778**, non la solita 3000. Così il progetto può girare accanto a un altro senza contendersi la porta. Il numero è il `23.777` scritto sul post-it grigio del tavolo, più facile da ricordare di uno a caso. Si possono cambiare tutte e due:
 
 ```bash
 PORT=4000 npm run dev
 ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Variabili d'ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Vanno in un file `.env` nella radice del progetto, che git ignora.
 
-## Learn More
+| Variabile | Serve a | Obbligatoria |
+|---|---|---|
+| `RESEND_API_KEY` | spedire i messaggi del modulo dei contatti | sì, senza la pagina non si avvia |
+| `GITHUB_TOKEN` | alzare il limite di richieste verso l'API di GitHub nel bancone delle notizie | no |
 
-To learn more about Next.js, take a look at the following resources:
+## Comandi
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Comando | Cosa fa |
+|---|---|
+| `npm run dev` | server di sviluppo sulla 3777 |
+| `npm run build` | build di produzione |
+| `npm start` | serve la build sulla 3778 |
+| `npm run typecheck` | controllo dei tipi |
+| `npm run lint` | ESLint |
+| `npm test` | tutti i test, una volta |
+| `npm run test:watch` | test in ascolto |
+| `npm run assets` | rigenera le immagini in `public/` partendo da `assets-source/` e dagli script in `scripts/` |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Struttura
 
-## Deploy on Vercel
+```
+messages/                testi in italiano e in inglese
+assets-source/           immagini originali, prima della conversione
+scripts/                 generano gli asset in public/ e src/content/works-shots.ts
+src/
+  app/                   layout, pagina, immagine Open Graph, sitemap
+    api/notizie/         la raccolta delle notizie per il bancone
+  components/
+    sections/            una cartella per sezione (Hero, Receipt, Services, Works, ...)
+    shell/               navigazione, scorrimento, tema e lingua
+    brand/               firma, avatar e segni grafici
+  content/               i dati del sito: lavori, percorso, servizi, attrezzi
+  lib/news/              le fonti delle notizie e la loro raccolta
+  animations/            preset GSAP e utilità di movimento
+  styles/
+    tokens.css           colori, misure e tipografia
+    sections/            un foglio per sezione
+    game/                i fogli del gioco
+  test/                  strumenti comuni ai test
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Convenzioni
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Il codice è in inglese: nomi di file, componenti, variabili, attributi `data-*` e classi CSS.
+- I commenti sono in italiano e dicono solo il perché che il codice non dice, in poche righe.
+- I testi visibili stanno nei messaggi, in tutte e due le lingue.
+- Niente trattino lungo, in nessun testo: un test lo controlla in `src/`, `scripts/` e `messages/`.
+- Prima di un commit: `npm run typecheck`, `npm run lint` e `npm test`.
